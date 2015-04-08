@@ -1,0 +1,430 @@
+import QtQuick 2.0
+import QtQuick.Controls 1.0
+import QtQuick.Dialogs 1.0
+import MComponents 1.0
+import Audio 1.0
+import QtQuick.Controls.Styles 1.2
+import MPlotModule 1.0
+import Managers 1.0
+import Analysis 1.0
+
+MForm{
+    //@@@@@@@@@@    Definitions     @@@@@@@@@@
+    signal back
+
+    //@@@@@@@@@@    Properties      @@@@@@@@@@
+    id : rootAna
+    background: Images.analysis
+    visible:whoIsVisilbe===name?true:false
+    Component.onCompleted: iniTime.start(100)
+
+    //@@@@@@@@@@    Functions       @@@@@@@@@@
+    function openFile(file)
+    {
+        mngData.loadFile(file)
+        plot.setAbsXmin(mngData.getStartTime())
+        plot.setAbsXmax(mngData.getEndTime())
+        player.visible=audioPlayer.loadSignalFromFile(file)
+    }
+
+    function loadConfiguration(file)
+    {
+        mngCon.fileName=file
+        mngCon.read()
+    }
+
+    function storeInfo(info)
+    {
+        organizer.storeNews(info)
+    }
+
+    function initialize()
+    {
+        organizer.addModel("Track",traMod.strList)
+        organizer.addModel("Marker",marMod.strList)
+        organizer.addModel("Definer",fraMod.strList)
+        mngCon.read()
+        plot.popola()
+    }
+
+    function save(pointer)
+    {
+        dopAna.addSignals(pointer)
+    }
+
+    //@@@@@@@@@@    Objects     @@@@@@@@@@
+    Timer{id:iniTime;onTriggered: initialize()}
+
+    DopplerAnalysis{
+        //@@@@@@@@@@    Properties      @@@@@@@@@@
+        id: dopAna
+
+        //@@@@@@@@@@    Events          @@@@@@@@@@
+        onAnalysisNewsChanged:{
+            organizer.storeNews(analysisNews)
+            if(box.ready)
+            {
+                plot.tracks=organizer.getData("Track")
+                plot.markers=organizer.getData("Marker")
+                plot.frames=organizer.getData("Definer")
+                plot.limits=organizer.getPlotLimits();
+            }
+        }
+    }
+
+    MOrganizer{
+        //@@@@@@@@@@    Properties      @@@@@@@@@@
+        id:organizer
+
+        //@@@@@@@@@@    Events          @@@@@@@@@@
+        onInfoListChanged:
+        {
+            plot.tracks=organizer.getData("Track")
+            plot.markers=organizer.getData("Marker")
+            plot.frames=organizer.getData("Definer")
+            plot.limits=organizer.getPlotLimits();
+        }
+        onSaveStoreChanges: mngData.saveChanges(organizer.storage())
+    }
+
+
+
+    /*@@@@@@@@@@@@@@@@@@@@
+      MAudioFileManager{
+
+
+
+      }
+    */
+
+    //@@@@@@@@@@--- Player @@@@@@@@@@@@@@@@@@@@@@@@@@@@@@------
+    MPlayer{
+        //@@@@@@@@@@    Properties      @@@@@@@@@@
+        id:audioPlayer
+
+        //@@@@@@@@@@    Events          @@@@@@@@@@
+        onEndReached:player.playClick()
+        onSliderPosChanged:
+        {
+            plot.timeMarker=sliderPos/1000
+            player.sliderPos=sliderPos
+        }
+    }
+
+    Player{
+        //@@@@@@@@@@    Properties      @@@@@@@@@@
+        id:player
+        height:visible?50:0
+        width:rootAna.width
+        startPos: audioPlayer.startPos
+        endPos: audioPlayer.endPos
+        duration: audioPlayer.duration
+
+        //@@@@@@@@@@    Events          @@@@@@@@@@
+        onSliderPosChanged:
+        {
+            plot.timeMarker=sliderPos/1000
+            audioPlayer.sliderPos=sliderPos
+        }        
+        onPlay:audioPlayer.startPlaying()
+        onPause:audioPlayer.suspendPlaying()
+    }
+
+    MPlot2DStack {
+        //@@@@@@@@@@    Properties      @@@@@@@@@@
+        id: plot
+        clip:true
+        anchors.bottom: parent.bottom
+        anchors.left: parent.left
+        anchors.right: box.left
+        Behavior on width {NumberAnimation { duration: 1000 }}
+        height: rootAna.height - 30 - player.height
+        plotProp:mngCon.plotSetting
+
+        //@@@@@@@@@@    Events          @@@@@@@@@@
+        onTimeMarkerChanged:if(!player.playing)
+                            {
+                                player.sliderPos=timeMarker*1000
+                                audioPlayer.sliderPos=timeMarker*1000
+                            }
+        //onSaveMeChanged: mngTra.saveThis(saveMe)
+        //onTracksChanged:console.log("draw these",tracks)
+        onCurObjChanged: {
+            organizer.changeObject(curObj)
+            plot.tracks=organizer.getData("Track")
+            plot.markers=organizer.getData("Marker")
+            plot.frames=organizer.getData("Definer")
+        }
+    }
+
+    //@@@@@@@@@@--- Dialogs and Selectors@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@------
+
+    MDialog{
+        //@@@@@@@@@@    Properties      @@@@@@@@@@
+        id:plotDial
+        anchors.centerIn: plot
+        width: plot.width*0.8
+        height: plot.height*0.8
+        dataList: organizer.availableData
+        plotList: mngCon.plotList
+        trackList: organizer.availableTracks
+
+        //@@@@@@@@@@    Events          @@@@@@@@@@
+        onReady:organizer.infoList=news
+    }
+
+    FileDialog{
+        //@@@@@@@@@@    Definitions     @@@@@@@@@@
+        property string owner:"none"
+
+        //@@@@@@@@@@    Properties      @@@@@@@@@@
+        id: fileDial
+
+        //@@@@@@@@@@    Events          @@@@@@@@@@
+        onAccepted:
+        {
+            switch(owner)
+            {
+            case "mngData":
+                mngData.loadFile(fileUrl)
+                plot.setAbsXmin(mngData.getStartTime())
+                plot.setAbsXmax(mngData.getEndTime())
+                player.visible=audioPlayer.loadSignalFromFile(fileUrl)
+                break;
+            case "mngCon":
+                mngCon.fileName=fileUrl
+                mngCon.read()
+                break;
+            default:console.log("Should Not Be Here!",owner);break;
+
+            }
+        }
+    }
+
+    MNewName{
+        //@@@@@@@@@@    Properties      @@@@@@@@@@
+        id:editName
+        height: 100
+        width:300
+        anchors.centerIn: parent
+        owner:""
+
+        //@@@@@@@@@@    Events          @@@@@@@@@@
+        onSelected: {
+            //a seconda di chi lo sta usando decido cosa fare
+            switch(owner)
+            {
+            case "NewObj": organizer.addCustomObj(selector.preChoices,curText,type);plotDial.visible=true;break;
+            default:break;
+            }
+            visible=false
+
+        }
+    }
+
+    MListSelector{
+        //@@@@@@@@@@    Properties      @@@@@@@@@@
+        id:selector
+        height: 300
+        width:300
+        anchors.centerIn: parent
+        owner:""
+
+        //@@@@@@@@@@    Events          @@@@@@@@@@
+        onOwnerChanged:
+        {
+            //a seconda di chi lo controlla decido come riempirlo
+            switch(owner)
+            {
+            case "audioPlayer": elements=audioPlayer.fileList();    break;
+            case "dopAna":      elements=mngData.availableTracks;   break;
+            case "family":      elements=organizer.getLinks("Families");
+                enableNew=false;
+                break;
+            case "name":        enableNew=true;break;
+            default:break;
+            }
+        }
+        onSelected: {
+            //a seconda di chi lo sta usando decido cosa fare
+            switch(owner)
+            {
+            case "audioPlayer": player.enabled=audioPlayer.loadSignalFromName(curText); owner="";break;
+            case "dopAna":      dopAna.currentSignal=organizer.getSignal(curText);      owner="";break;
+            case "family":
+                title="Choose or create an element"
+                elements=organizer.getLinks("Names",choices,type);
+                //organizer.addCustomObj(choices,type);
+                //plotDial.visible=true;
+                owner="name";break;
+            default:break;
+            }
+
+        }
+        onNuovo: {
+            switch(owner)
+            {
+            case "name":
+                editName.owner="NewObj"
+                editName.type=type
+                editName.setDefText("New Name")
+                editName.visible=true
+                owner="";
+                break;
+            }
+        }
+
+    }
+
+    //Models
+
+    MarkerModel{id:marMod}
+    FrameModel{id:fraMod}
+    TrackModel{id:traMod}
+    ParameterModel{id:parMod}
+
+    //Managers
+
+    ParameterManager{
+        //@@@@@@@@@@    Properties      @@@@@@@@@@
+        id:mngPar
+        roles:parMod.strList
+        lastParMod:box.valueNews
+
+        //@@@@@@@@@@    Events          @@@@@@@@@@
+        onLastParModChanged: {
+            dopAna.analyze(mngPar.curAnalysis,mngPar.curPar)
+        }
+    }
+
+    ConfigManager{id:mngCon}
+
+    //@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@---------
+
+    ParameterBox{
+        //@@@@@@@@@@    Properties      @@@@@@@@@@
+        id:box
+        anchors.bottom: parent.bottom
+        anchors.right: parent.right
+        width:0
+        height: root.height - 30 - player.height
+        Behavior on width {NumberAnimation { duration: 1000 }}
+
+        //@@@@@@@@@@    Events          @@@@@@@@@@
+        onUpdate: {
+            dopAna.analyze(mngPar.curAnalysis,mngPar.curPar)
+            plotDial.visible=true
+        }
+
+
+    }
+    //@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@-
+    MMenuBar {
+        //@@@@@@@@@@    Properties      @@@@@@@@@@
+        id: mainMenu
+        anchors.top: parent.top
+        color: "transparent"
+        height: root.height
+        width: root.width
+        opacity: rootAna.opacity
+        theme: "red"
+        items: [
+            ["File","Open Audio","Open Exam","Salva","Back"],
+            ["Add","Data to Plot","New Marker","New Definer"],
+            ["Select Signal","To Analyze","To Play"],
+            ["Analisys","Spectrum","Time Warping","Energy","Time Spectrum"],
+            ["Player","Show Player Audio"],
+            ["Plot","Load Settings"]
+        ]
+
+        //@@@@@@@@@@    Events          @@@@@@@@@@
+        onSelected: {
+            dopAna.handleMenu(itemClicked)
+            if (itemClicked == "Open Audio") {
+                fileDial.owner="mngData"
+                fileDial.folder="../../ProgettoDoppler/Exams/Audio di Prova"
+                fileDial.setNameFilters("*.wav")
+                fileDial.open()
+            }
+            if (itemClicked == "Open Exam") {
+                fileDial.owner="mngData"
+                fileDial.folder="../../ProgettoDoppler/Exams"
+                fileDial.setNameFilters("*.pic")
+                fileDial.open()
+            }
+            if (itemClicked == "Salva")
+            {
+                organizer.save()
+            }
+            if (itemClicked == "Back") {
+                rootAna.back()
+            }
+            //Add
+            if (itemClicked == "Data to Plot")
+                plotDial.visible=true
+            if (itemClicked == "New Marker")
+            {
+                selector.type="Marker"
+                selector.owner="family"
+                selector.title="Choose a family"
+                selector.multipleChoice=true
+            }
+            if (itemClicked == "New Definer")
+            {
+                selector.type="Definer"
+                selector.owner="family"
+                selector.title="Choose a family"
+                selector.multipleChoice=true
+            }
+
+            //if (itemClicked == "Cursors")
+            //mngMar.addMarker(["$Marker","doppler","number",Func.newId(),"&Marker"])
+
+            if (itemClicked == "Analysis")
+            {
+                plotDial.visible=true
+            }
+            //Player
+            if (itemClicked == "Show Player Audio")
+                player.height=50
+
+            //Select
+            if (itemClicked == "To Play")
+            {
+                selector.owner="audioPlayer"
+            }
+            if (itemClicked == "To Analyze")
+            {
+                selector.owner="dopAna"
+            }
+            //Analysis
+
+            var str=items[3];
+            if (str.indexOf(itemClicked)!==-1)
+            {
+                mngPar.curAnalysis=itemClicked
+
+                box.ready=false
+                box.currentAna=itemClicked
+                box.items=mngPar.items
+                box.width=parent.width/2
+                box.popola()
+                box.ready=true
+            }
+
+            //Settings
+            if (itemClicked == "Load Settings")
+            {
+                fileDial.owner="mngCon"
+                fileDial.folder="../../ProgettoDoppler/Doppler/Config"
+                fileDial.setNameFilters("*.xml")
+                fileDial.open()
+            }
+
+
+
+        }
+    }
+
+
+}

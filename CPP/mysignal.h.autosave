@@ -1,0 +1,116 @@
+#ifndef MYSIGNAL_H
+#define MYSIGNAL_H
+
+
+//#include <tabble.h>
+#include <QVector>
+#include <QPointF>
+#include <QPolygonF>
+#include <QString>
+
+//#define pi 3.14159
+/**
+ * @brief The signal class Questa classe serve per definire un segnale generito provvisto di
+ *un tempo di campionamento dt e di una dimensione size. Prevede inoltre l'implementazione di
+ * diverse funzioni utili alla sua analisi come minimo e massimo, valor medio e molte altre
+ */
+class MSignal
+{
+public:
+    //Proprietà generali del segnale generico
+    MSignal();
+    mysignal(int s);
+    double t0;
+    void setVal(int i,double v);
+    int getSize();
+    double getDuration();
+    void setSize(int n);
+    double getVal(int i);
+    void setFc(double f);
+    double getFc(void);
+    double getDt();
+    void setDt(double t);
+    double getT(int i);
+    void attach(mysignal *s);
+    void cut(int from, int count);
+
+    //Operazioni particolari
+    void normalize(void);
+    void zeroPad(int z);
+    void addSilenceTo(int s);
+    double mean(void);
+    double minimo(void);
+    double massimo(void);
+    double sum(void);
+    void Operator(mysignal,char);
+    void Operator(double v,char);
+    void Windowing(mysignal w);
+    void setOffset(double o);
+    void setGain(double g);
+    mysignal getSection(int start,int length);
+    mysignal clone();
+    void Hamming();
+    void filter(QVector<double> *bb,QVector<double> *aa);
+    QPolygonF toPoly();
+    int id;
+    QString name;
+
+protected:
+    QVector<double> val;
+    int size;
+    double off;
+    double gain;
+    double dt;
+    double Fc;
+};
+/**
+ * @brief The wavelet class
+ */
+class wavelet : public mysignal
+{
+public:
+
+    wavelet();
+    /// imposta l'ampiezza della wavelet
+    void setAmplitude(double amp){a=amp;build();}
+    /// imposta il tipo di wavelet
+    void setType(int ty){type=ty;build();}
+    void setSpan(double spa){span=spa;build();}
+
+    double getAmplitude(){return a;}
+    int getType(){return type;}
+    double getSpan(){return span;}
+    int begin(){return b;}
+    int end(){return e;}
+    int dimension(){return dim;}
+
+private:
+    void build();
+    double span;
+    double a;
+
+    int type;
+    int b;
+    int e;
+    int dim;
+
+};
+/**
+ * @brief The sine class
+ */
+class sine : public mysignal
+{
+public:
+    sine(){frec=1;phase=0;amp=1;}
+    void setFrequency(double f){frec=f;build();}
+    void setInitPhase(double p){phase=(p*3.14159)/180;build();}
+    void setAmplytude(double a){amp=a;build();}
+private:
+    double frec;
+    double phase;
+    double amp;
+    void build();
+};
+
+
+#endif // SIGNAL_H

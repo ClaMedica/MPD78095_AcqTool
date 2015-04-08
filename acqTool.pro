@@ -1,0 +1,103 @@
+TEMPLATE = app
+
+QT += qml quick widgets sql multimedia network
+
+RESOURCES += qml.qrc
+
+# Additional import path used to resolve QML modules in Qt Creator's code model
+QML_IMPORT_PATH +=   ../Build/CommonPlugin \
+                    ../UsefulOBJ \
+                    ../UsefulOBJ/MComponents/images.js\
+                    QML
+
+QT +=multimedia
+QT +=xml
+QT +=core
+# The .cpp file which was generated for your project. Feel free to hack it.
+SOURCES += main.cpp \
+    CPP/maudio.cpp \
+    CPP/mplayer.cpp \
+    CPP/functionhandler.cpp \
+    CPP/parametermanager.cpp \
+    CPP/tabble.cpp \
+    CPP/codebook.cpp \
+    ../MGlobal/msignal.cpp \
+    ../MGlobal/global.cpp \
+    CPP/mapmanager.cpp \
+    CPP/modelmanager.cpp \
+    CPP/mdatafilemanager.cpp \
+    CPP/mdatastorage.cpp \
+    CPP/morganizer.cpp \
+    CPP/doppleranalysis.cpp \
+    CPP/TCP/SimpleTCPChannel.cpp \
+    CPP/TCP/SimpleTCPClient.cpp \
+    CPP/TCP/TcpServers.cpp \
+    CPP/TCP/TcpSettingFile.cpp \
+    ../MGlobal/ancestry.cpp
+
+HEADERS += \
+    CPP/maudio.h \
+    CPP/mplayer.h \
+    CPP/functionhandler.h \
+    CPP/parametermanager.h \
+    CPP/tabble.h \
+    CPP/codebook.h \
+    ../MGlobal/global.h \
+    ../MGlobal/msignal.h \
+    CPP/mapmanager.h \
+    CPP/modelmanager.h \
+    CPP/mdatafilemanager.h \
+    CPP/mdatastorage.h \
+    CPP/morganizer.h \
+    CPP/doppleranalysis.h \
+    CPP/TCP/SimpleTCPChannel.h \
+    CPP/TCP/SimpleTCPClient.h \
+    CPP/TCP/TcpServers.h \
+    CPP/TCP/TcpSettingFile.h \
+    ../MGlobal/ancestry.h
+
+
+
+OTHER_FILES += \
+    QML/MyForms/AnalysisForm.qml \
+    QML/MyForms/RealTimeForm.qml \
+    QML/MyForms/HomeForm.qml \
+    ../../UsefulOBJ/MComponents/MButton.qml \
+    ../../UsefulOBJ/MComponents/MMenu.qml \
+    ../../UsefulOBJ/MComponents/MMenuBar.qml \
+    ../../UsefulOBJ/MComponents/MMenuButton.qml \
+    ../../UsefulOBJ/MComponents/MSubMenu.qml \
+    ../../UsefulOBJ/MComponents/MForm.qml \
+    QML/MTools/MDialog.qml
+
+INCLUDEPATH += CPP\
+                ../MGlobal \
+                ../Source/Libcpp \
+                ../Source/Plot \
+                ../Source/Plot/Tools \
+                ../Source/QML \
+                ../Source/QML/Models \
+                ../Source/QML/Tools \
+                ../DataFileManager \
+                CPP/TCP \
+                ../CellaBluetooth/Supervisor
+
+# Default rules for deployment.
+include(deployment.pri)
+
+win32:CONFIG(release, debug|release): LIBS += -L$$PWD/../Build/DataBuild/release/ -lDatafileManager1
+else:win32:CONFIG(debug, debug|release): LIBS += -L$$PWD/../Build/DataBuild/debug/ -lDatafileManager1
+
+INCLUDEPATH += $$PWD/../Build/DataBuild/release
+DEPENDPATH += $$PWD/../Build/DataBuild/release
+
+DISTFILES += \
+    ../UsefulOBJ/MComponents/MDialog.qml \
+    ../UsefulOBJ/MComponents/MGridView.qml \
+    ../UsefulOBJ/MComponents/MListSelector.qml \
+    ../UsefulOBJ/MComponents/MMessageYesNo.qml \
+    ../UsefulOBJ/MComponents/MNewName.qml \
+    ../UsefulOBJ/MComponents/MPopUp.qml \
+    ../UsefulOBJ/MComponents/Parameter.qml \
+    ../UsefulOBJ/MComponents/ParameterBox.qml \
+    ../UsefulOBJ/MComponents/Player.qml
