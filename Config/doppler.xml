@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Doppler>
+<Graph name="doppler" repeat="3">
+<Margins topMargin="20"/>
+<Axis xAbsoluteMax="3600" xAbsoluteMin="0" yAbsoluteMax="1000" yAbsoluteMin="0" xALMajTextVisible="0" xALMinTextVisible="0"/>
+<Notches xNotchLenght="5" yNotchLenght="5"/>
+<Grid xGridLines="5" yGridLines="3" xSubGridLines="2" ySubGridLines="2"/>
+<Colors gridLineColor="blue" subGridLineColor="green"/>
+<TimeCursor enableTimeCursor="0"/>
+<Zoom zoomSpeed="0.3"/>
+</Graph>
+</Doppler>

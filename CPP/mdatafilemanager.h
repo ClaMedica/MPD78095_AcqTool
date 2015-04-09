@@ -23,6 +23,7 @@ public:
     Q_PROPERTY(MOrganizer* organizer READ organizer NOTIFY organizerChanged)
     Q_PROPERTY(QVariantList infoList READ infoList WRITE setInfoList NOTIFY infoListChanged)
     Q_PROPERTY(QVariantList dataNews READ dataNews NOTIFY dataNewsChanged)
+    Q_PROPERTY(QVariantList alarms READ alarms NOTIFY alarmsChanged)
     Q_PROPERTY(QStringList availableTracks READ availableTracks NOTIFY availableTracksChanged())
     Q_PROPERTY(QStringList availableData READ availableData NOTIFY availableDataChanged)
     Q_PROPERTY(QString currentSignal READ currentSignal WRITE setCurrentSignal NOTIFY currentSignalChanged)
@@ -34,6 +35,7 @@ public:
 
     MOrganizer *organizer();
     QVariantList infoList(){return m_org->infoList();}
+    QVariantList alarms(){return m_alarmList;}
     void setInfoList(QVariantList __list);
 
     QVariantList dataNews();
@@ -56,6 +58,7 @@ public:
 signals:
     void dataNewsChanged();
     void availableDataChanged();
+    void alarmsChanged();
     void availableTracksChanged();
     void currentSignalChanged();
     void organizerChanged();
@@ -73,14 +76,20 @@ public slots:
     void createOrganizer();
     void saveChanges(QVariant __storage);
     bool newAcquisition(QString __newName="", QVariantList __info=QVariantList());
+    void connectToServers();
     void startSupe();
     void saveAcquisition();
     void deleteAcquisition();
     void addMarker(QVariant __key, QVariant __descr);
-    void addDefiner(bool __startEnd,QVariantList __info);
+    void addDefiner(bool __startEnd,QVariantList __info);    
+    bool sendStartAcq(void){return sendCommand(1);}
+    bool sendStopAcq (void){return sendCommand(3);}
+    void addAlarm(int __code);
+    void resetAlarms();
+
+private slots:
     bool sendCommand(tcp_flow_bt_cmd_t __command);
     bool sendCommand(int __command){return sendCommand((tcp_flow_bt_cmd_t)__command);}
-
 private:
     QVector<MSignal *> m_signalVector;
 
@@ -111,7 +120,7 @@ private:
 
     DatafileManager *m_mng,*m_copy;
 
-    QVariantList m_morphPointer,m_infoList;
+    QVariantList m_morphPointer,m_infoList,m_alarmList;
 
     MOrganizer *m_org;
 
@@ -119,7 +128,7 @@ private:
 
     SimpleTCPChannel *m_visualChannel,*m_commandChannel;
 
-    QVector<VarMap> m_acqMarker;
+    QVector<VarMap> m_acqMarker,m_alarms;
 
     Ancestry m_configuration;
 
@@ -128,11 +137,14 @@ private:
     QProcess *m_superProcess;
 
     void updateAvailableData();
+    void updateAlarms();
     void handleTCP(SimpleTCPClient *__client, QByteArray __block);
     void initializeServers();
     bool loadConfiguration(QString __name);
     void saveConfiguration();
     bool loadConnectivityInfo(Ancestry *__info);
+    void analyzeStatus(flowBT_status_t __status);
+    void analyzeAlarms(alarms_t __alarms);
 
 };
 

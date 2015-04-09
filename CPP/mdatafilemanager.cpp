@@ -19,6 +19,8 @@ MDataFileManager::MDataFileManager(QObject *parent) :
     m_configurationFileLoaded=false;//nessun file di configurazione caricato
     m_oldSample=0;
     m_superProcess=NULL;
+    m_visualChannel=NULL;
+    m_commandChannel=NULL;
 }
 
 MDataFileManager::~MDataFileManager()
@@ -31,8 +33,26 @@ MDataFileManager::~MDataFileManager()
 
     if(m_superProcess!=NULL)
     {
-        m_superProcess->kill();
-        delete m_superProcess;
+        m_superProcess->close();
+        if(m_superProcess->waitForFinished())
+            delete m_superProcess;
+    }
+
+    if(m_visualChannel!=NULL)
+    {
+        delete m_visualChannel;
+    }
+
+    if(m_commandChannel!=NULL)
+    {
+        delete m_commandChannel;
+    }
+
+    if(m_tcp.values().size()>0)
+    {
+        foreach (SimpleTCPClient * cur, m_tcp.values()) {
+            delete cur;
+        }
     }
     //    for(int i=0;i<m_signalVector.size();i++)
     //        if(m_signalVector[i]!=NULL)
@@ -274,7 +294,9 @@ void MDataFileManager::loadFile(QString __fileName)
             MSignal *sig=new MSignal;
             sig->setSize(m_mng->GetSamplesNumber(h));
             for(int i=0;i<m_mng->GetSamplesNumber(h);i++)
+            {
                 sig->setValue(i,m_mng->GetValue(h,i));
+            }
             sig->setName(m_mng->GetChanName(h));
             sig->setSamplingFrequency(m_mng->GetNAS(h));
             float M=sig->maximum();
@@ -608,14 +630,10 @@ bool MDataFileManager::newAcquisition(QString __newName,QVariantList __info)
             m_acqInProgress=true;//mi segno che sono in acquisizione
 
             //mi connetto ai server
-            foreach (SimpleTCPClient *client, m_tcp) {
-                client->registerDataReadyCallBack(&(this->dataOnTCP));
-                if(client->connectToHost())
-                    qDebug()<<"connesso "
-                           <<client->hostAddress().toString()
-                          <<client->hostPort();
-            }
+            QTimer::singleShot(500,this,SLOT(connectToServers()));
 
+            //partiamo
+            QTimer::singleShot(5000,this,SLOT(sendStartAcq()));
             //sendCommand(ETCP_CMD_START);//spedisco il comando su tcp al modulo di acq
         }
         else
@@ -628,12 +646,24 @@ bool MDataFileManager::newAcquisition(QString __newName,QVariantList __info)
     return true;
 }
 
+void MDataFileManager::connectToServers()
+{
+    //mi connetto ai server
+    foreach (SimpleTCPClient *client, m_tcp) {
+        client->registerDataReadyCallBack(&(this->dataOnTCP));
+        if(client->connectToHost())
+            qDebug()<<"connesso "
+                   <<client->hostAddress().toString()
+                  <<client->hostPort();
+    }
+}
+
 void MDataFileManager::startSupe()
 {
     m_superProcess=new QProcess();
 
-    QString path="M:/Lavoro/Software/Build/StandAlone/release/";
-    m_superProcess->start(path+"FlowBtSupe.exe");
+    QString path="M:/Lavoro/Software/Build/StandAlone/";
+    m_superProcess->start(path+"FlowBtSupe.exe",QStringList()<<"hde");
 
 }
 
@@ -683,6 +713,29 @@ void MDataFileManager::addDefiner(bool __startEnd, QVariantList __info)
 
 }
 
+void MDataFileManager::addAlarm(int __code)
+{
+    VarMap ala;
+
+    foreach (VarMap raisedAlarms, m_alarms) {
+        if(raisedAlarms["code"]==__code)
+            return;
+    }
+    ala["code"]=__code;
+    ala["message"]="Help me!! code "+QString::number(__code);
+    ala["help"]="I don't care";
+    ala["color"]="red";
+
+    m_alarms.append(ala);
+    updateAlarms();
+}
+
+void MDataFileManager::resetAlarms()
+{
+    m_alarms.clear();
+    updateAlarms();
+}
+
 void MDataFileManager::dataOnTCP(QObject *__pParent, SimpleTCPClient *__pTCP, QByteArray __block)
 {//arriviamo qua dentro ogni volta che arriva qualcosa da uno dei server a cui siamo collegati
 
@@ -708,7 +761,26 @@ void MDataFileManager::updateAvailableData()
         m_availableData<<"&Group";
     }
 
+    //qDebug()<<"m_availableData = "<<m_availableData;
     emit availableDataChanged();
+}
+
+void MDataFileManager::updateAlarms()
+{
+    m_alarmList.clear();
+
+    foreach (VarMap alarm, m_alarms) {
+        m_alarmList<<"$Alarm";
+        foreach(QString key,alarm.keys())
+        {
+            m_alarmList<<key;
+            m_alarmList<<alarm[key];
+        }
+        m_alarmList<<"&Alarm";
+    }
+
+    //qDebug()<<"m_alarmList = "<<m_alarmList;
+    emit alarmsChanged();
 }
 
 void MDataFileManager::handleTCP(SimpleTCPClient *__client, QByteArray __block)
@@ -719,8 +791,16 @@ void MDataFileManager::handleTCP(SimpleTCPClient *__client, QByteArray __block)
         //qDebug()<<who<<__block;
         if(who=="STA")
         {//allora è uno stato
+            flowBT_status_t status;
+            alarms_t alarms;
+            uint i=0;
+            for(i = 0; i < sizeof(flowBT_status_t); i++)
+                ((qint8*)(&status))[i]=__block[i];
+            for(uint j = i; j < sizeof(alarms_t)+i; j++)
+                ((qint8*)(&alarms))[i]=__block[j-i];
 
-
+            analyzeStatus(status);
+            analyzeAlarms(alarms);
         }
         /*
         if(who=="CMD")
@@ -821,8 +901,11 @@ void MDataFileManager::handleTCP(SimpleTCPClient *__client, QByteArray __block)
                         }
                         else
                             v=m_oldSample;
-                        m_mng->AppendValue(&currChan,&v,1);
+
+
                         out << (qreal)v;
+                        qDebug()<<v;
+                        m_mng->AppendValue(&currChan,&v,1);
                     }
                 }
                 else
@@ -908,6 +991,23 @@ bool MDataFileManager::loadConnectivityInfo(Ancestry *__info)
 
     emit connectivityInfoChanged();
     return true;
+}
+
+void MDataFileManager::analyzeStatus(flowBT_status_t __status)
+{
+    qDebug()<<__status.currState;
+    switch(__status.currState)
+    {
+        case ESTATE_IDLE_NOT_CONNECTED:
+        addAlarm(0);
+        break;
+        default:break;
+    }
+}
+
+void MDataFileManager::analyzeAlarms(alarms_t __alarms)
+{
+
 }
 
 bool MDataFileManager::sendCommand(tcp_flow_bt_cmd_t __command)

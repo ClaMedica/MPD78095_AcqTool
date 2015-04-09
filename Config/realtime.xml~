@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Doppler>
+<Graph name="doppler">
+<Axis yAbsoluteMax="32768" yAbsoluteMin="0"/>
+<Notches xNotchLenght="5" yNotchLenght="5"/>
+<Grid xGridLines="5" yGridLines="3" xSubGridLines="2" ySubGridLines="2"/>
+<Colors gridLineColor="blue" subGridLineColor="green" backgroundColor="black"/>
+<Time updateInterval="50"/>
+<Network serverPort="9000" serverAddress="127.0.0.1"/>
+<Track tName="quad" tColor="steelBlue" tThick="10"/>
+<Track tName="phase" tColor="yellow" tThick="2"/>
+</Graph>
+</Doppler>

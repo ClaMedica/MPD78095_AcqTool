@@ -82,11 +82,11 @@ MForm{
         {
             var configFile
             if(curText=="Cella Bluetooth")
-                configFile="../Doppler/Config/cella.xml"
+                configFile=configFolder+"cella.xml"
             if(curText=="Doppler")
-                configFile="../Doppler/Config/realtime.xml"
+                configFile=configFolder+"realtime.xml"
 
-            mngData.startSupe()
+
             forReal.configurationFile=configFile
             mngData.configurationFile=configFile
 

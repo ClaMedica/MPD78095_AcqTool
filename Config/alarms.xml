@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Root>
+	<Graphs>
+		<Cella>
+			<Tracks>
+				<Peso thick="5" color="white"/>
+			</Tracks>
+			<Properties>
+				<Network serverPort="9000" serverAddress="127.0.0.1"/>
+				<Time updateInterval="50" samplingFrq="10"/>
+				<Colors gridLineColor="blue" subGridLineColor="red" backgroundColor="black"/>
+				<Grid xGridLines="5" yGridLines="3" xSubGridLines="2" ySubGridLines="2"/>
+				<Notches xNotchLenght="5" yNotchLenght="5"/>
+				<Axis yAbsoluteMax="100" yAbsoluteMin="0"/>
+				<Cursors enableTracking="1"/>
+			</Properties>
+		</Cella>
+	</Graphs>
+	<Connections>
+		<TCP>
+			<CMD address="127.0.0.1" port="2001"/>
+			<VAL address="127.0.0.1" port="2000"/>
+		</TCP>
+	</Connections>
+</Root>

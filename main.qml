@@ -8,8 +8,9 @@ import Managers 1.0
 
 ApplicationWindow {
     //@@@@@@@@@@ Definitions @@@@@@@@@@
-    //property string workFolder:"../../Doppler/"
-   // property string examFolder:"../Exams/"
+    property string workFolder:"../../AcqTool/"
+    property string examFolder:workFolder+"Exams/"
+    property string configFolder:workFolder+"Config/"
 
     //@@@@@@@@@@    Properties      @@@@@@@@@@
     id: root

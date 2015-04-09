@@ -4,10 +4,13 @@ QT += qml quick widgets sql multimedia network
 
 RESOURCES += qml.qrc
 
+
+
 # Additional import path used to resolve QML modules in Qt Creator's code model
 QML_IMPORT_PATH +=   ../Build/CommonPlugin \
                     ../UsefulOBJ \
                     ../UsefulOBJ/MComponents/images.js\
+                    ../UsefulOBJ/MComponents/Models\
                     QML
 
 QT +=multimedia
@@ -100,4 +103,9 @@ DISTFILES += \
     ../UsefulOBJ/MComponents/MPopUp.qml \
     ../UsefulOBJ/MComponents/Parameter.qml \
     ../UsefulOBJ/MComponents/ParameterBox.qml \
-    ../UsefulOBJ/MComponents/Player.qml
+    ../UsefulOBJ/MComponents/Player.qml \
+    ../UsefulOBJ/MComponents/MAlarmBox.qml \
+    ../UsefulOBJ/MComponents/func.js \
+    ../UsefulOBJ/MComponents/images.js \
+    ../UsefulOBJ/MComponents/Models/AlarmModel.qml \
+    ../UsefulOBJ/MComponents/MAlarm.qml

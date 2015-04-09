@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Doppler>
+<Graph name="Originale">
+<Axis xAbsoluteMax="1" xAbsoluteMin="0" yAbsoluteMax="1" yAbsoluteMin="-1" xALMinTextVisible="1"/>
+<Notches xNotchLenght="5" yNotchLenght="5"/>
+<Grid xGridLines="5" yGridLines="3" xSubGridLines="2" ySubGridLines="2"/>
+<Colors gridLineColor="blue" subGridLineColor="green"/>
+<TimeCursor enableTimeCursor="0"/>
+<Zoom zoomSpeed="0.3"/>
+</Graph>
+<Graph name="Analisi">
+<Axis xAbsoluteMax="1" xAbsoluteMin="0" yAbsoluteMax="0.1" yAbsoluteMin="-0.1" xALMinTextVisible="1"/>
+<Notches xNotchLenght="5" yNotchLenght="5"/>
+<Grid xGridLines="5" yGridLines="3" xSubGridLines="2" ySubGridLines="2"/>
+<Colors gridLineColor="blue" subGridLineColor="yellow"/>
+<Zoom zoomSpeed="0.1"/>
+<TimeCursor enableTimeCursor="1"/>
+</Graph>
+</Doppler>

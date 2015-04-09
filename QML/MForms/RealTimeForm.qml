@@ -48,6 +48,20 @@ MForm{
         }
     }
 
+    MAlarmBox{
+        //@@@@@@@@@@    Properties      @@@@@@@@@@
+        id:alarmBox
+        alarmHeight: 50
+        anchors.topMargin: 30
+        anchors.top:parent.top
+        anchors.left:parent.left
+        anchors.right:parent.right
+        alarms: mngData.alarms
+
+        //@@@@@@@@@@    Events          @@@@@@@@@@
+        onResetAlarms: mngData.resetAlarms()
+    }
+
     MPlot2DRealStack {
         //@@@@@@@@@@    Properties      @@@@@@@@@@
         id: plot
@@ -55,7 +69,7 @@ MForm{
         anchors.bottom: parent.bottom
         anchors.left: parent.left
         anchors.right: parent.right//box.left        
-        height: root.height - 30 //- player.height
+        height: root.height - 30 - alarmBox.height
         plotProp:mngCon.plotSetting
         Behavior on width {NumberAnimation { duration: 1000 }}
     }
@@ -113,7 +127,7 @@ MForm{
                 mngData.newAcquisition(lastAcqFileName);
                 mngCon.fileName=configurationFile
                 mngCon.read()                
-                plot.startAll();
+                plot.startAll();                
                 break;
             default:break;
             }
@@ -194,7 +208,7 @@ MForm{
 
     MMenuBar {
         //@@@@@@@@@@    Properties      @@@@@@@@@@
-        id: forAnaMenu
+        id: forReaMenu
         anchors.top: parent.top
         color: "transparent"
         height: root.height
@@ -202,7 +216,7 @@ MForm{
         opacity: rootRealTime.opacity
         theme:"green"
         items: [
-            ["Acquisition","Start","Stop","Send","Back"],
+            ["Acquisition","Start","Stop","Send","alarm","Back"],
             ["Save","Tracks"],
             ["Add","Marker","Start Definer","Stop Definer"],
             ["Analisys","Spectral","Wavelet","Energy","Time Spectrum"],
@@ -216,14 +230,21 @@ MForm{
             if (itemClicked == "Start") {               
                 editName.owner="NewAcq"
                 editName.visible=true
+                mngData.startSupe()
             }
             if (itemClicked == "Send") {
 
                 plot.startAll();
                 mngData.sendCommand(1)
             }
+
+            if (itemClicked == "alarm") {
+                mngData.addAlarm(1)
+            }
+
             if (itemClicked == "Stop") {
                 messageDialog.visible=true
+                mngData.sendStopAcq()
             }            
             if (itemClicked == "Back") {
                 rootRealTime.back()

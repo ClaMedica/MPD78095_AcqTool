@@ -71,7 +71,7 @@ void ModelManager::updateModelList()
                     //qDebug()<<curMap;
                     bool correct=true;
                     foreach (QString curRole, curMap->keys())
-                    if(!m_roles.contains(curRole))
+                    if(!m_roles.contains(curRole))                        
                         correct=false;
 
 //                    qDebug()<<"@@@@@@@@@@";

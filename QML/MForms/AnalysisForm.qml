@@ -42,9 +42,7 @@ MForm{
     {
         organizer.addModel("Track",traMod.strList)
         organizer.addModel("Marker",marMod.strList)
-        organizer.addModel("Definer",fraMod.strList)
-        mngCon.read()
-        plot.popola()
+        organizer.addModel("Definer",fraMod.strList)        
     }
 
     function save(pointer)
