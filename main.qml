@@ -31,19 +31,27 @@ ApplicationWindow {
         if(Qt.application.arguments[1]!==undefined)
         {
             forReal.fileName=Qt.application.arguments[1]
-            mngData.acqFile=Qt.application.arguments[1]
+            mngAcq.acqFile=Qt.application.arguments[1]
             forHome.whoIsVisilbe=forReal.name
         }
     }
 
     //@@@@@@@@@@    Objects         @@@@@@@@@@
-    MDataFileManager{
+    MAcqManager{
+        //@@@@@@@@@@    Properties      @@@@@@@@@@
+        id:mngAcq
+
+        //@@@@@@@@@@    Events          @@@@@@@@@@
+        Component.onCompleted: console.log("MAcqManager Ready!")
+    }
+
+    MDataManager{
         //@@@@@@@@@@    Properties      @@@@@@@@@@
         id:mngData
 
         //@@@@@@@@@@    Events          @@@@@@@@@@
-        onDataNewsChanged:forAna.storeInfo(dataNews)        
-        Component.onCompleted: console.log("MDataFileManager Ready!")
+        onInfoListChanged:forAna.populate()
+        Component.onCompleted: console.log("MDataManager Ready!")
     }
 
     HomeForm {
@@ -76,7 +84,7 @@ ApplicationWindow {
         //@@@@@@@@@@    Events          @@@@@@@@@@
         onBack: forHome.whoIsVisilbe=forHome.name
         onSaveMeChanged: forAna.save(saveMe)
-        onSaveExam: mngData.saveAcquisition()
+        onSaveExam: mngAcq.saveAcquisition()
     }
 
 

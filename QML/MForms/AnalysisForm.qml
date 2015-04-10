@@ -27,22 +27,25 @@ MForm{
         player.visible=audioPlayer.loadSignalFromFile(file)
     }
 
+    function populate()
+    {
+        plot.tracks=mngData.getData("Track")
+        plot.markers=mngData.getData("Marker")
+        plot.frames=mngData.getData("Definer")
+        plot.limits=mngData.getPlotLimits();
+    }
+
     function loadConfiguration(file)
     {
         mngCon.fileName=file
         mngCon.read()
     }
 
-    function storeInfo(info)
-    {
-        organizer.storeNews(info)
-    }
-
     function initialize()
     {
-        organizer.addModel("Track",traMod.strList)
-        organizer.addModel("Marker",marMod.strList)
-        organizer.addModel("Definer",fraMod.strList)        
+        mngData.registerModel("Track",traMod.strList)
+        mngData.registerModel("Marker",marMod.strList)
+        mngData.registerModel("Definer",fraMod.strList)
     }
 
     function save(pointer)
@@ -59,32 +62,16 @@ MForm{
 
         //@@@@@@@@@@    Events          @@@@@@@@@@
         onAnalysisNewsChanged:{
-            organizer.storeNews(analysisNews)
+            mngData.storeNews(analysisNews)
             if(box.ready)
             {
-                plot.tracks=organizer.getData("Track")
-                plot.markers=organizer.getData("Marker")
-                plot.frames=organizer.getData("Definer")
-                plot.limits=organizer.getPlotLimits();
+                plot.tracks=mngData.getData("Track")
+                plot.markers=mngData.getData("Marker")
+                plot.frames=mngData.getData("Definer")
+                plot.limits=mngData.getPlotLimits();
             }
         }
     }
-
-    MOrganizer{
-        //@@@@@@@@@@    Properties      @@@@@@@@@@
-        id:organizer
-
-        //@@@@@@@@@@    Events          @@@@@@@@@@
-        onInfoListChanged:
-        {
-            plot.tracks=organizer.getData("Track")
-            plot.markers=organizer.getData("Marker")
-            plot.frames=organizer.getData("Definer")
-            plot.limits=organizer.getPlotLimits();
-        }
-        onSaveStoreChanges: mngData.saveChanges(organizer.storage())
-    }
-
 
 
     /*@@@@@@@@@@@@@@@@@@@@
@@ -148,10 +135,10 @@ MForm{
         //onSaveMeChanged: mngTra.saveThis(saveMe)
         //onTracksChanged:console.log("draw these",tracks)
         onCurObjChanged: {
-            organizer.changeObject(curObj)
-            plot.tracks=organizer.getData("Track")
-            plot.markers=organizer.getData("Marker")
-            plot.frames=organizer.getData("Definer")
+            mngData.changeObject(curObj)
+            plot.tracks=mngData.getData("Track")
+            plot.markers=mngData.getData("Marker")
+            plot.frames=mngData.getData("Definer")
         }
     }
 
@@ -163,12 +150,12 @@ MForm{
         anchors.centerIn: plot
         width: plot.width*0.8
         height: plot.height*0.8
-        dataList: organizer.availableData
+        dataList: mngData.availableData
         plotList: mngCon.plotList
-        trackList: organizer.availableTracks
+        trackList: mngData.availableTracks
 
         //@@@@@@@@@@    Events          @@@@@@@@@@
-        onReady:organizer.infoList=news
+        onReady:mngData.infoList=news
     }
 
     FileDialog{
@@ -189,6 +176,7 @@ MForm{
                 plot.setAbsXmax(mngData.getEndTime())
                 player.visible=audioPlayer.loadSignalFromFile(fileUrl)
                 break;
+
             case "mngCon":
                 mngCon.fileName=fileUrl
                 mngCon.read()
@@ -212,7 +200,7 @@ MForm{
             //a seconda di chi lo sta usando decido cosa fare
             switch(owner)
             {
-            case "NewObj": organizer.addCustomObj(selector.preChoices,curText,type);plotDial.visible=true;break;
+            case "NewObj": mngData.addCustomObj(selector.preSelectedElements,curText,type);plotDial.visible=true;break;
             default:break;
             }
             visible=false
@@ -236,7 +224,7 @@ MForm{
             {
             case "audioPlayer": elements=audioPlayer.fileList();    break;
             case "dopAna":      elements=mngData.availableTracks;   break;
-            case "family":      elements=organizer.getLinks("Families");
+            case "family":      elements=mngData.getLinks("Families");
                 enableNew=false;
                 break;
             case "name":        enableNew=true;break;
@@ -248,11 +236,11 @@ MForm{
             switch(owner)
             {
             case "audioPlayer": player.enabled=audioPlayer.loadSignalFromName(curText); owner="";break;
-            case "dopAna":      dopAna.currentSignal=organizer.getSignal(curText);      owner="";break;
+            case "dopAna":      dopAna.currentSignal=mngData.getSignal(curText);      owner="";break;
             case "family":
                 title="Choose or create an element"
-                elements=organizer.getLinks("Names",choices,type);
-                //organizer.addCustomObj(choices,type);
+                elements=mngData.getLinks("Names",selectedElements,type);
+                //mngData.addCustomObj(choices,type);
                 //plotDial.visible=true;
                 owner="name";break;
             default:break;
@@ -327,7 +315,7 @@ MForm{
         opacity: rootAna.opacity
         theme: "red"
         items: [
-            ["File","Open Audio","Open Exam","Salva","Back"],
+            ["File","Open Audio","Open Exam","Save","Back"],
             ["Add","Data to Plot","New Marker","New Definer"],
             ["Select Signal","To Analyze","To Play"],
             ["Analisys","Spectrum","Time Warping","Energy","Time Spectrum"],
@@ -350,12 +338,11 @@ MForm{
                 fileDial.setNameFilters("*.pic")
                 fileDial.open()
             }
-            if (itemClicked == "Salva")
-            {
-                organizer.save()
-            }
             if (itemClicked == "Back") {
                 rootAna.back()
+            }
+            if (itemClicked == "Save") {
+                mngData.saveChanges()
             }
             //Add
             if (itemClicked == "Data to Plot")

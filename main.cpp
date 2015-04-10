@@ -7,8 +7,8 @@
 #include <global.h>
 #include <mapmanager.h>
 #include <modelmanager.h>
-#include <mdatafilemanager.h>
-#include <morganizer.h>
+#include <macqmanager.h>
+#include <mdatamanager.h>
 #include <QProcess>
 
 int main(int argc, char *argv[])
@@ -20,8 +20,9 @@ int main(int argc, char *argv[])
     qmlRegisterType<ParameterManager>("Managers",1,0,"ParameterManager");
     qmlRegisterType<MapManager>("Managers",1,0,"MapManager");
     qmlRegisterType<ModelManager>("Managers",1,0,"ModelManager");
-    qmlRegisterType<MDataFileManager>("Managers",1,0,"MDataFileManager");
-    qmlRegisterType<MOrganizer>("Managers",1,0,"MOrganizer");
+    qmlRegisterType<MAcqManager>("Managers",1,0,"MAcqManager");
+    qmlRegisterType<MDataManager>("Managers",1,0,"MDataManager");
+
 
     QQmlApplicationEngine engine;
 

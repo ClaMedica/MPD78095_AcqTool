@@ -28,15 +28,15 @@ SOURCES += main.cpp \
     ../MGlobal/global.cpp \
     CPP/mapmanager.cpp \
     CPP/modelmanager.cpp \
-    CPP/mdatafilemanager.cpp \
-    CPP/mdatastorage.cpp \
-    CPP/morganizer.cpp \
     CPP/doppleranalysis.cpp \
     CPP/TCP/SimpleTCPChannel.cpp \
     CPP/TCP/SimpleTCPClient.cpp \
     CPP/TCP/TcpServers.cpp \
     CPP/TCP/TcpSettingFile.cpp \
-    ../MGlobal/ancestry.cpp
+    ../MGlobal/ancestry.cpp \
+    CPP/macqmanager.cpp \
+    CPP/mdatamanager.cpp \
+    CPP/mstorage.cpp
 
 HEADERS += \
     CPP/maudio.h \
@@ -49,15 +49,15 @@ HEADERS += \
     ../MGlobal/msignal.h \
     CPP/mapmanager.h \
     CPP/modelmanager.h \
-    CPP/mdatafilemanager.h \
-    CPP/mdatastorage.h \
-    CPP/morganizer.h \
     CPP/doppleranalysis.h \
     CPP/TCP/SimpleTCPChannel.h \
     CPP/TCP/SimpleTCPClient.h \
     CPP/TCP/TcpServers.h \
     CPP/TCP/TcpSettingFile.h \
-    ../MGlobal/ancestry.h
+    ../MGlobal/ancestry.h \
+    CPP/macqmanager.h \
+    CPP/mdatamanager.h \
+    CPP/mstorage.h
 
 
 

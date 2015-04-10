@@ -56,10 +56,10 @@ MForm{
         anchors.top:parent.top
         anchors.left:parent.left
         anchors.right:parent.right
-        alarms: mngData.alarms
+        alarms: mngAcq.alarms
 
         //@@@@@@@@@@    Events          @@@@@@@@@@
-        onResetAlarms: mngData.resetAlarms()
+        onResetAlarms: mngAcq.resetAlarms()
     }
 
     MPlot2DRealStack {
@@ -124,7 +124,7 @@ MForm{
             {
             case "NewAcq":
                 lastAcqFileName=examFolder+curText+".pic"
-                mngData.newAcquisition(lastAcqFileName);
+                mngAcq.newAcquisition(lastAcqFileName);
                 mngCon.fileName=configurationFile
                 mngCon.read()                
                 plot.startAll();                
@@ -151,9 +151,9 @@ MForm{
             switch(owner)
             {
             case "Marker":
-                mngData.addMarker(currentItem,"Sono un marker");
-                console.log(mngData.getAcqMarkers())
-                plot.markers=mngData.getAcqMarkers();
+                mngAcq.addMarker(currentItem,"Sono un marker");
+                console.log(mngAcq.getAcqMarkers())
+                plot.markers=mngAcq.getAcqMarkers();
                 break;
             }
         }
@@ -230,21 +230,21 @@ MForm{
             if (itemClicked == "Start") {               
                 editName.owner="NewAcq"
                 editName.visible=true
-                mngData.startSupe()
+                mngAcq.startSupe()
             }
             if (itemClicked == "Send") {
 
                 plot.startAll();
-                mngData.sendCommand(1)
+                mngAcq.sendCommand(1)
             }
 
             if (itemClicked == "alarm") {
-                mngData.addAlarm(1)
+                mngAcq.addAlarm(1)
             }
 
             if (itemClicked == "Stop") {
                 messageDialog.visible=true
-                mngData.sendStopAcq()
+                mngAcq.sendStopAcq()
             }            
             if (itemClicked == "Back") {
                 rootRealTime.back()

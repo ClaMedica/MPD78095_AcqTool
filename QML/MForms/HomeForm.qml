@@ -29,6 +29,7 @@ MForm{
             btnSup.enabled=false
             btnOpt.enabled=false
             configSelector.visible=true
+            configSelector.owner="RealTimeForm"
         }
     }
     MButton{
@@ -40,7 +41,14 @@ MForm{
         width:rootHom.width/2
         height: rootHom.height/2
         background:Images.analysis
-        //onClicked:
+        onClicked:{
+            btnRea.enabled=false
+            btnAna.enabled=false
+            btnSup.enabled=false
+            btnOpt.enabled=false
+            configSelector.visible=true
+            configSelector.owner="AnalysisForm"
+        }
 
     }
     MButton{
@@ -86,11 +94,21 @@ MForm{
             if(curText=="Doppler")
                 configFile=configFolder+"realtime.xml"
 
+            switch(owner)
+            {
+            case "RealTimeForm":
+                forReal.configurationFile=configFile
+                mngAcq.configurationFile=configFile
+                break;
+            case "AnalysisForm":
+                forAna.loadConfiguration(configFile)
+                mngData.configurationFile=configFile
+                break;
+            }
 
-            forReal.configurationFile=configFile
-            mngData.configurationFile=configFile
 
-            whoIsVisilbe="RealTimeForm"
+
+            whoIsVisilbe=owner
 
             configSelector.visible=false
             btnRea.enabled=true

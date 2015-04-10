@@ -1,13 +1,13 @@
-#include "mdatastorage.h"
+#include "mstorage.h"
 #include "qmath.h"
 
-MDataStorage::MDataStorage(QObject *parent) :
+MStorage::MStorage(QObject *parent) :
     QObject(parent)
 {
     m_all=new VarMapVec;
 }
 
-qulonglong MDataStorage::pickUp(QString __family, QString __name)
+VarMapVec* MStorage::pickUp(QString __family, QString __name)
 {
     if(m_storage.keys().contains(__family))
         if(m_storage[__family].keys().contains(__name))
@@ -15,19 +15,19 @@ qulonglong MDataStorage::pickUp(QString __family, QString __name)
     return 0;
 }
 
-QStringList MDataStorage::getFamilies()
+QStringList MStorage::getFamilies()
 {
     return m_storage.keys();
 }
 
-QStringList MDataStorage::getNames(QStringList __families, QStringList __filterType)
+QStringList MStorage::getNames(QStringList __families, QStringList __filterType)
 {
     QStringList list;
     foreach (QString family, __families)
         if(m_storage.keys().contains(family))
             foreach (QString name, m_storage[family].keys())
                 foreach (QString type, __filterType) {
-                    VarMapVec *curVec=(VarMapVec *)m_storage[family][name];
+                    VarMapVec *curVec=m_storage[family][name];
                     if(curVec!=NULL)//così per sfizio
                     {
                         VarMap *curMap=curVec->at(0);
@@ -40,23 +40,21 @@ QStringList MDataStorage::getNames(QStringList __families, QStringList __filterT
     return list;
 }
 /**
- * @brief MDataStorage::archive a new item in the storage
+ * @brief MStorage::archive a new item in the storage
  * @param __family of the item
  * @param __name of the item
  * @param __pointer of the item data
  * @return
  */
-bool MDataStorage::archive(QString __family, QString __name, qulonglong __pointer, bool __whatIfAlreadyPresent)
+bool MStorage::archive(QString __family, QString __name, VarMapVec *__elements, bool __whatIfAlreadyPresent)
 {
     //verifichiamo se c'è già qualcosa con lo stesso nome all'interno della famiglia
     bool present=false;
     if(m_storage.keys().contains(__family))
         if(m_storage[__family].keys().contains(__name))
-            present=true;
+            present=true;    
 
-    VarMapVec *curVec=(VarMapVec *)__pointer;
-
-    foreach (VarMap *curMap, (*curVec))
+    foreach (VarMap *curMap, (*__elements))
         if(!m_all->contains(curMap))
             m_all->append(curMap);
 
@@ -65,35 +63,33 @@ bool MDataStorage::archive(QString __family, QString __name, qulonglong __pointe
     {
         if(__whatIfAlreadyPresent==OVERWRITE)
         {
-            m_storage[__family][__name]=__pointer;
+            m_storage[__family][__name]=__elements;
         }
         else
         {
-            VarMapVec *oldVec=(VarMapVec *)m_storage[__family][__name];
-            (*oldVec)<<(*curVec);
-            m_storage[__family][__name]=(qulonglong)oldVec;
+            VarMapVec *oldVec=m_storage[__family][__name];
+            (*oldVec)<<(*__elements);
+            m_storage[__family][__name]=oldVec;
         }
     }
     else
     {
         //memorizzo nella mappa il puntatore ai dati
-        m_storage[__family][__name]=__pointer;
+        m_storage[__family][__name]=__elements;
     }
 
-    //Riassegno al vettore corrente il puntatore al nuovo vettore
     //ora assegno un codice ad ognuno degli oggetti appena immagazzinati
-    curVec=(VarMapVec *)m_storage[__family][__name];
 
-    foreach (VarMap *curMap, (*curVec)) {
+    foreach (VarMap *curMap,(*m_storage[__family][__name])) {
         (*curMap)["code"]=(qulonglong)curMap;
         //qDebug()<<__family<<__name<<curMap;
     }
 
-    //in questo modo ogni elemento del CurVec ha un suo codice identificativo uguale all'indirizzo a cui punta
+    //in questo modo ogni elemento ha un suo codice identificativo uguale all'indirizzo a cui punta
     return true;
 }
 
-bool MDataStorage::contains(QString __family, QString __name)
+bool MStorage::contains(QString __family, QString __name)
 {
     if(m_storage.contains(__family))
         return m_storage[__family].contains(__name);
@@ -101,21 +97,22 @@ bool MDataStorage::contains(QString __family, QString __name)
     return false;
 }
 
-bool MDataStorage::modifyElement(QString __family, QString __name, qulonglong __code, QVariantList __news)
+bool MStorage::modifyElement(QString __family, QString __name, qulonglong __code, QVariantList __news)
 {
+
     VarMapVec *curVec=NULL;
     if(m_storage.keys().contains(__family))
         if(m_storage[__family].keys().contains(__name))
-            curVec=(VarMapVec *)m_storage[__family][__name];
+            curVec=m_storage[__family][__name];
 
     if(curVec==NULL)
-        return error("MDataStorage::modifyElement","No element found with "+__family+" and "+__name);
+        return error("MStorage::modifyElement","No element found with "+__family+" and "+__name);
 
     VarMap *elementToModify=NULL;
     int indexToModify=-1;
 
     foreach (VarMap *curMap, (*curVec)) {
-        if(curMap->value("code")==__code)
+        if(curMap->value("code") == __code)
         {
             if(elementToModify==NULL)
             {
@@ -124,14 +121,14 @@ bool MDataStorage::modifyElement(QString __family, QString __name, qulonglong __
             }
             else
             {
-                qDebug()<<"MDataStorage::modifyElement data corrupted!!!";
+                qDebug()<<"MStorage::modifyElement data corrupted!!!";
                 return false;
             }
         }
     }
 
     if(indexToModify==-1)
-        return error("MDataStorage::modifyElement","Code not found");
+        return error("MStorage::modifyElement","Code not found");
 
     //qDebug()<<"modify"<<__family<<__name<<__code<<elementToModify;
     if(__news.length()==0)

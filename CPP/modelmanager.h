@@ -2,7 +2,7 @@
 #define MODELMANAGER_H
 #include <global.h>
 #include <QAbstractListModel>
-#include <mdatastorage.h>
+#include <mstorage.h>
 #include <QObject>
 
 class ModelManager : public QObject
@@ -28,7 +28,7 @@ public:
 
     QVariantList drawList(){return m_drawList;}
 
-    void setStore(MDataStorage *__pStore){m_pStore=__pStore;}
+    void setStore(MStorage *__pStore){m_pStore=__pStore;}
 
 signals:
     void infoListChanged();
@@ -64,7 +64,7 @@ private:
     QStringList m_roles;
 
     ///puntatore al datastorage
-    MDataStorage *m_pStore;
+    MStorage *m_pStore;
 
     int findElement(int __number);
     void updateModelList();
