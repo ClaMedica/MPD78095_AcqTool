@@ -22,6 +22,8 @@ MForm{
     visible:whoIsVisilbe===name?true:false
     clip:true
 
+    //@@@@@@@@@@    Events      @@@@@@@@@@
+
     //@@@@@@@@@@    Objects         @@@@@@@@@@
     FileDialog{
         //@@@@@@@@@@    Definitions     @@@@@@@@@@
@@ -68,7 +70,7 @@ MForm{
         clip:true
         anchors.bottom: parent.bottom
         anchors.left: parent.left
-        anchors.right: parent.right//box.left        
+        anchors.right: parent.right//box.left
         height: root.height - 30 - alarmBox.height
         plotProp:mngCon.plotSetting
         Behavior on width {NumberAnimation { duration: 1000 }}
@@ -94,7 +96,11 @@ MForm{
         width:0
         height: parent.height - 30
         Behavior on width {NumberAnimation { duration: 1000 }}
-
+        items:["$Parameter",
+            "label","Page Time",
+            "name","Page Time",
+            "values",[10,30,60,120,300],
+            "&Parameter"]
         //@@@@@@@@@@    Events          @@@@@@@@@@
         onValueNewsChanged:
         {
@@ -126,8 +132,8 @@ MForm{
                 lastAcqFileName=examFolder+curText+".pic"
                 mngAcq.newAcquisition(lastAcqFileName);
                 mngCon.fileName=configurationFile
-                mngCon.read()                
-                plot.startAll();                
+                mngCon.read()
+                plot.startAll();
                 break;
             default:break;
             }
@@ -152,8 +158,8 @@ MForm{
             {
             case "Marker":
                 mngAcq.addMarker(currentItem,"Sono un marker");
-                console.log(mngAcq.getAcqMarkers())
-                plot.markers=mngAcq.getAcqMarkers();
+                //console.log(mngAcq.acqMarkers)
+                plot.markers=mngAcq.acqMarkers;
                 break;
             }
         }
@@ -192,7 +198,7 @@ MForm{
             {
                 timClose.start(1000);
             }
-        }        
+        }
     }
 
 
@@ -216,73 +222,37 @@ MForm{
         opacity: rootRealTime.opacity
         theme:"green"
         items: [
-            ["Acquisition","Start","Stop","Send","alarm","Back"],
-            ["Save","Tracks"],
+            ["Acquisition","Start","Stop"],
             ["Add","Marker","Start Definer","Stop Definer"],
-            ["Analisys","Spectral","Wavelet","Energy","Time Spectrum"],
-            ["Player","Show Player Audio"],
-            ["Plot","Load Settings","Properties"]
+            ["Plot","Properties"]
         ]
 
         //@@@@@@@@@@    Events          @@@@@@@@@@
         onSelected: {
 
-            if (itemClicked == "Start") {               
+            if (itemClicked == "Start") {
                 editName.owner="NewAcq"
                 editName.visible=true
-                mngAcq.startSupe()
+                box.popola()
             }
-            if (itemClicked == "Send") {
-
-                plot.startAll();
-                mngAcq.sendCommand(1)
-            }
-
-            if (itemClicked == "alarm") {
-                mngAcq.addAlarm(1)
-            }
-
             if (itemClicked == "Stop") {
                 messageDialog.visible=true
                 mngAcq.sendStopAcq()
-            }            
-            if (itemClicked == "Back") {
-                rootRealTime.back()
-            }
-            if (itemClicked == "Exit") {
-
             }
             if (itemClicked == "Marker")
             {
                 grid.owner="Marker"
                 grid.visible=true
-                grid.display()                
-            }
-
-            if (itemClicked == "Tracks") {
-                plot.saveScreen(0)
-            }
-
-            if (itemClicked == "Load Settings")
-            {
-                fileDial.owner="mngCon"
-                fileDial.folder="../../Config"
-                fileDial.setNameFilters("*.xml")
-                fileDial.open()
+                grid.display()
             }
 
             if (itemClicked == "Properties")
             {
-                box.ready=false
-                box.items=["$Parameter",
-                           "label","Page Time",
-                           "name","Page Time",
-                           "values",[0.1,0.2,0.5,1,2,5,10,20],
-                           "&Parameter"]
+                //box.ready=false
                 box.width=parent.width/2
 
-                box.popola()
-                box.ready=true
+                //box.popola()
+                //box.ready=true
             }
 
         }

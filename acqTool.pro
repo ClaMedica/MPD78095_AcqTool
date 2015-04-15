@@ -36,7 +36,8 @@ SOURCES += main.cpp \
     ../MGlobal/ancestry.cpp \
     CPP/macqmanager.cpp \
     CPP/mdatamanager.cpp \
-    CPP/mstorage.cpp
+    CPP/mstorage.cpp \
+    CPP/alarmmanager.cpp
 
 HEADERS += \
     CPP/maudio.h \
@@ -57,7 +58,8 @@ HEADERS += \
     ../MGlobal/ancestry.h \
     CPP/macqmanager.h \
     CPP/mdatamanager.h \
-    CPP/mstorage.h
+    CPP/mstorage.h \
+    CPP/alarmmanager.h
 
 
 
@@ -108,4 +110,8 @@ DISTFILES += \
     ../UsefulOBJ/MComponents/func.js \
     ../UsefulOBJ/MComponents/images.js \
     ../UsefulOBJ/MComponents/Models/AlarmModel.qml \
-    ../UsefulOBJ/MComponents/MAlarm.qml
+    ../UsefulOBJ/MComponents/MAlarm.qml \
+    QML/MForms/AnalysisForm.qml \
+    QML/MForms/HomeForm.qml \
+    QML/MForms/RealTimeForm.qml \
+    QML/MForms/SupervisorForm.qml

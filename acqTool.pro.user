@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE QtCreatorProject>
-<!-- Written by QtCreator 3.3.0, 2015-04-10T17:03:48. -->
+<!-- Written by QtCreator 3.3.0, 2015-04-15T16:56:38. -->
 <qtcreator>
  <data>
   <variable>EnvironmentId</variable>
@@ -144,7 +144,7 @@
      </valuemap>
      <valuemap type="QVariantMap" key="ProjectExplorer.BuildStepList.Step.2">
       <value type="bool" key="ProjectExplorer.BuildStep.Enabled">true</value>
-      <value type="QString" key="ProjectExplorer.ProcessStep.Arguments">/c copy %{buildDir}\release\acqTool.exe M:\Lavoro\Software\Build\StandAlone</value>
+      <value type="QString" key="ProjectExplorer.ProcessStep.Arguments">/c copy %{buildDir}\release\AcqTool.exe M:\Lavoro\Software\Build\StandAlone</value>
       <value type="QString" key="ProjectExplorer.ProcessStep.Command">cmd.exe</value>
       <value type="QString" key="ProjectExplorer.ProcessStep.WorkingDirectory">%{buildDir}</value>
       <value type="QString" key="ProjectExplorer.ProjectConfiguration.DefaultDisplayName">Custom Process Step</value>

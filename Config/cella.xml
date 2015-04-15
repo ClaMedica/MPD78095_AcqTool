@@ -2,9 +2,11 @@
 <Root>
 	<Connections>
 		<TCP>
-			<CMD address="127.0.0.1" port="2002"/>
-			<VAL address="127.0.0.1" port="2000"/>
-			<STA address="127.0.0.1" port="2001"/>
+			<CMD address="127.0.0.1" port="2002" type="client"/>
+			<VAL address="127.0.0.1" port="2000" type="client"/>
+			<STA address="127.0.0.1" port="2001" type="client"/>
+			<MNG address="127.0.0.1" port="2100" type="server"/>
+			<PLT address="127.0.0.1" port="9000" type="server"/>
 		</TCP>
 	</Connections>
 	<Graphs>

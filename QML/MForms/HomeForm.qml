@@ -21,13 +21,10 @@ MForm{
         width:rootHom.width/2
         height: rootHom.height/2
         background:Images.realTime
+        enabled:configSelector.visible?false:true
 
         //@@@@@@@@@@    Events          @@@@@@@@@@
         onClicked:{
-            btnRea.enabled=false
-            btnAna.enabled=false
-            btnSup.enabled=false
-            btnOpt.enabled=false
             configSelector.visible=true
             configSelector.owner="RealTimeForm"
         }
@@ -41,11 +38,8 @@ MForm{
         width:rootHom.width/2
         height: rootHom.height/2
         background:Images.analysis
-        onClicked:{
-            btnRea.enabled=false
-            btnAna.enabled=false
-            btnSup.enabled=false
-            btnOpt.enabled=false
+        enabled:configSelector.visible?false:true
+        onClicked:{            
             configSelector.visible=true
             configSelector.owner="AnalysisForm"
         }
@@ -60,7 +54,8 @@ MForm{
         width:rootHom.width/2
         height: rootHom.height/2
         background:Images.supervisor
-
+        onClicked: mngAcq.startSupe("show")
+        enabled:configSelector.visible?false:true
     }
     MButton{
         //@@@@@@@@@@    Properties      @@@@@@@@@@
@@ -71,7 +66,7 @@ MForm{
         width:rootHom.width/2
         height: rootHom.height/2
         background:Images.options
-
+        enabled:configSelector.visible?false:true
     }
 
     MListSelector{
@@ -84,6 +79,7 @@ MForm{
         enableNew: false
         title:"Choose your configuration"
         elements:["Cella Bluetooth","Doppler"]
+
 
         //@@@@@@@@@@    Events          @@@@@@@@@@
         onSelected:
@@ -99,6 +95,8 @@ MForm{
             case "RealTimeForm":
                 forReal.configurationFile=configFile
                 mngAcq.configurationFile=configFile
+                mngAcq.alarmFile=configFolder+"alarms.xml"
+                mngAcq.startSupe("hide")
                 break;
             case "AnalysisForm":
                 forAna.loadConfiguration(configFile)
@@ -111,10 +109,7 @@ MForm{
             whoIsVisilbe=owner
 
             configSelector.visible=false
-            btnRea.enabled=true
-            btnAna.enabled=true
-            btnSup.enabled=true
-            btnOpt.enabled=true
+
         }
     }
 }

@@ -27,13 +27,25 @@ ApplicationWindow {
     //@@@@@@@@@@    Events          @@@@@@@@@@
     Component.onCompleted:
     {
-        console.log("Application Ready!")
-        if(Qt.application.arguments[1]!==undefined)
+
+        var arguments=Qt.application.arguments
+        if(arguments.length>1)
         {
+            console.log("arguments founded",arguments)
+            mngAcq.configurationFile=
+            mngAcq.newAcquisition(Qt.application.arguments[1]);
+            mngCon.fileName=configurationFile
+            mngCon.read()
+            plot.startAll();
             forReal.fileName=Qt.application.arguments[1]
             mngAcq.acqFile=Qt.application.arguments[1]
             forHome.whoIsVisilbe=forReal.name
         }
+        else
+        {
+            console.log("No arguments founded")
+        }
+        console.log("Application Ready!")
     }
 
     //@@@@@@@@@@    Objects         @@@@@@@@@@

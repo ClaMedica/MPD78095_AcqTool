@@ -10,6 +10,7 @@ import Analysis 1.0
 
 MForm{
     //@@@@@@@@@@    Definitions     @@@@@@@@@@
+    property string configurationFile:""
     signal back
 
     //@@@@@@@@@@    Properties      @@@@@@@@@@
@@ -110,7 +111,7 @@ MForm{
         {
             plot.timeMarker=sliderPos/1000
             audioPlayer.sliderPos=sliderPos
-        }        
+        }
         onPlay:audioPlayer.startPlaying()
         onPause:audioPlayer.suspendPlaying()
     }
@@ -135,10 +136,13 @@ MForm{
         //onSaveMeChanged: mngTra.saveThis(saveMe)
         //onTracksChanged:console.log("draw these",tracks)
         onCurObjChanged: {
-            mngData.changeObject(curObj)
-            plot.tracks=mngData.getData("Track")
-            plot.markers=mngData.getData("Marker")
-            plot.frames=mngData.getData("Definer")
+            if(completed)
+            {
+                mngData.changeObject(curObj)
+                plot.tracks=mngData.getData("Track")
+                plot.markers=mngData.getData("Marker")
+                plot.frames=mngData.getData("Definer")
+            }
         }
     }
 

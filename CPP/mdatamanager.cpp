@@ -180,7 +180,7 @@ void MDataManager::loadFile(QString __fileName)
             qDebug()<<val;
             (*mrk)["val"]=val;
             (*mrk)["popUp"]=descr;
-            (*mrk)["lock"]=false;
+            (*mrk)["lock"]=true;
             (*mrk)["key"]=key;
             (*mrk)["color"]=COLOR_OPERATIVE;
             (*mrk)["visible"]=true;
@@ -492,6 +492,8 @@ bool MDataManager::loadConfiguration(QString __name)
     if(!m_configuration.loadFromXML(curConfigFile))
         return error("MDataManager::loadConfiguration()","XML file corrupted");
 
+    //
+
     qDebug()<<curConfigFile<<"Loaded correctly";
     //ora abbiamo caricato tutto ciò che ci serve dentro a m_configuration
 }
@@ -570,7 +572,7 @@ QVariantList MDataManager::getPlotLimits()
         }
         limits<<"&Limit";
     }
-    qDebug()<<limits;
+    //qDebug()<<limits;
     return limits;
 }
 
