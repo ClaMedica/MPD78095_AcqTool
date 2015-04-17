@@ -2,6 +2,7 @@
 #include "SimpleTCPChannel.h"
 #include <iostream>
 #include <QString>
+
 //for endianess functions
 
 // DEFINITION OF SimpleTCPChannel class - begin //

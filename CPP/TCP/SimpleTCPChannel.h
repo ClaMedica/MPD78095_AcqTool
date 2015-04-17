@@ -7,6 +7,7 @@
 #ifndef SIMPLETCPCHANNEL_H
 #define SIMPLETCPCHANNEL_H
 
+#include <QtMessageHandler>
 #include <QtNetwork>
 
 class SimpleTCPChannel : public QObject{

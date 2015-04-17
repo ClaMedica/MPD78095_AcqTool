@@ -58,7 +58,7 @@ bool AlarmManager::setLanguage(QString __language)
     if(m_languages.contains(__language))
         m_curLanguage=__language;
     else
-        return error("AlarmManager::setLanguage","No language "+__language+" found");
+    {qCritical()<<"No language "+__language+" found";return false;}
 
     curAlarmSet=m_confAla->getChild(__language);
     foreach (Ancestry *alarm,curAlarmSet->getChildren()) {
@@ -69,6 +69,9 @@ bool AlarmManager::setLanguage(QString __language)
 
 void AlarmManager::addAlarm(int __code)
 {
+    qDebug()<<"Alarm! "<<__code;
+    if(m_confAla==NULL)
+    {qCritical()<<"No alarm configuration file loaded";return;}
     if(m_enabledAlarms.contains(__code))
         if(!m_enabledAlarms[__code])
         {
@@ -138,7 +141,7 @@ bool AlarmManager::manageAlarm(int __code, bool __enable)
         return true;
     }
     else
-        return error("AlarmManager::manageAlarm","Code "+QString::number(__code)+" not found");
+    {qCritical()<<"Code "+QString::number(__code)+" not found";return false;}
 }
 
 void AlarmManager::enableAll()

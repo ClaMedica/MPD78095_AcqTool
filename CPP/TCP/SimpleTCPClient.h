@@ -1,6 +1,7 @@
 #ifndef SIMPLETCPCLIENT_H
 #define SIMPLETCPCLIENT_H
 
+#include <QtMessageHandler>
 #include <QObject>
 #include <QtNetwork>
 

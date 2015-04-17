@@ -9,7 +9,7 @@ import Managers 1.0
 MForm{
     //@@@@@@@@@@ Definitions @@@@@@@@@@
     property string fileName:""
-    property string configurationFile:""
+    property alias configurationFile:mngCon.fileName
     property string lastAcqFileName:""
     property int saveMe:plot.savedData
     signal back
@@ -74,6 +74,9 @@ MForm{
         height: root.height - 30 - alarmBox.height
         plotProp:mngCon.plotSetting
         Behavior on width {NumberAnimation { duration: 1000 }}
+
+        //@@@@@@@@@@    Events          @@@@@@@@@@
+        onPlotPropChanged: if(mngCon.fileName!==""){console.log("start!");plot.startAll()}
     }
 
     //Managers
@@ -83,7 +86,9 @@ MForm{
     ConfigManager{
         //@@@@@@@@@@    Properties      @@@@@@@@@@
         id:mngCon
-        fileName:fileDial.fileUrl
+        fileName: ""
+        //@@@@@@@@@@    Events          @@@@@@@@@@
+        onFileNameChanged: if(fileName!==""){plot.completed=true;read()}
     }
 
 
@@ -178,26 +183,27 @@ MForm{
             {
                 saveExam()
                 plot.stopAll()
-                message="Do you want to analyze it?"
+                timClose.start(1000);
+                //message="Do you want to analyze it?"
             }
-            else
-            {
-                forAna.openFile(lastAcqFileName);
-                forAna.loadConfiguration(configurationFile)
-                forHome.whoIsVisilbe=forAna.name
-            }
+//            else
+//            {
+//                forAna.openFile(mngAcq.acqFile);
+//                forAna.loadConfiguration(mngAcq.configurationFile)
+//                forHome.whoIsVisilbe=forAna.name
+//            }
         }
         onRejected:
         {
             if(message=="Do you want to save the current exam?")
             {
                 deleteExam()
-                //timClose.start(1000);
-            }
-            else
-            {
                 timClose.start(1000);
             }
+//            else
+//            {
+//                timClose.start(1000);
+//            }
         }
     }
 

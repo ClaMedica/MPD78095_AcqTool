@@ -1,6 +1,7 @@
 #ifndef TCPSETTINGFILE_H
 #define TCPSETTINGFILE_H
 
+#include <QtMessageHandler>
 #include <QObject>
 #include <QFile>
 #include <QDir>

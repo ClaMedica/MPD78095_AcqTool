@@ -6,6 +6,7 @@ int dataCount=0;
 MAcqManager::MAcqManager(QObject *parent) :
     QObject(parent)
 {
+
     m_mng=NULL;
     m_acqFileOpened=false;//nessuna acquisizione in atto
     m_sendingToPlot=false;//nessuno sta spedendo qualcosa per cui ci si può scrivere sopra
@@ -110,37 +111,40 @@ bool MAcqManager::newAcquisition(QString __newName)
         if(__newName!="")
             m_acqFileName=__newName;
         else
-            return error("MAcqManager::newAcquisition","Error file empty");
+        {
+            qCritical("Error file empty");
+            return false;
+        }
 
         //ho letto la configurazione
 
         qDebug()<<m_acqFileName<<" exists? "<<QFile::exists(m_acqFileName);
-        if(QFile::exists(m_acqFileName))
-        {
-            m_mng=new DatafileManager;
+        if(!QFile::exists(m_acqFileName))
+        {qCritical()<<"File does not exists";return false;}
 
-            m_mng->SetFileName(m_acqFileName);
-            m_mng->SetFileType(5);
+        m_mng=new DatafileManager;
 
-            qDebug()<<"Aperto il file?"<<m_mng->Open();
-            m_acqFileOpened=true;//mi segno che ho aperto il file
-        }
-        else
-        {
-            return error("MAcqManager::newAcquisition","File does not exists");
-        }
-        buildConfigurationFile();
+        m_mng->SetFileName(m_acqFileName);
+        m_mng->SetFileType(5);
+
+        qDebug()<<"Opening file ... "<<m_mng->Open();
+        qDebug()<<"Loading parameters ... "<<m_mng->GetParameters();
+        qDebug()<<"Continue ..."<<m_mng->Restore();
+        m_acqFileOpened=true;//mi segno che ho aperto il file
+
+        if(!buildConfigurationFile())
+        {qCritical()<<"Error during building of configuration file";return false;}
         //inizializzo i server di comunicazione con i plotter
         initializeServers();
         //disabilito alcuni allarmi
         m_alarmMng.manageAlarm(S_ALA_NOT_ACQUIRING,DISABLE);
         //mi connetto ai server del supe e del programma di gestione archivi
-        QTimer::singleShot(500,this,SLOT(connectToServers()));
+        QTimer::singleShot(10000,this,SLOT(connectToServers()));
 
 
     }
     //faccio partire il timer per l'allarme di stato
-    m_alarmMng.startTimeoutAlarms();
+    //m_alarmMng.startTimeoutAlarms();
 
     return true;
 }
@@ -148,28 +152,32 @@ bool MAcqManager::newAcquisition(QString __newName)
 void MAcqManager::connectToServers()
 {
     //mi connetto ai server
+    qDebug()<<"Connecting to servers ..."<<m_tcpClients.keys();
     foreach (SimpleTCPClient *client, m_tcpClients) {
         client->registerDataReadyCallBack(&(this->dataOnTCP));
         client->connectToHost();
+
         if(client->waitForConnected(10000))
         {
             qDebug()<<"connesso "<<client->hostAddress().toString()<<client->hostPort();
         }
         else
         {
+            qCritical()<<"Timeout of"<<m_tcpClients.key(client);
             QStringList superPorts;
             superPorts<<"CMD"<<"VAL"<<"STA";
             if(superPorts.contains(m_tcpClients.key(client)))
             {
                 if(m_superProcess!=NULL)
                 {
-                    m_superProcess->close();
+                    m_superProcess->kill();
                     if(m_superProcess->waitForFinished())
                         delete m_superProcess;
                 }
-                startSupe("hide");
-                QTimer::singleShot(500,this,SLOT(connectToServers()));
+                startSupe("show");
+                QTimer::singleShot(10000,this,SLOT(connectToServers()));
             }
+
         }
 
     }
@@ -178,21 +186,23 @@ void MAcqManager::connectToServers()
 void MAcqManager::startSupe(QString __mode)
 {
     m_superProcess=new QProcess();
-
+    qDebug()<<"Supervisor starting...";
     QString path="M:/Lavoro/Software/Build/StandAlone/";
     m_superProcess->start(path+"FlowBtSupe.exe",QStringList()<<__mode);
 
 }
 
-void MAcqManager::saveAcquisition()
+void MAcqManager::endAcquisition(QString __exit)
 {
     //disabilito gli allarmi
     m_alarmMng.disableAll();
     //interrompo la connessione
 
     foreach (SimpleTCPClient *client, m_tcpClients) {
+        //mi disconnetto dal supe
+
         if(client->disconnectToHost())
-            qDebug()<<"disconnesso "
+            qDebug()<<"disconnect "
                    <<client->hostAddress().toString()
                   <<client->hostPort();
     }
@@ -203,13 +213,22 @@ void MAcqManager::saveAcquisition()
     m_mng->Close();
     delete m_mng;
     m_mng=NULL;
+    //mando il comando al gestore archivio paziente
+    QByteArray mex=__exit.toLatin1();
+    m_tcpChannels["MNG"]->sendData(&mex);
+    qDebug()<<__exit;
 
+    foreach (SimpleTCPChannel *channel, m_tcpChannels) {
+        //mi disconnetto dal resto
+
+        if(channel->disconnect())
+            qDebug()<<"disconnect "
+                   <<channel->serverAddress().toString().toLatin1()
+                  <<channel->serverPort();
+    }
 }
 
-void MAcqManager::deleteAcquisition()
-{
 
-}
 
 void MAcqManager::addMarker(QVariant __key,QVariant __descr)
 {
@@ -373,7 +392,7 @@ void MAcqManager::handleTCP(SimpleTCPClient *__client, QByteArray __block)
              * - numChanData, type qint32. Number of samples (float) for the current channel
              * - samples, type qreal, lenght numChanData. Channel's samples
              */
-
+            m_chanMapValues.clear();
             dataCount++;
             //qDebug()<<"dal server"<<dataCount<<(float)tim.elapsed()/1000;
             QByteArray block,blockOut;
@@ -413,17 +432,18 @@ void MAcqManager::handleTCP(SimpleTCPClient *__client, QByteArray __block)
                 //qDebug()<<currChan;
                 if(currChan < maxNumChan && currChan >= 0)
                 {//se è un canale con del senso
+
                     for(int i=0;i < numChanData;i++)
                     {
                         in >> sample;
 
-                        float res=m_acqData.resolution[k];
+
                         float v;
                         float diff=fabs(m_oldSample-sample);
 
-                        if(diff>(res*0.75))
+                        if(diff>0.75)
                         {
-                            v=round(sample/res)*res;
+                            v=round(sample);
                             m_oldSample=v;
                         }
                         else
@@ -432,7 +452,8 @@ void MAcqManager::handleTCP(SimpleTCPClient *__client, QByteArray __block)
 
                         out << (qreal)v;
                         //qDebug()<<v;
-                        m_mng->AppendValue(&currChan,&v,1);
+                        //qDebug()<<"append? "<<m_mng->AppendValue(&currChan,&v,1);
+                        m_chanMapValues[k]<<v;
                     }
                 }
                 else
@@ -442,11 +463,12 @@ void MAcqManager::handleTCP(SimpleTCPClient *__client, QByteArray __block)
             }
             if(!m_sendingToPlot && m_serverReady)
             {
+
                 m_sendingPack = blockOut;
                 //qDebug()<<"al plot"<<dataCount<<(float)tim.elapsed()/1000;
                 //mandiamo i dati alla visualizzazione
                 m_sendingToPlot=true;
-                m_tcpChannels["PLT"]->sendData(&m_sendingPack);
+                sendToPlots();
                 m_sendingToPlot=false;
             }
             else
@@ -461,6 +483,7 @@ void MAcqManager::handleTCP(SimpleTCPClient *__client, QByteArray __block)
 void MAcqManager::initializeServers()
 {
     //creiamo un nuovo canale con la qmlplotter
+    qDebug()<<"Creating servers for plots ... "<<m_tcpChannels.keys();
     foreach(SimpleTCPChannel *chan,m_tcpChannels.values())
         chan->listen();
     m_serverReady=true;
@@ -476,9 +499,13 @@ bool MAcqManager::loadConfiguration(QString __name)
         curConfigFile=__name;
 
     if(!QFile::exists(curConfigFile))
-        return error("MAcqManager::loadConfiguration()","File "+curConfigFile+" does not exists");
+    {
+        qCritical()<<"Files "<<m_configurationFileName<<__name<<"does not exists";return false;
+    }
     if(!m_configuration.loadFromXML(curConfigFile))
-        return error("MAcqManager::loadConfiguration()","XML file corrupted");
+    {
+        qCritical()<<"XML file corrupted";return false;
+    }
 
     qDebug()<<curConfigFile<<"Loaded correctly";
     //ora abbiamo caricato tutto ciò che ci serve dentro a m_configuration
@@ -486,7 +513,7 @@ bool MAcqManager::loadConfiguration(QString __name)
     if(m_configuration.getChild(XML_CONNECTIONS)!=NULL)
         return loadConnectivityInfo(m_configuration.getChild(XML_CONNECTIONS));
     else
-        return error("MAcqManager::loadConfiguration()","XML file corrupted");
+    {qCritical()<<"XML file corrupted";return false;}
 }
 
 bool MAcqManager::loadAlarms(QString __name)
@@ -499,9 +526,9 @@ bool MAcqManager::loadAlarms(QString __name)
         curAlaFile=__name;
 
     if(!QFile::exists(curAlaFile))
-        return error("MAcqManager::loadAlarms()","File "+curAlaFile+" does not exists");
+    {qCritical()<<"File "+curAlaFile+" does not exists";return false;}
     if(!m_alarmMng.load(curAlaFile))
-        return error("MAcqManager::loadAlarms()","XML file corrupted");
+    {qCritical()<<"XML file corrupted";return false;}
 
     qDebug()<<curAlaFile<<"Loaded correctly";
     //ora abbiamo caricato tutto ciò che ci serve dentro a m_configuration
@@ -516,7 +543,7 @@ void MAcqManager::saveConfiguration()
 bool MAcqManager::loadConnectivityInfo(Ancestry *__info)
 {
     if(__info==NULL)
-        return error("MAcqManager::loadConnectivityInfo","NULL pointer");
+    {qCritical()<<"NULL pointer";return false;}
     if(__info->getChild(XML_TCP)!=NULL)
     {
         Ancestry *tcp=__info->getChild(XML_TCP);
@@ -528,12 +555,16 @@ bool MAcqManager::loadConnectivityInfo(Ancestry *__info)
             if(child->getAttribute(XML_TYPE)=="client")
                 m_tcpClients[name]=new SimpleTCPClient(QHostAddress(address),port,this);
             else if(child->getAttribute(XML_TYPE)=="server")
+            {
                 m_tcpChannels[name]=new SimpleTCPChannel(QHostAddress(address),port,this);
+
+            }
         }
     }
     else
-        return error("MAcqManager::loadConnectivityInfo()","XML file corrupted");
-
+    {qCritical()<<"XML file corrupted";return false;}
+    qDebug()<<"Loaded clients:"<<m_tcpClients.keys();
+    qDebug()<<"Loaded channels:"<<m_tcpChannels.keys();
     return true;
 }
 
@@ -570,56 +601,87 @@ void MAcqManager::analyzeAlarms(alarms_t __alarms)
 
 }
 
-void MAcqManager::buildConfigurationFile()
+bool MAcqManager::buildConfigurationFile()
 {
     Ancestry config;
     if(!config.loadFromXML(QDir::currentPath()+"/generalConfig.xml"))
-        return "";
+    {qCritical()<<"No original config file found";return false;}
     //creo il file di configurazione in base all'esame
-    config.addChild("Graphs");
-    Ancestry *graph=config.getChild("Graphs");
-    QList<int> graphNumbers;
+    config.addChild(XML_GRAPHS);
+    Ancestry *graph=config.getChild(XML_GRAPHS);
+
+
     int chanlNum=m_mng->GetChanNum();
+    if(chanlNum==0){qCritical()<<"No channels in file";return false;}
     for(int nc=0;nc<chanlNum;nc++)
     {//contiamo i grafici
-        if(!graphNumbers.contains(m_mng->GetGraph(nc)))
-            graphNumbers<<m_mng->GetGraph(nc);
+        m_chanInPlots["Graph_"+QString::number(m_mng->GetGraph(nc))]<<nc;
+        m_plotOfChannelMap[nc]=m_mng->GetGraph(nc);
     }
+    Ancestry *connections=config.getChild(XML_CONNECTIONS);
+    foreach (QString graphName, m_chanInPlots.keys()) {
 
-    foreach (int num, graphNumbers) {
+        graph->addChild(graphName);
+        Ancestry *  graphN=graph->getChild(graphName);
+        graphN->addChild(XML_PROPERTIES);
+        graphN->addChild(XML_TRACKS);
+        Ancestry *  prop=graphN->getChild(XML_PROPERTIES);
+        Ancestry *  tracks=graphN->getChild(XML_TRACKS);
+        //ho la certezza che i canali su ogni grafico hanno tutti le stesse proprietà grafiche per cui vado tranquillo
+        if(m_chanInPlots[graphName].size()==0)
+            qFatal("Graph without channels");
+        int nc=m_chanInPlots[graphName].at(0);
+        prop->addChild("Axis");
+        prop->setAttribute("yAUOM",QString::number(m_mng->GetUdM(nc)),QStringList()<<"Axis");
+        prop->setAttribute("yAbsoluteMax",QString::number(m_mng->GetSupLim(nc)),QStringList()<<"Axis");
+        prop->setAttribute("yAbsoluteMin",QString::number(m_mng->GetInfLim(nc)),QStringList()<<"Axis");
+        prop->setAttribute("samplingFrq",QString::number(m_mng->GetNAS(nc)),QStringList()<<"Time");
+        prop->setAttribute("pageTime",QString::number(m_mng->GetPageTime()),QStringList()<<"Time");
+        prop->setAttribute(XML_PORT,QString::number(9000+nc),QStringList()<<"Network");
+        prop->setAttribute(XML_ADDRESS,"127.0.0.1",QStringList()<<"Network");
+        connections->addChild(graphName,QStringList()<<XML_TCP);
+        Ancestry *  pltN=connections->getChild(graphName,QStringList()<<XML_TCP);
+        pltN->setAttribute(XML_PORT,QString::number(9000+nc));
+        pltN->setAttribute(XML_ADDRESS,"127.0.0.1");
+        pltN->setAttribute(XML_TYPE,"server");
+        foreach (int chan, m_chanInPlots[graphName])
+        {//qui scrivo le proprietà delle tracce
+            tracks->addChild(m_mng->GetChanName(chan));
+            tracks->setAttribute(XML_THICK,"3",QStringList()<<m_mng->GetChanName(chan));
+            tracks->setAttribute(XML_COLOR,"white",QStringList()<<m_mng->GetChanName(chan));
+        }
 
-        graph->addChild("Graph_"+QString::number(num));
-        graph->getChild("Graph_"+QString::number(num))->addChild("Tracks"); ;
-        Ancestry *cur=graph->getChild("Graph_"+QString::number(num))->getChild("Tracks");
-        for(int nc=0;nc<chanlNum;nc++)
+    }
+    config.saveToXML(QDir::currentPath()+"/cur.xml");
+    qDebug()<<"Configuration file builded succesfully";
+    setConfigurationFile(QDir::currentPath()+"/cur.xml");
+    return true;
+}
+
+void MAcqManager::sendToPlots()
+{
+
+    QByteArray block;
+    QDataStream out(&block, QIODevice::WriteOnly);
+    foreach(QString plotName,m_chanInPlots.keys())
+    {
+        QList<int> chanList=m_chanInPlots[plotName];
+        block.clear();
+        out<<(qint32)chanList.size();
+        foreach(int currChan,chanList)
         {
-
-            //vediamo chi ci va disegnato dentro
-            if(graphNumbers.contains(m_mng->GetGraph(nc)))
-            {//ci vado disegnato dentro
-                QString chanName=m_mng->GetChanName(nc);
-                cur->addChild(chanName);
-                //dm.SetChanName(nc,Channel->name());
-                //dm.SetLoc(nc,Channel->loc());
-                //dm.SetGraph(nc,Channel->graph().toInt());
-                cur->setAttribute("yAUOM",QString::number(m_mng->GetUdM(nc)),QStringList()<<chanName<<"Axis");
-                //dm.SetUdM(nc,50);
-                //dm.SetZero(nc,Channel->zero().toInt());
-                //dm.SetRange(nc,Channel->range().toFloat());
-                cur->setAttribute("yAbsoluteMax",QString::number(m_mng->GetSupLim(nc)),QStringList()<<chanName<<"Axis");
-                //dm.SetSupLim(nc,supLim);
-                cur->setAttribute("yAbsoluteMin",QString::number(m_mng->GetInfLim(nc)),QStringList()<<chanName<<"Axis");
-                //dm.SetInfLim(nc,infLim);
-                //dm.SetDist(nc,Channel->dist().toInt());
-                //dm.SetAngle(nc,Channel->angle().toInt());
-                cur->setAttribute("samplingFrq",QString::number(m_mng->GetNAS(nc)),QStringList()<<chanName<<"Time");
-                //dm.SetNAS(nc,10);
-                //dm.SetChanOther(nc,"");
-                cur->setAttribute("serverPort",QString::number(9000+nc),QStringList()<<chanName<<"Network");
+            out<<currChan;
+            out<<(qint32)m_chanMapValues[currChan].size();
+            foreach (qreal val, m_chanMapValues[currChan]) {
+                out<<val;
             }
         }
+        if(m_tcpChannels.keys().contains(plotName))
+            m_tcpChannels[plotName]->sendData(block.data(),block.size());
+        else
+            qCritical()<<"No server of name"<<plotName;
     }
-    config.saveToXML(QDir::homePath()+DATAFILE_PATH+"/pv"+testnum+"1A.xml");
+
 }
 
 
@@ -637,7 +699,7 @@ bool MAcqManager::sendCommand(tcp_flow_bt_cmd_t __command)
         return true;
     }
     else
-        return error("MAcqManager::sendCommand","No CMD channel loaded");
+    {qCritical()<<"No CMD channel loaded";return false;}
 }
 
 

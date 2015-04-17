@@ -106,7 +106,7 @@ bool MStorage::modifyElement(QString __family, QString __name, qulonglong __code
             curVec=m_storage[__family][__name];
 
     if(curVec==NULL)
-        return error("MStorage::modifyElement","No element found with "+__family+" and "+__name);
+    {qCritical()<<"No element found with "+__family+" and "+__name;return false;}
 
     VarMap *elementToModify=NULL;
     int indexToModify=-1;
@@ -121,14 +121,13 @@ bool MStorage::modifyElement(QString __family, QString __name, qulonglong __code
             }
             else
             {
-                qDebug()<<"MStorage::modifyElement data corrupted!!!";
-                return false;
+                qCritical()<<"Data corrupted!!!";return false;
             }
         }
     }
 
     if(indexToModify==-1)
-        return error("MStorage::modifyElement","Code not found");
+    {qCritical()<<"Code not found";return false;}
 
     //qDebug()<<"modify"<<__family<<__name<<__code<<elementToModify;
     if(__news.length()==0)

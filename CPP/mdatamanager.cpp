@@ -406,9 +406,9 @@ bool MDataManager::addCustomObj(QStringList __families, QString __name, QString 
 {
     qDebug()<<"Aggiungi alle famiglie "<<__families<<" un "<<__type<<" chiamato "<<__name<<" con queste caratteristiche"<<__info;
     if(!m_possibleTypes.contains(__type))
-        return error("MDataManager::addCustomObj","unknown type"+__type);
+    {qCritical()<<"unknown type"+__type;return false;}
     if(__families.isEmpty())
-        return error("MDataManager::addCustomObj","Families corrupted");
+    {qCritical()<<"Families corrupted";return false;}
     foreach (QString family, __families) {
         //devo aggiungere il mio nuovo oggetto ad ogni famiglia che ho scelto
         VarMapVec *objVec=NULL;
@@ -455,7 +455,7 @@ bool MDataManager::addCustomObj(QStringList __families, QString __name, QString 
                 return false;
         }
         else
-            return error("MDataManager::addCustomObj","Type "+__type+" not recognized");
+        {qCritical()<<"Type "+__type+" not recognized";return false;}
     }
     return true;
 
@@ -488,9 +488,9 @@ bool MDataManager::loadConfiguration(QString __name)
         curConfigFile=__name;
 
     if(!QFile::exists(curConfigFile))
-        return error("MDataManager::loadConfiguration()","File "+curConfigFile+" does not exists");
+    {qCritical()<<"File "+curConfigFile+" does not exists";return false;}
     if(!m_configuration.loadFromXML(curConfigFile))
-        return error("MDataManager::loadConfiguration()","XML file corrupted");
+    {qCritical()<<"XML file corrupted";return false;}
 
     //
 
@@ -593,8 +593,10 @@ bool MDataManager::changeObject(QVariantList __curObj)
         //qDebug()<<"Richiesta di modifica per "<<family<<name<<code;
         if(m_storage.modifyElement(family,name,code,__curObj))
             m_changesToBeSaved=true;
+        return true;
     }
-    return error("MDataManager::changeObject","No code info founded");
+    qCritical()<<"No code info founded";
+    return false;
 }
 
 QVariant MDataManager::getSignal(QString __name)
@@ -623,23 +625,23 @@ QStringList MDataManager::getLinks(QString __what, QStringList __filterFamily, Q
 
 bool MDataManager::saveDataAndUpdate(QString __family, QString __name, VarMapVec* __elements, bool __whatIfAlreadyPresent)
 {
-        if(__elements->isEmpty())
-               return error("MDataManager::saveDataAndUpdate","No data in __elements");
+    if(__elements->isEmpty())
+    {qCritical()<<"No data in __elements";return false;}
 
-        if(m_storage.archive(__family,__name,__elements,__whatIfAlreadyPresent))
-        {//se siamo qua dentro vuol dire che tutto è andato liscio e possiamo visualizzare le info all'utente
-            if(!m_data.keys().contains(__family))
-            {
-                m_data[__family].append(__name);
-                emit availableTracksChanged();
-            }
-            else
-                if(!m_data[__family].contains(__name))
-                    m_data[__family].append(__name);
-            updateAvailableData();
-            return true;
+    if(m_storage.archive(__family,__name,__elements,__whatIfAlreadyPresent))
+    {//se siamo qua dentro vuol dire che tutto è andato liscio e possiamo visualizzare le info all'utente
+        if(!m_data.keys().contains(__family))
+        {
+            m_data[__family].append(__name);
+            emit availableTracksChanged();
         }
         else
-            return false;
+            if(!m_data[__family].contains(__name))
+                m_data[__family].append(__name);
+        updateAvailableData();
+        return true;
+    }
+    else
+        return false;
 
 }

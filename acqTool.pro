@@ -16,6 +16,8 @@ QML_IMPORT_PATH +=   ../Build/CommonPlugin \
 QT +=multimedia
 QT +=xml
 QT +=core
+
+DEFINES += QT_MESSAGELOGCONTEXT
 # The .cpp file which was generated for your project. Feel free to hack it.
 SOURCES += main.cpp \
     CPP/maudio.cpp \

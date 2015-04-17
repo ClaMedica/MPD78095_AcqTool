@@ -13,6 +13,7 @@
 #include "TcpServerFlowBt_types.h"
 #include "inheritEnum.h"
 #include "alarmmanager.h"
+#include "QtGlobal"
 
 
 class MAcqManager : public QObject
@@ -57,8 +58,7 @@ public slots:
     bool newAcquisition(QString __newName="");
     void connectToServers();
     void startSupe(QString __mode);
-    void saveAcquisition();
-    void deleteAcquisition();
+    void endAcquisition(QString __exit);
     void addMarker(QVariant __key, QVariant __descr);
     void addDefiner(bool __startEnd,QVariantList __info);    
     bool sendStartAcq(void);
@@ -94,6 +94,12 @@ private:
 
     QMap<QString,SimpleTCPChannel *> m_tcpChannels;//canali di comunicazione verso l'esterno
 
+    QMap<QString,QList<int> > m_chanInPlots;
+
+    QMap<int,QList<qreal> > m_chanMapValues;
+
+    QMap<int,QString> m_plotOfChannelMap;
+
     QVector<VarMap> m_acqMarker;
 
     Ancestry m_configuration,m_alarmStrings;
@@ -119,7 +125,8 @@ private:
     void analyzeAlarms(alarms_t __alarms);
     bool newAcqFromConfigFile();
     bool newAcqFromPIC();
-    void buildConfigurationFile();
+    bool buildConfigurationFile();
+    void sendToPlots();
 
 };
 

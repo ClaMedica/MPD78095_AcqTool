@@ -5,6 +5,7 @@ import MComponents 1.0
 import MPlotModule 1.0
 import MForms 1.0
 import Managers 1.0
+import QtQuick.Window 2.2
 
 ApplicationWindow {
     //@@@@@@@@@@ Definitions @@@@@@@@@@
@@ -15,8 +16,8 @@ ApplicationWindow {
     //@@@@@@@@@@    Properties      @@@@@@@@@@
     id: root
     visible: true
-    width: 800
-    height: 600
+    width:Screen.width*0.9
+    height:Screen.height*0.9
 
     Rectangle{
         color:"red"
@@ -32,13 +33,10 @@ ApplicationWindow {
         if(arguments.length>1)
         {
             console.log("arguments founded",arguments)
-            mngAcq.configurationFile=
+            mngAcq.startSupe("show")
+            mngAcq.alarmFile=configFolder+"alarms.xml"
             mngAcq.newAcquisition(Qt.application.arguments[1]);
-            mngCon.fileName=configurationFile
-            mngCon.read()
-            plot.startAll();
-            forReal.fileName=Qt.application.arguments[1]
-            mngAcq.acqFile=Qt.application.arguments[1]
+            forReal.configurationFile=mngAcq.configurationFile
             forHome.whoIsVisilbe=forReal.name
         }
         else
@@ -96,7 +94,8 @@ ApplicationWindow {
         //@@@@@@@@@@    Events          @@@@@@@@@@
         onBack: forHome.whoIsVisilbe=forHome.name
         onSaveMeChanged: forAna.save(saveMe)
-        onSaveExam: mngAcq.saveAcquisition()
+        onSaveExam: mngAcq.endAcquisition("TEST_SAVE")
+        onDeleteExam: mngAcq.endAcquisition("TEST_DISCARD")
     }
 
 
