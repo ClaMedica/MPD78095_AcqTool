@@ -14,6 +14,7 @@ MAcqManager::MAcqManager(QObject *parent) :
     m_configurationFileLoaded=false;//nessun file di configurazione caricato
     m_oldSample=0;
     m_superProcess=NULL;
+    m_saving=false;
 
 
     m_oldState=ESTATE_IDLE_NOT_CONNECTED;
@@ -89,6 +90,19 @@ void MAcqManager::setAlarmFile(QString __name)
             emit alarmFileChanged();
         }
     }
+}
+
+void MAcqManager::dataOnTCP(QObject *__pParent, SimpleTCPClient *__pTCP, QByteArray __block)
+{//arriviamo qua dentro ogni volta che arriva qualcosa da uno dei server a cui siamo collegati
+
+    if(__pParent!=NULL)
+    {//punta a qualcosa andiamo avanti
+        if(__pTCP!=NULL)
+        {//punta a qualcosa proviamo a gestirlo
+            ((MAcqManager *)__pParent)->handleTCP(__pTCP,__block);
+        }
+    }
+
 }
 
 bool MAcqManager::newAcquisition(QString __newName)
@@ -281,18 +295,21 @@ void MAcqManager::setAlarms(QVariantList __list)
 
 }
 
-void MAcqManager::dataOnTCP(QObject *__pParent, SimpleTCPClient *__pTCP, QByteArray __block)
-{//arriviamo qua dentro ogni volta che arriva qualcosa da uno dei server a cui siamo collegati
+bool MAcqManager::sendCommand(tcp_flow_bt_cmd_t __command)
+{
 
-    if(__pParent!=NULL)
-    {//punta a qualcosa andiamo avanti
-        if(__pTCP!=NULL)
-        {//punta a qualcosa proviamo a gestirlo
-            ((MAcqManager *)__pParent)->handleTCP(__pTCP,__block);
-        }
+    if(m_tcpClients.contains("CMD"))
+    {
+        qDebug()<<"Sending command: "<<__command;
+        quint8 c=(quint8)__command;
+        m_tcpClients["CMD"]->sendData((char *)&c,sizeof(quint8));
+        return true;
     }
-
+    else
+    {qCritical()<<"No CMD channel loaded";return false;}
 }
+
+
 
 
 
@@ -419,7 +436,7 @@ void MAcqManager::handleTCP(SimpleTCPClient *__client, QByteArray __block)
 
             if(numChan > maxNumChan)
             {
-                qDebug( "handleTCP: ERROR, numChan(%d) > maxNumChan(%d)", numChan,maxNumChan);
+                qCritical( "ERROR, numChan(%d) > maxNumChan(%d)", numChan,maxNumChan);
                 return;
             }
 
@@ -452,8 +469,15 @@ void MAcqManager::handleTCP(SimpleTCPClient *__client, QByteArray __block)
 
                         out << (qreal)v;
                         //qDebug()<<v;
-                        //qDebug()<<"append? "<<m_mng->AppendValue(&currChan,&v,1);
                         m_chanMapValues[k]<<v;
+                        m_bufferChanMap[m_mng->GetChanName(k)]<<v;
+                        if(!m_saving)
+                            checkAutomaticStartStop("Start");
+                        else
+                        {
+                            m_mng->AppendValue(&currChan,&v,1);
+                            checkAutomaticStartStop("Stop");
+                        }
                     }
                 }
                 else
@@ -463,7 +487,6 @@ void MAcqManager::handleTCP(SimpleTCPClient *__client, QByteArray __block)
             }
             if(!m_sendingToPlot && m_serverReady)
             {
-
                 m_sendingPack = blockOut;
                 //qDebug()<<"al plot"<<dataCount<<(float)tim.elapsed()/1000;
                 //mandiamo i dati alla visualizzazione
@@ -649,6 +672,10 @@ bool MAcqManager::buildConfigurationFile()
             tracks->addChild(m_mng->GetChanName(chan));
             tracks->setAttribute(XML_THICK,"3",QStringList()<<m_mng->GetChanName(chan));
             tracks->setAttribute(XML_COLOR,"white",QStringList()<<m_mng->GetChanName(chan));
+            //ora per la sola flussimetria e giusto per fare una prova #BUG
+            m_automaticChannelsMap[chan]=false;
+            if(m_mng->GetLoc(chan)=="a")
+                m_automaticChannelsMap[chan]=true;
         }
 
     }
@@ -667,6 +694,9 @@ void MAcqManager::sendToPlots()
     {
         QList<int> chanList=m_chanInPlots[plotName];
         block.clear();
+        //vediamo quanti di questi canali sono automatici
+
+
         out<<(qint32)chanList.size();
         foreach(int currChan,chanList)
         {
@@ -684,23 +714,47 @@ void MAcqManager::sendToPlots()
 
 }
 
+void MAcqManager::checkAutomaticStartStop(QString __which)
+{//ok controlliamo se c'è qualche condizione automatica
+    QStringList lineage;lineage<<"Settings"<<"Acquisition"<<"Auto"+__which;
 
+    foreach (QList<qreal> currBuff, m_bufferChanMap) {
+        QString chanName=m_bufferChanMap.key(currBuff);
+        Ancestry *autoConfig=m_configuration.getChild(chanName,lineage);
+        if(autoConfig==NULL)
+            continue;//vuol dire che non ci sono condizioni per questo canale -> skippalo
+        //ho qualcosa di interessante vediamo cosa
+        foreach(Ancestry *condition,autoConfig->getChildren())
+        {
+            if(condition->name()=="Step")
+            {//condizione a gradino
+                //per prima cosa controlliamo quanti campioni è
+                int min=condition->getChild("Duration")->getAttribute("min").toInt();
+                int bufferSize=condition->getAttribute("bufferSize").toInt();
+                qreal ampMin=condition->getChild("Amplitude")->getAttribute("min").toInt();
+                qreal ampMax=condition->getChild("Amplitude")->getAttribute("max").toInt();
+                if(currBuff.size()<min)
+                    continue;//non ho ancora abbastanza campioni per decidere skip alla prossima condizione
+                //ora quindi sono sicuro che arrivo qui solo quando ho abbastanza campioni
+                if(currBuff.size()>bufferSize)
+                    m_bufferChanMap[chanName].removeFirst();//effetto buffer
+                //controllo se c'è un gradino
+                qreal startVal=currBuff[0];
+                int count=0;
+                foreach(qreal sample,currBuff){
+                    if(sample-startVal>ampMin && sample-startVal<ampMax)
+                        count++;
+                    else
+                        count=0;
+                }
+                if(count>=min)
+                    m_saving=true;//posso iniziare a salvare i dati
+            }
 
-
-
-bool MAcqManager::sendCommand(tcp_flow_bt_cmd_t __command)
-{
-
-    if(m_tcpClients.contains("CMD"))
-    {
-        qDebug()<<"Sending command: "<<__command;
-        quint8 c=(quint8)__command;
-        m_tcpClients["CMD"]->sendData((char *)&c,sizeof(quint8));
-        return true;
+        }
     }
-    else
-    {qCritical()<<"No CMD channel loaded";return false;}
 }
+
 
 
 

@@ -80,7 +80,8 @@ private:
     m_serverReady,
     m_sendingToPlot,
     m_configurationFileLoaded,
-    m_alarmFileLoaded;
+    m_alarmFileLoaded,
+    m_saving;
 
     QByteArray m_sendingPack;
 
@@ -98,7 +99,11 @@ private:
 
     QMap<int,QList<qreal> > m_chanMapValues;
 
+    QMap<int,bool> m_automaticChannelsMap;
+
     QMap<int,QString> m_plotOfChannelMap;
+
+    QMap<QString,QList<qreal> > m_bufferChanMap;
 
     QVector<VarMap> m_acqMarker;
 
@@ -127,6 +132,7 @@ private:
     bool newAcqFromPIC();
     bool buildConfigurationFile();
     void sendToPlots();
+    void checkAutomaticStartStop(QString __which);
 
 };
 

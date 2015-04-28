@@ -21,11 +21,10 @@
 int main(int argc, char *argv[])
 {
     //creo il file di report
-
-
     qInstallMessageHandler(myMessageOutput); //install : set the callback
+    QGuiApplication app(argc, argv);
     QFile f;
-    f.setFileName(QDir::currentPath()+LOG_FILE);
+    f.setFileName(QDir::currentPath()+"/"+QGuiApplication::applicationDisplayName()+"_log.htm");
     f.open(QIODevice::WriteOnly);
     f.write(LOG_HEADER);
     QString curDateTime=QDateTime::currentDateTime().toString()+"<BR>";
@@ -33,7 +32,7 @@ int main(int argc, char *argv[])
     f.close();
 
 
-    QGuiApplication app(argc, argv);
+
 
     qmlRegisterType<DopplerAnalysis>("Analysis",1,0,"DopplerAnalysis");
     qmlRegisterType<MPlayer>("Audio",1,0,"MPlayer");
