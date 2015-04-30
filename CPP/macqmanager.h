@@ -65,6 +65,8 @@ public slots:
     bool sendStopAcq (void);
     void resetAlarms();
     void setAlarms(QVariantList __list);
+
+
 private slots:
     bool sendCommand(tcp_flow_bt_cmd_t __command);
     bool sendCommand(int __command){return sendCommand((tcp_flow_bt_cmd_t)__command);}
@@ -101,9 +103,11 @@ private:
 
     QMap<int,bool> m_automaticChannelsMap;
 
+    QMap<int32_t,int32_t> m_HWChannelMap;//mappa che mi dice in che canale salvare un campione proveniente da un canale fisico
+
     QMap<int,QString> m_plotOfChannelMap;
 
-    QMap<QString,QList<qreal> > m_bufferChanMap;
+    QMap<int,QList<qreal> > m_bufferChanMap;
 
     QVector<VarMap> m_acqMarker;
 
@@ -133,6 +137,8 @@ private:
     bool buildConfigurationFile();
     void sendToPlots();
     void checkAutomaticStartStop(QString __which);
+    void prependBuffer();
+        void updateDataFile();
 
 };
 

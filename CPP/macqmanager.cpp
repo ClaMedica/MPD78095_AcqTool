@@ -148,6 +148,9 @@ bool MAcqManager::newAcquisition(QString __newName)
 
         if(!buildConfigurationFile())
         {qCritical()<<"Error during building of configuration file";return false;}
+
+        //aggiorno il datafile con i dati relativi alla mia configurazione
+        updateDataFile();
         //inizializzo i server di comunicazione con i plotter
         initializeServers();
         //disabilito alcuni allarmi
@@ -191,9 +194,7 @@ void MAcqManager::connectToServers()
                 startSupe("show");
                 QTimer::singleShot(10000,this,SLOT(connectToServers()));
             }
-
         }
-
     }
 }
 
@@ -203,7 +204,6 @@ void MAcqManager::startSupe(QString __mode)
     qDebug()<<"Supervisor starting...";
     QString path="M:/Lavoro/Software/Build/StandAlone/";
     m_superProcess->start(path+"FlowBtSupe.exe",QStringList()<<__mode);
-
 }
 
 void MAcqManager::endAcquisition(QString __exit)
@@ -263,7 +263,7 @@ void MAcqManager::addMarker(QVariant __key,QVariant __descr)
 
 void MAcqManager::addDefiner(bool __startEnd, QVariantList __info)
 {
-    //BUG
+    //#BUG
 }
 
 bool MAcqManager::sendStartAcq()
@@ -316,7 +316,7 @@ bool MAcqManager::sendCommand(tcp_flow_bt_cmd_t __command)
 void MAcqManager::updateAcqData()
 {
     QStringList plotNames;
-    plotNames<<"Cella";//BUG
+    plotNames<<"Cella";//#BUG
     QString type="Marker";
     QString sGroup="$"+type+"Group";
     QString eGroup="&"+type+"Group";
@@ -409,7 +409,7 @@ void MAcqManager::handleTCP(SimpleTCPClient *__client, QByteArray __block)
              * - numChanData, type qint32. Number of samples (float) for the current channel
              * - samples, type qreal, lenght numChanData. Channel's samples
              */
-            m_chanMapValues.clear();
+            m_chanMapValues.clear();//pulisco il buffer temporaneo
             dataCount++;
             //qDebug()<<"dal server"<<dataCount<<(float)tim.elapsed()/1000;
             QByteArray block,blockOut;
@@ -465,18 +465,20 @@ void MAcqManager::handleTCP(SimpleTCPClient *__client, QByteArray __block)
                         }
                         else
                             v=m_oldSample;
-
-
                         out << (qreal)v;
-                        //qDebug()<<v;
-                        m_chanMapValues[k]<<v;
-                        m_bufferChanMap[m_mng->GetChanName(k)]<<v;
+                        //ora di questo campione cosa ne faccio?
+
                         if(!m_saving)
+                        {//finchè non devo salvare riempo il buffer e controllo
+                            m_bufferChanMap[currChan]<<v;
                             checkAutomaticStartStop("Start");
+                        }
                         else
-                        {
-                            m_mng->AppendValue(&currChan,&v,1);
-                            checkAutomaticStartStop("Stop");
+                        {//appena posso salvare torno come prima
+                            m_chanMapValues[currChan]<<v;
+                            int32_t chan=(int32_t)m_HWChannelMap[currChan];
+                            m_mng->AppendValue(&chan,&v,1);
+                            //checkAutomaticStartStop("Stop");
                         }
                     }
                 }
@@ -485,7 +487,7 @@ void MAcqManager::handleTCP(SimpleTCPClient *__client, QByteArray __block)
                     qDebug( "handleTCP: WARNING, packet corrupt --> currChan (%d) out of range", currChan);
                 }
             }
-            if(!m_sendingToPlot && m_serverReady)
+            if(!m_sendingToPlot && m_serverReady && m_saving)
             {
                 m_sendingPack = blockOut;
                 //qDebug()<<"al plot"<<dataCount<<(float)tim.elapsed()/1000;
@@ -494,11 +496,6 @@ void MAcqManager::handleTCP(SimpleTCPClient *__client, QByteArray __block)
                 sendToPlots();
                 m_sendingToPlot=false;
             }
-            else
-            {
-                qDebug()<<"Skip";
-            }
-
         }
     }
 }
@@ -632,12 +629,20 @@ bool MAcqManager::buildConfigurationFile()
     //creo il file di configurazione in base all'esame
     config.addChild(XML_GRAPHS);
     Ancestry *graph=config.getChild(XML_GRAPHS);
-
+    QStringList lineage;lineage<<"Settings"<<"Acquisition";
 
     int chanlNum=m_mng->GetChanNum();
+    qDebug()<<"N° Canali: "<<chanlNum;
     if(chanlNum==0){qCritical()<<"No channels in file";return false;}
     for(int nc=0;nc<chanlNum;nc++)
-    {//contiamo i grafici
+    {//contiamo i grafici e popoliamo la mappa di associazione dei canali fisici
+        QString chanName=m_mng->GetChanName(nc);
+        Ancestry *cur=config.getChild(chanName,lineage);
+        if(cur!=NULL)
+            if(cur->getAttribute("HWC")!="none" || cur->getAttribute("HWC")!="")
+                m_HWChannelMap[(int32_t)cur->getAttribute("HWC").toInt()]=(int32_t)nc;
+
+
         m_chanInPlots["Graph_"+QString::number(m_mng->GetGraph(nc))]<<nc;
         m_plotOfChannelMap[nc]=m_mng->GetGraph(nc);
     }
@@ -669,13 +674,16 @@ bool MAcqManager::buildConfigurationFile()
         pltN->setAttribute(XML_TYPE,"server");
         foreach (int chan, m_chanInPlots[graphName])
         {//qui scrivo le proprietà delle tracce
-            tracks->addChild(m_mng->GetChanName(chan));
+            QString chanName=m_mng->GetChanName(chan);
+            tracks->addChild(chanName);
             tracks->setAttribute(XML_THICK,"3",QStringList()<<m_mng->GetChanName(chan));
             tracks->setAttribute(XML_COLOR,"white",QStringList()<<m_mng->GetChanName(chan));
+
+
             //ora per la sola flussimetria e giusto per fare una prova #BUG
-            m_automaticChannelsMap[chan]=false;
-            if(m_mng->GetLoc(chan)=="a")
-                m_automaticChannelsMap[chan]=true;
+            //m_automaticChannelsMap[chan]=false;
+            //if(m_mng->GetLoc(chan)=="a")
+            //    m_automaticChannelsMap[chan]=true;
         }
 
     }
@@ -716,14 +724,26 @@ void MAcqManager::sendToPlots()
 
 void MAcqManager::checkAutomaticStartStop(QString __which)
 {//ok controlliamo se c'è qualche condizione automatica
-    QStringList lineage;lineage<<"Settings"<<"Acquisition"<<"Auto"+__which;
+    QStringList originalLineage;originalLineage<<"Settings"<<"Acquisition";
 
-    foreach (QList<qreal> currBuff, m_bufferChanMap) {
-        QString chanName=m_bufferChanMap.key(currBuff);
-        Ancestry *autoConfig=m_configuration.getChild(chanName,lineage);
+    foreach (QList<qreal> currBuff, m_bufferChanMap) {//scorro ogni canale alla ricerca di una condizione
+        QStringList lineage=originalLineage;
+        int chanNum=m_bufferChanMap.key(currBuff);
+        QString chanName=m_mng->GetChanName(chanNum);
+        lineage<<chanName;
+
+        if(!m_configuration.hasLineage(lineage))
+            continue;//questo canale non viene toccato -> skip
+
+        Ancestry *autoConfig=m_configuration.getChild("Auto"+__which,lineage);
+
         if(autoConfig==NULL)
-            continue;//vuol dire che non ci sono condizioni per questo canale -> skippalo
-        //ho qualcosa di interessante vediamo cosa
+            continue;//non ci sono condizioni di start stop automatico -> skip
+        QString enabled=autoConfig->getAttribute("enabled");
+        if(enabled=="false" && __which=="Start")
+            continue;//ci sono condizioni ma sono disabilitate
+        //ci sono le condizioni e sono abilitate -> avanti savoia!
+
         foreach(Ancestry *condition,autoConfig->getChildren())
         {
             if(condition->name()=="Step")
@@ -737,7 +757,7 @@ void MAcqManager::checkAutomaticStartStop(QString __which)
                     continue;//non ho ancora abbastanza campioni per decidere skip alla prossima condizione
                 //ora quindi sono sicuro che arrivo qui solo quando ho abbastanza campioni
                 if(currBuff.size()>bufferSize)
-                    m_bufferChanMap[chanName].removeFirst();//effetto buffer
+                    m_bufferChanMap[chanNum].removeFirst();//effetto buffer
                 //controllo se c'è un gradino
                 qreal startVal=currBuff[0];
                 int count=0;
@@ -747,10 +767,47 @@ void MAcqManager::checkAutomaticStartStop(QString __which)
                     else
                         count=0;
                 }
+                //qDebug()<<currBuff;
                 if(count>=min)
+                {
                     m_saving=true;//posso iniziare a salvare i dati
+                    prependBuffer();
+                    return;
+                }
             }
 
+        }
+
+    }
+}
+
+void MAcqManager::prependBuffer()
+{
+    foreach (QList<qreal> currBuff, m_bufferChanMap) {
+        int32_t chanNum=m_bufferChanMap.key(currBuff);
+        m_chanMapValues[chanNum].swap(m_bufferChanMap[chanNum]);
+        foreach(qreal sample,currBuff){
+            float v=sample;
+            int32_t chan=(int32_t)m_HWChannelMap[chanNum];
+            qDebug()<<chan;
+            m_mng->AppendValue(&chan,&v,1);
+        }
+        qDebug()<<currBuff;
+    }
+}
+
+void MAcqManager::updateDataFile()
+{//viene chiamata per aggiornare il datafile a seconda del file di configurazione del relativo esame
+    QStringList originalLineage;originalLineage<<"Settings"<<"Acquisition";
+    int maxChan=m_mng->GetChanNum();
+    for(int i=0;i<maxChan;i++)
+    {
+        QString chanName=m_mng->GetChanName(i);
+        Ancestry *chanConfig=m_configuration.getChild(chanName,originalLineage);
+        if(chanConfig!=NULL)
+        {
+            m_mng->SetGain(i,chanConfig->getAttribute("gain").toFloat());
+            m_mng->SetOffset(i,chanConfig->getAttribute("offset").toFloat());
         }
     }
 }

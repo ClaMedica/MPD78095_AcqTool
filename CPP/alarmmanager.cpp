@@ -69,13 +69,12 @@ bool AlarmManager::setLanguage(QString __language)
 
 void AlarmManager::addAlarm(int __code)
 {
-    qDebug()<<"Alarm! "<<__code;
+
     if(m_confAla==NULL)
     {qCritical()<<"No alarm configuration file loaded";return;}
     if(m_enabledAlarms.contains(__code))
         if(!m_enabledAlarms[__code])
         {
-            qDebug()<<"disable "<<__code;
             return;
         }//allarme disabilitato
 
@@ -93,6 +92,7 @@ void AlarmManager::addAlarm(int __code)
 
     m_alarms.append(ala);
     updateAlarms();
+    qDebug()<<"Alarm! "<<__code;
 }
 
 void AlarmManager::resetAlarms(QList<int> __codes)

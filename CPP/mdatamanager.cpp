@@ -200,10 +200,13 @@ void MDataManager::loadFile(QString __fileName)
         {
             MSignal *sig=new MSignal;
             sig->setSize(m_mng->GetSamplesNumber(h));
+            QList<float> buff;
             for(int i=0;i<m_mng->GetSamplesNumber(h);i++)
             {
+                buff<<m_mng->GetValue(h,i);
                 sig->setValue(i,m_mng->GetValue(h,i));
             }
+            qDebug()<<buff;
             sig->setName(m_mng->GetChanName(h));
             sig->setSamplingFrequency(m_mng->GetNAS(h));
             float M=sig->maximum();
@@ -252,7 +255,6 @@ void MDataManager::loadFile(QString __fileName)
                 if(defEn[i].at(nc).toBool())
                 {
                     subVec->append(defVec->at(i));
-
                 }
             if(!subVec->isEmpty())
                 saveDataAndUpdate(m_mng->GetChanName(nc),"Definers",subVec);
@@ -566,6 +568,7 @@ QVariantList MDataManager::getPlotLimits()
                     if(sig->getDuration()>xMax)xMax=sig->getDuration();
                     if(sig->minimum()<yMin)yMin=sig->minimum();
                     if(sig->maximum()>yMax)yMax=sig->maximum();
+                    //qDebug()<<"Segnale lungo:"<<sig->getSize();
                 }
             }
             limits<<xMin<<xMax<<yMin<<(yMax+abs(yMax*0.05));
