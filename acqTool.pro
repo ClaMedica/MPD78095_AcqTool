@@ -17,20 +17,17 @@ QT +=multimedia
 QT +=xml
 QT +=core
 
+
 DEFINES += QT_MESSAGELOGCONTEXT
 # The .cpp file which was generated for your project. Feel free to hack it.
 SOURCES += main.cpp \
     CPP/maudio.cpp \
     CPP/mplayer.cpp \
-    CPP/functionhandler.cpp \
     CPP/parametermanager.cpp \
     CPP/tabble.cpp \
-    CPP/codebook.cpp \
     ../MGlobal/msignal.cpp \
     ../MGlobal/global.cpp \
-    CPP/mapmanager.cpp \
     CPP/modelmanager.cpp \
-    CPP/doppleranalysis.cpp \
     CPP/TCP/SimpleTCPChannel.cpp \
     CPP/TCP/SimpleTCPClient.cpp \
     CPP/TCP/TcpServers.cpp \
@@ -44,15 +41,11 @@ SOURCES += main.cpp \
 HEADERS += \
     CPP/maudio.h \
     CPP/mplayer.h \
-    CPP/functionhandler.h \
     CPP/parametermanager.h \
     CPP/tabble.h \
-    CPP/codebook.h \
     ../MGlobal/global.h \
     ../MGlobal/msignal.h \
-    CPP/mapmanager.h \
     CPP/modelmanager.h \
-    CPP/doppleranalysis.h \
     CPP/TCP/SimpleTCPChannel.h \
     CPP/TCP/SimpleTCPClient.h \
     CPP/TCP/TcpServers.h \

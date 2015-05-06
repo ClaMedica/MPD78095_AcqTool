@@ -6,7 +6,7 @@ import Audio 1.0
 import QtQuick.Controls.Styles 1.2
 import MPlotModule 1.0
 import Managers 1.0
-import Analysis 1.0
+//import Analysis 1.0
 
 MForm{
     //@@@@@@@@@@    Definitions     @@@@@@@@@@
@@ -56,23 +56,6 @@ MForm{
 
     //@@@@@@@@@@    Objects     @@@@@@@@@@
     Timer{id:iniTime;onTriggered: initialize()}
-
-    DopplerAnalysis{
-        //@@@@@@@@@@    Properties      @@@@@@@@@@
-        id: dopAna
-
-        //@@@@@@@@@@    Events          @@@@@@@@@@
-        onAnalysisNewsChanged:{
-            mngData.storeNews(analysisNews)
-            if(box.ready)
-            {
-                plot.tracks=mngData.getData("Track")
-                plot.markers=mngData.getData("Marker")
-                plot.frames=mngData.getData("Definer")
-                plot.limits=mngData.getPlotLimits();
-            }
-        }
-    }
 
 
     /*@@@@@@@@@@@@@@@@@@@@

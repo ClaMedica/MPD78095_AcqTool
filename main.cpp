@@ -1,11 +1,9 @@
 #include <QGuiApplication>
 #include <QQmlApplicationEngine>
 #include "qqml.h"
-#include <doppleranalysis.h>
 #include <parametermanager.h>
 #include <msignal.h>
 #include <global.h>
-#include <mapmanager.h>
 #include <modelmanager.h>
 #include <macqmanager.h>
 #include <mdatamanager.h>
@@ -34,10 +32,8 @@ int main(int argc, char *argv[])
 
 
 
-    qmlRegisterType<DopplerAnalysis>("Analysis",1,0,"DopplerAnalysis");
     qmlRegisterType<MPlayer>("Audio",1,0,"MPlayer");
     qmlRegisterType<ParameterManager>("Managers",1,0,"ParameterManager");
-    qmlRegisterType<MapManager>("Managers",1,0,"MapManager");
     qmlRegisterType<ModelManager>("Managers",1,0,"ModelManager");
     qmlRegisterType<MAcqManager>("Managers",1,0,"MAcqManager");
     qmlRegisterType<MDataManager>("Managers",1,0,"MDataManager");

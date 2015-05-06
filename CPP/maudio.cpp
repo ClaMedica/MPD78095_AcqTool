@@ -91,11 +91,11 @@ bool MAudio::setFormat(QVector<MSignal> *__pChannels,
             p_waveFormat->BlockAlign=p_waveFormat->NumChannels*p_waveFormat->BitsPerSample/8;
             p_waveFormat->ByteRate=s[0].getSamplingFrequency()*p_waveFormat->NumChannels*p_waveFormat->BitsPerSample/8;
 
-            if(s[0].getSize()>0)
-                p_waveFormat->Subchunk2IDSize=s[0].getSize()*p_waveFormat->NumChannels*p_waveFormat->BitsPerSample/8;
+            if(s[0].size()>0)
+                p_waveFormat->Subchunk2IDSize=s[0].size()*p_waveFormat->NumChannels*p_waveFormat->BitsPerSample/8;
             else
             {
-                qDebug() << "Wrong signal length : " << s[0].getSize();
+                qDebug() << "Wrong signal length : " << s[0].size();
                 return false;
             }
             p_waveFormat->ChunkSize=36+p_waveFormat->Subchunk2IDSize;
@@ -166,10 +166,10 @@ int MAudio::fromFileToSignal(MSignal **__pChannels, QString __fileName)
     for(int which=0;which<p_waveFormat->NumChannels;which++)
     {
         (*__pChannels)=new MSignal[p_waveFormat->NumChannels];
-        (*__pChannels)[which].setSize(p_waveFormat->Subchunk2IDSize/(p_waveFormat->NumChannels*p_waveFormat->BitsPerSample/8));
+        (*__pChannels)[which].resize(p_waveFormat->Subchunk2IDSize/(p_waveFormat->NumChannels*p_waveFormat->BitsPerSample/8));
         (*__pChannels)[which].setSamplingFrequency(p_waveFormat->SampleRate);
         int index=0;
-        for(int i=44+k;index<(*__pChannels)[which].getSize();i+=p_waveFormat->BitsPerSample/8)
+        for(int i=44+k;index<(*__pChannels)[which].size();i+=p_waveFormat->BitsPerSample/8)
         {
             float park;
             c[3]=0;
@@ -186,7 +186,7 @@ int MAudio::fromFileToSignal(MSignal **__pChannels, QString __fileName)
                 c[3]=BA[i+3];
 
             park=c[3]*pow(2,32)+c[2]*pow(2,16)+c[1]*pow(2,8)+c[0];
-            (*__pChannels)[which].setValue(index,park);
+            (*__pChannels)[which].replace(index,park);
 
             index++;
         }
@@ -279,10 +279,10 @@ bool MAudio::fromSignalToFile(QString __filename,
     Header.append(toLittleEndian(4,p_waveFormat->Subchunk2IDSize));
 
     int w=0;
-    for(int i=0;i<s[0].getSize();i++)
+    for(int i=0;i<s[0].size();i++)
         for(w=0;w<p_waveFormat->NumChannels;w++)
         {
-            float d=s[w].getValue(i);
+            float d=s[w].value(i);
             int v;
             d=d*pow(2,p_waveFormat->BitsPerSample-1)+pow(2,p_waveFormat->BitsPerSample-1)-1;
             v=d;
@@ -339,10 +339,10 @@ bool MAudio::fromSignalToBuffer(QBuffer *__pBuffer,
     Header.append(toLittleEndian(4,p_waveFormat->Subchunk2IDSize));
 
     int w=0;
-    for(int i=0;i<(*__pChannels)[0].getSize();i++)
+    for(int i=0;i<(*__pChannels)[0].size();i++)
         for(w=0;w<p_waveFormat->NumChannels;w++)
         {
-            float d=(*__pChannels)[w].getValue(i);
+            float d=(*__pChannels)[w].value(i);
             int v;
             d=d*pow(2,p_waveFormat->BitsPerSample-1)+pow(2,p_waveFormat->BitsPerSample-1)-1;
             v=d;

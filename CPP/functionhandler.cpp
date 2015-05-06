@@ -882,7 +882,7 @@ bool vectorize(Tabble *__pTab,MSignal *__pSignal, float __winDimension, int __co
 
     //Controlli
     QString funMex="vectorize: ";
-    int __winLen=__winDimension*__pSignal->getSamplingFrequency();
+    uint __winLen=__winDimension*__pSignal->getSamplingFrequency();
 
     if(__pSignal==NULL)
     {
@@ -949,7 +949,7 @@ bool vectorize(Tabble *__pTab,MSignal *__pSignal, float __winDimension, int __co
         c2=P;        //c2=P*(1/2*choose+1);
         __pTab->resize(c1,c2);
         bool go=true;
-        for(int i=0;i<(size-__winLen)&&go;i+=M)
+        for(uint i=0;i<(size-__winLen)&&go;i+=M)
         {
             MSignal section;
 

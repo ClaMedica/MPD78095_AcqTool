@@ -114,7 +114,7 @@ void MDataManager::loadFile(QString __fileName)
     VarMapVec *defVec=new VarMapVec;
     QMap<int,QVariantList > defEn;
 
-    float sigMin=INF,sigMax=-INF;
+    double sigMin=INF,sigMax=-INF;
     byte key;
     int32_t numCh;
     int32_t numSamp[20];
@@ -176,7 +176,7 @@ void MDataManager::loadFile(QString __fileName)
         {
             VarMap *mrk=new VarMap;
             m_mng->GetOpMarker(i,&key,numSamp,&descr);
-            float val=(float)numSamp[i]/m_mng->GetNAS(0);
+            double val=(double)numSamp[i]/m_mng->GetNAS(0);
             qDebug()<<val;
             (*mrk)["val"]=val;
             (*mrk)["popUp"]=descr;
@@ -199,18 +199,15 @@ void MDataManager::loadFile(QString __fileName)
         for(int h=0;h<m_mng->GetChanNum();h++)
         {
             MSignal *sig=new MSignal;
-            sig->setSize(m_mng->GetSamplesNumber(h));
-            QList<float> buff;
+            sig->resize(m_mng->GetSamplesNumber(h));
             for(int i=0;i<m_mng->GetSamplesNumber(h);i++)
-            {
-                buff<<m_mng->GetValue(h,i);
-                sig->setValue(i,m_mng->GetValue(h,i));
-            }
-            qDebug()<<buff;
+               sig->replace(i,m_mng->GetValue(h,i));
+
+            qDebug()<<sig;
             sig->setName(m_mng->GetChanName(h));
             sig->setSamplingFrequency(m_mng->GetNAS(h));
-            float M=sig->maximum();
-            float m=sig->minimum();
+            double M=sig->maximum();
+            double m=sig->minimum();
             if(sigMax<M)
                 sigMax=M;
             if(sigMin>m)
@@ -272,7 +269,7 @@ void MDataManager::loadFile(QString __fileName)
             m_mng->GetAnMarker(i,&key,&numCh,numSamp,&numDef);
             numChVec<<numCh;
 
-            float val=(float)numSamp[i]/m_mng->GetNAS(0);
+            double val=(double)numSamp[i]/m_mng->GetNAS(0);
             qDebug()<<val;
             (*mrk)["val"]=val;
             (*mrk)["popUp"]=descr;
@@ -556,7 +553,7 @@ QVariantList MDataManager::getPlotLimits()
         limits<<plotName;
         if(!families.isEmpty())
         {
-            float xMin=INF,xMax=-INF,yMin=INF,yMax=-INF;
+            double xMin=INF,xMax=-INF,yMin=INF,yMax=-INF;
             foreach (QString family, families) {
                 VarMapVec *cur=(VarMapVec *)m_storage.pickUp(family,"Signal");
 

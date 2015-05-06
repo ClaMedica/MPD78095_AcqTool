@@ -35,9 +35,18 @@ ApplicationWindow {
             console.log("arguments founded",arguments)
             mngAcq.startSupe("show")
             mngAcq.alarmFile=configFolder+"alarms.xml"
-            mngAcq.newAcquisition(Qt.application.arguments[1]);
-            forReal.configurationFile=mngAcq.configurationFile
-            forHome.whoIsVisilbe=forReal.name
+            if(Qt.application.arguments[1]==="acq")
+            {
+                mngAcq.newAcquisition(Qt.application.arguments[2]);
+                forReal.configurationFile=mngAcq.configurationFile
+                forHome.whoIsVisilbe=forReal.name
+            }
+            else
+            {
+                mngData.loadFile(Qt.application.arguments[2]);
+                forAna.configurationFile=mngData.configurationFile
+                forHome.whoIsVisilbe=forAna.name
+            }
         }
         else
         {

@@ -62,11 +62,6 @@ void MPlayer::setSliderPos(uint __pos)
                 }
             }
     }
-    else
-    {
-        qDebug() << "Slider position error"<<__pos;
-    }
-
 }
 
 QStringList MPlayer::fileList()

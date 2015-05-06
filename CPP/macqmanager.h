@@ -87,8 +87,6 @@ private:
 
     QByteArray m_sendingPack;
 
-    float m_oldSample;//BUG deve essere aggiunta la classe di filtraggio
-
     DatafileManager *m_mng;
 
     QVariantList m_alarmList,m_acqMarkerList;//BUG aggiungere la definer list se servirà
@@ -97,17 +95,15 @@ private:
 
     QMap<QString,SimpleTCPChannel *> m_tcpChannels;//canali di comunicazione verso l'esterno
 
-    QMap<QString,QList<int> > m_chanInPlots;
-
-    QMap<int,QList<qreal> > m_chanMapValues;
+    QMap<QString,QList<int> > m_chanInPlots;//associa nome plot ad una lista di canali del datafile che ci vanno disegnati dentro
 
     QMap<int,bool> m_automaticChannelsMap;
 
-    QMap<int32_t,int32_t> m_HWChannelMap;//mappa che mi dice in che canale salvare un campione proveniente da un canale fisico
+    QMap<uint,int32_t> m_HWChannelMap;//in base all'indice del canale fisico ottengo in che canale del datafile memorizzarlo
+    QMap<uint,MSignal > m_HBufferMap;//mappa dei buffer hardware in base al canale fisico
 
-    QMap<int,QString> m_plotOfChannelMap;
-
-    QMap<int,QList<qreal> > m_bufferChanMap;
+    QMap<QString,int32_t> m_SWChannelMap;//in base al nome del canale software ottengo in che canale del datafile memorizzarlo
+    QMap<QString,MSignal > m_SBufferMap;//mappa dei buffer software in base al nome
 
     QVector<VarMap> m_acqMarker;
 
@@ -137,8 +133,10 @@ private:
     bool buildConfigurationFile();
     void sendToPlots();
     void checkAutomaticStartStop(QString __which);
-    void prependBuffer();
-        void updateDataFile();
+    void saveBuffersToFile();
+    void updateDataFile();
+    void calculateSoftwareChannels();
+    void fillBuffers(QByteArray __block);
 
 };
 
