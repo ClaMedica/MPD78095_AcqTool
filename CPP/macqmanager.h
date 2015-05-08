@@ -55,7 +55,7 @@ signals:
 
 public slots:
 
-    bool newAcquisition(QString __newName="");
+    bool newAcquisition(QString __dataFile="",QString __configFile="");
     void connectToServers();
     void startSupe(QString __mode);
     void endAcquisition(QString __exit);
@@ -134,7 +134,7 @@ private:
     void sendToPlots();
     void checkAutomaticStartStop(QString __which);
     void saveBuffersToFile();
-    void updateDataFile();
+    bool updateDataFile();
     void calculateSoftwareChannels();
     void fillBuffers(QByteArray __block);
 

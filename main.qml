@@ -30,14 +30,15 @@ ApplicationWindow {
     {
 
         var arguments=Qt.application.arguments
-        if(arguments.length>1)
+        if(arguments.length===4)
         {
-            console.log("arguments founded",arguments)
+            console.log("arguments founded",arguments,arguments.length)
+            //gli argomenti sono acq/ana dataFile configFile
             mngAcq.startSupe("show")
             mngAcq.alarmFile=configFolder+"alarms.xml"
             if(Qt.application.arguments[1]==="acq")
             {
-                mngAcq.newAcquisition(Qt.application.arguments[2]);
+                mngAcq.newAcquisition(arguments[2],arguments[3]);
                 forReal.configurationFile=mngAcq.configurationFile
                 forHome.whoIsVisilbe=forReal.name
             }

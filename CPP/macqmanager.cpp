@@ -104,7 +104,7 @@ void MAcqManager::dataOnTCP(QObject *__pParent, SimpleTCPClient *__pTCP, QByteAr
 
 }
 
-bool MAcqManager::newAcquisition(QString __newName)
+bool MAcqManager::newAcquisition(QString __dataFile, QString __configFile)
 {
 
     if(m_acqFileOpened)
@@ -121,18 +121,23 @@ bool MAcqManager::newAcquisition(QString __newName)
             delete m_mng;
         }
 
-        if(__newName!="")
-            m_acqFileName=__newName;
+        if(__dataFile!="" && __configFile!="")
+        {
+            m_acqFileName=__dataFile;
+            m_configurationFileName=__configFile;
+        }
         else
         {
-            qCritical("Error file empty");
+            qCritical("Error: file empty");
             return false;
         }
 
-        //ho letto la configurazione
+        //controllo l'esistenza dei file
 
-        qDebug()<<m_acqFileName<<" exists? "<<QFile::exists(m_acqFileName);
         if(!QFile::exists(m_acqFileName))
+        {qCritical()<<"File does not exists";return false;}
+
+        if(!QFile::exists(m_configurationFileName))
         {qCritical()<<"File does not exists";return false;}
 
         m_mng=new DatafileManager;
@@ -149,6 +154,7 @@ bool MAcqManager::newAcquisition(QString __newName)
         {qCritical()<<"Error during building of configuration file";return false;}
 
         //aggiorno il datafile con i dati relativi alla mia configurazione
+        qDebug()<<"Updating datafile";
         updateDataFile();
         //ripristino il file in acquisizione
         qDebug()<<"Continue ..."<<m_mng->Continue();
@@ -487,6 +493,7 @@ void MAcqManager::saveConfiguration()
 
 bool MAcqManager::loadConnectivityInfo(Ancestry *__info)
 {
+    qDebug()<<"Loading connectivity info";
     if(__info==NULL)
     {qCritical()<<"NULL pointer";return false;}
     if(__info->getChild(XML_TCP)!=NULL)
@@ -495,15 +502,12 @@ bool MAcqManager::loadConnectivityInfo(Ancestry *__info)
 
         foreach (Ancestry *child, tcp->getChildren()) {
             QString name=child->name();
-            QString address=child->getAttribute(XML_ADDRESS);
-            int port=child->getAttribute(XML_PORT).toInt();
-            if(child->getAttribute(XML_TYPE)=="client")
+            QString address=child->getAttribute(ATT_ADDRESS);
+            int port=child->getAttribute(ATT_PORT).toInt();
+            if(child->getAttribute(ATT_TYPE)=="client")
                 m_tcpClients[name]=new SimpleTCPClient(QHostAddress(address),port,this);
-            else if(child->getAttribute(XML_TYPE)=="server")
-            {
+            else if(child->getAttribute(ATT_TYPE)=="server")
                 m_tcpChannels[name]=new SimpleTCPChannel(QHostAddress(address),port,this);
-
-            }
         }
     }
     else
@@ -566,15 +570,15 @@ bool MAcqManager::buildConfigurationFile()
     * di canali coinvolti separata da virgola
     *
     */
-    Ancestry config;//iniziamo col pescare il file di configurazione generale che per ora è config_BT #BUG dovrà essere dinamico
-    if(!config.loadFromXML(QDir::currentPath()+"/Config_BT.pic"))
+    Ancestry config;//iniziamo col pescare il file di configurazione
+    if(!config.loadFromXML(m_configurationFileName))
     {qCritical()<<"No original config file found";return false;}
     //ora che la mia classe è popolata la vado a completare iniziando con l'aggiungere il campo graphs
 
     Ancestry *graph=config.addChild(XML_GRAPHS);
     if(graph==NULL){qCritical()<<"Could not create child";return false;}
-    //setto la lineage di partenza e sò che è così perchè l'ho fatta io
-    QStringList lineage;lineage<<"Settings"<<"Acquisition";
+    //mi salvo il puntatore al livello acquisition
+    Ancestry *acq=config.getChild("Settings")->getChild("Acquisition");
 
     //ok finita questa fase preliminare iniziamo con calma a scrivere qualcosa
     //peschiamo il numero totale di canali
@@ -584,7 +588,7 @@ bool MAcqManager::buildConfigurationFile()
     for(int nc=0;nc<chanlNum;nc++)
     {//contiamo i grafici e popoliamo la mappa di associazione dei canali fisici
         QString chanName=m_mng->GetChanName(nc);
-        Ancestry *cur=config.getChild(chanName,lineage);
+        Ancestry *cur=acq->getChild(chanName);
         //è necessario controllare che nel file di configurazione ci sia scritto come gestire questo canale
         if(cur==NULL){qCritical()<<"No channel name in config file";return false;}
         //ok ora mi segno se e a quale canale fisico è associato questo canale
@@ -614,9 +618,9 @@ bool MAcqManager::buildConfigurationFile()
         if(m_chanInPlots[graphName].size()==0)
             qFatal("Graph without channels");//controllo superfluo ma se da errore meglio chiudere baracca e burattini
         int nc=m_chanInPlots[graphName].at(0);
-        Ancestry *  axis=prop->addChild("Axis");
-        Ancestry *  time=prop->addChild("Time");
-        Ancestry *  network=prop->addChild("Network");
+        Ancestry *  axis=prop->addChild(XML_AXIS);
+        Ancestry *  time=prop->addChild(XML_TIME);
+        Ancestry *  network=prop->addChild(XML_NETWORK);
         if(axis==NULL){qCritical()<<"Could not create child";return false;}
         if(time==NULL){qCritical()<<"Could not create child";return false;}
         if(network==NULL){qCritical()<<"Could not create child";return false;}
@@ -625,24 +629,27 @@ bool MAcqManager::buildConfigurationFile()
         axis->setAttribute("yAbsoluteMin",QString::number(m_mng->GetInfLim(nc)));
         time->setAttribute("samplingFrq",QString::number(m_mng->GetNAS(nc)));
         time->setAttribute("pageTime",QString::number(m_mng->GetPageTime()));
-        network->setAttribute(XML_PORT,QString::number(9000+nc));
-        network->setAttribute(XML_ADDRESS,"127.0.0.1");
-        Ancestry *  pltN=connections->addChild(graphName,QStringList()<<XML_TCP);
+        network->setAttribute(ATT_PORT,QString::number(9000+nc));
+        network->setAttribute(ATT_ADDRESS,"127.0.0.1");
+        Ancestry * tokenTcp=connections->getChild(XML_TCP);
+        Ancestry *  pltN=tokenTcp->addChild(graphName);
         if(pltN==NULL){qCritical()<<"Could not create child";return false;}
-        pltN->setAttribute(XML_PORT,QString::number(9000+nc));
-        pltN->setAttribute(XML_ADDRESS,"127.0.0.1");
-        pltN->setAttribute(XML_TYPE,"server");
+        pltN->setAttribute(ATT_PORT,QString::number(9000+nc));
+        pltN->setAttribute(ATT_ADDRESS,"127.0.0.1");
+        pltN->setAttribute(ATT_TYPE,"server");
         foreach (int chan, m_chanInPlots[graphName])
         {//qui scrivo le proprietà delle tracce
             QString chanName=m_mng->GetChanName(chan);
             Ancestry * trkN=tracks->addChild(chanName);
             if(trkN==NULL){qCritical()<<"Could not create child";return false;}
-            trkN->setAttribute(XML_THICK,"3");
-            trkN->setAttribute(XML_COLOR,"white");
+            trkN->setAttribute(ATT_THICK,"3");
+            trkN->setAttribute(ATT_COLOR,"white");
         }
     }
+    //ora salvo il file di configurazione come cur.xml
     config.saveToXML(QDir::currentPath()+"/cur.xml");
     qDebug()<<"Configuration file builded succesfully";
+    //e mi sovrascrivo il nome perchè tanto le info ce le ho
     setConfigurationFile(QDir::currentPath()+"/cur.xml");
     return true;
 }
@@ -685,35 +692,35 @@ void MAcqManager::sendToPlots()
 
 void MAcqManager::checkAutomaticStartStop(QString __which)
 {//ok controlliamo se c'è qualche condizione automatica
-    QStringList originalLineage;originalLineage<<"Settings"<<"Acquisition";
+    //mi salvo il puntatore al livello acquisition
+    Ancestry *acq=m_configuration.getChild(XML_ACQUISITION);
 
     foreach (MSignal currBuff, m_HBufferMap) {//scorro ogni canale alla ricerca di una condizione
-        QStringList lineage=originalLineage;
+
         uint chanNum=m_HBufferMap.key(currBuff);
         QString chanName=m_mng->GetChanName(chanNum);
-        lineage<<chanName;
-
-        if(!m_configuration.hasLineage(lineage))
+        Ancestry *tokenChan=acq->getChild(chanName);
+        if(tokenChan==NULL)
             continue;//questo canale non viene toccato -> skip
 
-        Ancestry *autoConfig=m_configuration.getChild("Auto"+__which,lineage);
+        Ancestry *autoConfig=tokenChan->getChild("Auto"+__which);
 
         if(autoConfig==NULL)
             continue;//non ci sono condizioni di start stop automatico -> skip
-        QString enabled=autoConfig->getAttribute("enabled");
+        QString enabled=autoConfig->getAttribute(ATT_ENABLED);
         if(enabled=="false" && __which=="Start")
             continue;//ci sono condizioni ma sono disabilitate
         //ci sono le condizioni e sono abilitate -> avanti savoia!
 
         foreach(Ancestry *condition,autoConfig->getChildren())
         {
-            if(condition->name()=="Step")
+            if(condition->name()==ATT_STEP)
             {//condizione a gradino
                 //per prima cosa controlliamo quanti campioni è
-                uint min=condition->getChild("Duration")->getAttribute("min").toUInt();
-                uint bufferSize=condition->getAttribute("bufferSize").toUInt();
-                qreal ampMin=condition->getChild("Amplitude")->getAttribute("min").toInt();
-                qreal ampMax=condition->getChild("Amplitude")->getAttribute("max").toInt();
+                uint min=condition->getChild(ATT_DURATION)->getAttribute(ATT_MIN).toUInt();
+                uint bufferSize=condition->getAttribute(ATT_BUFFERSIZE).toUInt();
+                qreal ampMin=condition->getChild(ATT_AMPLITUDE)->getAttribute(ATT_MIN).toInt();
+                qreal ampMax=condition->getChild(ATT_AMPLITUDE)->getAttribute(ATT_MAX).toInt();
                 if(currBuff.size()<min)
                     continue;//non ho ancora abbastanza campioni per decidere skip alla prossima condizione
                 //ora quindi sono sicuro che arrivo qui solo quando ho abbastanza campioni
@@ -756,28 +763,36 @@ void MAcqManager::saveBuffersToFile()
     }
 }
 
-void MAcqManager::updateDataFile()
+bool MAcqManager::updateDataFile()
 {//viene chiamata per aggiornare il datafile a seconda del file di configurazione del relativo esame
-    QStringList originalLineage;originalLineage<<"Settings"<<"Acquisition";
+    Ancestry *channels=m_configuration.getChild(XML_CHANNELS);
+    if(channels==NULL){qCritical("Child not alive");return false;}
+    //ciclo per ogni canale del datafile alla ricerca di proprietà da completare
     int maxChan=m_mng->GetChanNum();
     for(int i=0;i<maxChan;i++)
     {
         QString chanName=m_mng->GetChanName(i);
-        Ancestry *chanConfig=m_configuration.getChild(chanName,originalLineage);
-        if(chanConfig!=NULL)
-        {
-            m_mng->SetGain(i,chanConfig->getAttribute("gain").toFloat());
-            m_mng->SetOffset(i,chanConfig->getAttribute("offset").toFloat());
+
+        foreach (Ancestry *channel, channels->getChildren()) {
+            if(channel->getChild(XML_NAME)!=NULL)
+                if(channel->getChild(XML_NAME)->text()==chanName){
+                    if(channel->getChild(XML_GAIN)!=NULL)
+                        m_mng->SetGain(i,channel->getChild(XML_GAIN)->text().toFloat());
+                    if(channel->getChild(XML_OFFSET)!=NULL)
+                        m_mng->SetOffset(i,channel->getChild(XML_OFFSET)->text().toFloat());
+                }
         }
+        qDebug()<<m_mng->GetGain(i)<<m_mng->GetOffset(i);
     }
     qDebug()<<"stato"<<m_mng->GetState();
     qDebug()<<"Commit Parameters?"<<m_mng->CommitParameters();
+    return true;
 }
 
 void MAcqManager::calculateSoftwareChannels()
 {//dobbiamo leggere il file di configurazione e capire se ci sono canali software
-    QStringList lineage;lineage<<"Settings";
-    Ancestry *acq=m_configuration.getChild("Acquisition",lineage);
+
+    Ancestry *acq=m_configuration.getChild(XML_SETTINGS)->getChild(XML_ACQUISITION);
     foreach (Ancestry *child, acq->getChildren()) {
         if(child->getAttribute("HWC")=="none")
         {//beccato il canale software
