@@ -65,6 +65,7 @@ public slots:
     bool sendStopAcq (void);
     void resetAlarms();
     void setAlarms(QVariantList __list);
+    QString plotConfigFileName(){return m_plotConfigFileName;}
 
 
 private slots:
@@ -76,6 +77,7 @@ private:
 
     QString m_acqFileName,
     m_configurationFileName,
+    m_plotConfigFileName,
     m_alarmFileName;
 
     bool    m_acqFileOpened,

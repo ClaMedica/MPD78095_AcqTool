@@ -68,7 +68,7 @@ public slots:
     bool changeObject(QVariantList __curObj);
     QVariant getSignal(QString __name);
     QStringList getLinks(QString __what, QStringList __filterFamily=QStringList(), QStringList __filterType=QStringList());
-
+    QString plotConfigFileName(){return m_plotConfigFileName;}
 private:
     QVector<MSignal *> m_signalVector;
 
@@ -79,6 +79,7 @@ private:
     m_filesLoaded;//contiene l'elenco di tutti i file che sono stati aperti e di cui vi sono i dati disponibili per l'utente
 
     QString m_currentSignalName,
+    m_plotConfigFileName,
     m_fileName,
     m_configurationFileName;
 

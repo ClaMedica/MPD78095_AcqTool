@@ -39,13 +39,13 @@ ApplicationWindow {
             if(Qt.application.arguments[1]==="acq")
             {
                 mngAcq.newAcquisition(arguments[2],arguments[3]);
-                forReal.configurationFile=mngAcq.configurationFile
+                forReal.configurationFile=mngAcq.plotConfigFileName()
                 forHome.whoIsVisilbe=forReal.name
             }
             else
             {
                 mngData.loadFile(Qt.application.arguments[2]);
-                forAna.configurationFile=mngData.configurationFile
+                forAna.configurationFile=mngData.plotConfigFileName()
                 forHome.whoIsVisilbe=forAna.name
             }
         }
