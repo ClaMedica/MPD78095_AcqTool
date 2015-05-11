@@ -12,9 +12,8 @@ MAcqManager::MAcqManager(QObject *parent) :
     m_sendingToPlot=false;//nessuno sta spedendo qualcosa per cui ci si può scrivere sopra
     m_serverReady=false;//i server non sono inizializzati quindi falso
     m_configurationFileLoaded=false;//nessun file di configurazione caricato
-    m_superProcess=NULL;
-    m_saving=false;
-
+    m_superProcess=NULL;//nessun supervisore avviato
+    m_saving=false;//non sto salvando i dati
 
     m_oldState=ESTATE_IDLE_NOT_CONNECTED;
 
@@ -250,8 +249,6 @@ void MAcqManager::endAcquisition(QString __exit)
     }
 }
 
-
-
 void MAcqManager::addMarker(QVariant __key,QVariant __descr)
 {
     if(m_acqFileOpened)
@@ -285,8 +282,6 @@ bool MAcqManager::sendStopAcq()
     return sendCommand(3);
 }
 
-
-
 void MAcqManager::resetAlarms()
 {
     m_alarmMng.resetAlarms();
@@ -316,10 +311,6 @@ bool MAcqManager::sendCommand(tcp_flow_bt_cmd_t __command)
     else
     {qCritical()<<"No CMD channel loaded";return false;}
 }
-
-
-
-
 
 void MAcqManager::updateAcqData()
 {
@@ -380,7 +371,6 @@ void MAcqManager::handleTCP(SimpleTCPClient *__client, QByteArray __block)
 
             //abbiamo spacchettato i canali e salvati nella mappa dei buffer
             //calcoliamoci i canali software se ci sono
-
             calculateSoftwareChannels();
 
             if(!m_saving)
@@ -502,12 +492,14 @@ bool MAcqManager::loadConnectivityInfo(Ancestry *__info)
 
         foreach (Ancestry *child, tcp->getChildren()) {
             QString name=child->name();
+
             QString address=child->getAttribute(ATT_ADDRESS);
             int port=child->getAttribute(ATT_PORT).toInt();
             if(child->getAttribute(ATT_TYPE)=="client")
                 m_tcpClients[name]=new SimpleTCPClient(QHostAddress(address),port,this);
             else if(child->getAttribute(ATT_TYPE)=="server")
                 m_tcpChannels[name]=new SimpleTCPChannel(QHostAddress(address),port,this);
+            qDebug()<<name<<address<<port;
         }
     }
     else
@@ -693,20 +685,15 @@ void MAcqManager::sendToPlots()
 void MAcqManager::checkAutomaticStartStop(QString __which)
 {//ok controlliamo se c'è qualche condizione automatica
     //mi salvo il puntatore al livello acquisition
-    Ancestry *acq=m_configuration.getChild(XML_ACQUISITION);
+    Ancestry *channels=m_configuration.getChild(XML_CHANNELS);
 
-    foreach (MSignal currBuff, m_HBufferMap) {//scorro ogni canale alla ricerca di una condizione
-
-        uint chanNum=m_HBufferMap.key(currBuff);
-        QString chanName=m_mng->GetChanName(chanNum);
-        Ancestry *tokenChan=acq->getChild(chanName);
-        if(tokenChan==NULL)
-            continue;//questo canale non viene toccato -> skip
-
-        Ancestry *autoConfig=tokenChan->getChild("Auto"+__which);
-
+    foreach (Ancestry *channel, channels->getChildren()) {//scorro ogni canale alla ricerca di una condizione
+        uint chanNum=channel->getTextOfChild(XML_TCPCHAN).toUInt();
+        Ancestry *autoConfig=channel->getChild("Auto"+__which);
         if(autoConfig==NULL)
-            continue;//non ci sono condizioni di start stop automatico -> skip
+            continue;//questo canale non viene toccato -> skip
+    //trovo un canale con una condizione cercata
+
         QString enabled=autoConfig->getAttribute(ATT_ENABLED);
         if(enabled=="false" && __which=="Start")
             continue;//ci sono condizioni ma sono disabilitate
@@ -714,32 +701,33 @@ void MAcqManager::checkAutomaticStartStop(QString __which)
 
         foreach(Ancestry *condition,autoConfig->getChildren())
         {
-            if(condition->name()==ATT_STEP)
+            if(condition->name()==XML_STEP)
             {//condizione a gradino
                 //per prima cosa controlliamo quanti campioni è
                 uint min=condition->getChild(ATT_DURATION)->getAttribute(ATT_MIN).toUInt();
                 uint bufferSize=condition->getAttribute(ATT_BUFFERSIZE).toUInt();
                 qreal ampMin=condition->getChild(ATT_AMPLITUDE)->getAttribute(ATT_MIN).toInt();
                 qreal ampMax=condition->getChild(ATT_AMPLITUDE)->getAttribute(ATT_MAX).toInt();
-                if(currBuff.size()<min)
+                if(m_HBufferMap[chanNum].size()<min)
                     continue;//non ho ancora abbastanza campioni per decidere skip alla prossima condizione
                 //ora quindi sono sicuro che arrivo qui solo quando ho abbastanza campioni
-                if(currBuff.size()>bufferSize)
+                if(m_HBufferMap[chanNum].size()>bufferSize)
                     m_HBufferMap[chanNum].removeFirst();//effetto buffer
                 //controllo se c'è un gradino
-                qreal startVal=currBuff[0];
+                qreal startVal=m_HBufferMap[chanNum].at(0);
                 int count=0;
-                foreach(qreal sample,currBuff){
+                foreach(qreal sample,m_HBufferMap[chanNum]){
                     if(sample-startVal>ampMin && sample-startVal<ampMax)
                         count++;
                     else
                         count=0;
                 }
-                //qDebug()<<currBuff;
+                qDebug()<<m_HBufferMap[chanNum];
                 if(count>=min)
                 {
                     m_saving=true;//posso iniziare a salvare i dati
                     saveBuffersToFile();
+                    qDebug()<<"inizio acq";
                     return;
                 }
             }
@@ -756,6 +744,17 @@ void MAcqManager::saveBuffersToFile()
         foreach(qreal sample,currBuff){
             float v=sample;
             int32_t chan=(int32_t)m_HWChannelMap[chanNum];
+            //qDebug()<<chan;
+            m_mng->AppendValue(&chan,&v,1);
+        }
+        //qDebug()<<currBuff;
+    }
+
+    foreach (MSignal currBuff, m_SBufferMap) {
+        QString chanName=m_SBufferMap.key(currBuff);
+        foreach(qreal sample,currBuff){
+            float v=sample;
+            int32_t chan=(int32_t)m_SWChannelMap[chanName];
             //qDebug()<<chan;
             m_mng->AppendValue(&chan,&v,1);
         }
@@ -791,19 +790,20 @@ bool MAcqManager::updateDataFile()
 
 void MAcqManager::calculateSoftwareChannels()
 {//dobbiamo leggere il file di configurazione e capire se ci sono canali software
-
-    Ancestry *acq=m_configuration.getChild(XML_SETTINGS)->getChild(XML_ACQUISITION);
-    foreach (Ancestry *child, acq->getChildren()) {
-        if(child->getAttribute("HWC")=="none")
-        {//beccato il canale software
-            int32_t dataChan=child->getAttribute("dataChan").toUInt();
-            m_SWChannelMap[child->name()]=dataChan;
+    Ancestry *channels=m_configuration.getChild(XML_CHANNELS);
+    if(channels==NULL){qCritical("Child not alive");return;}
+    foreach (Ancestry *channel, channels->getChildren()) {
+        QString tcpChan=channel->getTextOfChild(XML_TCPCHAN);
+        if(tcpChan!="")
+        {//canale agganciato a qualcosa
+            int32_t dataChan=channel->getTextOfChild(XML_DATACHAN).toUInt();
+            m_SWChannelMap[channel->getTextOfChild(XML_NAME)]=dataChan;
             //controlliamo che operazione devo fare
-            if(child->getAttribute("operation")=="derive")
+            if(channel->getTextOfChild(XML_OPERATION)=="derive")
             {//derivataaaaa
-                uint chToDeriv=child->getAttribute("chanList").toUInt();
+                uint chToDeriv=tcpChan.toUInt();
                 //mi intende il canale fisico ovviamente
-                m_SBufferMap[child->name()]=m_HBufferMap[chToDeriv].derive();
+                m_SBufferMap[channel->getTextOfChild(XML_NAME)]=m_HBufferMap[chToDeriv].derive();
             }
         }
     }
