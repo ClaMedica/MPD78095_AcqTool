@@ -365,48 +365,13 @@ void MAcqManager::handleTCP(SimpleTCPClient *__client, QByteArray __block)
             //calcoliamoci i canali software se ci sono
             calculateSoftwareChannels();
 
-            if(!m_saving)
+            if(!m_saving){
                 checkAutomaticStartStop("Start");//finchè non devo salvare riempo il buffer e controllo
+            }
             else
             {//ora vado a salvare i canali fisici se ho dei buffer un po grandini tipo ogni 10 campioni
-                qDebug()<<"Start acquiring";
-                foreach (uint bufNum, m_HWChannelMap.keys()) {
-                    int32_t chan=m_HWChannelMap[bufNum];
-                    qDebug()<<chan;
-                    if(m_HBufferMap[bufNum].size()>10){
-                        foreach (qreal val, m_HBufferMap[bufNum]) {
-                            float v=(float)val;
-                            m_mng->AppendValue(&chan,&v,1);
-                        }
-                    }
-                }
-
-                //e quelli software
-
-                foreach (QString bufName, m_SWChannelMap.keys()) {
-                    int32_t chan=m_SWChannelMap[bufName];
-                    qDebug()<<chan;
-                    if(m_SBufferMap[bufName].size()>10){
-                        foreach (qreal val, m_SBufferMap[bufName]) {
-                            float v=(float)val;
-                            m_mng->AppendValue(&chan,&v,1);
-                        }
-                    }
-                }
-
-
-                if(m_saving)
-                    m_HBufferMap.clear();//pulisco il buffer temporaneo se sto già salvando i dati
-
-                //checkAutomaticStartStop("Stop");
-            }
-            if(!m_sendingToPlot && m_serverReady && m_saving)
-            {
-                //qDebug()<<"al plot"<<dataCount<<(float)tim.elapsed()/1000;
-                //mandiamo i dati alla visualizzazione
-                m_sendingToPlot=true;
-                sendToPlots();
-                m_sendingToPlot=false;
+                sendBuffersToPlot();
+                saveBuffersToFile();
             }
         }
     }
@@ -580,7 +545,8 @@ bool MAcqManager::buildConfigurationFile()
         if(cur==NULL){qCritical()<<"No channel name in config file";return false;}
         //ok ora mi segno se e a quale canale fisico è associato questo canale
         QString tcpChan=cur->getTextOfChild(XML_TCPCHAN);
-        if(tcpChan!="none" || tcpChan!=QString())
+        QString operation=cur->getTextOfChild(XML_OPERATION);
+        if(tcpChan!="" && operation=="")//in sostanza entro se è associato ad un canale tcp e se non ci devo fare alcuna operazione sopra
             m_HWChannelMap[tcpChan.toUInt()]=(int32_t)nc;
         /*ok magari fa un po' di confusione ma facciamo un esempio:
         *sul file di config c'è scritto <VBT1 HWC="0"> e nel datafile VBT1 è il nome del canale 1
@@ -640,46 +606,35 @@ bool MAcqManager::buildConfigurationFile()
     return true;
 }
 
-void MAcqManager::sendToPlots()
-{
-
-    QByteArray block;
-    QDataStream out(&block, QIODevice::WriteOnly);
-    foreach(QString plotName,m_chanInPlots.keys())
-    {
-        QList<int> chanList=m_chanInPlots[plotName];
-        QVector<MSignal> channels;
-        block.clear();
-        //controllo tra i buffer hardware
-        foreach(int32_t ch,m_HWChannelMap)
-            if(chanList.contains(ch))
-                channels<<m_HBufferMap[m_HWChannelMap.key(ch)];
-
-        //controllo tra i buffer software
-        foreach(int32_t ch,m_SWChannelMap)
-            if(chanList.contains(ch))
-                channels<<m_SBufferMap[m_SWChannelMap.key(ch)];
-
-        out<<(qint32)chanList.size();
-        for(int i=0;i<chanList.size();i++){
-            out<<i;
-            out<<(qint32)channels[i].size();
-            foreach (qreal val, channels[i]) {
-                out<<val;
-            }
+void MAcqManager::bufferManager()
+{//in questa funzione gestisco i buffer
+    //innanzitutto gestisco il salvataggio sul file
+    foreach (uint chanNum, m_HBufferMap.keys()) {
+        int32_t chan=m_HWChannelMap[chanNum];
+        while(m_HBufferMap[chanNum].size()>5){
+            float v=m_HBufferMap[chanNum].takeFirst();
+            m_mng->AppendValue(&chan,&v,1);
         }
-        if(m_tcpChannels.keys().contains(plotName))
-            m_tcpChannels[plotName]->sendData(block.data(),block.size());
-        else
-            qCritical()<<"No server of name"<<plotName;
+        //qDebug()<<"Saving Hardware Channels"<<chan<<currBuff;
+    }
+
+    foreach (QString chanName, m_SBufferMap.keys()) {
+        int32_t chan=m_SWChannelMap[chanName];
+        while(m_SBufferMap[chanName].size()>5){
+            float v=m_SBufferMap[chanName].takeFirst();
+            m_mng->AppendValue(&chan,&v,1);
+        }
+        //qDebug()<<"Saving Software Channels"<<chan<<currBuff;
     }
 
 }
 
+
+
 void MAcqManager::checkAutomaticStartStop(QString __which)
 {//ok controlliamo se c'è qualche condizione automatica
     //mi salvo il puntatore al livello acquisition
-    qDebug()<<"Start check";
+    //qDebug()<<"Start check";
     Ancestry *channels=m_configuration.getChild(XML_CHANNELS);
     if(channels==NULL){qCritical("Child not alive");return;}
     foreach (Ancestry *channel, channels->getChildren()) {//scorro ogni canale alla ricerca di una condizione
@@ -704,8 +659,8 @@ void MAcqManager::checkAutomaticStartStop(QString __which)
                 uint bufferSize=condition->getAttribute(ATT_BUFFERSIZE).toUInt();
                 qreal ampMin=condition->getChild(XML_AMPLITUDE)->getAttribute(ATT_MIN).toInt();
                 qreal ampMax=condition->getChild(XML_AMPLITUDE)->getAttribute(ATT_MAX).toInt();
-                qDebug()<<m_HBufferMap[chanNum];
-                qDebug()<<min<<bufferSize<<ampMax<<ampMin;
+                //qDebug()<<m_HBufferMap[chanNum];
+                //qDebug()<<min<<bufferSize<<ampMax<<ampMin;
                 if(m_HBufferMap[chanNum].size()<min)
                     continue;//non ho ancora abbastanza campioni per decidere skip alla prossima condizione
                 //ora quindi sono sicuro che arrivo qui solo quando ho abbastanza campioni
@@ -724,8 +679,7 @@ void MAcqManager::checkAutomaticStartStop(QString __which)
                 if(count>=min)
                 {
                     m_saving=true;//posso iniziare a salvare i dati
-                    saveBuffersToFile();
-                    qDebug()<<"inizio acq";
+                    qDebug()<<"Start acquiring";
                     return;
                 }
             }
@@ -733,31 +687,64 @@ void MAcqManager::checkAutomaticStartStop(QString __which)
         }
 
     }
-    qDebug()<<"Stop check";
+    //qDebug()<<"Stop check";
 }
 
 void MAcqManager::saveBuffersToFile()
 {
-    foreach (MSignal currBuff, m_HBufferMap) {
-        int32_t chanNum=m_HBufferMap.key(currBuff);
-        foreach(qreal sample,currBuff){
-            float v=sample;
-            int32_t chan=(int32_t)m_HWChannelMap[chanNum];
-            //qDebug()<<chan;
+    foreach (uint chanNum, m_HBufferMap.keys()) {
+        int32_t chan=m_HWChannelMap[chanNum];
+        qDebug()<<"Saving Hardware Channels"<<chan<<m_HBufferMap[chanNum];
+        while(m_HBufferMap[chanNum].size()>5){
+            float v=m_HBufferMap[chanNum].takeFirst();
             m_mng->AppendValue(&chan,&v,1);
         }
-        //qDebug()<<currBuff;
+        qDebug()<<"These sample remaining"<<chan<<m_HBufferMap[chanNum];
     }
 
-    foreach (MSignal currBuff, m_SBufferMap) {
-        QString chanName=m_SBufferMap.key(currBuff);
-        foreach(qreal sample,currBuff){
-            float v=sample;
-            int32_t chan=(int32_t)m_SWChannelMap[chanName];
-            //qDebug()<<chan;
+    foreach (QString chanName, m_SBufferMap.keys()) {
+        int32_t chan=m_SWChannelMap[chanName];
+        qDebug()<<"Saving Software Channels"<<chan<<m_SBufferMap[chanName];
+        while(m_SBufferMap[chanName].size()>5){
+            float v=m_SBufferMap[chanName].takeFirst();
             m_mng->AppendValue(&chan,&v,1);
         }
-        //qDebug()<<currBuff;
+        qDebug()<<"These sample remaining"<<chan<<m_SBufferMap[chanName];
+    }
+}
+
+void MAcqManager::sendBuffersToPlot()
+{
+    int buffLength=5;//#BUG dimensione forse da rendere parametrizzata
+    foreach(QString plotName,m_chanInPlots.keys())
+    {
+        QByteArray block;
+        QDataStream out(&block, QIODevice::WriteOnly);
+        QList<int> chanList=m_chanInPlots[plotName];
+        QVector<MSignal> channels;
+
+        //controllo tra i buffer hardware
+        foreach(int32_t ch,m_HWChannelMap)
+            if(chanList.contains(ch))
+                channels<<m_HBufferMap[m_HWChannelMap.key(ch)];
+
+        //controllo tra i buffer software
+        foreach(int32_t ch,m_SWChannelMap)
+            if(chanList.contains(ch))
+                channels<<m_SBufferMap[m_SWChannelMap.key(ch)];
+        qDebug()<<"Sending data to"<<plotName<<m_tcpChannels[plotName]->serverPort()<<channels;
+        out<<(qint32)chanList.size();
+        for(int i=0;i<chanList.size();i++){
+            out<<i;
+            out<<(qint32)channels[i].size()-buffLength;
+            while(channels[i].size()>buffLength){
+                out<<channels[i].takeFirst();
+            }
+        }
+        if(m_tcpChannels.keys().contains(plotName))
+            m_tcpChannels[plotName]->sendData(block.data(),block.size());
+        else
+            qCritical()<<"No server of name"<<plotName;
     }
 }
 
@@ -793,7 +780,8 @@ void MAcqManager::calculateSoftwareChannels()
     if(channels==NULL){qCritical("Child not alive");return;}
     foreach (Ancestry *channel, channels->getChildren()) {
         QString tcpChan=channel->getTextOfChild(XML_TCPCHAN);
-        if(tcpChan!="")
+        QString operation=channel->getTextOfChild(XML_OPERATION);
+        if(tcpChan!="" && operation !="")
         {//canale agganciato a qualcosa
             int32_t dataChan=channel->getTextOfChild(XML_DATACHAN).toUInt();
             m_SWChannelMap[channel->getTextOfChild(XML_NAME)]=dataChan;
@@ -860,17 +848,6 @@ void MAcqManager::fillBuffers(QByteArray __block)
             for(int i=0;i < numChanData;i++)
             {
                 in >> sample;
-                //                        float v;
-                //                        float diff=fabs(m_oldSample-sample);
-
-                //                        if(diff>0.75)
-                //                        {
-                //                            v=round(sample);
-                //                            m_oldSample=v;
-                //                        }
-                //                        else
-                //                            v=m_oldSample;
-                //ora di questo campione cosa ne faccio?
                 m_HBufferMap[currChan]<<sample;//lo metto nel buffer del canale Hardware corrispondente
             }
         }

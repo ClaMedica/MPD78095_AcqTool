@@ -133,9 +133,10 @@ private:
     bool newAcqFromConfigFile();
     bool newAcqFromPIC();
     bool buildConfigurationFile();
-    void sendToPlots();
+    void bufferManager();
     void checkAutomaticStartStop(QString __which);
     void saveBuffersToFile();
+    void sendBuffersToPlot();
     bool updateDataFile();
     void calculateSoftwareChannels();
     void fillBuffers(QByteArray __block);
