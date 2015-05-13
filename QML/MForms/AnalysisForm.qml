@@ -51,7 +51,7 @@ MForm{
 
     function save(pointer)
     {
-        dopAna.addSignals(pointer)
+       // dopAna.addSignals(pointer)
     }
 
     //@@@@@@@@@@    Objects     @@@@@@@@@@
@@ -223,7 +223,7 @@ MForm{
             switch(owner)
             {
             case "audioPlayer": player.enabled=audioPlayer.loadSignalFromName(curText); owner="";break;
-            case "dopAna":      dopAna.currentSignal=mngData.getSignal(curText);      owner="";break;
+            //case "dopAna":      dopAna.currentSignal=mngData.getSignal(curText);      owner="";break;
             case "family":
                 title="Choose or create an element"
                 elements=mngData.getLinks("Names",selectedElements,type);
@@ -266,7 +266,7 @@ MForm{
 
         //@@@@@@@@@@    Events          @@@@@@@@@@
         onLastParModChanged: {
-            dopAna.analyze(mngPar.curAnalysis,mngPar.curPar)
+            //dopAna.analyze(mngPar.curAnalysis,mngPar.curPar)
         }
     }
 
@@ -285,7 +285,7 @@ MForm{
 
         //@@@@@@@@@@    Events          @@@@@@@@@@
         onUpdate: {
-            dopAna.analyze(mngPar.curAnalysis,mngPar.curPar)
+           // dopAna.analyze(mngPar.curAnalysis,mngPar.curPar)
             plotDial.visible=true
         }
 
@@ -312,7 +312,7 @@ MForm{
 
         //@@@@@@@@@@    Events          @@@@@@@@@@
         onSelected: {
-            dopAna.handleMenu(itemClicked)
+           // dopAna.handleMenu(itemClicked)
             if (itemClicked == "Open Audio") {
                 fileDial.owner="mngData"
                 fileDial.folder="../../ProgettoDoppler/Exams/Audio di Prova"

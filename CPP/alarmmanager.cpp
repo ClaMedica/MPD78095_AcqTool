@@ -43,28 +43,8 @@ bool AlarmManager::load(QString __fileName)
         m_confAla=NULL;
         return false;
     }
-
-    //pesco quante lingue ho
-    foreach(Ancestry *lang,m_confAla->getChildren())
-        m_languages<<lang->name();
-
-    setLanguage("ITA");
     return true;
 
-}
-
-bool AlarmManager::setLanguage(QString __language)
-{
-    if(m_languages.contains(__language))
-        m_curLanguage=__language;
-    else
-    {qCritical()<<"No language "+__language+" found";return false;}
-
-    curAlarmSet=m_confAla->getChild(__language);
-    foreach (Ancestry *alarm,curAlarmSet->getChildren()) {
-        m_vecMap[alarm->getAttribute("code").toInt()]=alarm->name();
-        m_enabledAlarms[alarm->getAttribute("code").toInt()]=true;
-    }
 }
 
 void AlarmManager::addAlarm(int __code)

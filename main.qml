@@ -20,7 +20,7 @@ ApplicationWindow {
     height:Screen.height*0.9
 
     Rectangle{
-        color:"red"
+        color:"transparent"
         anchors.fill:parent
     }
 
@@ -28,17 +28,16 @@ ApplicationWindow {
     //@@@@@@@@@@    Events          @@@@@@@@@@
     Component.onCompleted:
     {
-
         var arguments=Qt.application.arguments
-        if(arguments.length===4)
+        if(arguments.length===3)
         {
             console.log("arguments founded",arguments,arguments.length)
-            //gli argomenti sono acq/ana dataFile configFile
+            //gli argomenti sono acq/ana dataFile lingua
+            mngAcq.load()
             mngAcq.startSupe("show")
-            mngAcq.alarmFile=configFolder+"alarms.xml"
             if(Qt.application.arguments[1]==="acq")
             {
-                mngAcq.newAcquisition(arguments[2],arguments[3]);
+                mngAcq.newAcquisition(arguments[2]);
                 forReal.configurationFile=mngAcq.plotConfigFileName()
                 forHome.whoIsVisilbe=forReal.name
             }

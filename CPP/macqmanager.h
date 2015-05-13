@@ -28,8 +28,6 @@ public:
     Q_PROPERTY(QVariantList alarms READ alarms WRITE setAlarms NOTIFY alarmsChanged)
     Q_PROPERTY(QVariantList acqMarkers READ acqMarkers NOTIFY acqMarkersChanged)
     Q_PROPERTY(QString acqFile READ acqFile WRITE setAcqFile NOTIFY acqFileChanged)
-    Q_PROPERTY(QString configurationFile READ configurationFile WRITE setConfigurationFile NOTIFY configurationFileChanged)
-    Q_PROPERTY(QString alarmFile READ alarmFile WRITE setAlarmFile NOTIFY alarmFileChanged)
 
     QVariantList alarms(){return m_alarmList;}
 
@@ -38,24 +36,17 @@ public:
     QString acqFile(){return m_acqFileName;}
     void setAcqFile(QString __name);
 
-    QString configurationFile(){return m_configurationFileName;}
-    void setConfigurationFile(QString __name);
-
-    QString alarmFile(){return m_alarmFileName;}
-    void setAlarmFile(QString __name);
-
     static void dataOnTCP(QObject *__pParent=NULL, SimpleTCPClient *__pTCP=NULL, QByteArray __block=QByteArray());
 
 signals:
     void alarmsChanged();
     void acqMarkersChanged();
     void acqFileChanged();
-    void configurationFileChanged();
-    void alarmFileChanged();
 
 public slots:
 
-    bool newAcquisition(QString __dataFile="",QString __configFile="");
+    bool load(void);
+    bool newAcquisition(QString __dataFile="");
     void connectToServers();
     void startSupe(QString __mode);
     void endAcquisition(QString __exit);
@@ -76,15 +67,13 @@ private:
     QStringList m_serversNames;
 
     QString m_acqFileName,
-    m_configurationFileName,
+
     m_plotConfigFileName,
-    m_alarmFileName;
+    m_applicationPath;
 
     bool    m_acqFileOpened,
     m_serverReady,
     m_sendingToPlot,
-    m_configurationFileLoaded,
-    m_alarmFileLoaded,
     m_saving;
 
     QByteArray m_sendingPack;
@@ -109,7 +98,9 @@ private:
 
     QVector<VarMap> m_acqMarker;
 
-    Ancestry m_configuration,m_alarmStrings;
+    Ancestry m_configLocale,    //è la prima ad essere caricata e contiene la lingua
+    m_configAcq,                //contiene le info fisse di acquisizione
+    m_configUser;               //contiene le info modificate dall'utente
 
     AcqData m_acqData;
 
@@ -119,23 +110,19 @@ private:
 
     flowBT_states_t m_oldState;
 
-
-
     void updateAcqData();
     void handleTCP(SimpleTCPClient *__client, QByteArray __block);
     void initializeServers();
-    bool loadConfiguration(QString __name);
-    bool loadAlarms(QString __name);
-    void saveConfiguration();
     bool loadConnectivityInfo(Ancestry *__info);
     void analyzeStatus(flowBT_status_t __status);
     void analyzeAlarms(alarms_t __alarms);
     bool newAcqFromConfigFile();
     bool newAcqFromPIC();
     bool buildConfigurationFile();
-    void sendToPlots();
+    void bufferManager();
     void checkAutomaticStartStop(QString __which);
     void saveBuffersToFile();
+    void sendBuffersToPlot();
     bool updateDataFile();
     void calculateSoftwareChannels();
     void fillBuffers(QByteArray __block);

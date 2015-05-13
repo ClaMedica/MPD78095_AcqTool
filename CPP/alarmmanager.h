@@ -45,8 +45,6 @@ public:
     ~AlarmManager();
 
     bool load(QString __fileName);
-    bool setLanguage(QString __language);
-
     QVector<VarMap> * alarmVector(){return &m_alarms;}
     void resetAlarms(QList<int> __codes=QList<int>());
     void startTimeoutAlarms(int __code=-1, int __time=TIMEOUT_TIME_ON_STATUS);
@@ -59,10 +57,9 @@ signals:
 public slots:
     void addAlarm(int __code);
 private:
-    QStringList m_languages;
+
     QMap<int,AlarmTimer *> m_ATMap;
     Ancestry *m_confAla,*curAlarmSet;
-    QString m_curLanguage;
     QVector<VarMap> m_alarms;
     QVariantList m_alarmList;
     QMap<int,QString> m_vecMap;
