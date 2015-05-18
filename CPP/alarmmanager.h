@@ -59,7 +59,7 @@ public slots:
 private:
 
     QMap<int,AlarmTimer *> m_ATMap;
-    Ancestry *m_confAla,*curAlarmSet;
+    Ancestry *m_confAla;
     QVector<VarMap> m_alarms;
     QVariantList m_alarmList;
     QMap<int,QString> m_vecMap;

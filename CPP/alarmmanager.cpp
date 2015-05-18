@@ -39,10 +39,16 @@ bool AlarmManager::load(QString __fileName)
     m_confAla=new Ancestry;
     if(!m_confAla->loadFromXML(__fileName))
     {
+        qCritical()<<"File corrupted";
         delete m_confAla;
         m_confAla=NULL;
         return false;
     }
+    foreach (Ancestry *alarm,m_confAla->getChildren()) {
+            m_vecMap[alarm->getAttribute("code").toInt()]=alarm->name();
+            m_enabledAlarms[alarm->getAttribute("code").toInt()]=true;
+        }
+    qDebug()<<"Alarms loaded:"<<m_confAla->childrenNames();
     return true;
 
 }
@@ -66,10 +72,14 @@ void AlarmManager::addAlarm(int __code)
     }
 
     ala["code"]=__code;
-    ala["message"]=curAlarmSet->getChild(m_vecMap[__code])->getChild("Text")->text();
-    ala["help"]=curAlarmSet->getChild(m_vecMap[__code])->getChild("Help")->text();
+    Ancestry *child=curAlarmSet->getChild(m_vecMap[__code]);
+    if(child==NULL)
+    {qCritical()<<m_vecMap[__code]<<MEX_CHILD_NOT_ALIVE;return;}
+    qDebug()<<"allarme3";
+    ala["message"]=child->getTextOfChild("Text");
+    ala["help"]=child->getTextOfChild("Help");
     ala["color"]="red";
-
+    qDebug()<<"allarme4";
     m_alarms.append(ala);
     updateAlarms();
     qDebug()<<"Alarm! "<<__code;

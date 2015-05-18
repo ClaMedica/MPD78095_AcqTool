@@ -19,7 +19,6 @@
 class MAcqManager : public QObject
 {
     Q_OBJECT    
-
 public:
     explicit MAcqManager(QObject *parent = 0);
     ~MAcqManager();
@@ -64,7 +63,8 @@ private slots:
     bool sendCommand(int __command){return sendCommand((tcp_flow_bt_cmd_t)__command);}
 
 private:
-    QStringList m_serversNames;
+    QStringList m_serversNames,
+                m_superList;    //lista dei supervisori che dovrò avviare
 
     QString m_acqFileName,
 
@@ -80,7 +80,7 @@ private:
 
     DatafileManager *m_mng;
 
-    QVariantList m_alarmList,m_acqMarkerList;//BUG aggiungere la definer list se servirà
+    QVariantList m_alarmList,m_acqMarkerList;//#BUG aggiungere la definer list se servirà
 
     QMap<QString,SimpleTCPClient *> m_tcpClients;//elenco dei client attivi
 
@@ -88,8 +88,11 @@ private:
 
     QMap<QString,QList<int> > m_chanInPlots;//associa nome plot ad una lista di canali del datafile che ci vanno disegnati dentro
 
-    QMap<int,bool> m_automaticChannelsMap;
 
+    QMap<QString,int32_t> m_namesToDataChanNum; //in base al nome del canale memorizzo il numero del canale del datafile
+    QMap<QString,MSignal> m_channelsMap;// in questa mappa ho tutti i canali del datafile elencati per nome
+    QMap<QString,QStringList>   m_operationMap,// ho l'elenco delle operazioni da fare per ogni tipo di canale
+                                m_involvedChansMap; //ho l'elenco dei canali hw coinvolti per ogni tipo di canale
     QMap<uint,int32_t> m_HWChannelMap;//in base all'indice del canale fisico ottengo in che canale del datafile memorizzarlo
     QMap<uint,MSignal > m_HBufferMap;//mappa dei buffer hardware in base al canale fisico
 
@@ -118,6 +121,7 @@ private:
     void analyzeAlarms(alarms_t __alarms);
     bool newAcqFromConfigFile();
     bool newAcqFromPIC();
+    bool readConfigurationFile();
     bool buildConfigurationFile();
     void bufferManager();
     void checkAutomaticStartStop(QString __which);

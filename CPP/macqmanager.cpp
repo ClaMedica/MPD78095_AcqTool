@@ -19,7 +19,6 @@ MAcqManager::MAcqManager(QObject *parent) :
 
     //connetto il gestore degli allarmi alla proprietà alarms
     connect(&m_alarmMng,SIGNAL(alarmsUpdated(QVariantList)),this,SLOT(setAlarms(QVariantList)));
-
 }
 
 MAcqManager::~MAcqManager()
@@ -132,11 +131,15 @@ bool MAcqManager::newAcquisition(QString __dataFile)
 
         m_acqFileOpened=true;//mi segno che ho aperto il file
 
+        qDebug()<<"Reading configuration file";
+        if(!readConfigurationFile())
+        {qCritical()<<"Error during reading of configuration file";return false;}
+
         qDebug()<<"Building configuration file for plots";
         if(!buildConfigurationFile())
         {qCritical()<<"Error during building of configuration file";return false;}
 
-        //aggiorno il datafile con i dati relativi alla mia configurazione
+        //aggiorno il datafile con i dati relativi alla mia configurazione #BUG da togliere non appena il file verrà scritto correttamente
         qDebug()<<"Updating datafile...";
         updateDataFile();
         //ripristino il file in acquisizione
@@ -287,9 +290,9 @@ bool MAcqManager::sendCommand(tcp_flow_bt_cmd_t __command)
 
     if(m_tcpClients.contains("CMD"))
     {
-        qDebug()<<"Sending command: "<<__command;
         quint8 c=(quint8)__command;
         m_tcpClients["CMD"]->sendData((char *)&c,sizeof(quint8));
+        qDebug()<<"Sending command: "<<__command;
         return true;
     }
     else
@@ -328,6 +331,7 @@ void MAcqManager::updateAcqData()
 
 void MAcqManager::handleTCP(SimpleTCPClient *__client, QByteArray __block)
 {
+
     if(m_tcpClients.values().contains(__client))
     {
         QString who=m_tcpClients.key(__client);
@@ -382,25 +386,24 @@ bool MAcqManager::loadConnectivityInfo(Ancestry *__info)
 {
     qDebug()<<"Loading connectivity info";
     if(__info==NULL)
-    {qCritical()<<"NULL pointer";return false;}
-    if(__info->getChild(XML_TCP)!=NULL)
-    {
-        Ancestry *tcp=__info->getChild(XML_TCP);
+    {qCritical()<<MEX_CHILD_NOT_ALIVE;return false;}
+    Ancestry *tcp=__info->getChild(XML_TCP);
+    if(tcp==NULL)
+    {qCritical()<<MEX_CHILD_NOT_ALIVE;return false;}
 
-        foreach (Ancestry *child, tcp->getChildren()) {
-            QString name=child->name();
 
-            QString address=child->getAttribute(ATT_ADDRESS);
-            int port=child->getAttribute(ATT_PORT).toInt();
-            if(child->getAttribute(ATT_TYPE)=="client")
-                m_tcpClients[name]=new SimpleTCPClient(QHostAddress(address),port,this);
-            else if(child->getAttribute(ATT_TYPE)=="server")
-                m_tcpChannels[name]=new SimpleTCPChannel(QHostAddress(address),port,this);
-            qDebug()<<name<<address<<port;
-        }
+    foreach (Ancestry *child, tcp->getChildren()) {
+        QString name=child->name();
+
+        QString address=child->getAttribute(ATT_ADDRESS);
+        int port=child->getAttribute(ATT_PORT).toInt();
+        if(child->getAttribute(ATT_TYPE)=="client")
+            m_tcpClients[name]=new SimpleTCPClient(QHostAddress(address),port,this);
+        else if(child->getAttribute(ATT_TYPE)=="server")
+            m_tcpChannels[name]=new SimpleTCPChannel(QHostAddress(address),port,this);
+        qDebug()<<name<<address<<port;
     }
-    else
-    {qCritical()<<"XML file corrupted";return false;}
+
     qDebug()<<"Loaded clients:"<<m_tcpClients.keys();
     qDebug()<<"Loaded channels:"<<m_tcpChannels.keys();
     return true;
@@ -409,10 +412,7 @@ bool MAcqManager::loadConnectivityInfo(Ancestry *__info)
 void MAcqManager::analyzeStatus(flowBT_status_t __status)
 {
     if(__status.currState!=m_oldState)
-    {
         qDebug()<<"Stato "<<__status.currState;
-    }
-
 
     switch(__status.currState)
     {
@@ -431,11 +431,53 @@ void MAcqManager::analyzeStatus(flowBT_status_t __status)
     default:break;
     }
     m_oldState=__status.currState;
-
 }
 
 void MAcqManager::analyzeAlarms(alarms_t __alarms)
 {
+
+}
+
+bool MAcqManager::readConfigurationFile()
+{
+    //in questa funzione leggo il file di configurazione e mi annoto le info che mi servono
+    Ancestry *channels=m_configAcq.getChild(XML_CHANNELS);
+    if(channels==NULL){qCritical()<<MEX_CHILD_NOT_ALIVE;return false;}
+
+    foreach(Ancestry *channel,channels->getChildren()){
+        //scorriamo tutti i canali per acquisire le info
+        //che supervisore serve?
+        QString card=channel->getAttribute("card");
+        if(card==""){qCritical()<<"File corrupted";return false;}
+        if(!m_superList.contains(card))
+            m_superList<<card;
+        QString name=channel->getTextOfChild(XML_NAME);
+        if(name==""){qCritical()<<"File corrupted";return false;}
+        //ora leggiamo quanti canali di questo tipo ci sono
+        QString num=channel->getTextOfChild(XML_NUM);
+        //
+        if(num.toUInt()>0){
+            for(uint i=1;i<=num.toUInt();i++)
+                m_channelsMap[name+QString::number(i)]=MSignal();
+        }
+        else
+            m_channelsMap[name]=MSignal();
+
+        //ci sono delle operazioni?
+        QString operations=channel->getTextOfChild(XML_OPERATION);
+        if(operations==""){qCritical()<<"File corrupted";return false;}
+        //ora si suppone che canali dello stesso tipo subiscono le stesse operazioni
+        m_operationMap[name]=operations.split("#");
+
+        //quali canali sono coinvolti?
+        QString hwchans=channel->getTextOfChild(XML_HWCHAN);
+        if(hwchans==""){qCritical()<<"File corrupted";return false;}
+        //ora si suppone che canali dello stesso tipo subiscono le stesse operazioni
+        m_involvedChansMap[name]=hwchans.split("#");
+    }
+    //sono a posto così
+    qDebug()<<"Configuration file read succesfully!";
+    return true;
 
 }
 
@@ -459,49 +501,27 @@ bool MAcqManager::buildConfigurationFile()
     * di canali coinvolti separata da virgola
     *
     */
-    Ancestry config;//iniziamo col pescare il file di configurazione
+    Ancestry configPlot;//iniziamo col pescare il file di configurazione
     //ora che la mia classe è popolata la vado a completare iniziando con l'aggiungere il campo graphs
 
-    Ancestry *graph=config.addChild(XML_GRAPHS);
+    Ancestry *graph=configPlot.addChild(XML_GRAPHS);
     if(graph==NULL){qCritical()<<"Could not create child";return false;}
-    //mi salvo il puntatore al livello channels
-    Ancestry *channels=m_configAcq.getChild(XML_CHANNELS);
 
-    //ok finita questa fase preliminare iniziamo con calma a scrivere qualcosa
-    //peschiamo il numero totale di canali
+    //ok iniziamo con calma a scrivere qualcosa, peschiamo il numero totale di canali
     int chanlNum=m_mng->GetChanNum();
     //qDebug()<<"N° Canali: "<<chanlNum;
     if(chanlNum==0){qCritical()<<"No channels in file";return false;}
     for(int nc=0;nc<chanlNum;nc++)
     {//contiamo i grafici e popoliamo la mappa di associazione dei canali fisici
         QString chanName=m_mng->GetChanName(nc);
-        Ancestry *cur=NULL;
-        //scorro tutti i canali alla ricerca di quello col mio nome
-        foreach(Ancestry *channel,channels->getChildren())
-            if(chanName.contains(channel->getTextOfChild(XML_NAME)))//#BUG non mi piace per nulla
-            {cur=channel;break;}
+        m_namesToDataChanNum[chanName]=nc;//associo il nome al numero del canale del datafile
 
-        //è necessario controllare che nel file di configurazione ci sia scritto come gestire questo canale
-        if(cur==NULL){qCritical()<<"No channel name in config file";return false;}
-        //ok ora mi segno se e a quale canale fisico è associato questo canale
-        QString tcpChan=cur->getTextOfChild(XML_TCPCHAN);
-        QString operation=cur->getTextOfChild(XML_OPERATION);
-        if(tcpChan!="" && operation=="")//in sostanza entro se è associato ad un canale tcp e se non ci devo fare alcuna operazione sopra
-            m_HWChannelMap[tcpChan.toUInt()]=(int32_t)nc;
-        /*ok magari fa un po' di confusione ma facciamo un esempio:
-        *sul file di config c'è scritto <VBT1 HWC="0"> e nel datafile VBT1 è il nome del canale 1
-        *allora l'operazione è m_HWChannelMap[0]=1
-        * questo vuol dire che il canale che nel pacchetto TCP che mi arriva è al posto 0 va salvato nel posto 1 del datafile
-        */
         //pesco il numero del grafico dove far vedere questo canale e me lo annoto in mappa
         m_chanInPlots["Graph_"+QString::number(m_mng->GetGraph(nc))]<<nc;
     }
-    //bene ora mi servono le info della parte di connection per poter istruire i plot
-    Ancestry *connections=m_configAcq.getChild(XML_CONNECTIONS);
-    if(connections==NULL){qCritical()<<"No connections field in file";return false;}
+    //bene ora ho una mappa dei grafici che dovrò fisualizzare vado a riempirla con le info configurabili dall'utente SE CI SONO
+
     foreach (QString graphName, m_chanInPlots.keys()) {//scorro per ogni grafico
-
-
         Ancestry *  graphN=graph->addChild(graphName);
         if(graphN==NULL){qCritical()<<"Could not create child";return false;}
         Ancestry *  prop=graphN->addChild(XML_PROPERTIES);
@@ -539,7 +559,7 @@ bool MAcqManager::buildConfigurationFile()
         }
     }
     //ora salvo il file di configurazione come cur.xml
-    config.saveToXML(QDir::currentPath()+"/cur.xml");
+    configPlot.saveToXML(QDir::currentPath()+"/cur.xml");
     qDebug()<<"Configuration file builded succesfully";
     //e mi sovrascrivo il nome perchè tanto le info ce le ho
     m_plotConfigFileName=QDir::currentPath()+"/cur.xml";
@@ -575,11 +595,12 @@ void MAcqManager::checkAutomaticStartStop(QString __which)
 {//ok controlliamo se c'è qualche condizione automatica
     //mi salvo il puntatore al livello acquisition
     //qDebug()<<"Start check";
-    Ancestry *channels=m_configAcq.getChild(XML_CHANNELS);
-    if(channels==NULL){qCritical("Child not alive");return;}
-    foreach (Ancestry *channel, channels->getChildren()) {//scorro ogni canale alla ricerca di una condizione
-        uint chanNum=channel->getTextOfChild(XML_TCPCHAN).toUInt();
-        Ancestry *autoConfig=channel->getChild("Auto"+__which);
+    Ancestry *contitions=m_configUser.getChild("Auto"+__which+"s");
+    if(contitions==NULL){qCritical(MEX_CHILD_NOT_ALIVE);return;}
+    foreach (Ancestry *condition, contitions->getChildren()) {//scorro ogni canale alla ricerca di una condizione
+        QString chanName=condition->getAttribute(ATT_CHANNAME);
+
+        Ancestry *autoConfig=condition->getChild("Auto"+__which);
         if(autoConfig==NULL)
             continue;//questo canale non viene toccato -> skip
         //trovo un canale con una condizione cercata
@@ -748,7 +769,7 @@ void MAcqManager::fillBuffers(QByteArray __block)
      */
 
     dataCount++;
-    //qDebug()<<"dal server"<<dataCount<<(float)tim.elapsed()/1000;
+
     QByteArray block,blockOut;
     QDataStream in(&block, QIODevice::ReadOnly),out(&blockOut, QIODevice::WriteOnly);
     block=__block;

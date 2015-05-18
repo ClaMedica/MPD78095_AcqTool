@@ -29,7 +29,7 @@ ApplicationWindow {
     Component.onCompleted:
     {
         var arguments=Qt.application.arguments
-        if(arguments.length===3)
+        if(arguments.length>1)
         {
             console.log("arguments founded",arguments,arguments.length)
             //gli argomenti sono acq/ana dataFile lingua
