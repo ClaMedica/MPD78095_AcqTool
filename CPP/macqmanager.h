@@ -90,14 +90,9 @@ private:
 
 
     QMap<QString,int32_t> m_namesToDataChanNum; //in base al nome del canale memorizzo il numero del canale del datafile
-    QMap<QString,MSignal> m_channelsMap;// in questa mappa ho tutti i canali del datafile elencati per nome
+    QMap<QString,QList<MSignal> > m_channelsMap;// in questa mappa ho tutti i canali del datafile elencati per tipo: dentro ho poi la lista
     QMap<QString,QStringList>   m_operationMap,// ho l'elenco delle operazioni da fare per ogni tipo di canale
                                 m_involvedChansMap; //ho l'elenco dei canali hw coinvolti per ogni tipo di canale
-    QMap<uint,int32_t> m_HWChannelMap;//in base all'indice del canale fisico ottengo in che canale del datafile memorizzarlo
-    QMap<uint,MSignal > m_HBufferMap;//mappa dei buffer hardware in base al canale fisico
-
-    QMap<QString,int32_t> m_SWChannelMap;//in base al nome del canale software ottengo in che canale del datafile memorizzarlo
-    QMap<QString,MSignal > m_SBufferMap;//mappa dei buffer software in base al nome
 
     QVector<VarMap> m_acqMarker;
 

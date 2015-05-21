@@ -457,11 +457,11 @@ bool MAcqManager::readConfigurationFile()
         QString num=channel->getTextOfChild(XML_NUM);
         //
         if(num.toUInt()>0){
-            for(uint i=1;i<=num.toUInt();i++)
-                m_channelsMap[name+QString::number(i)]=MSignal();
+            for(uint i=0;i<num.toUInt();i++)
+                m_channelsMap[name]<<MSignal();
         }
         else
-            m_channelsMap[name]=MSignal();
+            qCritical()<<"Fake channel";
 
         //ci sono delle operazioni?
         QString operations=channel->getTextOfChild(XML_OPERATION);
@@ -469,11 +469,15 @@ bool MAcqManager::readConfigurationFile()
         //ora si suppone che canali dello stesso tipo subiscono le stesse operazioni
         m_operationMap[name]=operations.split("#");
 
+
         //quali canali sono coinvolti?
         QString hwchans=channel->getTextOfChild(XML_HWCHAN);
         if(hwchans==""){qCritical()<<"File corrupted";return false;}
-        //ora si suppone che canali dello stesso tipo subiscono le stesse operazioni
-        m_involvedChansMap[name]=hwchans.split("#");
+        //ora si suppone che ci sia scritto num valori
+        if(hwchans.split("#")==num)
+            m_involvedChansMap[name]=hwchans.split("#");
+        else
+            qCritical()<<"missing hw channel";
     }
     //sono a posto così
     qDebug()<<"Configuration file read succesfully!";
@@ -597,55 +601,48 @@ void MAcqManager::checkAutomaticStartStop(QString __which)
     //qDebug()<<"Start check";
     Ancestry *contitions=m_configUser.getChild("Auto"+__which+"s");
     if(contitions==NULL){qCritical(MEX_CHILD_NOT_ALIVE);return;}
-    foreach (Ancestry *condition, contitions->getChildren()) {//scorro ogni canale alla ricerca di una condizione
-        QString chanName=condition->getAttribute(ATT_CHANNAME);
-
-        Ancestry *autoConfig=condition->getChild("Auto"+__which);
-        if(autoConfig==NULL)
-            continue;//questo canale non viene toccato -> skip
-        //trovo un canale con una condizione cercata
-
-        QString enabled=autoConfig->getAttribute(ATT_ENABLED);
-        if(enabled=="false")
-            continue;//ci sono condizioni ma sono disabilitate
-        //ci sono le condizioni e sono abilitate -> avanti savoia!
-
-        foreach(Ancestry *condition,autoConfig->getChildren())
-        {
-            if(condition->name()==XML_STEP)
-            {//condizione a gradino
-
-                //per prima cosa controlliamo quanti campioni è
-                uint min=condition->getChild(XML_DURATION)->getAttribute(ATT_MIN).toUInt();
-                uint bufferSize=condition->getAttribute(ATT_BUFFERSIZE).toUInt();
-                qreal ampMin=condition->getChild(XML_AMPLITUDE)->getAttribute(ATT_MIN).toInt();
-                qreal ampMax=condition->getChild(XML_AMPLITUDE)->getAttribute(ATT_MAX).toInt();
-                //qDebug()<<m_HBufferMap[chanNum];
-                //qDebug()<<min<<bufferSize<<ampMax<<ampMin;
-                if(m_HBufferMap[chanNum].size()<min)
-                    continue;//non ho ancora abbastanza campioni per decidere skip alla prossima condizione
-                //ora quindi sono sicuro che arrivo qui solo quando ho abbastanza campioni
-                if(m_HBufferMap[chanNum].size()>bufferSize)
-                    m_HBufferMap[chanNum].removeFirst();//effetto buffer
-                //controllo se c'è un gradino
-                qreal startVal=m_HBufferMap[chanNum].at(0);
-                int count=0;
-                foreach(qreal sample,m_HBufferMap[chanNum]){
-                    if(sample-startVal>ampMin && sample-startVal<ampMax)
-                        count++;
-                    else
-                        count=0;
-                }
-
-                if(count>=min)
-                {
-                    m_saving=true;//posso iniziare a salvare i dati
-                    qDebug()<<"Start acquiring";
-                    return;
-                }
+    foreach (Ancestry *condition, contitions->getChildren()) {//scorro le condizioni di autostart anche se ce ne è solo una
+        //pesco su quale canale è fatta
+        QString chanType=condition->getAttribute(ATT_CHANTYPE);
+        int num=condition->getAttribute(ATT_NUM).toInt()-1;//il meno 1 è per ovviare al fatto che si parte da 1
+        //e in base a come si chiama vedo che farci
+        if(condition->name()==XML_STEP)
+        {//condizione a gradino
+            Ancestry *childDur=condition->getChild(XML_DURATION);
+            if(childDur==NULL){qCritical(MEX_CHILD_NOT_ALIVE);return;}
+            Ancestry *childAmp=condition->getChild(XML_AMPLITUDE);
+            if(childAmp==NULL){qCritical(MEX_CHILD_NOT_ALIVE);return;}
+            //per prima cosa controlliamo quanti campioni è
+            uint min=childDur->getAttribute(ATT_MIN).toUInt();
+            uint bufferSize=condition->getAttribute(ATT_BUFFERSIZE).toUInt();
+            qreal ampMin=childAmp->getAttribute(ATT_MIN).toInt();
+            qreal ampMax=childAmp->getAttribute(ATT_MAX).toInt();
+            //qDebug()<<m_HBufferMap[chanNum];
+            //qDebug()<<min<<bufferSize<<ampMax<<ampMin;
+            if(m_channelsMap[chanType].at(num).size()<min)
+                continue;//non ho ancora abbastanza campioni per decidere skip alla prossima condizione
+            //ora quindi sono sicuro che arrivo qui solo quando ho abbastanza campioni
+            if(m_channelsMap[chanType].at(num).size()>bufferSize)
+                m_channelsMap[chanType].at(num).removeFirst();//effetto buffer
+            //controllo se c'è un gradino
+            qreal startVal=m_channelsMap[chanType].at(num).at(0);
+            int count=0;
+            foreach(qreal sample,m_channelsMap[chanType].at(num)){
+                if(sample-startVal>ampMin && sample-startVal<ampMax)
+                    count++;
+                else
+                    count=0;
             }
 
+            if(count>=min)
+            {
+                m_saving=true;//posso iniziare a salvare i dati
+                qDebug()<<"Start acquiring";
+                return;
+            }
         }
+
+
 
     }
     //qDebug()<<"Stop check";
@@ -809,7 +806,7 @@ void MAcqManager::fillBuffers(QByteArray __block)
             for(int i=0;i < numChanData;i++)
             {
                 in >> sample;
-                m_HBufferMap[currChan]<<sample;//lo metto nel buffer del canale Hardware corrispondente
+                m_channelsMap[m_currChan]<<sample;//lo metto nel buffer del canale Hardware corrispondente
             }
         }
         else
