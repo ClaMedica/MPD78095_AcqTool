@@ -18,7 +18,7 @@
 
 class MAcqManager : public QObject
 {
-    Q_OBJECT    
+    Q_OBJECT
 public:
     explicit MAcqManager(QObject *parent = 0);
     ~MAcqManager();
@@ -50,7 +50,7 @@ public slots:
     void startSupe(QString __mode);
     void endAcquisition(QString __exit);
     void addMarker(QVariant __key, QVariant __descr);
-    void addDefiner(bool __startEnd,QVariantList __info);    
+    void addDefiner(bool __startEnd,QVariantList __info);
     bool sendStartAcq(void);
     bool sendStopAcq (void);
     void resetAlarms();
@@ -64,10 +64,12 @@ private slots:
 
 private:
     QStringList m_serversNames,
+                m_totalHWChan,//lista dei canali hw che ci sono
                 m_superList;    //lista dei supervisori che dovrò avviare
 
-    QString m_acqFileName,
 
+
+    QString m_acqFileName,
     m_plotConfigFileName,
     m_applicationPath;
 
@@ -86,14 +88,16 @@ private:
 
     QMap<QString,SimpleTCPChannel *> m_tcpChannels;//canali di comunicazione verso l'esterno
 
-    QMap<QString,QList<int> > m_chanInPlots;//associa nome plot ad una lista di canali del datafile che ci vanno disegnati dentro
+    QMap<QString,int>   m_sampleFreqMap, //mi dice per ogni canale fisico la frequenza di campionamento
+                        m_frameMap,//mi dice quanti campioni cavare via da ogni buffer ad ogni ciclo di controllo
+                        m_bufSizeMap;//mi dice per ogni buffer la dimensione da tenere per essere pronti
+    QMap<QString,int32_t> m_dataChanNameMap;//associa l'indice del canale datafile ad una mappa con cui ripescare il buffer
 
-
-    QMap<QString,int32_t> m_namesToDataChanNum; //in base al nome del canale memorizzo il numero del canale del datafile
-    QMap<QString,QList<MSignal> > m_channelsMap;// in questa mappa ho tutti i canali del datafile elencati per tipo: dentro ho poi la lista
-    QMap<QString,QStringList>   m_operationMap,// ho l'elenco delle operazioni da fare per ogni tipo di canale
-                                m_involvedChansMap; //ho l'elenco dei canali hw coinvolti per ogni tipo di canale
-
+    QMap<QString,MSignal *> m_bufferMap;//mappa dei buffer fisici
+    QMap<QString,QList<MSignal *> > m_channelMap;// in questa mappa ho tutti i canali del datafile elencati per tipo: dentro ho poi la lista
+    QMap<QString,QMap<QString,int> >   m_operationMap;// ho l'elenco delle operazioni da fare per ogni tipo di canale
+    QMap<QString,QStringList>   m_HWChansMap, //ho l'elenco dei  canali hw coinvolti per ogni tipo di canale
+                                m_chanInPlots;//associa nome plot ad una mappa con cui ripescare il buffer
     QVector<VarMap> m_acqMarker;
 
     Ancestry m_configLocale,    //è la prima ad essere caricata e contiene la lingua
@@ -118,13 +122,14 @@ private:
     bool newAcqFromPIC();
     bool readConfigurationFile();
     bool buildConfigurationFile();
-    void bufferManager();
     void checkAutomaticStartStop(QString __which);
     void saveBuffersToFile();
     void sendBuffersToPlot();
+    void removeLastFrame();
     bool updateDataFile();
-    void calculateSoftwareChannels();
+    void applyOperations();
     void fillBuffers(QByteArray __block);
+    bool buffersReady();
 
 };
 

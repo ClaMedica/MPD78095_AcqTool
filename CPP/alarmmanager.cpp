@@ -72,7 +72,7 @@ void AlarmManager::addAlarm(int __code)
     }
 
     ala["code"]=__code;
-    Ancestry *child=curAlarmSet->getChild(m_vecMap[__code]);
+    Ancestry *child=m_confAla->getChild(m_vecMap[__code]);
     if(child==NULL)
     {qCritical()<<m_vecMap[__code]<<MEX_CHILD_NOT_ALIVE;return;}
     qDebug()<<"allarme3";
