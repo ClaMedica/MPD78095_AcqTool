@@ -36,7 +36,8 @@ SOURCES += main.cpp \
     CPP/macqmanager.cpp \
     CPP/mdatamanager.cpp \
     CPP/mstorage.cpp \
-    CPP/alarmmanager.cpp
+    CPP/alarmmanager.cpp \
+    ../MGlobal/p7settingsmanager.cpp
 
 HEADERS += \
     CPP/maudio.h \
@@ -54,7 +55,8 @@ HEADERS += \
     CPP/macqmanager.h \
     CPP/mdatamanager.h \
     CPP/mstorage.h \
-    CPP/alarmmanager.h
+    CPP/alarmmanager.h \
+    ../MGlobal/p7settingsmanager.h
 
 
 

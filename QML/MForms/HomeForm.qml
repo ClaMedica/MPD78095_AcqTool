@@ -86,7 +86,7 @@ MForm{
         {
             var configFile
             if(curText=="Cella Bluetooth")
-                configFile=configFolder+"Config_BT.xml"
+                configFile=configFolder+"/cur.xml"
 
 
             switch(owner)

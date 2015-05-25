@@ -103,6 +103,8 @@ void MDataManager::loadFile(QString __fileName)
 {
     __fileName.remove("file:///");
     qDebug()<<"Apro il file "<<__fileName;
+    if(!QFile::exists(__fileName))
+    {qCritical()<<"File does not exists";return;}
     m_fileName=__fileName;
 
     MAudio audio;
@@ -212,7 +214,7 @@ void MDataManager::loadFile(QString __fileName)
                 sigMax=M;
             if(sigMin>m)
                 sigMin=m;
-
+            qDebug()<<(*sig);
             this->addSignal(sig);
         }
 
@@ -561,10 +563,12 @@ QVariantList MDataManager::getPlotLimits()
                 {
                     qulonglong p=(*map)["pointer"].toULongLong();
                     MSignal *sig=(MSignal*)p;
+                    qDebug()<<(*sig);
                     if(sig->getT0()<xMin)xMin=sig->getT0();
                     if(sig->getDuration()>xMax)xMax=sig->getDuration();
                     if(sig->minimum()<yMin)yMin=sig->minimum();
                     if(sig->maximum()>yMax)yMax=sig->maximum();
+                    qDebug()<<yMin<<yMax;
                     //qDebug()<<"Segnale lungo:"<<sig->getSize();
                 }
             }

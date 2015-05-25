@@ -14,6 +14,7 @@
 #include <qapplication.h>
 #include <stdio.h>
 #include <stdlib.h>
+#include <p7settingsmanager.h>
 
 
 
@@ -38,7 +39,7 @@ int main(int argc, char *argv[])
     qmlRegisterType<ModelManager>("Managers",1,0,"ModelManager");
     qmlRegisterType<MAcqManager>("Managers",1,0,"MAcqManager");
     qmlRegisterType<MDataManager>("Managers",1,0,"MDataManager");
-
+    qmlRegisterType<P7Settings>("Managers",1,0,"MSettings");
 
     QQmlApplicationEngine engine;
     engine.setProperty("workFolder", QDir::currentPath());

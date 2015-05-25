@@ -9,8 +9,8 @@ import QtQuick.Window 2.2
 
 ApplicationWindow {
     //@@@@@@@@@@ Definitions @@@@@@@@@@
-    property string examFolder:"C:/Users/Luca/Documents/UDSData/"
-    property string configFolder:root.workFolder
+    property string examFolder:settings.datafilePath
+    property string configFolder:settings.appPath()
 
     //@@@@@@@@@@    Properties      @@@@@@@@@@
     id: root
@@ -23,6 +23,10 @@ ApplicationWindow {
         anchors.fill:parent
     }
 
+    MSettings{
+        id:settings
+        Component.onCompleted: loadSettings()
+    }
 
     //@@@@@@@@@@    Events          @@@@@@@@@@
     Component.onCompleted:
@@ -50,7 +54,7 @@ ApplicationWindow {
         else
         {
             console.log("No arguments founded")
-            mngData.loadFile(examFolder+"pv000601A.pic")
+            mngData.loadFile(examFolder+"/pv000641A.pic")
         }
         console.log("Application Ready!")
     }

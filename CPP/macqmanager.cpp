@@ -767,20 +767,23 @@ bool MAcqManager::updateDataFile()
     for(int i=0;i<maxChan;i++)
     {
         QString chanName=m_mng->GetChanName(i);
-
+        //qDebug()<<chanName;
         foreach (Ancestry *channel, channels->getChildren()) {
             if(channel->getChild(XML_NAME)!=NULL)
-                if(channel->getChild(XML_NAME)->text()==chanName){
-                    if(channel->getChild(XML_GAIN)!=NULL)
-                        m_mng->SetGain(i,channel->getChild(XML_GAIN)->text().toFloat());
-                    if(channel->getChild(XML_OFFSET)!=NULL)
-                        m_mng->SetOffset(i,channel->getChild(XML_OFFSET)->text().toFloat());
+                if(chanName.contains(channel->getTextOfChild(XML_NAME))){
+                    if(channel->getTextOfChild(XML_GAIN)!="")
+                        m_mng->SetGain(i,channel->getTextOfChild(XML_GAIN).toFloat());
+                    if(channel->getTextOfChild(XML_OFFSET)!="")
+                        m_mng->SetOffset(i,channel->getTextOfChild(XML_OFFSET).toFloat());
                 }
         }
         qDebug()<<m_mng->GetGain(i)<<m_mng->GetOffset(i);
     }
     qDebug()<<"stato"<<m_mng->GetState();
     qDebug()<<"Commit Parameters?"<<m_mng->CommitParameters();
+    qDebug()<<"Close?"<<m_mng->Close();
+    qDebug()<<"Open?"<<m_mng->Open();
+    qDebug()<<"Get Parameters?"<<m_mng->GetParameters();
     return true;
 }
 
