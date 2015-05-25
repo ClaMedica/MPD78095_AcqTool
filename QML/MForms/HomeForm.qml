@@ -86,9 +86,8 @@ MForm{
         {
             var configFile
             if(curText=="Cella Bluetooth")
-                configFile=configFolder+"cella.xml"
-            if(curText=="Doppler")
-                configFile=configFolder+"realtime.xml"
+                configFile=configFolder+"Config_BT.xml"
+
 
             switch(owner)
             {
@@ -99,6 +98,7 @@ MForm{
                 mngAcq.startSupe("hide")
                 break;
             case "AnalysisForm":
+                console.log(root.applicationDirPath);
                 forAna.loadConfiguration(configFile)
                 mngData.configurationFile=configFile
                 break;

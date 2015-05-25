@@ -1,5 +1,6 @@
 #include <QGuiApplication>
 #include <QQmlApplicationEngine>
+
 #include "qqml.h"
 #include <parametermanager.h>
 #include <msignal.h>
@@ -40,7 +41,7 @@ int main(int argc, char *argv[])
 
 
     QQmlApplicationEngine engine;
-
+    engine.setProperty("workFolder", QDir::currentPath());
 
     engine.addImportPath("../../UsefulOBJ");
     engine.addImportPath("../../AcqTool/QML");
@@ -49,6 +50,7 @@ int main(int argc, char *argv[])
     engine.addImportPath("../../../UsefulOBJ");
     engine.addImportPath("../../../AcqTool/QML");
     engine.addImportPath("../../CommonPlugin");
+
 
     engine.load(QUrl(QStringLiteral("qrc:/main.qml")));
 

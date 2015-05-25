@@ -469,9 +469,19 @@ bool MAcqManager::readConfigurationFile()
         //ora leggiamo quanti canali di questo tipo ci sono
         QString num=channel->getTextOfChild(XML_NUM);
         //
+        QString f=channel->getTextOfChild(XML_FREQUENCY);
+        if(f==""){qCritical()<<"File corrupted";return false;}
+        int sampleFreq=f.toInt();
+        if(sampleFreq<fmin)
+            fmin=sampleFreq;
+
         if(num.toUInt()>0){
             for(uint i=0;i<num.toUInt();i++)
-                m_channelMap[name].append(new MSignal());
+            {
+                MSignal *p=new MSignal();
+                p->setSamplingFrequency(sampleFreq);
+                m_channelMap[name].append(p);
+            }
         }
         else
             qCritical()<<"Fake channel"<<num;
@@ -491,11 +501,7 @@ bool MAcqManager::readConfigurationFile()
         //qDebug()<<m_operationMap[name];
         //ora si suppone che canali dello stesso tipo subiscono le stesse operazioni
 
-        QString f=channel->getTextOfChild(XML_FREQUENCY);
-        if(f==""){qCritical()<<"File corrupted";return false;}
-        int sampleFreq=f.toInt();
-        if(sampleFreq<fmin)
-            fmin=sampleFreq;
+
         //quali canali sono coinvolti?
         QString hwchans=channel->getTextOfChild(XML_HWCHAN);
         if(hwchans==""){qCritical()<<"File corrupted";return false;}
@@ -626,7 +632,7 @@ void MAcqManager::checkAutomaticStartStop(QString __which)
             if(childAmp==NULL){qCritical(MEX_CHILD_NOT_ALIVE);return;}
             //per prima cosa controlliamo quanti campioni è
             int min=childDur->getAttribute(ATT_MIN).toUInt();
-            int bufferSize=condition->getAttribute(ATT_BUFFERSIZE).toUInt();
+
             qreal ampMin=childAmp->getAttribute(ATT_MIN).toInt();
             qreal ampMax=childAmp->getAttribute(ATT_MAX).toInt();
             //qDebug()<<"Buffer"<<chanType<<num<<"="<<*(m_channelMap[chanType].at(num));
@@ -634,8 +640,7 @@ void MAcqManager::checkAutomaticStartStop(QString __which)
             if(m_channelMap[chanType].at(num)->size()<min)
                 continue;//non ho ancora abbastanza campioni per decidere skip alla prossima condizione
             //ora quindi sono sicuro che arrivo qui solo quando ho abbastanza campioni
-            if(m_channelMap[chanType].at(num)->size()>bufferSize)
-                m_channelMap[chanType].at(num)->remove(0);//effetto buffer
+
             //controllo se c'è un gradino
             qreal startVal=m_channelMap[chanType].at(num)->first();
             int count=0;
@@ -648,15 +653,28 @@ void MAcqManager::checkAutomaticStartStop(QString __which)
 
             if(count>=min)
             {
+                //effetto buffer tengo solo gli ultimi 5 secondi
+                foreach(QString type,m_channelMap.keys())
+                    foreach(MSignal *sig,m_channelMap[type])
+                        sig->saveLastSec(5.0);
                 m_saving=true;//posso iniziare a salvare i dati
                 qDebug()<<"Start acquiring";
                 return;
+            }
+            else
+            {
+                qDebug()<<chanType<<num<<(*m_channelMap[chanType].at(num));
             }
         }
 
 
 
     }
+    //effetto buffer tengo solo gli ultimi 5 secondi
+    foreach(QString type,m_channelMap.keys())
+        foreach(MSignal *sig,m_channelMap[type])
+            sig->saveLastSec(5.0);
+
     //qDebug()<<"Stop check";
 }
 
@@ -677,12 +695,14 @@ void MAcqManager::saveBuffersToFile()
         int index=number.toInt()-1;
         int32_t chanNum=m_dataChanNameMap[chanName];
         //svuta tutto
-        while(m_channelMap[type].at(index)->size()){
+        qDebug()<<"Saving"<<m_channelMap[type].at(index)->size()<<"samples in channel"<<chanNum;
+        while(m_channelMap[type].at(index)->size()>0){
             float v=m_channelMap[type].at(index)->takeFirst();
             m_mng->AppendValue(&chanNum,&v,1);
         }
-    }
 
+    }
+qDebug()<<"Salvooo"<<m_mng->GetDuration();
 }
 
 void MAcqManager::sendBuffersToPlot()
@@ -870,6 +890,5 @@ bool MAcqManager::buffersReady()
     foreach(QString hwchan,m_totalHWChan)
         if(m_bufferMap[hwchan]->size()<m_bufSizeMap[hwchan]+m_frameMap[hwchan])
             return false;
-
     return true;
 }

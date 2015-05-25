@@ -9,9 +9,8 @@ import QtQuick.Window 2.2
 
 ApplicationWindow {
     //@@@@@@@@@@ Definitions @@@@@@@@@@
-    property string workFolder:"../../AcqTool/"
-    property string examFolder:workFolder+"Exams/"
-    property string configFolder:workFolder+"Config/"
+    property string examFolder:"C:/Users/Luca/Documents/UDSData/"
+    property string configFolder:root.workFolder
 
     //@@@@@@@@@@    Properties      @@@@@@@@@@
     id: root
@@ -51,6 +50,7 @@ ApplicationWindow {
         else
         {
             console.log("No arguments founded")
+            mngData.loadFile(examFolder+"pv000601A.pic")
         }
         console.log("Application Ready!")
     }
