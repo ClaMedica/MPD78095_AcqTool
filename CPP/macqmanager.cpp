@@ -3,8 +3,7 @@ int dataCount=0;
 
 
 
-MAcqManager::MAcqManager(QObject *parent) :
-    QObject(parent)
+MAcqManager::MAcqManager(QObject *parent)
 {
 
     m_mng=NULL;
@@ -14,7 +13,7 @@ MAcqManager::MAcqManager(QObject *parent) :
 
     m_superProcess=NULL;//nessun supervisore avviato
     m_saving=false;//non sto salvando i dati
-    m_applicationPath=QApplication::applicationDirPath();
+
     m_oldState=ESTATE_IDLE_NOT_CONNECTED;
 
     //connetto il gestore degli allarmi alla proprietà alarms
@@ -60,15 +59,6 @@ MAcqManager::~MAcqManager()
     //            delete m_signalVector[i];
 }
 
-void MAcqManager::setAcqFile(QString __name)
-{
-    if(__name!=m_acqFileName)
-    {
-        m_acqFileName=__name;
-        emit acqFileChanged();
-    }
-}
-
 void MAcqManager::dataOnTCP(QObject *__pParent, SimpleTCPClient *__pTCP, QByteArray __block)
 {//arriviamo qua dentro ogni volta che arriva qualcosa da uno dei server a cui siamo collegati
 
@@ -81,29 +71,6 @@ void MAcqManager::dataOnTCP(QObject *__pParent, SimpleTCPClient *__pTCP, QByteAr
     }
 }
 
-bool MAcqManager::load()
-{//in questa funzione inizializzo tutto caricando i file di configurazione fissi
-    if(!m_configLocale.loadFromXML(m_applicationPath+"/Config_Locale.xml"))
-    {qCritical()<<"Error on locale configuration file";return false;}
-
-    if(!m_configAcq.loadFromXML(m_applicationPath+"/Config_Acq.xml"))
-    {qCritical()<<"Error on acq configuration file";return false;}
-
-    if(!m_configUser.loadFromXML(m_applicationPath+"/Config_User.xml"))
-    {qCritical()<<"Error on user configuration file";return false;}
-
-    //e infine carico il file degli allarmi con la lingua giusta
-    QString lang=m_configLocale.getChild(XML_LOCALE)->getAttribute("Value");
-    if(!m_alarmMng.load(m_applicationPath+"/Config_Alarms_"+lang+".xml"))
-    {qCritical()<<"Error on alarm configuration file";return false;}
-
-    //carico info di connettività
-    if(m_configAcq.getChild(XML_CONNECTIONS)!=NULL)
-        return loadConnectivityInfo(m_configAcq.getChild(XML_CONNECTIONS));
-    else
-    {qCritical()<<"XML file corrupted";return false;}
-}
-
 bool MAcqManager::newAcquisition(QString __dataFile)
 {
 
@@ -113,6 +80,21 @@ bool MAcqManager::newAcquisition(QString __dataFile)
     }
     else
     {
+        //carico la configurazione per l'acquisizione
+        if(!m_configAcq.loadFromXML(m_applicationPath+"/Config_Acq.xml"))
+        {qCritical()<<"Error on acq configuration file";return false;}
+
+        //e infine carico il file degli allarmi con la lingua giusta
+        QString lang=m_configLocale.getChild(XML_LOCALE)->getAttribute("Value");
+        if(!m_alarmMng.load(m_applicationPath+"/Config_Alarms_"+lang+".xml"))
+        {qCritical()<<"Error on alarm configuration file";return false;}
+
+        //carico info di connettività
+        if(m_configAcq.getChild(XML_CONNECTIONS)==NULL)
+        {qCritical()<<"XML file corrupted";return false;}
+        loadConnectivityInfo(m_configAcq.getChild(XML_CONNECTIONS));
+
+
         /* non sono in acquisizione e quindi posso lanciarne una nuova aprendo il file e leggendo le info
          * oppure pescandole dal file di configurazione
         */
@@ -125,11 +107,10 @@ bool MAcqManager::newAcquisition(QString __dataFile)
 
         if(!QFile::exists(__dataFile))
         {qCritical()<<"File does not exists";return false;}
-        m_acqFileName=__dataFile;
 
         m_mng=new DatafileManager;
 
-        m_mng->SetFileName(m_acqFileName);
+        m_mng->SetFileName(__dataFile);
         m_mng->SetFileType(5);
 
         qDebug()<<"Opening file ... "<<m_mng->Open();
@@ -225,8 +206,7 @@ void MAcqManager::endAcquisition(QString __exit)
         qDebug()<<"Commit Values?"<<m_mng->CommitValues();
     }
     qDebug()<<"File closed?"<<m_mng->Close();
-    delete m_mng;
-    m_mng=NULL;
+
     //mando il comando al gestore archivio paziente
     QByteArray mex=__exit.toLatin1();
     m_tcpChannels["MNG"]->sendData(&mex);
@@ -240,6 +220,8 @@ void MAcqManager::endAcquisition(QString __exit)
                    <<channel->serverAddress().toString().toLatin1()
                   <<channel->serverPort();
     }
+    //delete m_mng;
+    m_mng=NULL;
 }
 
 void MAcqManager::addMarker(QVariant __key,QVariant __descr)
@@ -256,6 +238,7 @@ void MAcqManager::addMarker(QVariant __key,QVariant __descr)
         mrk["val"]=(float)m_mng->GetSamplesNumber(0)/m_mng->GetNAS(0);
         m_acqMarker.append(mrk);
         updateAcqData();
+        qDebug()<<"Marker appended at "<<mrk["val"].toString()<<" sec";
     }
 }
 
@@ -450,167 +433,7 @@ void MAcqManager::analyzeAlarms(alarms_t __alarms)
 
 }
 
-bool MAcqManager::readConfigurationFile()
-{
-    int fmin=INF;
-    //in questa funzione leggo il file di configurazione e mi annoto le info che mi servono
-    Ancestry *channels=m_configAcq.getChild(XML_CHANNELS);
-    if(channels==NULL){qCritical()<<MEX_CHILD_NOT_ALIVE;return false;}
 
-    foreach(Ancestry *channel,channels->getChildren()){
-        //scorriamo tutti i canali per acquisire le info
-        //che supervisore serve?
-        QString card=channel->getAttribute("card");
-        if(card==""){qCritical()<<"File corrupted";return false;}
-        if(!m_superList.contains(card))
-            m_superList<<card;
-        QString name=channel->getTextOfChild(XML_NAME);
-        if(name==""){qCritical()<<"File corrupted";return false;}
-        //ora leggiamo quanti canali di questo tipo ci sono
-        QString num=channel->getTextOfChild(XML_NUM);
-        //
-        QString f=channel->getTextOfChild(XML_FREQUENCY);
-        if(f==""){qCritical()<<"File corrupted";return false;}
-        int sampleFreq=f.toInt();
-        if(sampleFreq<fmin)
-            fmin=sampleFreq;
-
-        if(num.toUInt()>0){
-            for(uint i=0;i<num.toUInt();i++)
-            {
-                MSignal *p=new MSignal();
-                p->setSamplingFrequency(sampleFreq);
-                m_channelMap[name].append(p);
-            }
-        }
-        else
-            qCritical()<<"Fake channel"<<num;
-
-        //ci sono delle operazioni?
-        Ancestry *operations=channel->getChild(XML_OPERATIONS);
-        if(operations==NULL){qCritical()<<MEX_CHILD_NOT_ALIVE;return false;}
-        int bufMax=0;//massima lunghezza di buffer
-        foreach(Ancestry *operation, operations->getChildren())
-            if(operation->getAttribute(ATT_BUFFERSIZE)!="")
-            {
-                int bufSize=operation->getAttribute(ATT_BUFFERSIZE).toInt();
-                m_operationMap[name][operation->name()]=bufSize;
-                if(bufSize>bufMax)
-                    bufMax=bufSize;
-            }
-        //qDebug()<<m_operationMap[name];
-        //ora si suppone che canali dello stesso tipo subiscono le stesse operazioni
-
-
-        //quali canali sono coinvolti?
-        QString hwchans=channel->getTextOfChild(XML_HWCHAN);
-        if(hwchans==""){qCritical()<<"File corrupted";return false;}
-        //ora si suppone che ci sia scritto num valori
-        if(hwchans.split("#").size()==num.toInt())
-        {
-            foreach(QString hwc,hwchans.split("#")){
-                m_HWChansMap[name]<<hwc;
-                if(m_sampleFreqMap.keys().contains(hwc))
-                    if(m_sampleFreqMap[hwc]!=sampleFreq)//controllo che questo canale abbia una sola frequenza di campionamento
-                    {qCritical()<<"File corrupted";return false;}
-                m_sampleFreqMap[hwc]=sampleFreq;
-                if(m_bufSizeMap[hwc]<bufMax)
-                    m_bufSizeMap[hwc]=bufMax;
-            }
-        }
-        else
-            qCritical()<<"missing hw channel";
-
-        foreach(QString c,hwchans.split("#"))
-            if(!m_totalHWChan.contains(c))
-                m_totalHWChan<<c;
-
-
-
-
-    }
-    //inizializzo i buffer hardware;
-    foreach (QString c,m_totalHWChan) {
-        m_bufferMap[c]=new MSignal();
-        m_frameMap[c]=m_sampleFreqMap[c]/gcd(m_sampleFreqMap.values());
-    }
-
-
-
-
-
-    //sono a posto così
-    qDebug()<<"Configuration file read succesfully!";
-    return true;
-
-}
-
-bool MAcqManager::buildConfigurationFile()
-{
-
-    Ancestry configPlot;//iniziamo col creare una classe vergine
-    //aggiungo il campo graphs
-    Ancestry *graph=configPlot.addChild(XML_GRAPHS);
-    if(graph==NULL){qCritical()<<"Could not create child";return false;}
-
-    //ok iniziamo con calma a scrivere qualcosa, peschiamo il numero totale di canali
-    int32_t chanlNum=m_mng->GetChanNum();
-    //qDebug()<<"N° Canali: "<<chanlNum;
-    if(chanlNum==0){qCritical()<<"No channels in file";return false;}
-    for(int32_t nc=0;nc<chanlNum;nc++)
-    {//contiamo i grafici e popoliamo le mappe di associazione
-        QString chanName=m_mng->GetChanName(nc);
-
-        //per i grafici devo appendere l'informazione perchè posso avere più canali
-        m_chanInPlots["Graph_"+QString::number(m_mng->GetGraph(nc))]<<chanName;
-        //per il datafile invece no
-        m_dataChanNameMap[chanName]=nc;
-
-    }
-    //bene ora ho una mappa dei grafici che dovrò visualizzare vado a riempirla con le info configurabili dall'utente SE CI SONO
-
-    foreach (QString graphName, m_chanInPlots.keys()) {//scorro per ogni grafico
-        Ancestry *  graphN=graph->addChild(graphName);
-        if(graphN==NULL){qCritical()<<"Could not create child";return false;}
-        Ancestry *  prop=graphN->addChild(XML_PROPERTIES);
-        Ancestry *  tracks=graphN->addChild(XML_TRACKS);
-        if(prop==NULL){qCritical()<<"Could not create child";return false;}
-        if(tracks==NULL){qCritical()<<"Could not create child";return false;}
-        //ho la certezza che i canali su ogni grafico hanno tutti le stesse proprietà grafiche per cui vado tranquillo
-        QString chanName=m_chanInPlots[graphName].first();
-        int32_t nc=m_dataChanNameMap[chanName];
-        Ancestry *  axis=prop->addChild(XML_AXIS);
-        Ancestry *  time=prop->addChild(XML_TIME);
-        Ancestry *  network=prop->addChild(XML_NETWORK);
-        if(axis==NULL){qCritical()<<"Could not create child";return false;}
-        if(time==NULL){qCritical()<<"Could not create child";return false;}
-        if(network==NULL){qCritical()<<"Could not create child";return false;}
-        axis->setAttribute("yAUOM",QString::number(m_mng->GetUdM(nc)));
-        axis->setAttribute("yAbsoluteMax",QString::number(m_mng->GetSupLim(nc)));
-        axis->setAttribute("yAbsoluteMin",QString::number(m_mng->GetInfLim(nc)));
-        time->setAttribute("samplingFrq",QString::number(m_mng->GetNAS(nc)));
-        time->setAttribute("pageTime",QString::number(m_mng->GetPageTime()));
-        network->setAttribute(ATT_PORT,QString::number(9000+nc));
-        network->setAttribute(ATT_ADDRESS,"127.0.0.1");
-
-        //aggiungo il canale su cui comunicherà questo plot
-        m_tcpChannels[graphName]=new SimpleTCPChannel(QHostAddress("127.0.0.1"),9000+nc,this);
-
-        foreach (QString chanName, m_chanInPlots[graphName])
-        {//qui scrivo le proprietà delle tracce
-            Ancestry * trkN=tracks->addChild(chanName);
-            if(trkN==NULL){qCritical()<<"Could not create child";return false;}
-            trkN->setAttribute(ATT_THICK,"3");
-            trkN->setAttribute(ATT_COLOR,"white");
-        }
-    }
-    //ora salvo il file di configurazione come cur.xml
-    configPlot.saveToXML(QDir::currentPath()+"/cur.xml");
-    qDebug()<<"Configuration file builded succesfully";
-    //e mi sovrascrivo il nome perchè tanto le info ce le ho
-    m_plotConfigFileName=QDir::currentPath()+"/cur.xml";
-    return true;
-}
 
 void MAcqManager::checkAutomaticStartStop(QString __which)
 {//ok controlliamo se c'è qualche condizione automatica
@@ -702,7 +525,7 @@ void MAcqManager::saveBuffersToFile()
         }
 
     }
-qDebug()<<"Salvooo"<<m_mng->GetDuration();
+    qDebug()<<"Salvooo"<<m_mng->GetDuration();
 }
 
 void MAcqManager::sendBuffersToPlot()
@@ -792,8 +615,14 @@ void MAcqManager::applyOperations()
     //abbiamo l'elenco di operazioni da fare per ogni tipo di canale
     //e le eseguiamo
     foreach (QString type, m_operationMap.keys()) {//per ogni tipo di canale
-        foreach(QString op,m_operationMap[type].keys()){
-            if(op == "None")
+        foreach(QString op,m_operationMap[type]){//sono tranquillo di avere le operazioni in ordine
+            QStringList opData=op.split("@");
+            //opData.at(0) è il nome dell'operazione
+            //opData.at(1) è la buffersize
+            //siamo sicuri che ci sono in quanto il controllo sulle dimensioni lo facciamo in readconfiguration
+            QString name=opData.at(0);
+            int bufferSize=opData.at(1).toInt();
+            if(name == "none")
             {//non devo fare nulla per cui copio un frame nei channel giusti
                 foreach (QString hwc, m_HWChansMap[type]) {
                     int index=m_HWChansMap[type].indexOf(hwc);
@@ -802,15 +631,36 @@ void MAcqManager::applyOperations()
                 }
             }
 
-            if(op == "Derive")
+            if(name == "derive")
             {//derivo
                 MSignal der;
                 foreach (QString hwc, m_HWChansMap[type]) {
                     int index=m_HWChansMap[type].indexOf(hwc);
-                    der=m_bufferMap[hwc]->derive(m_operationMap[type][op]);
+                    der=m_bufferMap[hwc]->derive(bufferSize);
 
                     for(int i=0;i<m_frameMap[hwc];i++)
                         m_channelMap[type].at(index)->append(der.at(i));
+                }
+            }
+
+            if(name == "threshold")
+            {//faccio soglia tra due valori quindi mi aspetto almeno altri due parametri
+                if(opData.length()!=4){qCritical()<<MEX_FILE_CORRUPTED;return;}
+                QString smin=opData.at(2);
+                QString smax=opData.at(3);
+                qreal min,max;
+                if(smin=="-INF")
+                    min=-INF;
+                else
+                    min=smin.toDouble();
+                if(smax=="INF")
+                    max=INF;
+                else
+                    max=smax.toDouble();
+                foreach (QString hwc, m_HWChansMap[type]) {
+                    int index=m_HWChansMap[type].indexOf(hwc);
+
+                    m_channelMap[type].at(index)->threshold(min,max);
                 }
             }
 
@@ -894,4 +744,94 @@ bool MAcqManager::buffersReady()
         if(m_bufferMap[hwchan]->size()<m_bufSizeMap[hwchan]+m_frameMap[hwchan])
             return false;
     return true;
+}
+
+bool MAcqManager::readConfigurationFile()
+{
+    int fmin=INF;
+    //in questa funzione leggo il file di configurazione e mi annoto le info che mi servono
+    Ancestry *channels=m_configAcq.getChild(XML_CHANNELS);
+    if(channels==NULL){qCritical()<<MEX_CHILD_NOT_ALIVE;return false;}
+
+    foreach(Ancestry *channel,channels->getChildren()){
+        //scorriamo tutti i canali per acquisire le info
+        //che supervisore serve?
+        QString card=channel->getAttribute("card");
+        if(card==""){qCritical()<<"File corrupted";return false;}
+        if(!m_superList.contains(card))
+            m_superList<<card;
+        QString name=channel->getTextOfChild(XML_NAME);
+        if(name==""){qCritical()<<"File corrupted";return false;}
+        //ora leggiamo quanti canali di questo tipo ci sono
+        QString num=channel->getTextOfChild(XML_NUM);
+        //
+        QString f=channel->getTextOfChild(XML_FREQUENCY);
+        if(f==""){qCritical()<<"File corrupted";return false;}
+        int sampleFreq=f.toInt();
+        if(sampleFreq<fmin)
+            fmin=sampleFreq;
+
+        if(num.toUInt()>0){
+            for(uint i=0;i<num.toUInt();i++)
+            {
+                MSignal *p=new MSignal();
+                p->setSamplingFrequency(sampleFreq);
+                m_channelMap[name].append(p);
+            }
+        }
+        else
+            qCritical()<<"Fake channel"<<num;
+
+        //ci sono delle operazioni?
+        QString operations=channel->getTextOfChild(XML_OPERATIONS);
+        if(operations==""){qCritical()<<MEX_CHILD_NOT_ALIVE;return false;}
+        int bufMax=0;//massima lunghezza di buffer
+        m_operationMap[name]=operations.split("#");
+        foreach(QString operation, m_operationMap[name])
+        {
+            QStringList opData=operation.split("@");
+            if(opData.length()<2){qCritical()<<"File corrupted";return false;}
+            if(opData.at(1)!="")
+            {
+                int bufSize=opData.at(1).toInt();
+                if(bufSize>bufMax)
+                    bufMax=bufSize;
+            }
+        }
+        //qDebug()<<m_operationMap[name];
+        //ora si suppone che canali dello stesso tipo subiscono le stesse operazioni
+
+        //quali canali sono coinvolti?
+        QString hwchans=channel->getTextOfChild(XML_HWCHAN);
+        if(hwchans==""){qCritical()<<"File corrupted";return false;}
+        //ora si suppone che ci sia scritto num valori
+        if(hwchans.split("#").size()==num.toInt())
+        {
+            foreach(QString hwc,hwchans.split("#")){
+                m_HWChansMap[name]<<hwc;
+                if(m_sampleFreqMap.keys().contains(hwc))
+                    if(m_sampleFreqMap[hwc]!=sampleFreq)//controllo che questo canale abbia una sola frequenza di campionamento
+                    {qCritical()<<"File corrupted";return false;}
+                m_sampleFreqMap[hwc]=sampleFreq;
+                if(m_bufSizeMap[hwc]<bufMax)
+                    m_bufSizeMap[hwc]=bufMax;
+            }
+        }
+        else
+            qCritical()<<"missing hw channel";
+
+        foreach(QString c,hwchans.split("#"))
+            if(!m_totalHWChan.contains(c))
+                m_totalHWChan<<c;
+    }
+    //inizializzo i buffer hardware;
+    foreach (QString c,m_totalHWChan) {
+        m_bufferMap[c]=new MSignal();
+        m_frameMap[c]=m_sampleFreqMap[c]/gcd(m_sampleFreqMap.values());
+    }
+
+    //sono a posto così
+    qDebug()<<"Configuration file read succesfully!";
+    return true;
+
 }

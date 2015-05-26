@@ -37,7 +37,8 @@ SOURCES += main.cpp \
     CPP/mdatamanager.cpp \
     CPP/mstorage.cpp \
     CPP/alarmmanager.cpp \
-    ../MGlobal/p7settingsmanager.cpp
+    ../MGlobal/p7settingsmanager.cpp \
+    CPP/mabstractmanager.cpp
 
 HEADERS += \
     CPP/maudio.h \
@@ -56,7 +57,8 @@ HEADERS += \
     CPP/mdatamanager.h \
     CPP/mstorage.h \
     CPP/alarmmanager.h \
-    ../MGlobal/p7settingsmanager.h
+    ../MGlobal/p7settingsmanager.h \
+    CPP/mabstractmanager.h
 
 
 

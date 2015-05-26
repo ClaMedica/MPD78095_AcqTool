@@ -5,7 +5,7 @@ import MComponents 1.0
 import QtQuick.Controls.Styles 1.2
 import MPlotModule 1.0
 import Managers 1.0
-
+import QtMultimedia 5.0
 MForm{
     //@@@@@@@@@@ Definitions @@@@@@@@@@
     property string fileName:""
@@ -170,6 +170,7 @@ MForm{
         }
     }
 
+
     MMessageYesNo{
         //@@@@@@@@@@    Properties      @@@@@@@@@@
         id: messageDialog
@@ -181,9 +182,9 @@ MForm{
         onAccepted: {
             if(message=="Do you want to save the current exam?")
             {
+                timClose.start(1000)
                 saveExam()
-                plot.stopAll()
-                timClose.start(1000);
+                plot.stopAll()                
                 //message="Do you want to analyze it?"
             }
 //            else
@@ -197,8 +198,8 @@ MForm{
         {
             if(message=="Do you want to save the current exam?")
             {
-                deleteExam()
                 timClose.start(1000);
+                deleteExam()
             }
 //            else
 //            {
@@ -228,14 +229,13 @@ MForm{
         opacity: rootRealTime.opacity
         theme:"green"
         items: [
-            ["Acquisition","Start","Stop"],
+            ["Acquisition","Start","Stop","Suona"],
             ["Add","Marker","Start Definer","Stop Definer"],
             ["Plot","Properties"]
         ]
 
         //@@@@@@@@@@    Events          @@@@@@@@@@
         onSelected: {
-
             if (itemClicked == "Start") {
                 editName.owner="NewAcq"
                 editName.visible=true

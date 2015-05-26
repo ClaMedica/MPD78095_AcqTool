@@ -17,11 +17,13 @@ void ModelManager::setType(QString __type)
 void ModelManager::setInfoList(QVariantList __list)
 {
     m_infoList=__list;
+    qDebug()<<__list;
     for(int plotIndex=0;plotIndex<m_infoList.size();plotIndex++)
     {
         QVariantList plotInfo=m_infoList.at(plotIndex).toList();
         QString plotName=plotInfo.at(0).toString();
         QStringList info=plotInfo.at(1).toStringList();
+        qDebug()<<plotName<<info;
         m_infoMap[plotName]=info;
     }
     updateModelList();

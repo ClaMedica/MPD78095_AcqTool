@@ -36,18 +36,23 @@ ApplicationWindow {
         {
             console.log("arguments founded",arguments,arguments.length)
             //gli argomenti sono acq/ana dataFile lingua
-            mngAcq.load()
-            mngAcq.startSupe("show")
+
+
             if(Qt.application.arguments[1]==="acq")
             {
+                mngAcq.load()
+                mngAcq.startSupe("show")
                 mngAcq.newAcquisition(arguments[2]);
                 forReal.configurationFile=mngAcq.plotConfigFileName()
                 forHome.whoIsVisilbe=forReal.name
             }
-            else
+            else if(Qt.application.arguments[1]==="vis")
             {
+                mngData.load()
                 mngData.loadFile(Qt.application.arguments[2]);
                 forAna.configurationFile=mngData.plotConfigFileName()
+                forAna.populate()
+                //forAna.displayInformations=mngData.displayInformations()
                 forHome.whoIsVisilbe=forAna.name
             }
         }

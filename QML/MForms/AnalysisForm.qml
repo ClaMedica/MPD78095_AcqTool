@@ -10,7 +10,8 @@ import Managers 1.0
 
 MForm{
     //@@@@@@@@@@    Definitions     @@@@@@@@@@
-    property string configurationFile:""
+    property alias configurationFile:mngCon.fileName
+    property string displayInformations:""
     signal back
 
     //@@@@@@@@@@    Properties      @@@@@@@@@@
@@ -25,7 +26,6 @@ MForm{
         mngData.loadFile(file)
         plot.setAbsXmin(mngData.getStartTime())
         plot.setAbsXmax(mngData.getEndTime())
-        player.visible=audioPlayer.loadSignalFromFile(file)
     }
 
     function populate()
@@ -34,12 +34,6 @@ MForm{
         plot.markers=mngData.getData("Marker")
         plot.frames=mngData.getData("Definer")
         plot.limits=mngData.getPlotLimits();
-    }
-
-    function loadConfiguration(file)
-    {
-        mngCon.fileName=file
-        mngCon.read()
     }
 
     function initialize()
@@ -66,39 +60,6 @@ MForm{
       }
     */
 
-    //@@@@@@@@@@--- Player @@@@@@@@@@@@@@@@@@@@@@@@@@@@@@------
-    MPlayer{
-        //@@@@@@@@@@    Properties      @@@@@@@@@@
-        id:audioPlayer
-
-        //@@@@@@@@@@    Events          @@@@@@@@@@
-        onEndReached:player.playClick()
-        onSliderPosChanged:
-        {
-            plot.timeMarker=sliderPos/1000
-            player.sliderPos=sliderPos
-        }
-    }
-
-    Player{
-        //@@@@@@@@@@    Properties      @@@@@@@@@@
-        id:player
-        height:visible?50:0
-        width:rootAna.width
-        startPos: audioPlayer.startPos
-        endPos: audioPlayer.endPos
-        duration: audioPlayer.duration
-
-        //@@@@@@@@@@    Events          @@@@@@@@@@
-        onSliderPosChanged:
-        {
-            plot.timeMarker=sliderPos/1000
-            audioPlayer.sliderPos=sliderPos
-        }
-        onPlay:audioPlayer.startPlaying()
-        onPause:audioPlayer.suspendPlaying()
-    }
-
     MPlot2DStack {
         //@@@@@@@@@@    Properties      @@@@@@@@@@
         id: plot
@@ -107,15 +68,11 @@ MForm{
         anchors.left: parent.left
         anchors.right: box.left
         Behavior on width {NumberAnimation { duration: 1000 }}
-        height: rootAna.height - 30 - player.height
+        height: rootAna.height - 30
         plotProp:mngCon.plotSetting
 
         //@@@@@@@@@@    Events          @@@@@@@@@@
-        onTimeMarkerChanged:if(!player.playing)
-                            {
-                                player.sliderPos=timeMarker*1000
-                                audioPlayer.sliderPos=timeMarker*1000
-                            }
+
         //onSaveMeChanged: mngTra.saveThis(saveMe)
         //onTracksChanged:console.log("draw these",tracks)
         onCurObjChanged: {
@@ -161,7 +118,7 @@ MForm{
                 mngData.loadFile(fileUrl)
                 plot.setAbsXmin(mngData.getStartTime())
                 plot.setAbsXmax(mngData.getEndTime())
-                player.visible=audioPlayer.loadSignalFromFile(fileUrl)
+
                 break;
 
             case "mngCon":
@@ -222,7 +179,6 @@ MForm{
             //a seconda di chi lo sta usando decido cosa fare
             switch(owner)
             {
-            case "audioPlayer": player.enabled=audioPlayer.loadSignalFromName(curText); owner="";break;
             //case "dopAna":      dopAna.currentSignal=mngData.getSignal(curText);      owner="";break;
             case "family":
                 title="Choose or create an element"
@@ -270,7 +226,13 @@ MForm{
         }
     }
 
-    ConfigManager{id:mngCon}
+    ConfigManager{
+        //@@@@@@@@@@    Properties      @@@@@@@@@@
+        id:mngCon
+        fileName: ""
+        //@@@@@@@@@@    Events          @@@@@@@@@@
+        onFileNameChanged: if(fileName!==""){plot.completed=true;read()}
+    }
 
     //@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@---------
 
@@ -280,7 +242,7 @@ MForm{
         anchors.bottom: parent.bottom
         anchors.right: parent.right
         width:0
-        height: root.height - 30 - player.height
+        height: root.height - 30
         Behavior on width {NumberAnimation { duration: 1000 }}
 
         //@@@@@@@@@@    Events          @@@@@@@@@@
@@ -306,7 +268,6 @@ MForm{
             ["Add","Data to Plot","New Marker","New Definer"],
             ["Select Signal","To Analyze","To Play"],
             ["Analisys","Spectrum","Time Warping","Energy","Time Spectrum"],
-            ["Player","Show Player Audio"],
             ["Plot","Load Settings"]
         ]
 
@@ -356,9 +317,7 @@ MForm{
             {
                 plotDial.visible=true
             }
-            //Player
-            if (itemClicked == "Show Player Audio")
-                player.height=50
+
 
             //Select
             if (itemClicked == "To Play")

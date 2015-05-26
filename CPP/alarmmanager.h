@@ -4,6 +4,7 @@
 #include <QObject>
 #include <global.h>
 #include <ancestry.h>
+#include <p7settingsmanager.h>
 #include "flowBT_types.h"
 enum StaticAlarmRecord
 {

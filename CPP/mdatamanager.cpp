@@ -2,8 +2,7 @@
 
 
 
-MDataManager::MDataManager(QObject *parent) :
-    QObject(parent)
+MDataManager::MDataManager(QObject *parent)
 {
     m_mng=NULL;
     m_copy=NULL;
@@ -12,6 +11,7 @@ MDataManager::MDataManager(QObject *parent) :
     m_updateWhenNews=false;
     m_start=0;
     m_end=3600;//fine esame di default a 1 ora
+    m_applicationPath=QApplication::applicationDirPath();
     m_configurationFileLoaded=false;//nessun file di configurazione caricato
     m_changesToBeSaved=false;
 }
@@ -32,11 +32,6 @@ void MDataManager::setInfoList(QVariantList __list)
         m_infoList=__list;
         emit infoListChanged();
     }
-}
-
-QString MDataManager::currentSignal()
-{
-    return m_currentSignalName;
 }
 
 bool MDataManager::addSignal(MSignal *__pSignal)
@@ -69,42 +64,12 @@ bool MDataManager::addSignal(MSignal *__pSignal)
 
 }
 
-bool MDataManager::setCurrentSignal(QString __name)
-{
-    for(int i=0;i<m_signalVector.size();i++)
-    {
-        if(m_signalVector[i]->getName()==__name)
-        {
-            m_pCurrentSignal=m_signalVector[i];
-            m_currentSignalName=__name;
-            emit currentSignalChanged();
-            return true;
-        }
-    }
-    return false;
-}
-
-void MDataManager::setConfigurationFile(QString __name)
-{
-    if(__name!=m_configurationFileName)
-    {
-        m_configurationFileLoaded=loadConfiguration(__name);//carico la nuova configurazione
-        if(m_configurationFileLoaded)
-        {
-            m_configurationFileName=__name;
-            emit configurationFileChanged();
-        }
-    }
-}
-
-
-
 void MDataManager::loadFile(QString __fileName)
 {
     __fileName.remove("file:///");
     qDebug()<<"Apro il file "<<__fileName;
     if(!QFile::exists(__fileName))
-    {qCritical()<<"File does not exists";return;}
+    {qCritical()<<__fileName<<MEX_FILE_NOT_EXISTS;return;}
     m_fileName=__fileName;
 
     MAudio audio;
@@ -129,40 +94,22 @@ void MDataManager::loadFile(QString __fileName)
 
     switch(fileType(__fileName))
     {
-    case WAV:
-    {
-        m_pCurrentSignal=NULL;
-        nChannels=audio.fromFileToSignal(&m_pCurrentSignal,__fileName);
-        list=__fileName.split(QRegularExpression("\\b"));
-        name=list[list.size()-4];
-        for(int i=0;i<nChannels;i++)
-        {
-            if(nChannels>1)
-            {
-                name.append("_ch_");
-                QString s;
-                s.setNum(i);
-                name.append(s);
-            }
-            m_pCurrentSignal[i].setName(name);
-            m_end=m_pCurrentSignal[i].getDuration();
-            this->addSignal(m_pCurrentSignal+i);
-        }
-
-        break;
-    }
     case PIC:
     {
         if(m_mng!=NULL)
         {
-            qDebug()<<"m_mng già creato errore!!!";
-            return;
+            delete m_mng;
         }
         m_mng=new DatafileManager;
         m_mng->SetFileName(__fileName);
         m_mng->SetFileType(5);
         qDebug()<<"File Aperto?"<<m_mng->Open();
         qDebug()<<"File Caricato?"<<m_mng->GetParameters();
+
+        qDebug()<<"Building configuration file ...";
+        if(!buildConfigurationFile())
+        {qCritical()<<MEX_FILE_CORRUPTED;return;}
+
         QString patientName=m_mng->GetPatient().section(";",0,1);
         patientName.replace(";","_");
         n=m_mng->GetDuration();
@@ -307,7 +254,7 @@ void MDataManager::loadFile(QString __fileName)
     default:qDebug()<<"Should not be here!!!!!";break;
     }
 
-
+    qDebug()<<"Load file operation completed succesfully!";
 }
 
 
@@ -477,31 +424,6 @@ void MDataManager::updateAvailableData()
 
     //qDebug()<<"m_availableData = "<<m_availableData;
     emit availableDataChanged();
-}
-
-bool MDataManager::loadConfiguration(QString __name)
-{
-    QString curConfigFile="";
-
-    if(__name=="")
-        curConfigFile=m_configurationFileName;
-    else
-        curConfigFile=__name;
-
-    if(!QFile::exists(curConfigFile))
-    {qCritical()<<"File "+curConfigFile+" does not exists";return false;}
-    if(!m_configuration.loadFromXML(curConfigFile))
-    {qCritical()<<"XML file corrupted";return false;}
-
-    //
-
-    qDebug()<<curConfigFile<<"Loaded correctly";
-    //ora abbiamo caricato tutto ciò che ci serve dentro a m_configuration
-}
-
-void MDataManager::saveConfiguration()
-{
-    m_configuration.saveToXML(m_configurationFileName);
 }
 
 /**

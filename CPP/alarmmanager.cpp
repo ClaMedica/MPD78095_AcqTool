@@ -75,11 +75,12 @@ void AlarmManager::addAlarm(int __code)
     Ancestry *child=m_confAla->getChild(m_vecMap[__code]);
     if(child==NULL)
     {qCritical()<<m_vecMap[__code]<<MEX_CHILD_NOT_ALIVE;return;}
-    qDebug()<<"allarme3";
+
     ala["message"]=child->getTextOfChild("Text");
     ala["help"]=child->getTextOfChild("Help");
     ala["color"]="red";
-    qDebug()<<"allarme4";
+    ala["sound"]="file:///"+g_P7SettingsManager.appPath()+"/Alarm.wav";
+
     m_alarms.append(ala);
     updateAlarms();
     qDebug()<<"Alarm! "<<__code;
