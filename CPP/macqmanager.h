@@ -23,6 +23,8 @@ public:
 signals:
     void alarmsChanged();
     void acqMarkersChanged();
+    void acquisitionStarted();
+    void systemInAcqStatus();
 
 public slots:
 
@@ -30,7 +32,7 @@ public slots:
     void connectToServers();
     void startSupe(QString __mode);
     void endAcquisition(QString __exit);
-    void addMarker(QVariant __key, QVariant __descr);
+    void addMarker(QVariant __bmp);
     void addDefiner(bool __startEnd,QVariantList __info);
     bool sendStartAcq(void);
     bool sendStopAcq (void);
@@ -83,7 +85,7 @@ private:
     void analyzeStatus(flowBT_status_t __status);
     void analyzeAlarms(alarms_t __alarms);
     bool newAcqFromConfigFile();
-    bool newAcqFromPIC();    
+    bool newAcqFromPIC();
     void checkAutomaticStartStop(QString __which);
     void saveBuffersToFile();
     void sendBuffersToPlot();

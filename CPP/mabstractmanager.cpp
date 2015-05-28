@@ -10,6 +10,22 @@ MAbstractManager::~MAbstractManager()
 
 }
 
+QVariantList MAbstractManager::markersInfo(QString __what,
+                                           QString __filterType,
+                                           QVariantList __filterValues)
+{
+    //leggioamo il file di configurazione e riempiamo le info
+    QVariantList list;
+    foreach(VarMap *marker,m_markerInfo)
+    {
+        if(__filterType!="")
+            if(!__filterValues.contains(marker->value(__filterType)))
+                continue;
+        list<<marker->value(__what);
+    }
+    return list;
+}
+
 bool MAbstractManager::load()
 {//in questa funzione inizializzo tutto caricando i file di configurazione fissi
     if(!m_configLocale.loadFromXML(m_applicationPath+"/Config_Locale.xml"))
@@ -18,7 +34,10 @@ bool MAbstractManager::load()
     if(!m_configUser.loadFromXML(m_applicationPath+"/Config_User.xml"))
     {qCritical()<<"Error on user configuration file";return false;}
 
+    if(!m_configMarkers.loadFromXML(m_applicationPath+"/markers.xml"))
+    {qCritical()<<"Error on user configuration file";return false;}
 
+    buildMarkerInfoMap();
 }
 
 
@@ -89,5 +108,25 @@ bool MAbstractManager::buildConfigurationFile()
     //ora salvo il file di configurazione come cur.xml
     configPlot.saveToXML(m_applicationPath+"/cur.xml");
     qDebug()<<"Configuration file builded succesfully";
+    return true;
+}
+
+bool MAbstractManager::buildMarkerInfoMap()
+{
+    foreach(Ancestry *marker,m_configMarkers.getChildren())
+    {
+        VarMap *mark=new VarMap;
+        QString img=marker->getAttribute(ATT_BMP);
+        QStringList imgPart=img.split(".");
+        QString rootURL="file:///"+m_applicationPath+"/Icone/";
+        (*mark)[ATT_BMP]=rootURL+img;
+        (*mark)[QString(ATT_BMP)+"16"]=rootURL+imgPart.first()+"16."+imgPart.last();
+        (*mark)[ATT_KEY]=marker->getAttribute(ATT_KEY);
+        (*mark)[ATT_CODE]=marker->getAttribute(ATT_CODE);
+        (*mark)[ATT_DESCR]=marker->getAttribute(ATT_DESCR);
+        (*mark)[ATT_TYPE]=marker->getAttribute(ATT_TYPE);
+        m_markerInfo<<mark;
+    }
+
     return true;
 }

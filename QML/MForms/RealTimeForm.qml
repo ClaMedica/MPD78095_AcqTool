@@ -22,9 +22,25 @@ MForm{
     visible:whoIsVisilbe===name?true:false
     clip:true
 
+    //@@@@@@@@@@    Functions       @@@@@@@@@@
+    function displayMessage(mex,time)
+    {
+        pop.message=mex
+        pop.display(1,0)
+        if(time!==-1)
+            pop.display(0,time)
+    }
+
+    function setMarkersInfo(info)
+    {
+        grid.model=info
+    }
+
     //@@@@@@@@@@    Events      @@@@@@@@@@
 
     //@@@@@@@@@@    Objects         @@@@@@@@@@
+
+
     FileDialog{
         //@@@@@@@@@@    Definitions     @@@@@@@@@@
         property string owner:"none"
@@ -70,7 +86,7 @@ MForm{
         clip:true
         anchors.bottom: parent.bottom
         anchors.left: parent.left
-        anchors.right: parent.right//box.left
+        anchors.right: grid.left
         height: root.height - 30 - alarmBox.height
         plotProp:mngCon.plotSetting
         Behavior on width {NumberAnimation { duration: 1000 }}
@@ -150,11 +166,15 @@ MForm{
     MGridView{
         //@@@@@@@@@@    Properties      @@@@@@@@@@
         id:grid
-        anchors.centerIn: rootRealTime
-        model:[1,2,3,4,5,65,7,8,9]
-        type:"text"
-        visible:false
-        width:220
+        anchors.right: rootRealTime.right
+        anchors.top: alarmBox.bottom
+        owner:"Marker"
+        type:"image"
+        visible:true
+        width:100
+        itemInRow: 2
+        itemSize: 32
+        distanceBetweenItems: 10
 
         //@@@@@@@@@@    Events          @@@@@@@@@@
         onClicked:
@@ -162,7 +182,7 @@ MForm{
             switch(owner)
             {
             case "Marker":
-                mngAcq.addMarker(currentItem,"Sono un marker");
+                mngAcq.addMarker(currentItem);
                 //console.log(mngAcq.acqMarkers)
                 plot.markers=mngAcq.acqMarkers;
                 break;
@@ -184,15 +204,15 @@ MForm{
             {
                 timClose.start(1000)
                 saveExam()
-                plot.stopAll()                
+                plot.stopAll()
                 //message="Do you want to analyze it?"
             }
-//            else
-//            {
-//                forAna.openFile(mngAcq.acqFile);
-//                forAna.loadConfiguration(mngAcq.configurationFile)
-//                forHome.whoIsVisilbe=forAna.name
-//            }
+            //            else
+            //            {
+            //                forAna.openFile(mngAcq.acqFile);
+            //                forAna.loadConfiguration(mngAcq.configurationFile)
+            //                forHome.whoIsVisilbe=forAna.name
+            //            }
         }
         onRejected:
         {
@@ -201,10 +221,10 @@ MForm{
                 timClose.start(1000);
                 deleteExam()
             }
-//            else
-//            {
-//                timClose.start(1000);
-//            }
+            //            else
+            //            {
+            //                timClose.start(1000);
+            //            }
         }
     }
 
@@ -245,13 +265,6 @@ MForm{
                 messageDialog.visible=true
                 mngAcq.sendStopAcq()
             }
-            if (itemClicked == "Marker")
-            {
-                grid.owner="Marker"
-                grid.visible=true
-                grid.display()
-            }
-
             if (itemClicked == "Properties")
             {
                 //box.ready=false
@@ -264,5 +277,10 @@ MForm{
         }
     }
 
-
+    MPopUp{
+        id:pop
+        anchors.centerIn: parent
+        width:200
+        height:100
+    }
 }

@@ -33,6 +33,7 @@ signals:
     void alarmsChanged();
     void availableTracksChanged();
     void infoListChanged();
+    void loadingCompleted();
 
 public slots:
 
@@ -89,7 +90,8 @@ private:
 
 //----
     bool saveDataAndUpdate(QString __family, QString __name, VarMapVec*__elements,bool __whatIfAlreadyPresent=OVERWRITE);
-    void updateAvailableData();   
+    void updateAvailableData();
+    bool buildInfoList();
 };
 
 

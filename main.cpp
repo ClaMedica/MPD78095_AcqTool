@@ -42,7 +42,6 @@ int main(int argc, char *argv[])
     qmlRegisterType<P7Settings>("Managers",1,0,"MSettings");
 
     QQmlApplicationEngine engine;
-    engine.setProperty("workFolder", QDir::currentPath());
 
     engine.addImportPath("../../UsefulOBJ");
     engine.addImportPath("../../AcqTool/QML");

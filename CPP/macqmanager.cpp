@@ -224,17 +224,18 @@ void MAcqManager::endAcquisition(QString __exit)
     m_mng=NULL;
 }
 
-void MAcqManager::addMarker(QVariant __key,QVariant __descr)
+void MAcqManager::addMarker(QVariant __bmp)
 {
     if(m_acqFileOpened)
     {
-        m_mng->AppendOpMarker((uchar)__key.toUInt(),__descr.toString());
-
         VarMap mrk;
-        mrk["key"]=__key;
-        mrk["color"]="red";
-        mrk["popUp"]=__descr;
-        mrk["lock"]=true;
+        foreach(VarMap *m,m_markerInfo)
+            if(m->value(ATT_BMP)==__bmp)
+                mrk=(*m);
+
+        m_mng->AppendOpMarker(mrk[ATT_KEY].toString().toUInt(),mrk[ATT_DESCR].toString());
+
+
         mrk["val"]=(float)m_mng->GetSamplesNumber(0)/m_mng->GetNAS(0);
         m_acqMarker.append(mrk);
         updateAcqData();
@@ -290,8 +291,7 @@ bool MAcqManager::sendCommand(tcp_flow_bt_cmd_t __command)
 
 void MAcqManager::updateAcqData()
 {
-    QStringList plotNames;
-    plotNames<<"Cella";//#BUG
+    QStringList plotNames=m_chanInPlots.keys();
     QString type="Marker";
     QString sGroup="$"+type+"Group";
     QString eGroup="&"+type+"Group";
@@ -421,7 +421,10 @@ void MAcqManager::analyzeStatus(flowBT_status_t __status)
         break;
     case ESTATE_ACQUIRING:
         if(m_oldState==ESTATE_IDLE_CONNECTED)
+        {
+            emit systemInAcqStatus();
             m_alarmMng.manageAlarm(S_ALA_NOT_ACQUIRING,ENABLE);
+        }
         break;
     default:break;
     }
@@ -481,12 +484,13 @@ void MAcqManager::checkAutomaticStartStop(QString __which)
                     foreach(MSignal *sig,m_channelMap[type])
                         sig->saveLastSec(5.0);
                 m_saving=true;//posso iniziare a salvare i dati
+                emit acquisitionStarted();
                 qDebug()<<"Start acquiring";
                 return;
             }
             else
             {
-                qDebug()<<chanType<<num<<(*m_channelMap[chanType].at(num));
+                //qDebug()<<chanType<<num<<(*m_channelMap[chanType].at(num));
             }
         }
 
@@ -518,14 +522,14 @@ void MAcqManager::saveBuffersToFile()
         int index=number.toInt()-1;
         int32_t chanNum=m_dataChanNameMap[chanName];
         //svuta tutto
-        qDebug()<<"Saving"<<m_channelMap[type].at(index)->size()<<"samples in channel"<<chanNum;
+        //qDebug()<<"Saving"<<m_channelMap[type].at(index)->size()<<"samples in channel"<<chanNum;
         while(m_channelMap[type].at(index)->size()>0){
             float v=m_channelMap[type].at(index)->takeFirst();
             m_mng->AppendValue(&chanNum,&v,1);
         }
 
     }
-    qDebug()<<"Salvooo"<<m_mng->GetDuration();
+    //qDebug()<<"Salvooo"<<m_mng->GetDuration();
 }
 
 void MAcqManager::sendBuffersToPlot()

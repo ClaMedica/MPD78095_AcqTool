@@ -18,7 +18,6 @@ MForm{
     id : rootAna
     background: Images.analysis
     visible:whoIsVisilbe===name?true:false
-    Component.onCompleted: iniTime.start(100)
 
     //@@@@@@@@@@    Functions       @@@@@@@@@@
     function openFile(file)
@@ -30,6 +29,7 @@ MForm{
 
     function populate()
     {
+        console.log("populate")
         plot.tracks=mngData.getData("Track")
         plot.markers=mngData.getData("Marker")
         plot.frames=mngData.getData("Definer")
@@ -38,6 +38,7 @@ MForm{
 
     function initialize()
     {
+        console.log("inizialize")
         mngData.registerModel("Track",traMod.strList)
         mngData.registerModel("Marker",marMod.strList)
         mngData.registerModel("Definer",fraMod.strList)
@@ -49,8 +50,6 @@ MForm{
     }
 
     //@@@@@@@@@@    Objects     @@@@@@@@@@
-    Timer{id:iniTime;onTriggered: initialize()}
-
 
     /*@@@@@@@@@@@@@@@@@@@@
       MAudioFileManager{
@@ -99,7 +98,7 @@ MForm{
         trackList: mngData.availableTracks
 
         //@@@@@@@@@@    Events          @@@@@@@@@@
-        onReady:mngData.infoList=news
+        onReady:{mngData.infoList=news;populate()}
     }
 
     FileDialog{

@@ -41,19 +41,20 @@ ApplicationWindow {
             if(Qt.application.arguments[1]==="acq")
             {
                 mngAcq.load()
-                mngAcq.startSupe("show")
+                mngAcq.startSupe("hide")
                 mngAcq.newAcquisition(arguments[2]);
+                console.log("Start configuring screen")
+                forReal.setMarkersInfo(mngAcq.markersInfo("bmp","type",[1,6]))
                 forReal.configurationFile=mngAcq.plotConfigFileName()
+                forReal.displayMessage("Wait for inizialization...",-1)
                 forHome.whoIsVisilbe=forReal.name
+
             }
             else if(Qt.application.arguments[1]==="vis")
             {
+                forAna.initialize()
                 mngData.load()
                 mngData.loadFile(Qt.application.arguments[2]);
-                forAna.configurationFile=mngData.plotConfigFileName()
-                forAna.populate()
-                //forAna.displayInformations=mngData.displayInformations()
-                forHome.whoIsVisilbe=forAna.name
             }
         }
         else
@@ -71,6 +72,7 @@ ApplicationWindow {
 
         //@@@@@@@@@@    Events          @@@@@@@@@@
         Component.onCompleted: console.log("MAcqManager Ready!")
+        onSystemInAcqStatus:forReal.displayMessage("Go go go!",2000)
     }
 
     MDataManager{
@@ -78,7 +80,12 @@ ApplicationWindow {
         id:mngData
 
         //@@@@@@@@@@    Events          @@@@@@@@@@
-        onInfoListChanged:forAna.populate()
+        onLoadingCompleted:{
+            forAna.configurationFile=mngData.plotConfigFileName()
+            forAna.populate()
+            forHome.whoIsVisilbe=forAna.name
+        }
+
         Component.onCompleted: console.log("MDataManager Ready!")
     }
 

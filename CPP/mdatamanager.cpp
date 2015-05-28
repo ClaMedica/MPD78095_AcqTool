@@ -72,10 +72,8 @@ void MDataManager::loadFile(QString __fileName)
     {qCritical()<<__fileName<<MEX_FILE_NOT_EXISTS;return;}
     m_fileName=__fileName;
 
-    MAudio audio;
-    QStringList list;
-    int nChannels,n;
-    QString name;
+    int n;
+
     VarMapVec *mrkOpVec=new VarMapVec;
     VarMapVec *mrkAnVec=new VarMapVec;
     VarMapVec *defVec=new VarMapVec;
@@ -109,6 +107,10 @@ void MDataManager::loadFile(QString __fileName)
         qDebug()<<"Building configuration file ...";
         if(!buildConfigurationFile())
         {qCritical()<<MEX_FILE_CORRUPTED;return;}
+
+        qDebug()<<"Building infoList ...";
+        if(!buildInfoList())
+        {qCritical()<<"Error building infolist";return;}
 
         QString patientName=m_mng->GetPatient().section(";",0,1);
         patientName.replace(";","_");
@@ -254,12 +256,13 @@ void MDataManager::loadFile(QString __fileName)
     default:qDebug()<<"Should not be here!!!!!";break;
     }
 
+    emit loadingCompleted();
     qDebug()<<"Load file operation completed succesfully!";
 }
 
 
 void MDataManager::resetAll()
-{    
+{
     //    m_data.clear();
     //    m_availableData.clear();
     //    for(int i=0;i<m_signalVector.size();i++)
@@ -426,6 +429,50 @@ void MDataManager::updateAvailableData()
     emit availableDataChanged();
 }
 
+bool MDataManager::buildInfoList()
+{
+    /*abbiamo detto che di default ci sono:
+     *
+     * le tracce per ogni grafico
+     * i marker operativi 1 2 e 6 per ogni grafico
+     * i definitori relativi ai canali
+     * i marker di commento per ogni grafico
+     * i marker di distanza per ogni grafico
+     */
+
+    //allora dato che questa funzione è chiamata dopo aver costruito i plotter
+    //so già quanti e come si chiamano i grafici
+
+    QStringList graphs=m_chanInPlots.keys();
+
+    QVariantList infoList;
+    foreach(QString graph,graphs)
+    {
+        QVariantList pair;
+        QStringList elements;
+        QVariant row,gName,gElemPack;
+        gName=graph;
+        //riempo con gli elementi che mi servono
+
+        //tracce molto facile dato che ce le ho già
+        foreach (QString chanName, m_chanInPlots[graph]) {
+            elements<<chanName+":Signal";
+        }
+
+        //markers
+        elements<<"Markers:Operative";
+
+        //elementi finiti
+        gElemPack=elements;
+        //a posto impacchetto tutto
+        pair<<gName<<gElemPack;
+        row=pair;
+        infoList<<row;
+    }
+    m_infoList=infoList;
+    return true;
+}
+
 /**
  * @brief MDataManager::registerModel registers a model to the class
  * @param __type of the model marker, definer, track ...
@@ -485,12 +532,12 @@ QVariantList MDataManager::getPlotLimits()
                 {
                     qulonglong p=(*map)["pointer"].toULongLong();
                     MSignal *sig=(MSignal*)p;
-                    qDebug()<<(*sig);
+                    //qDebug()<<(*sig);
                     if(sig->getT0()<xMin)xMin=sig->getT0();
                     if(sig->getDuration()>xMax)xMax=sig->getDuration();
                     if(sig->minimum()<yMin)yMin=sig->minimum();
                     if(sig->maximum()>yMax)yMax=sig->maximum();
-                    qDebug()<<yMin<<yMax;
+                    //qDebug()<<yMin<<yMax;
                     //qDebug()<<"Segnale lungo:"<<sig->getSize();
                 }
             }
