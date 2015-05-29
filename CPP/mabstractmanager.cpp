@@ -10,18 +10,23 @@ MAbstractManager::~MAbstractManager()
 
 }
 
-QVariantList MAbstractManager::markersInfo(QString __what,
-                                           QString __filterType,
+QVariantList MAbstractManager::markersInfo(QString __filterType,
                                            QVariantList __filterValues)
 {
-    //leggioamo il file di configurazione e riempiamo le info
+    //leggiamo il file di configurazione e riempiamo le info
     QVariantList list;
     foreach(VarMap *marker,m_markerInfo)
     {
         if(__filterType!="")
             if(!__filterValues.contains(marker->value(__filterType)))
                 continue;
-        list<<marker->value(__what);
+        list<<"$GridElement";
+        foreach(QString key,marker->keys())
+        {
+            list<<key;
+            list<<marker->value(key);
+        }
+        list<<"&GridElement";
     }
     return list;
 }
@@ -116,17 +121,15 @@ bool MAbstractManager::buildMarkerInfoMap()
     foreach(Ancestry *marker,m_configMarkers.getChildren())
     {
         VarMap *mark=new VarMap;
-        QString img=marker->getAttribute(ATT_BMP);
-        QStringList imgPart=img.split(".");
+        QString img=marker->getAttribute(ATT_IMG);
         QString rootURL="file:///"+m_applicationPath+"/Icone/";
-        (*mark)[ATT_BMP]=rootURL+img;
-        (*mark)[QString(ATT_BMP)+"16"]=rootURL+imgPart.first()+"16."+imgPart.last();
+        (*mark)[ATT_IMG]=rootURL+img;
         (*mark)[ATT_KEY]=marker->getAttribute(ATT_KEY);
         (*mark)[ATT_CODE]=marker->getAttribute(ATT_CODE);
         (*mark)[ATT_DESCR]=marker->getAttribute(ATT_DESCR);
         (*mark)[ATT_TYPE]=marker->getAttribute(ATT_TYPE);
         m_markerInfo<<mark;
     }
-
+    qDebug()<<m_markerInfo.size()<<"markers loaded!";
     return true;
 }

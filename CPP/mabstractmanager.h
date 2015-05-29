@@ -24,8 +24,7 @@ public:
     explicit MAbstractManager(QObject *parent = 0);
     ~MAbstractManager();
 
-    Q_INVOKABLE QVariantList markersInfo(QString __what,
-                                         QString __filterType="",
+    Q_INVOKABLE QVariantList markersInfo(QString __filterType="",
                                          QVariantList __filterValues=QVariantList());
 
 signals:

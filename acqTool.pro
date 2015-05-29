@@ -114,4 +114,6 @@ DISTFILES += \
     QML/MForms/AnalysisForm.qml \
     QML/MForms/HomeForm.qml \
     QML/MForms/RealTimeForm.qml \
-    QML/MForms/SupervisorForm.qml
+    QML/MForms/SupervisorForm.qml \
+    ../UsefulOBJ/MComponents/MMarkerButton.qml \
+    ../UsefulOBJ/MComponents/qmldir

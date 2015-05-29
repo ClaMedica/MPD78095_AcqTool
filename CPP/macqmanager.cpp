@@ -224,13 +224,13 @@ void MAcqManager::endAcquisition(QString __exit)
     m_mng=NULL;
 }
 
-void MAcqManager::addMarker(QVariant __bmp)
+void MAcqManager::addMarker(QVariant __key)
 {
     if(m_acqFileOpened)
     {
         VarMap mrk;
         foreach(VarMap *m,m_markerInfo)
-            if(m->value(ATT_BMP)==__bmp)
+            if(m->value(ATT_KEY)==__key)
                 mrk=(*m);
 
         m_mng->AppendOpMarker(mrk[ATT_KEY].toString().toUInt(),mrk[ATT_DESCR].toString());
@@ -239,7 +239,7 @@ void MAcqManager::addMarker(QVariant __bmp)
         mrk["val"]=(float)m_mng->GetSamplesNumber(0)/m_mng->GetNAS(0);
         m_acqMarker.append(mrk);
         updateAcqData();
-        qDebug()<<"Marker appended at "<<mrk["val"].toString()<<" sec";
+        qDebug()<<"Marker key:"<<mrk["key"]<<"appended at"<<mrk["val"].toString()<<"sec";
     }
 }
 

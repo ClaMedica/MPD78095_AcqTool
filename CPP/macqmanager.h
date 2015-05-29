@@ -32,7 +32,7 @@ public slots:
     void connectToServers();
     void startSupe(QString __mode);
     void endAcquisition(QString __exit);
-    void addMarker(QVariant __bmp);
+    void addMarker(QVariant __key);
     void addDefiner(bool __startEnd,QVariantList __info);
     bool sendStartAcq(void);
     bool sendStopAcq (void);

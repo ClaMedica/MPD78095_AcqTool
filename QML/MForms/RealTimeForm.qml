@@ -33,7 +33,8 @@ MForm{
 
     function setMarkersInfo(info)
     {
-        grid.model=info
+        console.log(info)
+        grid.items=info
     }
 
     //@@@@@@@@@@    Events      @@@@@@@@@@
@@ -168,12 +169,15 @@ MForm{
         id:grid
         anchors.right: rootRealTime.right
         anchors.top: alarmBox.bottom
+        anchors.bottom: parent.bottom
+        width:120
         owner:"Marker"
-        type:"image"
+        itemsInRow:2
+        delegate: MMarkerButton{}
         visible:true
-        width:100
-        itemInRow: 2
-        itemSize: 32
+
+        //itemInRow: 2
+        //itemSize: 32
         distanceBetweenItems: 10
 
         //@@@@@@@@@@    Events          @@@@@@@@@@
@@ -182,7 +186,7 @@ MForm{
             switch(owner)
             {
             case "Marker":
-                mngAcq.addMarker(currentItem);
+                mngAcq.addMarker(value);
                 //console.log(mngAcq.acqMarkers)
                 plot.markers=mngAcq.acqMarkers;
                 break;

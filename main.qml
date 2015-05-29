@@ -44,7 +44,7 @@ ApplicationWindow {
                 mngAcq.startSupe("hide")
                 mngAcq.newAcquisition(arguments[2]);
                 console.log("Start configuring screen")
-                forReal.setMarkersInfo(mngAcq.markersInfo("bmp","type",[1,6]))
+                forReal.setMarkersInfo(mngAcq.markersInfo("type",[1,6]))
                 forReal.configurationFile=mngAcq.plotConfigFileName()
                 forReal.displayMessage("Wait for inizialization...",-1)
                 forHome.whoIsVisilbe=forReal.name
