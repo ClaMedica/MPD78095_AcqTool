@@ -56,7 +56,7 @@ private:
     QMap<QString,QStringList> m_data;
 
     QStringList m_availableData,
-    m_possibleTypes,
+    m_possibleCategories,
     m_filesLoaded;//contiene l'elenco di tutti i file che sono stati aperti e di cui vi sono i dati disponibili per l'utente
 
     QString m_currentSignalName,

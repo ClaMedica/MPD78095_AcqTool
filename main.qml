@@ -15,8 +15,8 @@ ApplicationWindow {
     //@@@@@@@@@@    Properties      @@@@@@@@@@
     id: root
     visible: true
-    width:Screen.width*0.9
-    height:Screen.height*0.9
+    width:Screen.width*0.94
+    height:Screen.height*0.94
 
     Rectangle{
         color:"transparent"
@@ -118,9 +118,6 @@ ApplicationWindow {
 
         //@@@@@@@@@@    Events          @@@@@@@@@@
         onBack: forHome.whoIsVisilbe=forHome.name
-        onSaveMeChanged: forAna.save(saveMe)
-        onSaveExam: mngAcq.endAcquisition("TEST_SAVE")
-        onDeleteExam: mngAcq.endAcquisition("TEST_DISCARD")
     }
 
 

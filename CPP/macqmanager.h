@@ -15,7 +15,6 @@ public:
     Q_PROPERTY(QVariantList acqMarkers READ acqMarkers NOTIFY acqMarkersChanged)
 
     QVariantList alarms(){return m_alarmList;}
-
     QVariantList acqMarkers(){return m_acqMarkerList;}
 
     static void dataOnTCP(QObject *__pParent=NULL, SimpleTCPClient *__pTCP=NULL, QByteArray __block=QByteArray());
@@ -51,7 +50,8 @@ private:
     bool    m_acqFileOpened,
     m_serverReady,
     m_sendingToPlot,
-    m_saving;
+    m_saving,
+    m_autoStartStop;//mi dice se il controllo è abilitato o meno
 
     QByteArray m_sendingPack;
 
@@ -77,6 +77,8 @@ private:
     AlarmManager    m_alarmMng;         //gestore allarmi
 
     flowBT_states_t m_oldState;
+
+    MSignal m_stopBuffer;
 
     void updateAcqData();
     void handleTCP(SimpleTCPClient *__client, QByteArray __block);

@@ -54,8 +54,8 @@ bool MDataManager::addSignal(MSignal *__pSignal)
     VarMap *traccia=new VarMap;
     QString family=__pSignal->getName();
     QString name="Signal";
-    (*traccia)["popUp"]=__pSignal->getName();
-    (*traccia)["type"]=TYP_SIGNAL;
+    (*traccia)["descr"]=__pSignal->getName();
+    (*traccia)["category"]=CAT_TRACK;
     (*traccia)["pointer"]=(qulonglong)__pSignal;
     vec->append(traccia);
     saveDataAndUpdate(family,name,vec);
@@ -82,7 +82,7 @@ void MDataManager::loadFile(QString __fileName)
     double sigMin=INF,sigMax=-INF;
     byte key;
     int32_t numCh;
-    int32_t numSamp[20];
+    int32_t numSamp[4];//4 byte per avere il numero del campione
     int32_t numDef;
     int32_t tStart[20],tEnd[20];
     QString descr;
@@ -127,15 +127,28 @@ void MDataManager::loadFile(QString __fileName)
         {
             VarMap *mrk=new VarMap;
             m_mng->GetOpMarker(i,&key,numSamp,&descr);
-            double val=(double)numSamp[i]/m_mng->GetNAS(0);
-            qDebug()<<val;
+            qDebug()<<numSamp[0];
+            qDebug()<<numSamp[1];
+            qDebug()<<numSamp[2];
+            qDebug()<<numSamp[3];
+            double val=(double)numSamp[0]/m_mng->GetNAS(0);
+            qDebug()<<"Marker"<<key<<val;
+            if(m_markerMap.keys().contains(key))
+            {//marker conosciuto le info ce le ho già
+                (*mrk)=m_markerMap[key];
+            }
+            else
+            {//me lo costruisco
+                (*mrk)["code"]="USR";
+                (*mrk)["descr"]=descr;//sovrascrivo
+                (*mrk)["lock"]=false;
+                (*mrk)["key"]=key;
+                (*mrk)["color"]=COLOR_OPERATIVE;
+                (*mrk)["visible"]=true;
+                (*mrk)["category"]=CAT_MARKER;
+            }
             (*mrk)["val"]=val;
-            (*mrk)["popUp"]=descr;
-            (*mrk)["lock"]=true;
-            (*mrk)["key"]=key;
-            (*mrk)["color"]=COLOR_OPERATIVE;
-            (*mrk)["visible"]=true;
-            (*mrk)["type"]=TYP_MARKER;
+
             mrkOpVec->append(mrk);
         }
         if(!mrkOpVec->isEmpty())
@@ -152,7 +165,7 @@ void MDataManager::loadFile(QString __fileName)
             MSignal *sig=new MSignal;
             sig->resize(m_mng->GetSamplesNumber(h));
             for(int i=0;i<m_mng->GetSamplesNumber(h);i++)
-               sig->replace(i,m_mng->GetValue(h,i));
+                sig->replace(i,m_mng->GetValue(h,i));
 
             qDebug()<<sig;
             sig->setName(m_mng->GetChanName(h));
@@ -182,9 +195,9 @@ void MDataManager::loadFile(QString __fileName)
             (*def)["yMin"]=sigMin;
             (*def)["yMax"]=sigMax;
             (*def)["enCh"]=defEn[i];
-            (*def)["popUp"]=descr;
+            (*def)["descr"]=descr;
             (*def)["color"]="cyan";
-            (*def)["type"]=TYP_DEFINER;
+            (*def)["category"]=CAT_DEFINER;
             (*def)["resizeable"]=1;
             defVec->append(def);
 
@@ -223,14 +236,14 @@ void MDataManager::loadFile(QString __fileName)
             double val=(double)numSamp[i]/m_mng->GetNAS(0);
             qDebug()<<val;
             (*mrk)["val"]=val;
-            (*mrk)["popUp"]=descr;
+            (*mrk)["descr"]=descr;
             (*mrk)["lock"]=false;
             (*mrk)["channel"]=numCh;
             (*mrk)["defCode"]=(qulonglong)defVec->value(numDef);
             (*mrk)["key"]=key;
             (*mrk)["color"]=COLOR_ANALYTICAL;
             (*mrk)["visible"]=true;
-            (*mrk)["type"]=TYP_MARKER;
+            (*mrk)["category"]=CAT_MARKER;
             mrkAnVec->append(mrk);
         }
         if(!mrkAnVec->isEmpty())
@@ -293,54 +306,53 @@ void MDataManager::saveChanges()
     qDebug()<<"Eliminati marker e definer?"<<m_copy->DeleteAllMarkers();
 
 
-
-    VarMapVec *elements=m_storage.getAll();
+    //-Salvataggio Marker
+    VarMapVec *elements=m_storage.getAll(CAT_MARKER);
 
     foreach (VarMap *curMap, (*elements)) {
         qDebug()<<"Salvo l'oggetto: "<<curMap;
-        //-Salvataggio Marker
-        if(curMap->value("type").toString()==TYP_MARKER)
+
+        qDebug()<<"Inizio salvataggio";
+        int32_t *numCamp;
+        numCamp=new int32_t[m_copy->GetChanNum()];
+        qDebug()<<curMap->value("val").toFloat();
+        for(int i=0;i<m_copy->GetChanNum();i++)
+            numCamp[i]=curMap->value("val").toFloat()*m_copy->GetNAS(i);
+        if(curMap->value("color").toString()==COLOR_OPERATIVE)
         {
-            qDebug()<<"Inizio salvataggio marker";
-            int32_t *numCamp;
-            numCamp=new int32_t[m_copy->GetChanNum()];
-            qDebug()<<curMap->value("val").toFloat();
-            for(int i=0;i<m_copy->GetChanNum();i++)
-                numCamp[i]=curMap->value("val").toFloat()*m_copy->GetNAS(i);
-            if(curMap->value("color").toString()==COLOR_OPERATIVE)
-            {
-                m_copy->AddOpMarker(numCamp,curMap->value("key").toInt(),curMap->value("popUp").toString());
-            }
-            if(curMap->value("color").toString()==COLOR_ANALYTICAL)
-            {
-                m_copy->AddAnMarker(curMap->value("channel").toInt(),
-                                    numCamp[curMap->value("channel").toInt()],
-                        curMap->value("key").toInt(),
-                        curMap->value("defCode").toInt());
-            }
-            qDebug()<<"Fine salvataggio marker";
+            m_copy->AddOpMarker(numCamp,curMap->value("key").toInt(),curMap->value("descr").toString());
         }
-        //-Salvataggio Definer
-        if(curMap->value("type").toString()==TYP_DEFINER)
+        if(curMap->value("color").toString()==COLOR_ANALYTICAL)
         {
-            qDebug()<<"Inizio salvataggio definer";
-            int32_t *start,*end;
-            unsigned char *enCh;
-            start=new int32_t[m_copy->GetChanNum()];
-            end=new int32_t[m_copy->GetChanNum()];
-            enCh=new unsigned char[m_copy->GetChanNum()];
-            for(int i=0;i<m_copy->GetChanNum();i++)
-            {
-                start[i]=curMap->value("xMin").toFloat()*m_copy->GetNAS(i);
-                end[i]=curMap->value("xMax").toFloat()*m_copy->GetNAS(i);
-                enCh[i]=curMap->value("enCh").toList().at(i).toBool();
-                qDebug()<<start[i]<<end[i]<<enCh[i];
-            }
-            m_copy->AddOpMarkerAn(start,end,enCh,curMap->value("key").toInt(),curMap->value("popUp").toString());
-            qDebug()<<"Fine salvataggio definer";
+            m_copy->AddAnMarker(curMap->value("channel").toInt(),
+                                numCamp[curMap->value("channel").toInt()],
+                    curMap->value("key").toInt(),
+                    curMap->value("defCode").toInt());
         }
-        //oltre questi due if non ci si dovrebbe arrivare a meno che non sia un segnale e nel caso si prosegue
+        qDebug()<<"Fine salvataggio marker";
     }
+    //-Salvataggio Definer
+    elements=m_storage.getAll(CAT_DEFINER);
+
+    foreach (VarMap *curMap, (*elements)) {
+        qDebug()<<"Inizio salvataggio definer";
+        int32_t *start,*end;
+        unsigned char *enCh;
+        start=new int32_t[m_copy->GetChanNum()];
+        end=new int32_t[m_copy->GetChanNum()];
+        enCh=new unsigned char[m_copy->GetChanNum()];
+        for(int i=0;i<m_copy->GetChanNum();i++)
+        {
+            start[i]=curMap->value("xMin").toFloat()*m_copy->GetNAS(i);
+            end[i]=curMap->value("xMax").toFloat()*m_copy->GetNAS(i);
+            enCh[i]=curMap->value("enCh").toList().at(i).toBool();
+            qDebug()<<start[i]<<end[i]<<enCh[i];
+        }
+        m_copy->AddOpMarkerAn(start,end,enCh,curMap->value("key").toInt(),curMap->value("descr").toString());
+        qDebug()<<"Fine salvataggio definer";
+    }
+    //oltre questi due if non ci si dovrebbe arrivare a meno che non sia un segnale e nel caso si prosegue
+
 
     qDebug()<<"Commit markers?"<<m_copy->CommitMarkers();
     qDebug()<<"Chiudo il file?"<<m_copy->Close();
@@ -349,38 +361,38 @@ void MDataManager::saveChanges()
 /**
  * @brief MDataManager::addCustomObj add a custom object like a marker or a definer linked to __families,
  * @param __families is the list of families were to insert the new obj
- * @param __type marker definer ecc.
+ * @param __cat marker definer ecc.
  * @param __info to add to the object
  * @return
  */
-bool MDataManager::addCustomObj(QStringList __families, QString __name, QString __type, QVariantList __info)
+bool MDataManager::addCustomObj(QStringList __families, QString __name, QString __cat, QVariantList __info)
 {
-    qDebug()<<"Aggiungi alle famiglie "<<__families<<" un "<<__type<<" chiamato "<<__name<<" con queste caratteristiche"<<__info;
-    if(!m_possibleTypes.contains(__type))
-    {qCritical()<<"unknown type"+__type;return false;}
+    qDebug()<<"Aggiungi alle famiglie "<<__families<<" un "<<__cat<<" chiamato "<<__name<<" con queste caratteristiche"<<__info;
+    if(!m_possibleCategories.contains(__cat))
+    {qCritical()<<"unknown category"+__cat;return false;}
     if(__families.isEmpty())
     {qCritical()<<"Families corrupted";return false;}
     foreach (QString family, __families) {
         //devo aggiungere il mio nuovo oggetto ad ogni famiglia che ho scelto
         VarMapVec *objVec=NULL;
 
-        if(__type==TYP_MARKER)
+        if(__cat==CAT_MARKER)
         {
             objVec=new VarMapVec;
             if(__info.isEmpty())
             {//link==none vuol dire che non prende info da nessuno
                 VarMap *mrk=new VarMap;
                 (*mrk)["val"]=1;
-                (*mrk)["popUp"]="New Marker";
+                (*mrk)["descr"]="New Marker";
                 (*mrk)["lock"]=false;
                 (*mrk)["color"]=COLOR_CUSTOM;
                 (*mrk)["visible"]=true;
-                (*mrk)["type"]=TYP_MARKER;
+                (*mrk)["category"]=CAT_MARKER;
                 objVec->append(mrk);
             }
         }
 
-        if(__type==TYP_DEFINER)
+        if(__cat==CAT_DEFINER)
         {
             objVec=new VarMapVec;
             if(__info.isEmpty())
@@ -390,9 +402,9 @@ bool MDataManager::addCustomObj(QStringList __families, QString __name, QString 
                 (*def)["xMax"]=1;
                 (*def)["yMin"]=0;
                 (*def)["yMax"]=1;
-                (*def)["popUp"]="New Definer";
+                (*def)["descr"]="New Definer";
                 (*def)["color"]="white";
-                (*def)["type"]=TYP_DEFINER;
+                (*def)["category"]=CAT_DEFINER;
                 (*def)["resizeable"]=1;
                 //(*def)["moveable"]=1;
                 objVec->append(def);
@@ -406,7 +418,7 @@ bool MDataManager::addCustomObj(QStringList __families, QString __name, QString 
                 return false;
         }
         else
-        {qCritical()<<"Type "+__type+" not recognized";return false;}
+        {qCritical()<<"Category "+__cat+" not recognized";return false;}
     }
     return true;
 
@@ -469,29 +481,41 @@ bool MDataManager::buildInfoList()
         row=pair;
         infoList<<row;
     }
+
     m_infoList=infoList;
     return true;
 }
 
 /**
  * @brief MDataManager::registerModel registers a model to the class
- * @param __type of the model marker, definer, track ...
+ * @param __cat of the model marker, definer, track ...
  * @param __roles is the list of roles of the current model
  */
-void MDataManager::registerModel(QString __type, QStringList __roles)
+void MDataManager::registerModel(QString __cat, QStringList __roles)
 {
-    m_possibleTypes<<__type;
-    m_modelMap[__type]=__roles;
+    m_possibleCategories<<__cat;
+    m_modelMap[__cat]=__roles;
+    m_storage.addCategory(__cat);
+
 }
 
-QVariantList MDataManager::getData(QString __type)
+QVariantList MDataManager::getData(QString __cat)
 {
-    ModelManager mng;
-    mng.setType(__type);
-    mng.setRoles(m_modelMap[__type]);
-    mng.setStore(&m_storage);
-    mng.setInfoList(m_infoList);
-    return mng.drawList();
+    if(m_possibleCategories.contains(__cat))
+    {
+        ModelManager mng;
+        mng.setType(__cat);
+        mng.setRoles(m_modelMap[__cat]);
+        mng.setStore(&m_storage);
+        mng.setInfoList(m_infoList);
+        qDebug()<<mng.drawList();
+        return mng.drawList();
+    }
+    else
+    {
+        qCritical()<<"Category"<<__cat<<"not registered!";
+        return QVariantList();
+    }
 }
 
 QVariantList MDataManager::getPlotLimits()
@@ -552,23 +576,17 @@ QVariantList MDataManager::getPlotLimits()
 bool MDataManager::changeObject(QVariantList __curObj)
 {
     //qDebug()<<"Cambio un elemento con queste caratteristiche :"<<__curObj;
-    if(__curObj.contains("code"))
+    if(__curObj.length()!=2)
     {
-        int codeIndex=__curObj.indexOf("code")+1;
-
-        QVariantList fullCode=__curObj.at(codeIndex).toList();
-        QString family=fullCode.at(0).toString();
-        QString name=fullCode.at(1).toString();
-        qulonglong code=fullCode.at(2).toULongLong();
-        //tolgo il fullcode e lascio solo le proprietà
+        qulonglong whoAmI=__curObj.first().toULongLong();
+        //tolgo il whoami e lascio solo le proprietà
         __curObj.removeFirst();
-        __curObj.removeFirst();
-        //qDebug()<<"Richiesta di modifica per "<<family<<name<<code;
-        if(m_storage.modifyElement(family,name,code,__curObj))
+        qDebug()<<"Richiesta di modifica per "<<whoAmI;
+        if(m_storage.modifyElement(whoAmI,__curObj))
             m_changesToBeSaved=true;
         return true;
     }
-    qCritical()<<"No code info founded";
+    qCritical()<<"Length error";
     return false;
 }
 

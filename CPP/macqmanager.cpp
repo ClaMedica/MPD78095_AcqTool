@@ -10,7 +10,7 @@ MAcqManager::MAcqManager(QObject *parent)
     m_acqFileOpened=false;//nessuna acquisizione in atto
     m_sendingToPlot=false;//nessuno sta spedendo qualcosa per cui ci si può scrivere sopra
     m_serverReady=false;//i server non sono inizializzati quindi falso
-
+    m_autoStartStop=true;
     m_superProcess=NULL;//nessun supervisore avviato
     m_saving=false;//non sto salvando i dati
 
@@ -221,6 +221,8 @@ void MAcqManager::endAcquisition(QString __exit)
                   <<channel->serverPort();
     }
     //delete m_mng;
+    m_superProcess->close();
+
     m_mng=NULL;
 }
 
@@ -229,11 +231,9 @@ void MAcqManager::addMarker(QVariant __key)
     if(m_acqFileOpened)
     {
         VarMap mrk;
-        foreach(VarMap *m,m_markerInfo)
-            if(m->value(ATT_KEY)==__key)
-                mrk=(*m);
+        mrk=m_markerMap[__key];
 
-        m_mng->AppendOpMarker(mrk[ATT_KEY].toString().toUInt(),mrk[ATT_DESCR].toString());
+        m_mng->AppendOpMarker(mrk[ATT_KEY].toUInt(),mrk[ATT_DESCR].toString());
 
 
         mrk["val"]=(float)m_mng->GetSamplesNumber(0)/m_mng->GetNAS(0);
@@ -356,11 +356,18 @@ void MAcqManager::handleTCP(SimpleTCPClient *__client, QByteArray __block)
                     m_bufferMap[hwc]->remove(0,m_frameMap[hwc]);
             }
 
+
+
             if(!m_saving){
-                checkAutomaticStartStop("Start");//finchè non devo salvare riempo il buffer e controllo
+                if(m_autoStartStop)
+                    checkAutomaticStartStop("Start");//finchè non devo salvare riempo il buffer e controllo
+                else
+                    m_saving=true;
             }
             else
             {
+                if(m_autoStartStop)
+                    checkAutomaticStartStop("Stop");
                 sendBuffersToPlot();
                 saveBuffersToFile();
             }
@@ -441,7 +448,7 @@ void MAcqManager::analyzeAlarms(alarms_t __alarms)
 void MAcqManager::checkAutomaticStartStop(QString __which)
 {//ok controlliamo se c'è qualche condizione automatica
     //mi salvo il puntatore al livello acquisition
-    //qDebug()<<"Start check";
+    //qDebug()<<"Start check"<<__which;
     Ancestry *contitions=m_configUser.getChild("Auto"+__which+"s");
     if(contitions==NULL){qCritical(MEX_CHILD_NOT_ALIVE);return;}
     foreach (Ancestry *condition, contitions->getChildren()) {//scorro le condizioni di autostart anche se ce ne è solo una
@@ -486,6 +493,44 @@ void MAcqManager::checkAutomaticStartStop(QString __which)
                 m_saving=true;//posso iniziare a salvare i dati
                 emit acquisitionStarted();
                 qDebug()<<"Start acquiring";
+                return;
+            }
+            else
+            {
+                //qDebug()<<chanType<<num<<(*m_channelMap[chanType].at(num));
+            }
+        }
+
+        if(condition->name()==XML_STATIONARY)
+        {//statio
+            Ancestry *childDur=condition->getChild(XML_DURATION);
+            if(childDur==NULL){qCritical(MEX_CHILD_NOT_ALIVE);return;}
+            Ancestry *childVal=condition->getChild(XML_VALUE);
+            if(childVal==NULL){qCritical(MEX_CHILD_NOT_ALIVE);return;}
+            //per prima cosa controlliamo quanti campioni è
+            int min=childDur->getAttribute(ATT_MIN).toUInt();
+
+            qreal valMin=childVal->getAttribute(ATT_MIN).toInt();
+            qreal valMax=childVal->getAttribute(ATT_MAX).toInt();
+            //qDebug()<<"Buffer"<<chanType<<num<<"="<<*(m_channelMap[chanType].at(num));
+            qDebug()<<m_stopBuffer;
+            m_stopBuffer<<*m_channelMap[chanType].at(num);
+            m_stopBuffer.saveLastSec(min);
+            if(m_stopBuffer.getDuration()<min)
+                continue;
+            //ora quindi sono sicuro che arrivo qui solo quando ho abbastanza campioni
+
+            //controllo gli ultimi min campioni
+            MSignal s;
+            s<<m_channelMap[chanType].at(num)->mid(m_channelMap[chanType].at(num)->size()-min);
+
+            qreal sum=s.sum();
+            qreal sumAve=sum/min;
+            qDebug()<<"Sum"<<sum;
+            if(sumAve>valMin && sumAve<valMax)
+            {
+                qDebug()<<"Stop acquiring";
+                endAcquisition("TEST_SAVE");
                 return;
             }
             else

@@ -4,7 +4,7 @@
 MStorage::MStorage(QObject *parent) :
     QObject(parent)
 {
-    m_all=new VarMapVec;
+
 }
 
 VarMapVec* MStorage::pickUp(QString __family, QString __name)
@@ -12,7 +12,15 @@ VarMapVec* MStorage::pickUp(QString __family, QString __name)
     if(m_storage.keys().contains(__family))
         if(m_storage[__family].keys().contains(__name))
             return m_storage[__family][__name];
-    return 0;
+    return NULL;
+}
+
+VarMapVec* MStorage::getAll(QString __category)
+{
+    if(m_allMap.contains(__category))
+        return m_allMap[__category];
+    else
+    {qCritical()<<"Category"<<__category<<"not found!";return NULL;}
 }
 
 QStringList MStorage::getFamilies()
@@ -20,18 +28,18 @@ QStringList MStorage::getFamilies()
     return m_storage.keys();
 }
 
-QStringList MStorage::getNames(QStringList __families, QStringList __filterType)
+QStringList MStorage::getNames(QStringList __families, QStringList __filterCategory)
 {
     QStringList list;
     foreach (QString family, __families)
         if(m_storage.keys().contains(family))
             foreach (QString name, m_storage[family].keys())
-                foreach (QString type, __filterType) {
+                foreach (QString category, __filterCategory) {
                     VarMapVec *curVec=m_storage[family][name];
                     if(curVec!=NULL)//così per sfizio
                     {
                         VarMap *curMap=curVec->at(0);
-                        if(curMap->value("type")==type)
+                        if(curMap->value("category")==category)
                             if(!list.contains(name))
                                 list<<name;
                     }
@@ -40,10 +48,11 @@ QStringList MStorage::getNames(QStringList __families, QStringList __filterType)
     return list;
 }
 /**
- * @brief MStorage::archive a new item in the storage
- * @param __family of the item
- * @param __name of the item
- * @param __pointer of the item data
+ * @brief MStorage::archive
+ * @param __family
+ * @param __name
+ * @param __elements
+ * @param __whatIfAlreadyPresent
  * @return
  */
 bool MStorage::archive(QString __family, QString __name, VarMapVec *__elements, bool __whatIfAlreadyPresent)
@@ -52,21 +61,33 @@ bool MStorage::archive(QString __family, QString __name, VarMapVec *__elements, 
     bool present=false;
     if(m_storage.keys().contains(__family))
         if(m_storage[__family].keys().contains(__name))
-            present=true;    
+            present=true;
 
     foreach (VarMap *curMap, (*__elements))
-        if(!m_all->contains(curMap))
-            m_all->append(curMap);
+    {
+        QString cat=curMap->value("category").toString();
+        if(cat=="")
+        {qCritical()<<"Category item not defined";return false;}
+        if(!m_allMap.contains(cat))
+        {qCritical()<<"Category"<<cat<<"not registered";return false;}
 
-    //qDebug()<<*m_all;
+        if(!m_allMap[cat]->contains(curMap))
+        {
+            curMap->insert("whoAmI",(qulonglong)curMap);
+            m_allMap[cat]->append(curMap);
+        }
+
+    }
+    //in questo modo ogni elemento ha un suo codice identificativo uguale all'indirizzo a cui punta
+    //qDebug()<<*m_allMap;
     if(present)
     {
         if(__whatIfAlreadyPresent==OVERWRITE)
-        {
+        {//sovrascrive
             m_storage[__family][__name]=__elements;
         }
         else
-        {
+        {//appende
             VarMapVec *oldVec=m_storage[__family][__name];
             (*oldVec)<<(*__elements);
             m_storage[__family][__name]=oldVec;
@@ -77,15 +98,6 @@ bool MStorage::archive(QString __family, QString __name, VarMapVec *__elements, 
         //memorizzo nella mappa il puntatore ai dati
         m_storage[__family][__name]=__elements;
     }
-
-    //ora assegno un codice ad ognuno degli oggetti appena immagazzinati
-
-    foreach (VarMap *curMap,(*m_storage[__family][__name])) {
-        (*curMap)["code"]=(qulonglong)curMap;
-        //qDebug()<<__family<<__name<<curMap;
-    }
-
-    //in questo modo ogni elemento ha un suo codice identificativo uguale all'indirizzo a cui punta
     return true;
 }
 
@@ -97,54 +109,37 @@ bool MStorage::contains(QString __family, QString __name)
     return false;
 }
 
-bool MStorage::modifyElement(QString __family, QString __name, qulonglong __code, QVariantList __news)
+bool MStorage::modifyElement(qulonglong __whoAmI, QVariantList __news)
 {
+    VarMap *elementToModify=(VarMap *)__whoAmI;
+    foreach(QString cat,m_allMap.keys())
+    {
+        if(!m_allMap[cat]->contains(elementToModify))
+        {qCritical()<<"Data corrupted";return false;}
 
-    VarMapVec *curVec=NULL;
-    if(m_storage.keys().contains(__family))
-        if(m_storage[__family].keys().contains(__name))
-            curVec=m_storage[__family][__name];
-
-    if(curVec==NULL)
-    {qCritical()<<"No element found with "+__family+" and "+__name;return false;}
-
-    VarMap *elementToModify=NULL;
-    int indexToModify=-1;
-
-    foreach (VarMap *curMap, (*curVec)) {
-        if(curMap->value("code") == __code)
-        {
-            if(elementToModify==NULL)
-            {
-                indexToModify=curVec->indexOf(curMap);
-                elementToModify=curMap;
-            }
-            else
-            {
-                qCritical()<<"Data corrupted!!!";return false;
-            }
+        if(__news.length()==0)
+        {//provvedo a cavarlo via
+            delete elementToModify;
+            if(!m_allMap[cat]->removeOne(elementToModify))
+            {qCritical()<<"Data corrupted";return false;}
         }
-    }
-
-    if(indexToModify==-1)
-    {qCritical()<<"Code not found";return false;}
-
-    //qDebug()<<"modify"<<__family<<__name<<__code<<elementToModify;
-    if(__news.length()==0)
-    {//provvedo a cavarlo via
-        delete elementToModify;
-        curVec->removeAt(indexToModify);
-    }
-    else
-    {//provvedo a modificarlo
-        for(int i=0;i<__news.length();i+=2)
-        {
-            QString role=__news.at(i).toString();
-            QVariant value=__news.at(i+1);
-            (*elementToModify)[role]=value;
+        else
+        {//provvedo a modificarlo
+            for(int i=0;i<__news.length();i+=2)
+            {
+                QString role=__news.at(i).toString();
+                QVariant value=__news.at(i+1);
+                (*elementToModify)[role]=value;
+            }
         }
     }
     return true;
+}
+
+void MStorage::addCategory(QString __category)
+{
+    if(__category!="")
+        m_allMap[__category]=new VarMapVec;
 }
 
 

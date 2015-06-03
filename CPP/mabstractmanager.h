@@ -39,7 +39,7 @@ protected:
 
     DatafileManager *m_mng;
 
-    VarMapVec m_markerInfo;
+    QMap<QVariant,VarMap> m_markerMap;//mappa di tutti i possibili marker ordinati per key
 
     QMap<QString,QStringList>   m_chanInPlots;//associa nome plot ad una mappa con cui ripescare il buffer
     QMap<QString,int32_t> m_dataChanNameMap;//associa il nome del canale al suo indice

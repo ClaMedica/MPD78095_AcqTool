@@ -12,20 +12,21 @@ public:
     explicit MStorage(QObject *parent = 0);
 
     VarMapVec* pickUp(QString __family,QString __name);
-    VarMapVec* getAll(void){return m_all;}
+    VarMapVec* getAll(QString __category);
     QStringList getFamilies();
-    QStringList getNames(QStringList __families,QStringList __filterType=QStringList());
+    QStringList getNames(QStringList __families,QStringList __filterCategory=QStringList());
 
     bool archive(QString __family, QString __name, VarMapVec *__elements, bool __whatIfAlreadyPresent=OVERWRITE);
     bool contains(QString __family,QString __name);
-    bool modifyElement(QString __family, QString __name,qulonglong __code, QVariantList __news);
+    bool modifyElement(qulonglong __whoAmI, QVariantList __news);
+    void addCategory(QString __category);
 signals:
 
 public slots:
 
 
 private:
-    VarMapVec *m_all;
+    QMap<QString,VarMapVec *> m_allMap;
     QMap<QString,QMap<QString,VarMapVec *> > m_storage;
 };
 

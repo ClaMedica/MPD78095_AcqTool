@@ -15,19 +15,20 @@ QVariantList MAbstractManager::markersInfo(QString __filterType,
 {
     //leggiamo il file di configurazione e riempiamo le info
     QVariantList list;
-    foreach(VarMap *marker,m_markerInfo)
+    foreach(VarMap marker,m_markerMap.values())
     {
         if(__filterType!="")
-            if(!__filterValues.contains(marker->value(__filterType)))
+            if(!__filterValues.contains(marker.value(__filterType)))
                 continue;
         list<<"$GridElement";
-        foreach(QString key,marker->keys())
+        foreach(QString key,marker.keys())
         {
             list<<key;
-            list<<marker->value(key);
+            list<<marker.value(key);
         }
         list<<"&GridElement";
     }
+
     return list;
 }
 
@@ -120,16 +121,20 @@ bool MAbstractManager::buildMarkerInfoMap()
 {
     foreach(Ancestry *marker,m_configMarkers.getChildren())
     {
-        VarMap *mark=new VarMap;
+        VarMap mark;
         QString img=marker->getAttribute(ATT_IMG);
         QString rootURL="file:///"+m_applicationPath+"/Icone/";
-        (*mark)[ATT_IMG]=rootURL+img;
-        (*mark)[ATT_KEY]=marker->getAttribute(ATT_KEY);
-        (*mark)[ATT_CODE]=marker->getAttribute(ATT_CODE);
-        (*mark)[ATT_DESCR]=marker->getAttribute(ATT_DESCR);
-        (*mark)[ATT_TYPE]=marker->getAttribute(ATT_TYPE);
-        m_markerInfo<<mark;
+        mark[ATT_IMG]=rootURL+img;
+        mark[ATT_KEY]=marker->getAttribute(ATT_KEY);
+        mark[ATT_CODE]=marker->getAttribute(ATT_CODE);
+        mark[ATT_DESCR]=marker->getAttribute(ATT_DESCR);
+        mark[ATT_TYPE]=marker->getAttribute(ATT_TYPE);
+        mark["lock"]=true;
+        mark["color"]=COLOR_OPERATIVE;
+        mark["visible"]=true;
+        mark["category"]=CAT_MARKER;
+        m_markerMap[mark[ATT_KEY]]=mark;
     }
-    qDebug()<<m_markerInfo.size()<<"markers loaded!";
+    qDebug()<<m_markerMap.size()<<"markers loaded!";
     return true;
 }

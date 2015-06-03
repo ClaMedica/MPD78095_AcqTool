@@ -61,27 +61,26 @@ void ModelManager::updateModelList()
             QString family=item.section(":",0,0);
             QString name=item.section(":",1,1);
 
-//            qDebug()<<"*******";
-//            qDebug()<<family<<name;
-//            qDebug()<<"*******";
+            qDebug()<<"***Family & Name****";
+            qDebug()<<family<<name;
+
 
             if(m_pStore->contains(family,name))
             {
                 VarMapVec *curVec=(VarMapVec *)m_pStore->pickUp(family,name);
                 foreach(VarMap *curMap,(*curVec))
                 {
-                    //qDebug()<<curMap;
+                    qDebug()<<curMap;
                     bool correct=true;
                     foreach (QString curRole, curMap->keys())
-                    if(!m_roles.contains(curRole))                        
+                    if(!m_roles.contains(curRole))
                         correct=false;
 
-//                    qDebug()<<"@@@@@@@@@@";
-//                    qDebug()<<curMap->keys();
-//                    qDebug()<<m_roles;
-//                    qDebug()<<correct;
-//                    qDebug()<<"@@@@@@@@@@";
-
+                    qDebug()<<"Object"<<curMap<<"can be drawn?"<<correct;
+                    if(!correct){
+                    qDebug()<<"m_roles"<<m_roles;
+                    qDebug()<<"cur roles"<<curMap->keys();
+                    }
                     if(correct)
                     {
                         m_drawList<<sType;
@@ -101,12 +100,16 @@ void ModelManager::updateModelList()
                 }
 
             }
+            else
+            {
+                qCritical()<<"No family or name founded!";return;
+            }
         }
         m_drawList<<eGroup;
     }
     if(!m_drawList.isEmpty())
     {
-        //qDebug()<<m_drawList;
+        qDebug()<<m_drawList;
         emit drawListChanged();
     }
 }

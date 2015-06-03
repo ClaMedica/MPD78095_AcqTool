@@ -13,8 +13,6 @@ MForm{
     property string lastAcqFileName:""
     property int saveMe:plot.savedData
     signal back
-    signal saveExam
-    signal deleteExam
 
     //@@@@@@@@@@    Properties      @@@@@@@@@@
     id : rootRealTime
@@ -170,15 +168,12 @@ MForm{
         anchors.right: rootRealTime.right
         anchors.top: alarmBox.bottom
         anchors.bottom: parent.bottom
-        width:120
+        width:200
         owner:"Marker"
         itemsInRow:2
         delegate: MMarkerButton{}
         visible:true
 
-        //itemInRow: 2
-        //itemSize: 32
-        distanceBetweenItems: 10
 
         //@@@@@@@@@@    Events          @@@@@@@@@@
         onClicked:
@@ -253,7 +248,7 @@ MForm{
         opacity: rootRealTime.opacity
         theme:"green"
         items: [
-            ["Acquisition","Start","Stop","Suona"],
+            ["Acquisition","Start",qsTr("Exit without saving"),qsTr("Exit and save"),qsTr("Exit, save and review")],
             ["Add","Marker","Start Definer","Stop Definer"],
             ["Plot","Properties"]
         ]
@@ -265,10 +260,25 @@ MForm{
                 editName.visible=true
                 box.popola()
             }
-            if (itemClicked == "Stop") {
-                messageDialog.visible=true
+            if (itemClicked === qsTr("Exit without saving")) {
                 mngAcq.sendStopAcq()
+                plot.stopAll()
+                mngAcq.endAcquisition("TEST_DISCARD")
+                timClose.start(1000);
             }
+            if (itemClicked === qsTr("Exit and save")) {
+                mngAcq.sendStopAcq()
+                plot.stopAll()
+                mngAcq.endAcquisition("TEST_SAVE")
+                timClose.start(1000);
+            }
+            if (itemClicked === qsTr("Exit, save and review")) {
+                mngAcq.sendStopAcq()
+                plot.stopAll()
+                mngAcq.endAcquisition("TEST_SAVE_REVIEW")
+                timClose.start(1000);
+            }
+
             if (itemClicked == "Properties")
             {
                 //box.ready=false
