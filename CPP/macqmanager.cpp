@@ -13,7 +13,8 @@ MAcqManager::MAcqManager(QObject *parent)
     m_autoStartStop=true;
     m_superProcess=NULL;//nessun supervisore avviato
     m_saving=false;//non sto salvando i dati
-
+    m_tcpAttempts=0;
+    m_supeConnected=0;
     m_oldState=ESTATE_IDLE_NOT_CONNECTED;
 
     //connetto il gestore degli allarmi alla proprietà alarms
@@ -134,14 +135,14 @@ bool MAcqManager::newAcquisition(QString __dataFile)
         //inizializzo i server di comunicazione con i plotter
         initializeServers();
         //disabilito alcuni allarmi
-        m_alarmMng.manageAlarm(S_ALA_NOT_ACQUIRING,DISABLE);
+        m_alarmMng.manageAlarm(ALA_NOT_ACQUIRING,DISABLE);
         //mi connetto ai server del supe e del programma di gestione archivi
-        QTimer::singleShot(10000,this,SLOT(connectToServers()));
+        connectToServers();
 
 
     }
     //faccio partire il timer per l'allarme di stato
-    //m_alarmMng.startTimeoutAlarms();
+    //m_alarmMng.startTimeoutAlarm();
 
     return true;
 }
@@ -153,30 +154,30 @@ void MAcqManager::connectToServers()
     foreach (SimpleTCPClient *client, m_tcpClients) {
         client->registerDataReadyCallBack(&(this->dataOnTCP));
         client->connectToHost();
-
-        if(client->waitForConnected(10000))
-        {
-            qDebug()<<"connesso "<<client->hostAddress().toString()<<client->hostPort();
-        }
-        else
-        {
-            qCritical()<<"Timeout of"<<m_tcpClients.key(client);
-            QStringList superPorts;
-            superPorts<<"CMD"<<"VAL"<<"STA";
-            if(superPorts.contains(m_tcpClients.key(client)))
-            {
-                if(m_superProcess!=NULL)
-                {
-                    m_superProcess->kill();
-                    if(m_superProcess->waitForFinished())
-                        delete m_superProcess;
-                }
-                startSupe("show");
-                QTimer::singleShot(10000,this,SLOT(connectToServers()));
-            }
-        }
     }
+    if(m_supeConnected==false)
+        QTimer::singleShot(2000,this,SLOT(connectToServers()));
+
+    if(m_tcpAttempts>0)
+        qDebug()<<"Retrying to connect in 2 seconds...";
+    if(m_tcpAttempts>=10)
+    {
+        qDebug()<<"Restarting supervisor...";
+        if(m_superProcess!=NULL)
+        {
+            m_superProcess->close();
+            if(m_superProcess->waitForFinished())
+                delete m_superProcess;
+        }
+        m_tcpAttempts=0;
+        startSupe("hide");
+        QTimer::singleShot(5000,this,SLOT(connectToServers()));
+
+    }
+    m_tcpAttempts++;
 }
+
+
 
 void MAcqManager::startSupe(QString __mode)
 {
@@ -255,7 +256,7 @@ bool MAcqManager::sendStartAcq()
 
 bool MAcqManager::sendStopAcq()
 {
-    m_alarmMng.manageAlarm(S_ALA_NOT_ACQUIRING,DISABLE);
+    m_alarmMng.manageAlarm(ALA_NOT_ACQUIRING,DISABLE);
     return sendCommand(3);
 }
 
@@ -327,6 +328,7 @@ void MAcqManager::handleTCP(SimpleTCPClient *__client, QByteArray __block)
         //qDebug()<<who<<__block;
         if(who=="STA")
         {//allora è uno stato
+            m_supeConnected=true;
             __block.remove(0,4);
             flowBT_status_t status;
             alarms_t alarms;
@@ -339,7 +341,6 @@ void MAcqManager::handleTCP(SimpleTCPClient *__client, QByteArray __block)
 
             analyzeStatus(status);
             analyzeAlarms(alarms);
-            m_alarmMng.startTimeoutAlarms(T_ALA_TIMEOUT_STATUS,TIMEOUT_TIME_ON_STATUS);
         }
 
         if(who=="VAL")
@@ -413,29 +414,37 @@ bool MAcqManager::loadConnectivityInfo(Ancestry *__info)
 
 void MAcqManager::analyzeStatus(flowBT_status_t __status)
 {
+    m_alarmMng.stopTimeoutAlarm(ALA_TIMEOUT_STATUS);
     if(__status.currState!=m_oldState)
         qDebug()<<"Stato "<<__status.currState;
 
     switch(__status.currState)
     {
     case ESTATE_IDLE_NOT_CONNECTED:
-        m_alarmMng.addAlarm(S_ALA_NOT_CONNECTED);
+        if(m_oldState==ESTATE_IDLE_CONNECTED)
+            m_alarmMng.addAlarm(ALA_NOT_CONNECTED);
+        else
+            m_alarmMng.startTimeoutAlarm(ALA_NOT_CONNECTED,1000);
         break;
     case ESTATE_IDLE_CONNECTED:
         if(m_oldState==ESTATE_IDLE_NOT_CONNECTED)
+        {
+            m_alarmMng.stopTimeoutAlarm(ALA_NOT_CONNECTED);
             sendStartAcq();
-        m_alarmMng.addAlarm(S_ALA_NOT_ACQUIRING);
+        }
+        m_alarmMng.addAlarm(ALA_NOT_ACQUIRING);
         break;
     case ESTATE_ACQUIRING:
         if(m_oldState==ESTATE_IDLE_CONNECTED)
         {
             emit systemInAcqStatus();
-            m_alarmMng.manageAlarm(S_ALA_NOT_ACQUIRING,ENABLE);
+            m_alarmMng.manageAlarm(ALA_NOT_ACQUIRING,ENABLE);
         }
         break;
     default:break;
     }
     m_oldState=__status.currState;
+    m_alarmMng.startTimeoutAlarm(ALA_TIMEOUT_STATUS,1000);
 }
 
 void MAcqManager::analyzeAlarms(alarms_t __alarms)
@@ -510,10 +519,10 @@ void MAcqManager::checkAutomaticStartStop(QString __which)
             //per prima cosa controlliamo quanti campioni è
             int min=childDur->getAttribute(ATT_MIN).toUInt();
 
-            qreal valMin=childVal->getAttribute(ATT_MIN).toInt();
-            qreal valMax=childVal->getAttribute(ATT_MAX).toInt();
+            qreal valMin=childVal->getAttribute(ATT_MIN).toDouble();
+            qreal valMax=childVal->getAttribute(ATT_MAX).toDouble();
             //qDebug()<<"Buffer"<<chanType<<num<<"="<<*(m_channelMap[chanType].at(num));
-            qDebug()<<m_stopBuffer;
+
             m_stopBuffer<<*m_channelMap[chanType].at(num);
             m_stopBuffer.saveLastSec(min);
             if(m_stopBuffer.getDuration()<min)
@@ -521,13 +530,11 @@ void MAcqManager::checkAutomaticStartStop(QString __which)
             //ora quindi sono sicuro che arrivo qui solo quando ho abbastanza campioni
 
             //controllo gli ultimi min campioni
-            MSignal s;
-            s<<m_channelMap[chanType].at(num)->mid(m_channelMap[chanType].at(num)->size()-min);
 
-            qreal sum=s.sum();
-            qreal sumAve=sum/min;
-            qDebug()<<"Sum"<<sum;
-            if(sumAve>valMin && sumAve<valMax)
+            qreal smin=m_stopBuffer.minimum();
+            qreal smax=m_stopBuffer.maximum();
+            qDebug()<<smin<<valMin<<smax<<valMax;
+            if(smin>valMin && smax<valMax)
             {
                 qDebug()<<"Stop acquiring";
                 endAcquisition("TEST_SAVE");

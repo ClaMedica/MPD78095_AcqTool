@@ -47,7 +47,9 @@ private:
                 m_totalHWChan,//lista dei canali hw che ci sono
                 m_superList;    //lista dei supervisori che dovrò avviare
 
+    int m_tcpAttempts;//contiene il numero di tentativi che ci metto per connettermi ai server
     bool    m_acqFileOpened,
+    m_supeConnected,    //mi indica quando il supervisore è connesso
     m_serverReady,
     m_sendingToPlot,
     m_saving,

@@ -472,6 +472,7 @@ bool MDataManager::buildInfoList()
         }
 
         //markers
+        if(m_mng->GetNumOperativeMarkers()>0)
         elements<<"Markers:Operative";
 
         //elementi finiti

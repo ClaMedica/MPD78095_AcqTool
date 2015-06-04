@@ -190,43 +190,6 @@ MForm{
     }
 
 
-    MMessageYesNo{
-        //@@@@@@@@@@    Properties      @@@@@@@@@@
-        id: messageDialog
-        anchors.centerIn: parent
-        message: "Do you want to save the current exam?"
-        visible:false
-
-        //@@@@@@@@@@    Events          @@@@@@@@@@
-        onAccepted: {
-            if(message=="Do you want to save the current exam?")
-            {
-                timClose.start(1000)
-                saveExam()
-                plot.stopAll()
-                //message="Do you want to analyze it?"
-            }
-            //            else
-            //            {
-            //                forAna.openFile(mngAcq.acqFile);
-            //                forAna.loadConfiguration(mngAcq.configurationFile)
-            //                forHome.whoIsVisilbe=forAna.name
-            //            }
-        }
-        onRejected:
-        {
-            if(message=="Do you want to save the current exam?")
-            {
-                timClose.start(1000);
-                deleteExam()
-            }
-            //            else
-            //            {
-            //                timClose.start(1000);
-            //            }
-        }
-    }
-
 
 
     Timer{
@@ -275,8 +238,14 @@ MForm{
             if (itemClicked === qsTr("Exit, save and review")) {
                 mngAcq.sendStopAcq()
                 plot.stopAll()
-                mngAcq.endAcquisition("TEST_SAVE_REVIEW")
-                timClose.start(1000);
+                mngAcq.endAcquisition("TEST_SAVE")
+                var arg=[]
+                arg[0]=Qt.application.arguments[0]
+                arg[1]="vis"
+                arg[2]=Qt.application.arguments[2]
+                arg[3]=Qt.application.arguments[3]
+                console.log("Lancioooo",arg[1])
+                launch(arg)
             }
 
             if (itemClicked == "Properties")

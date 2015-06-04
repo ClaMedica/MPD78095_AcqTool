@@ -1,6 +1,6 @@
 #include "alarmmanager.h"
 
-AlarmTimer::AlarmTimer(TimeoutAlarmRecord __code){
+AlarmTimer::AlarmTimer(AlarmRecord __code){
     m_code=(int)__code;
     m_tim=new QTimer;
     m_tim->setSingleShot(true);
@@ -13,25 +13,21 @@ void AlarmTimer::reset(){start(TIMEOUT_AFTER_RESET);}
 
 void AlarmTimer::start(int __msec){m_tim->start(__msec);}
 
+void AlarmTimer::stop(){m_tim->stop();}
+
 void AlarmTimer::send(){qDebug()<<"Timeout Alarm code = "<<m_code;emit timeout(m_code);}
 
 AlarmManager::AlarmManager(QObject *parent) : QObject(parent)
 {
     m_confAla=NULL;
-    for(int i=T_ALA_TIMEOUT_STATUS;i<T_ALA_NUM;i++)
-    {
-        TimeoutAlarmRecord curAla=(TimeoutAlarmRecord)i;
-        m_ATMap[curAla]=new AlarmTimer(curAla);
-        connect(m_ATMap[i],SIGNAL(timeout(int)),this,SLOT(addAlarm(int)));
-    }
-
-
 }
 
 AlarmManager::~AlarmManager()
 {
     if(m_confAla==NULL)
         delete m_confAla;
+    foreach(AlarmTimer *a,m_ATMap)
+        delete a;
 }
 
 bool AlarmManager::load(QString __fileName)
@@ -45,9 +41,9 @@ bool AlarmManager::load(QString __fileName)
         return false;
     }
     foreach (Ancestry *alarm,m_confAla->getChildren()) {
-            m_vecMap[alarm->getAttribute("code").toInt()]=alarm->name();
-            m_enabledAlarms[alarm->getAttribute("code").toInt()]=true;
-        }
+        m_vecMap[alarm->getAttribute("code").toInt()]=alarm->name();
+        m_enabledAlarms[alarm->getAttribute("code").toInt()]=true;
+    }
     qDebug()<<"Alarms loaded:"<<m_confAla->childrenNames();
     return true;
 
@@ -86,42 +82,35 @@ void AlarmManager::addAlarm(int __code)
     qDebug()<<"Alarm! "<<__code;
 }
 
-void AlarmManager::resetAlarms(QList<int> __codes)
+void AlarmManager::resetAlarms()
 {
-    if(__codes.isEmpty())
-    {
-        foreach (AlarmTimer *tim, m_ATMap.values()) {
-            tim->reset();
-        }
-        m_alarms.clear();
+
+    foreach (int code, m_ATMap.keys()) {
+        if(m_repeatAlarms.contains(code))
+            m_ATMap[code]->reset();
     }
-    else
-    {
-        QVector<VarMap> old=m_alarms;
-        m_alarms.clear();
-        foreach (VarMap alarm,old)
-        {
-            if(!__codes.contains(alarm["code"].toInt()))
-                m_alarms<<alarm;
-        }
-    }
+    m_alarms.clear();
+
     updateAlarms();
 }
 
-void AlarmManager::startTimeoutAlarms(int __code, int __time)
+void AlarmManager::startTimeoutAlarm(int __code, int __time,bool __repeat)
 {
-    if(__code==-1)
-    {//partono tutti
-        foreach (AlarmTimer *tim, m_ATMap.values()) {
-            tim->start(TIMEOUT_TIME_ON_STATUS);
-            m_enabledAlarms[tim->code()]=true;
-        }
-    }
-    else
+    //qDebug()<<"Alarm"<<__code<<"will come in"<<__time<<"seconds";
+    if(!m_ATMap.contains(__code))
     {
-        m_enabledAlarms[__code]=true;
-        m_ATMap[__code]->start(__time);
+        m_ATMap[__code]=new AlarmTimer((AlarmRecord)__code);
+        connect(m_ATMap[__code],SIGNAL(timeout(int)),this,SLOT(addAlarm(int)));
     }
+    m_enabledAlarms[__code]=true;
+    m_repeatAlarms<<__repeat;
+    m_ATMap[__code]->start(__time);
+}
+
+void AlarmManager::stopTimeoutAlarm(int __code)
+{
+    if(m_ATMap.contains(__code))
+        m_ATMap[__code]->stop();
 }
 
 bool AlarmManager::manageAlarm(int __code, bool __enable)

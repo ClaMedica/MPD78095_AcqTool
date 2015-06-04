@@ -2,13 +2,11 @@
 #define MABSTRACTMANAGER_H
 
 #include <QObject>
-#include <mplayer.h>
-#include "datafilemanager.h"
+#include <datafilemanager.h>
 #include "SimpleTCPClient.h"
 #include "TcpServers.h"
 #include "ancestry.h"
 #include "msignal.h"
-#include "tabble.h"
 #include "flowBT_types.h"
 #include "TcpServerFlowBt_types.h"
 #include "inheritEnum.h"

@@ -32,9 +32,6 @@ int main(int argc, char *argv[])
     f.close();
 
 
-
-
-    qmlRegisterType<MPlayer>("Audio",1,0,"MPlayer");
     qmlRegisterType<ParameterManager>("Managers",1,0,"ParameterManager");
     qmlRegisterType<ModelManager>("Managers",1,0,"ModelManager");
     qmlRegisterType<MAcqManager>("Managers",1,0,"MAcqManager");

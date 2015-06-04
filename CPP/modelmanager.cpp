@@ -2,7 +2,7 @@
 
 ModelManager::ModelManager(QObject *parent) :
     QObject(parent)
-{    
+{
 }
 
 void ModelManager::setType(QString __type)
@@ -17,13 +17,13 @@ void ModelManager::setType(QString __type)
 void ModelManager::setInfoList(QVariantList __list)
 {
     m_infoList=__list;
-    qDebug()<<__list;
+    //qDebug()<<__list;
     for(int plotIndex=0;plotIndex<m_infoList.size();plotIndex++)
     {
         QVariantList plotInfo=m_infoList.at(plotIndex).toList();
         QString plotName=plotInfo.at(0).toString();
         QStringList info=plotInfo.at(1).toStringList();
-        qDebug()<<plotName<<info;
+        //qDebug()<<plotName<<info;
         m_infoMap[plotName]=info;
     }
     updateModelList();
@@ -61,8 +61,8 @@ void ModelManager::updateModelList()
             QString family=item.section(":",0,0);
             QString name=item.section(":",1,1);
 
-            qDebug()<<"***Family & Name****";
-            qDebug()<<family<<name;
+            //qDebug()<<"***Family & Name****";
+            //qDebug()<<family<<name;
 
 
             if(m_pStore->contains(family,name))
@@ -70,16 +70,16 @@ void ModelManager::updateModelList()
                 VarMapVec *curVec=(VarMapVec *)m_pStore->pickUp(family,name);
                 foreach(VarMap *curMap,(*curVec))
                 {
-                    qDebug()<<curMap;
+                    //qDebug()<<curMap;
                     bool correct=true;
                     foreach (QString curRole, curMap->keys())
                     if(!m_roles.contains(curRole))
                         correct=false;
 
-                    qDebug()<<"Object"<<curMap<<"can be drawn?"<<correct;
+                    //qDebug()<<"Object"<<curMap<<"can be drawn?"<<correct;
                     if(!correct){
-                    qDebug()<<"m_roles"<<m_roles;
-                    qDebug()<<"cur roles"<<curMap->keys();
+                    //qDebug()<<"m_roles"<<m_roles;
+                    //qDebug()<<"cur roles"<<curMap->keys();
                     }
                     if(correct)
                     {
@@ -109,7 +109,7 @@ void ModelManager::updateModelList()
     }
     if(!m_drawList.isEmpty())
     {
-        qDebug()<<m_drawList;
+        //qDebug()<<m_drawList;
         emit drawListChanged();
     }
 }

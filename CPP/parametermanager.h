@@ -3,7 +3,7 @@
 
 #include <QObject>
 #include <QVariantList>
-#include <../MGlobal/global.h>
+#include <global.h>
 
 class ParameterManager : public QObject
 {

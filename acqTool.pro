@@ -22,10 +22,7 @@ QT +=core
 DEFINES += QT_MESSAGELOGCONTEXT
 # The .cpp file which was generated for your project. Feel free to hack it.
 SOURCES += main.cpp \
-    CPP/maudio.cpp \
-    CPP/mplayer.cpp \
     CPP/parametermanager.cpp \
-    CPP/tabble.cpp \
     ../MGlobal/msignal.cpp \
     ../MGlobal/global.cpp \
     CPP/modelmanager.cpp \
@@ -42,10 +39,7 @@ SOURCES += main.cpp \
     CPP/mabstractmanager.cpp
 
 HEADERS += \
-    CPP/maudio.h \
-    CPP/mplayer.h \
     CPP/parametermanager.h \
-    CPP/tabble.h \
     ../MGlobal/global.h \
     ../MGlobal/msignal.h \
     CPP/modelmanager.h \

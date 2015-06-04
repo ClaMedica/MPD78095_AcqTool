@@ -18,27 +18,15 @@ ApplicationWindow {
     width:Screen.width*0.94
     height:Screen.height*0.94
 
-    Rectangle{
-        color:"transparent"
-        anchors.fill:parent
-    }
-
-    MSettings{
-        id:settings
-        Component.onCompleted: loadSettings()
-    }
-
-    //@@@@@@@@@@    Events          @@@@@@@@@@
-    Component.onCompleted:
+    function launch(arguments)
     {
-        var arguments=Qt.application.arguments
         if(arguments.length>1)
         {
             console.log("arguments founded",arguments,arguments.length)
             //gli argomenti sono acq/ana dataFile lingua
 
 
-            if(Qt.application.arguments[1]==="acq")
+            if(arguments[1]==="acq")
             {
                 mngAcq.load()
                 mngAcq.startSupe("hide")
@@ -50,22 +38,30 @@ ApplicationWindow {
                 forHome.whoIsVisilbe=forReal.name
 
             }
-            else if(Qt.application.arguments[1]==="vis")
+            else if(arguments[1]==="vis")
             {
                 forAna.initialize()
                 mngData.load()
-                mngData.loadFile(Qt.application.arguments[2]);
+                mngData.loadFile(arguments[2]);
             }
         }
         else
         {
             console.log("No arguments founded")
-            mngData.loadFile(examFolder+"/pv000641A.pic")
         }
         console.log("Application Ready!")
     }
 
+    //@@@@@@@@@@    Events          @@@@@@@@@@
+    Component.onCompleted:launch(Qt.application.arguments)
+
+
     //@@@@@@@@@@    Objects         @@@@@@@@@@
+    MSettings{
+        id:settings
+        Component.onCompleted: loadSettings()
+    }
+
     MAcqManager{
         //@@@@@@@@@@    Properties      @@@@@@@@@@
         id:mngAcq
