@@ -1,0 +1,16 @@
+<RCC>
+    <qresource prefix="/Images">
+        <file>Analysis.jpg</file>
+        <file>Button.jpg</file>
+        <file>Button.png</file>
+        <file>File.jpg</file>
+        <file>Home.jpg</file>
+        <file>medica.jpg</file>
+        <file>Options.jpg</file>
+        <file>Real.jpg</file>
+        <file>resetOff.jpg</file>
+        <file>resetOn.jpg</file>
+        <file>setting.png</file>
+        <file>Supervisor.jpg</file>
+    </qresource>
+</RCC>

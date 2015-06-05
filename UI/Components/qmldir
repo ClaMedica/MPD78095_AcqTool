@@ -1,0 +1,21 @@
+module MComponents
+MMenuBar 1.0 MMenuBar.qml
+MMenu 1.0 MMenu.qml
+MMenuButton 1.0 MMenuButton.qml
+MButton 1.0 MButton.qml
+MForm 1.0 MForm.qml
+Player 1.0 Player.qml
+ParameterBox 1.0 ParameterBox.qml
+Parameter 1.0 Parameter.qml
+MNewName 1.0 MNewName.qml
+MMessageYesNo 1.0 MMessageYesNo.qml
+MListSelector 1.0 MListSelector.qml
+MGridView 1.0 MGridView.qml
+MDialog 1.0 MDialog.qml
+MPopUp 1.0 MPopUp.qml
+MAlarmBox 1.0 MAlarmBox.qml
+MAlarm 1.0 MAlarm.qml
+AlarmModel 1.0 Models/AlarmModel.qml
+MMarkerButton 1.0 MMarkerButton.qml
+Func 1.0 func.js
+Images 1.0 images.js

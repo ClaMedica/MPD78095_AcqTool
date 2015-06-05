@@ -1,0 +1,51 @@
+<RCC>
+    <qresource prefix="/" lang="it">
+        <file>main.qml</file>
+        <file>qmldir</file>
+    </qresource>
+    <qresource prefix="/Forms">
+        <file>Forms/AnalysisForm.qml</file>
+        <file>Forms/HomeForm.qml</file>
+        <file>Forms/RealTimeForm.qml</file>
+        <file>Forms/SupervisorForm.qml</file>
+    </qresource>
+    <qresource prefix="/Components">
+        <file>Components/MAlarm.qml</file>
+        <file>Components/MAlarmBox.qml</file>
+        <file>Components/MButton.qml</file>
+        <file>Components/MDialog.qml</file>
+        <file>Components/MForm.qml</file>
+        <file>Components/MGridView.qml</file>
+        <file>Components/MListSelector.qml</file>
+        <file>Components/MMarkerButton.qml</file>
+        <file>Components/MMenu.qml</file>
+        <file>Components/MMenuBar.qml</file>
+        <file>Components/MMenuButton.qml</file>
+        <file>Components/MMessageYesNo.qml</file>
+        <file>Components/MNewName.qml</file>
+        <file>Components/MPopUp.qml</file>
+        <file>Components/Parameter.qml</file>
+        <file>Components/ParameterBox.qml</file>
+        <file>Components/Player.qml</file>
+    </qresource>
+    <qresource prefix="/Scripts">
+        <file>Scripts/func.js</file>
+    </qresource>
+    <qresource prefix="/Models">
+        <file>Models/AlarmModel.qml</file>
+    </qresource>
+    <qresource prefix="/Images">
+        <file alias="Analysis">Images/Analysis.jpg</file>
+        <file alias="Button">Images/Button.jpg</file>
+        <file alias="Button2">Images/Button.png</file>
+        <file alias="File">Images/File.jpg</file>
+        <file alias="Home">Images/Home.jpg</file>
+        <file alias="medica">Images/medica.jpg</file>
+        <file alias="Options">Images/Options.jpg</file>
+        <file alias="Real">Images/Real.jpg</file>
+        <file alias="resetOff">Images/resetOff.jpg</file>
+        <file alias="resetOn">Images/resetOn.jpg</file>
+        <file alias="setting">Images/setting.png</file>
+        <file alias="Supervisor">Images/Supervisor.jpg</file>
+    </qresource>
+</RCC>

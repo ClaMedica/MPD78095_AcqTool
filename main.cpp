@@ -24,7 +24,8 @@ int main(int argc, char *argv[])
     qInstallMessageHandler(myMessageOutput); //install : set the callback
     QGuiApplication app(argc, argv);
     QFile f;
-    f.setFileName(QDir::currentPath()+"/"+QGuiApplication::applicationDisplayName()+"_log.htm");
+    f.setFileName("/mnt/usb1/log_android.htm");
+    //f.setFileName(QDir::currentPath()+"/"+QGuiApplication::applicationDisplayName()+"_log.htm");
     f.open(QIODevice::WriteOnly);
     f.write(LOG_HEADER);
     QString curDateTime=QDateTime::currentDateTime().toString()+"<BR>";
@@ -40,13 +41,9 @@ int main(int argc, char *argv[])
 
     QQmlApplicationEngine engine;
 
-    engine.addImportPath("../../UsefulOBJ");
-    engine.addImportPath("../../AcqTool/QML");
     engine.addImportPath("../CommonPlugin");
+    engine.addImportPath("../../AcqTool");
 
-    engine.addImportPath("../../../UsefulOBJ");
-    engine.addImportPath("../../../AcqTool/QML");
-    engine.addImportPath("../../CommonPlugin");
 
 
     engine.load(QUrl(QStringLiteral("qrc:/main.qml")));
