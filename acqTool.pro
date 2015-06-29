@@ -2,7 +2,7 @@ TEMPLATE = app
 TARGET = acqTool
 QT += qml quick widgets sql multimedia network
 
-RESOURCES += UI/qml.qrc
+RESOURCES += Resources/qml.qrc
 
 
 
@@ -72,9 +72,12 @@ else:win32:CONFIG(debug, debug|release): LIBS += -L$$PWD/../Build/DataBuild/debu
 INCLUDEPATH += $$PWD/../Build/DataBuild/release
 DEPENDPATH += $$PWD/../Build/DataBuild/release
 
+contains(ANDROID_TARGET_ARCH,armeabi-v7a) {
+    ANDROID_EXTRA_LIBS = \
+        $$PWD/../Build/Emulator/DataBuild/libDatafileManager.so
+}
 
+unix:!macx: LIBS += -L$$PWD/../Build/Emulator/DataBuild/ -lDatafileManager
 
-unix:!macx: LIBS += -L$$PWD/../Build/Android/DataBuild/ -lDatafileManager
-
-INCLUDEPATH += $$PWD/../Build/Android/DataBuild
-DEPENDPATH += $$PWD/../Build/Android/DataBuild
+INCLUDEPATH += $$PWD/../Build/Emulator/DataBuild
+DEPENDPATH += $$PWD/../Build/Emulator/DataBuild
