@@ -1,0 +1,49 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Markers Lang="English" Acqtype="1" Ver="4.4.0">
+  <Marker key="1" code="W" descr="Wait" type="2" img="sysMark32" />
+  <Marker key="2" code="E2" descr="Communication Error" type="2" img="sysMark32" />
+  <Marker key="3" code="E3" descr="Unexpected Interruption" type="2" img="sysMark32" />
+  <Marker key="4" code="X" descr="Stop Peripherals" type="2" img="sysMark32" />
+  <Marker key="5" code="Z" descr="Zero" type="2" img="sysMark32" />
+  <Marker key="6" code="D" descr="Distance Marker" type="3" img="sysMark32" />
+  <Marker key="7" code="C" descr="Comment" type="4" img="sysMark32" />
+  <Marker key="8" code="I" descr="Image" type="2" img="sysMark32" />
+  <Marker key="9" code="M" descr="Video" type="2" img="sysMark32" />
+  <Marker key="10" code="S" descr="Voice Comment" type="2" img="sysMark32" />
+  <Marker key="11" code="WT" descr="WTH Speed" type="2" img="sysMark32" />
+  <Marker key="14" code="WP" descr="Velocità Pompa" type="2" img="sysMark32" />
+  <Marker key="15" code="VAL" descr="Values" type="7" img="sysMark32" />
+  <Marker key="16" code="RE" descr="PRef Enabled" type="2" img="sysmark32" />
+  <Marker key="17" code="RD" descr="PRef Disabled" type="2" img="SysMark32" />
+  <Marker key="18" code="Zc" descr="Electrodes Contact Impedance" type="2" img="SysMark32" />
+  <Marker key="20" code="L" descr="Meal" type="2" img="sysmark32" />
+  <Marker key="21" code="ER" descr="Erect" type="2" img="sysmark32" />
+  <Marker key="22" code="SDR" descr="Supine" type="2" img="sysmark32" />
+  <Marker key="66" code="c1" descr="Compliance Start" type="1" img="fill32_C1" />
+  <Marker key="51" code="FD" descr="First Desire" type="1" img="fill32_FD" />
+  <Marker key="64" code="ND" descr="Normal Desire" type="1" img="fill32_ND" />
+  <Marker key="52" code="SD" descr="Strong Desire" type="1" img="fill32_SD" />
+  <Marker key="53" code="MCC" descr="Maximum Cystometric Capacity" type="1" img="fill32_MCC" />
+  <Marker key="65" code="LPD" descr="Leak Detected" type="1" img="LPD" />
+  <Marker key="57" code="vlp" descr="Valsalva Leak Point" type="1" img="VLP" />
+  <Marker key="58" code="dlp" descr="Detrusor Leak Point" type="1" img="DLP" />
+  <Marker key="59" code="alp" descr="Abdominal Leak Point" type="1" img="ALP" />
+  <Marker key="63" code="clp" descr="Cough Leak Point" type="1" img="CLP" />
+  <Marker key="60" code="do" descr="Detrusor Overactivity" type="1" img="fill32_DO" />
+  <Marker key="50" code="$" descr="Invitation to Micturate" type="1" img="void32_$" />
+  <Marker key="61" code="s" descr="Start Automatic Profile" type="1" img="upp32_sp" />
+  <Marker key="62" code="d" descr="Start Dynamic Profile" type="1" img="upp32_dp" />
+  <Marker key="100" code="DP" descr="Dynamic Profile" type="5" img="cmDefDPP" />
+  <Marker key="101" code="SP" descr="Static Profile" type="5" img="cmDefSPP" />
+  <Marker key="102" code="FLW" descr="Flowmetry" type="5" img="cmDefFlo" />
+  <Marker key="103" code="VOID" descr="Voiding" type="5" img="cmDefVoi" />
+  <Marker key="104" code="FILL" descr="Filling + Leak Point Pressure" type="5" img="cmDefFill" />
+  <Marker key="105" code="WHT" descr="Whitaker test" type="5" img="cmDefWT" />
+  <Marker key="107" code="HFLW" descr="Domiciliary Flowmetry" type="5" img="cmDefHFlo" />
+  <Marker key="108" code="LPP" descr="Leak Point Pressure" type="5" img="cmDefLPP" />
+  <Marker key="110" code="DO" descr="Detrusor Overactivity" type="5" img="cmDefDO" />
+  <Marker key="111" code="COMP" descr="Compliance" type="5" img="COMP.img "/>
+  <Marker key="113" code="EXC" descr="Exclude from Analysis" type="5" img="cmEXC" />
+  <Marker key="198" code="SNAP" descr="Snapshot" type="5" img="SNAP" />
+  <Marker key="199" code="ART" descr="Artefact" type="5" img="cmART" />
+</Markers>

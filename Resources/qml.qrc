@@ -1,0 +1,60 @@
+<RCC>
+    <qresource prefix="/">
+        <file>main.qml</file>
+        <file>qmldir</file>
+    </qresource>
+    <qresource prefix="/Forms">
+        <file>AnalysisForm.qml</file>
+        <file>HomeForm.qml</file>
+        <file>RealTimeForm.qml</file>
+        <file>SupervisorForm.qml</file>
+    </qresource>
+    <qresource prefix="/Components">
+        <file>MAlarm.qml</file>
+        <file>MAlarmBox.qml</file>
+        <file>MButton.qml</file>
+        <file>MDialog.qml</file>
+        <file>MForm.qml</file>
+        <file>MGridView.qml</file>
+        <file>MListSelector.qml</file>
+        <file>MMarkerButton.qml</file>
+        <file>MMenu.qml</file>
+        <file>MMenuBar.qml</file>
+        <file>MMenuButton.qml</file>
+        <file>MMessageYesNo.qml</file>
+        <file>MNewName.qml</file>
+        <file>MPopUp.qml</file>
+        <file>Parameter.qml</file>
+        <file>ParameterBox.qml</file>
+        <file>Player.qml</file>
+    </qresource>
+    <qresource prefix="/Scripts">
+        <file>func.js</file>
+    </qresource>
+    <qresource prefix="/Models">
+        <file>AlarmModel.qml</file>
+    </qresource>
+    <qresource prefix="/Images">
+        <file alias="Analysis">Analysis.jpg</file>
+        <file alias="Button">Button.jpg</file>
+        <file alias="Button2">Button.png</file>
+        <file alias="File">File.jpg</file>
+        <file alias="Home">Home.jpg</file>
+        <file alias="medica">medica.jpg</file>
+        <file alias="Options">Options.jpg</file>
+        <file alias="Real">Real.jpg</file>
+        <file alias="resetOff">resetOff.jpg</file>
+        <file alias="resetOn">resetOn.jpg</file>
+        <file alias="setting">setting.png</file>
+        <file alias="Supervisor">Supervisor.jpg</file>
+    </qresource>
+    <qresource prefix="/Config">
+        <file>Config_Acq.xml</file>
+        <file>Config_Alarms_it.xml</file>
+        <file>Config_BT.xml</file>
+        <file>Config_Locale.xml</file>
+        <file>Config_SAU.xml</file>
+        <file>Config_User.xml</file>
+        <file>markers.xml</file>
+    </qresource>
+</RCC>

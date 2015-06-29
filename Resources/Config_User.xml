@@ -1,0 +1,14 @@
+<Configuration>
+	<AutoStarts>
+		<Step chanType="VBT" num="1" repeat="no" bufferSize="50" enabled="true">
+			<Amplitude min="2" max="15"/>
+			<Duration min="10"/>
+		</Step>
+	</AutoStarts>
+	<AutoStops>
+		<Stationary chanType="QBT" num="1" repeat="no">
+			<Value min="-0.5" max="0.5"/>
+			<Duration min="300" max="INF"/>
+		</Stationary>
+	</AutoStops>
+</Configuration>

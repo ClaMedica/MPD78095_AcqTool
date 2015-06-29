@@ -1,0 +1,5 @@
+<Configuration>
+	<Locale Value="it"/>
+	<DataFolder Value="C:/Users/Luca/Documents/urodata"/>
+	<AndroidFolder Value="/mnt/sdcard/urodata"/>
+</Configuration>

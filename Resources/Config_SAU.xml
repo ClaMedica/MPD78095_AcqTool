@@ -1,0 +1,375 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Configuration TYPE="2" CARD="6" VER="1.0.0">
+  <Options>
+    <isWTHPresent>T</isWTHPresent>
+    <isWTPPresent>T</isWTPPresent>
+    <isCDPPresent>F</isCDPPresent>
+    <isAutorangePossible>T</isAutorangePossible>
+    <COM>1</COM>
+    <isZIGON>T</isZIGON>
+    <ZIGCOM>4</ZIGCOM>
+    <isZIGBR4ON>F</isZIGBR4ON>
+  </Options>
+  <Channels>
+    <Channel CN="1">
+      <Name>WTH</Name>
+      <Num>1</Num>
+      <UdM ID="60">mm/sec</UdM>
+      <HWChan>-1</HWChan>
+      <NumRanges>5</NumRanges>
+      <Ranges>
+        <Range>10</Range>
+        <Range>20</Range>
+        <Range>30</Range>
+        <Range>40</Range>
+        <Range>50</Range>
+      </Ranges>
+    </Channel>
+    <Channel CN="2">
+      <Name>WTP</Name>
+      <Num>1</Num>
+      <UdM ID="30">ml/min</UdM>
+      <HWChan>-1</HWChan>
+      <NumRanges>0</NumRanges>
+      <Ranges>
+        <Range>1</Range>
+        <Range>200</Range>
+        <Range>1</Range>
+      </Ranges>
+    </Channel>
+    <Channel CN="3">
+      <Name>CDP</Name>
+      <Num>1</Num>
+      <UdM ID="32">cc/min</UdM>
+      <HWChan>-1</HWChan>
+      <NumRanges>3</NumRanges>
+      <Ranges>
+        <Range>0</Range>
+        <Range>300</Range>
+        <Range>50</Range>
+      </Ranges>
+    </Channel>
+    <Channel CN="4">
+      <Name>T.Pag</Name>
+      <Num>1</Num>
+      <UdM ID="1">sec</UdM>
+      <HWChan>-1</HWChan>
+      <NumRanges>4</NumRanges>
+      <Ranges>
+        <Range>30</Range>
+        <Range>60</Range>
+        <Range>120</Range>
+        <Range>240</Range>
+      </Ranges>
+    </Channel>
+    <Channel CN="5">
+      <Name>N.Acq Pr</Name>
+      <Num>1</Num>
+      <UdM ID="70">Hz</UdM>
+      <HWChan>-1</HWChan>
+      <NumRanges>1</NumRanges>
+      <Ranges>
+        <Range>100</Range>
+      </Ranges>
+    </Channel>
+    <Channel CN="6">
+      <Name>N.Acq Vol</Name>
+      <Num>1</Num>
+      <UdM ID="70">Hz</UdM>
+      <HWChan>-1</HWChan>
+      <NumRanges>1</NumRanges>
+      <Ranges>
+        <Range>10</Range>
+      </Ranges>
+    </Channel>
+    <Channel CN="7">
+      <Name>NAS GEN_CH</Name>
+      <Num>1</Num>
+      <UdM ID="70">Hz</UdM>
+      <HWChan>-1</HWChan>
+      <NumRanges>1</NumRanges>
+      <Ranges>
+        <Range>1000</Range>
+      </Ranges>
+    </Channel>
+    <Channel CN="8">
+      <Name>NAS EMG</Name>
+      <Num>1</Num>
+      <UdM ID="70">Hz</UdM>
+      <HWChan>-1</HWChan>
+      <NumRanges>1</NumRanges>
+      <Ranges>
+        <Range>5200</Range>
+      </Ranges>
+    </Channel>
+    <Channel CN="10">
+      <Name>VLMa</Name>
+      <Num>1</Num>
+      <UdM ID="50">ml</UdM>
+      <HWChan>0</HWChan>
+      <NumRanges>4</NumRanges>
+      <Ranges>
+        <Range>200</Range>
+        <Range>500</Range>
+        <Range>1000</Range>
+        <Range>2000</Range>
+      </Ranges>
+    </Channel>
+    <Channel CN="11">
+      <Name>Flow</Name>
+      <Num>1</Num>
+      <UdM ID="30">ml/min</UdM>
+      <HWChan>0</HWChan>
+      <NumRanges>4</NumRanges>
+      <Ranges>
+        <Range>10</Range>
+        <Range>50</Range>
+        <Range>100</Range>
+        <Range>200</Range>
+      </Ranges>
+    </Channel>
+    <Channel CN="12">
+      <Name>QZIG</Name>
+      <Num>1</Num>
+      <UdM ID="31">ml/sec</UdM>
+      <HWChan>1</HWChan>
+      <NumRanges>4</NumRanges>
+      <Ranges>
+        <Range>10</Range>
+        <Range>25</Range>
+        <Range>50</Range>
+        <Range>100</Range>
+      </Ranges>
+    </Channel>
+    <Channel CN="13">
+      <Name>VZIG</Name>
+      <Num>1</Num>
+      <UdM ID="50">ml</UdM>
+      <HWChan>1</HWChan>
+      <NumRanges>4</NumRanges>
+      <Ranges>
+        <Range>200</Range>
+        <Range>500</Range>
+        <Range>1000</Range>
+        <Range>2000</Range>
+      </Ranges>
+    </Channel>
+    <Channel CN="14">
+      <Name>Ref</Name>
+      <Num>8</Num>
+      <UdM ID="21">cmH2O</UdM>
+      <HWChan>1</HWChan>
+      <HWChan>2</HWChan>
+      <HWChan>3</HWChan>
+      <HWChan>4</HWChan>
+      <HWChan>5</HWChan>
+      <HWChan>6</HWChan>
+      <HWChan>7</HWChan>
+      <HWChan>8</HWChan>
+      <NumRanges>4</NumRanges>
+      <Ranges>
+        <Range>50</Range>
+        <Range>100</Range>
+        <Range>200</Range>
+        <Range>250</Range>
+      </Ranges>
+    </Channel>
+    <Channel CN="22">
+      <Name>p</Name>
+      <Num>8</Num>
+      <UdM ID="21">cmH2O</UdM>
+      <HWChan>1</HWChan>
+      <HWChan>2</HWChan>
+      <HWChan>3</HWChan>
+      <HWChan>4</HWChan>
+      <HWChan>5</HWChan>
+      <HWChan>6</HWChan>
+      <HWChan>7</HWChan>
+      <HWChan>8</HWChan>
+      <NumRanges>4</NumRanges>
+      <Ranges>
+        <Range>50</Range>
+        <Range>100</Range>
+        <Range>200</Range>
+        <Range>250</Range>
+      </Ranges>
+    </Channel>
+    <Channel CN="30">
+      <Name>pdet</Name>
+      <Num>1</Num>
+      <UdM ID="21">cmH2O</UdM>
+      <HWChan>0</HWChan>
+      <NumRanges>4</NumRanges>
+      <Ranges>
+        <Range>50</Range>
+        <Range>100</Range>
+        <Range>200</Range>
+        <Range>250</Range>
+      </Ranges>
+    </Channel>
+    <Channel CN="31">
+      <Name>pucp</Name>
+      <Num>1</Num>
+      <UdM ID="21">cmH2O</UdM>
+      <HWChan>0</HWChan>
+      <NumRanges>4</NumRanges>
+      <Ranges>
+        <Range>50</Range>
+        <Range>100</Range>
+        <Range>200</Range>
+        <Range>250</Range>
+      </Ranges>
+    </Channel>
+    <Channel CN="32">
+      <Name>pprr</Name>
+      <Num>1</Num>
+      <UdM ID="21">cmH2O</UdM>
+      <HWChan>0</HWChan>
+      <NumRanges>4</NumRanges>
+      <Ranges>
+        <Range>50</Range>
+        <Range>100</Range>
+        <Range>200</Range>
+        <Range>250</Range>
+      </Ranges>
+    </Channel>
+    <Channel CN="33">
+      <Name>IVM</Name>
+      <Num>1</Num>
+      <UdM ID="50">ml</UdM>
+      <HWChan>1</HWChan>
+      <NumRanges>4</NumRanges>
+      <Ranges>
+        <Range>100</Range>
+        <Range>500</Range>
+        <Range>1000</Range>
+        <Range>2000</Range>
+      </Ranges>
+    </Channel>
+    <Channel CN="34">
+      <Name>Q</Name>
+      <Num>1</Num>
+      <UdM ID="31">ml/sec</UdM>
+      <HWChan>1</HWChan>
+      <NumRanges>4</NumRanges>
+      <Ranges>
+        <Range>10</Range>
+        <Range>20</Range>
+        <Range>50</Range>
+        <Range>100</Range>
+      </Ranges>
+    </Channel>
+    <Channel CN="35">
+      <Name>VV</Name>
+      <Num>1</Num>
+      <UdM ID="50">ml</UdM>
+      <HWChan>1</HWChan>
+      <NumRanges>4</NumRanges>
+      <Ranges>
+        <Range>100</Range>
+        <Range>500</Range>
+        <Range>1000</Range>
+        <Range>2000</Range>
+      </Ranges>
+    </Channel>
+    <Channel CN="36">
+      <Name>EMG</Name>
+      <Num>3</Num>
+      <UdM ID="41">µV</UdM>
+      <HWChan>1</HWChan>
+      <HWChan>2</HWChan>
+      <HWChan>3</HWChan>
+      <NumRanges>8</NumRanges>
+      <Ranges>
+        <Range>100</Range>
+        <Range>200</Range>
+        <Range>500</Range>
+        <Range>1000</Range>
+        <Range>2000</Range>
+        <Range>5000</Range>
+        <Range>10000</Range>
+        <Range>20000</Range>
+      </Ranges>
+    </Channel>
+    <Channel CN="39">
+      <Name>LPD</Name>
+      <Num>1</Num>
+      <UdM ID="71">%</UdM>
+      <HWChan>1</HWChan>
+      <NumRanges>1</NumRanges>
+      <Ranges>
+        <Range>100</Range>
+      </Ranges>
+    </Channel>
+    <Channel CN="43">
+      <Name>P.Fun</Name>
+      <Num>1</Num>
+      <UdM ID="21">cmH2O</UdM>
+      <HWChan>-1</HWChan>
+      <NumRanges>0</NumRanges>
+      <Ranges>
+        <Range>0</Range>
+        <Range>100</Range>
+        <Range>5</Range>
+      </Ranges>
+    </Channel>
+    <Channel CN="44">
+      <Name>P.Low</Name>
+      <Num>1</Num>
+      <UdM ID="21">cmH2O</UdM>
+      <HWChan>-1</HWChan>
+      <NumRanges>0</NumRanges>
+      <Ranges>
+        <Range>0</Range>
+        <Range>50</Range>
+        <Range>5</Range>
+      </Ranges>
+    </Channel>
+    <Channel CN="45">
+      <Name>EMG.Fun</Name>
+      <Num>1</Num>
+      <UdM ID="41">µV</UdM>
+      <HWChan>-1</HWChan>
+      <NumRanges>0</NumRanges>
+      <Ranges>
+        <Range>0</Range>
+        <Range>2000</Range>
+        <Range>100</Range>
+      </Ranges>
+    </Channel>
+    <Channel CN="46">
+      <Name>EMG.Low</Name>
+      <Num>1</Num>
+      <UdM ID="41">µV</UdM>
+      <HWChan>-1</HWChan>
+      <NumRanges>0</NumRanges>
+      <Ranges>
+        <Range>0</Range>
+        <Range>1000</Range>
+        <Range>100</Range>
+      </Ranges>
+    </Channel>
+    <Channel CN="47">
+      <Name>C.Lav</Name>
+      <Num>1</Num>
+      <UdM ID="1">sec</UdM>
+      <HWChan>-1</HWChan>
+      <NumRanges>0</NumRanges>
+      <Ranges>
+        <Range>0</Range>
+        <Range>60</Range>
+        <Range>5</Range>
+      </Ranges>
+    </Channel>
+  </Channels>
+  <MUXLines>
+    <MuxLine>0</MuxLine>
+    <MuxLine>1</MuxLine>
+    <MuxLine>2</MuxLine>
+    <MuxLine>3</MuxLine>
+    <MuxLine>4</MuxLine>
+    <MuxLine>5</MuxLine>
+    <MuxLine>6</MuxLine>
+    <MuxLine>7</MuxLine>
+  </MUXLines>
+</Configuration>

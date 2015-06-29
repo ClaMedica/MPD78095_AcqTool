@@ -1,0 +1,40 @@
+<?xml version="1.0" encoding="utf-8"?>
+<Configuration TYPE="2" VER="1.0.0">
+	<Channels>
+		<Channel card="8" type="measured">
+			<Name>QBT</Name>
+			<Gain>0.01</Gain>
+			<Offset>0</Offset>
+			<Operations>derive@5#threshold@1@0@INF</Operations>
+			<Num>1</Num>
+			<UdM ID="31">ml/sec</UdM>
+			<HWChannels>0</HWChannels>
+			<Frequency>10</Frequency>
+			<NumRanges>4</NumRanges>
+			<Ranges>200#500#1000#2000</Ranges>
+		</Channel>
+		<Channel card="8" type="measured">
+			<Name>VBT</Name>
+			<Gain>0.1</Gain>
+			<Offset>0</Offset>
+			<Num>1</Num>
+			<UdM ID="50">ml</UdM>
+			<HWChannels>0</HWChannels>
+			<Frequency>10</Frequency>
+			<NumRanges>4</NumRanges>
+			<Ranges>200#500#1000#2000</Ranges>
+			<Operations>none@1#threshold@1@0@INF</Operations>
+		</Channel>
+	</Channels>
+	<Connections>
+		<isWTHPresent>F</isWTHPresent>
+		<isWTPPresent>F</isWTPPresent>
+		<isCDPPresent>F</isCDPPresent>
+		<TCP>
+			<CMD serverAddress="127.0.0.1" serverPort="2002" type="client"/>
+			<VAL serverAddress="127.0.0.1" serverPort="2000" type="client"/>
+			<STA serverAddress="127.0.0.1" serverPort="2001" type="client"/>
+			<MNG serverAddress="127.0.0.1" serverPort="2100" type="server"/>
+		</TCP>
+	</Connections>
+</Configuration>
