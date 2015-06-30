@@ -1,7 +1,7 @@
 <RCC>
     <qresource prefix="/">
         <file>main.qml</file>
-        <file>qmldir</file>
+        <file alias="UIqmldir">qmldir</file>
     </qresource>
     <qresource prefix="/Forms">
         <file>AnalysisForm.qml</file>

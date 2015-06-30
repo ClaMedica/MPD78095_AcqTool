@@ -1,7 +1,8 @@
 import QtQuick 2.4
 import QtQuick.Controls 1.3
 import QtQuick.Dialogs 1.2
-import Resources 1.0
+//import Resources 1.0
+import "qrc:/Forms"
 import MPlotModule 1.0
 import Managers 1.0
 import QtQuick.Window 2.2
@@ -17,7 +18,6 @@ ApplicationWindow {
     width:platform==="android"?640:Screen.width*0.94
     height:platform==="android"?480:Screen.height*0.94
     color:"steelblue"
-
 
     Rectangle{
         anchors.centerIn: parent

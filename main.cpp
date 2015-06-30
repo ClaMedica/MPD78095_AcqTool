@@ -50,7 +50,7 @@ int main(int argc, char *argv[])
     QQmlApplicationEngine engine;
 
     engine.addImportPath("../CommonPlugin");
-    engine.addImportPath("../../AcqTool");
+    //engine.addImportPath("qrc:/Forms");
 
 
 

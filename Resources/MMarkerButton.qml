@@ -1,7 +1,9 @@
 import QtQuick 2.0
 import MPlotModule 1.0
-import Resources 1.0
-Rectangle{/*
+//import Resources 1.0
+import "qrc:/Components"
+import "qrc:/Models"
+Rectangle{
     //@@@@@@@@@@    Definitions     @@@@@@@@@@
     property int oriX:0
     property int oriY:0
@@ -105,6 +107,6 @@ Rectangle{/*
         onPressed:  {rootMarkerButton.state="pre"}
         onClicked:  {rootMarkerButton.state="idl";click(modM.key)}
     }
-    */
+
 }
 
