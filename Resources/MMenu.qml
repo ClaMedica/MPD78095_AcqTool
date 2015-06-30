@@ -1,6 +1,6 @@
 import QtQuick 2.2
 import QtQuick.Controls 1.0
-
+import Resources 1.0
 Rectangle {
     //@@@@@@@@@@    Definitions     @@@@@@@@@@
     property string title: "Menu"

@@ -1,6 +1,6 @@
 TEMPLATE = app
 TARGET = acqTool
-QT += qml quick widgets sql multimedia network
+QT += qml quick widgets sql network
 
 RESOURCES += Resources/qml.qrc
 
@@ -14,7 +14,7 @@ QT +=multimedia
 QT +=xml
 QT +=core
 
-DEFINES += ANDROID
+#DEFINES += ANDROID
 DEFINES += QT_MESSAGELOGCONTEXT
 # The .cpp file which was generated for your project. Feel free to hack it.
 SOURCES += main.cpp \
@@ -74,7 +74,8 @@ DEPENDPATH += $$PWD/../Build/DataBuild/release
 
 contains(ANDROID_TARGET_ARCH,armeabi-v7a) {
     ANDROID_EXTRA_LIBS = \
-        $$PWD/../Build/Emulator/DataBuild/libDatafileManager.so
+        M:/Lavoro/Software/AcqTool/../Build/Emulator/DataBuild/libDatafileManager.so \
+        $$PWD/../Build/Emulator/MPlotModule/libQmlPlotter.so
 }
 
 unix:!macx: LIBS += -L$$PWD/../Build/Emulator/DataBuild/ -lDatafileManager

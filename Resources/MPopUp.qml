@@ -1,5 +1,5 @@
 import QtQuick 2.0
-
+import Resources 1.0
 Rectangle{
     //@@@@@@@@@@    Definitions     @@@@@@@@@@
     property string message:"Ciao questo messaggio vuole verificare come funziona questo cavolo di messaggino piop up"

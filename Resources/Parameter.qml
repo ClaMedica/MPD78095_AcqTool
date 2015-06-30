@@ -1,9 +1,9 @@
 import QtQuick 2.4
 import QtQuick.Controls 1.2
 import QtQuick.Controls.Styles 1.3
-//import MPlotModule 1.0
-
-Rectangle{    /*
+import MPlotModule 1.0
+import Resources 1.0
+Rectangle{
     //@@@@@@@@@@    Definitions     @@@@@@@@@@
     property bool compressed:false
     property bool sliding: false
@@ -166,5 +166,5 @@ Rectangle{    /*
         }
         onValueChanged: if(sliding)spin.value=slider.value
     }
-    */
+
 }

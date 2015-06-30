@@ -1,25 +1,39 @@
 import QtQuick 2.4
 import QtQuick.Controls 1.3
 import QtQuick.Dialogs 1.2
-//import UI 1.0
-//import MPlotModule 1.0
+import Resources 1.0
+import MPlotModule 1.0
 import Managers 1.0
 import QtQuick.Window 2.2
 
 ApplicationWindow {
     //@@@@@@@@@@ Definitions @@@@@@@@@@
-    //property string examFolder:settings.datafilePath
-    //property string configFolder:settings.appPath()
-    property string platform:"android"//Qt.platform.os
+    property string examFolder:settings.datafilePath
+    property string configFolder:settings.appPath()
+    property string platform:Qt.platform.os//"android"//
     //@@@@@@@@@@    Properties      @@@@@@@@@@
     id: root
     visible: true
     width:platform==="android"?640:Screen.width*0.94
     height:platform==="android"?480:Screen.height*0.94
     color:"steelblue"
-    Component.onCompleted: {console.log("ciaoooo")}
 
-/*
+
+    Rectangle{
+        anchors.centerIn: parent
+        height:200
+        width:200
+        color:"red"
+        Plot2DRealTime{
+            anchors.centerIn: parent
+            height:100
+            width:100
+        }
+    }
+
+
+
+
     function launch(arguments)
     {
         if(arguments.length>1)
@@ -56,21 +70,21 @@ ApplicationWindow {
 
     //@@@@@@@@@@    Events          @@@@@@@@@@
     Component.onCompleted:launch(Qt.application.arguments)
-*/
+
 
     //@@@@@@@@@@    Objects         @@@@@@@@@@
     MSettings{
         id:settings
         Component.onCompleted: loadSettings()
     }
-/*
+
     MAcqManager{
         //@@@@@@@@@@    Properties      @@@@@@@@@@
         id:mngAcq
 
         //@@@@@@@@@@    Events          @@@@@@@@@@
         Component.onCompleted: console.log("MAcqManager Ready!")
-        onSystemInAcqStatus:forReal.displayMessage("Go go go!",2000)
+        //onSystemInAcqStatus:forReal.displayMessage("Go go go!",2000)
     }
 
     MDataManager{
@@ -86,7 +100,7 @@ ApplicationWindow {
 
         Component.onCompleted: console.log("MDataManager Ready!")
     }
-*/
+
     HomeForm {
         //@@@@@@@@@@    Properties      @@@@@@@@@@
         id: forHome
@@ -94,7 +108,8 @@ ApplicationWindow {
         name:"HomeForm"
         whoIsVisilbe: "HomeForm"
     }
-/*
+
+
     AnalysisForm{
         //@@@@@@@@@@    Properties      @@@@@@@@@@
         id: forAna
@@ -118,5 +133,5 @@ ApplicationWindow {
         onBack: forHome.whoIsVisilbe=forHome.name
     }
 
-*/
+
 }

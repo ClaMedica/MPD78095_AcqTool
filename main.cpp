@@ -41,16 +41,16 @@ int main(int argc, char *argv[])
     qDebug()<<"Partiamo";
 
 
-//    qmlRegisterType<ParameterManager>("Managers",1,0,"ParameterManager");
-//    qmlRegisterType<ModelManager>("Managers",1,0,"ModelManager");
-//    qmlRegisterType<MAcqManager>("Managers",1,0,"MAcqManager");
-//    qmlRegisterType<MDataManager>("Managers",1,0,"MDataManager");
+    qmlRegisterType<ParameterManager>("Managers",1,0,"ParameterManager");
+    qmlRegisterType<ModelManager>("Managers",1,0,"ModelManager");
+    qmlRegisterType<MAcqManager>("Managers",1,0,"MAcqManager");
+    qmlRegisterType<MDataManager>("Managers",1,0,"MDataManager");
     qmlRegisterType<P7Settings>("Managers",1,0,"MSettings");
 
     QQmlApplicationEngine engine;
 
-//    engine.addImportPath("../CommonPlugin");
-//    engine.addImportPath("../../AcqTool");
+    engine.addImportPath("../CommonPlugin");
+    engine.addImportPath("../../AcqTool");
 
 
 

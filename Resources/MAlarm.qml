@@ -1,6 +1,6 @@
 import QtQuick 2.0
-import UI 1.0
-import QtMultimedia 5.0
+import Resources 1.0
+
 Rectangle {
     //@@@@@@@@@@    Definitions      @@@@@@@@@@
     property var modello:[]
@@ -15,7 +15,7 @@ Rectangle {
     border.color: "black"
     opacity:1
     height:alarmMexHeight
-
+/*
     SoundEffect{
         //@@@@@@@@@@    Properties      @@@@@@@@@@
         id:sound
@@ -24,7 +24,7 @@ Rectangle {
         volume: 1
         onLoadedChanged:play()
     }
-
+*/
     Behavior on height {NumberAnimation { duration: 200 }}
     Behavior on y {NumberAnimation { duration: 200 }}
 
