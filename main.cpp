@@ -21,6 +21,7 @@
 
 int main(int argc, char *argv[])
 {
+    Q_INIT_RESOURCE(qml);
     //creo il file di report
     qInstallMessageHandler(myMessageOutput); //install : set the callback
     QGuiApplication app(argc, argv);
@@ -49,7 +50,11 @@ int main(int argc, char *argv[])
 
     QQmlApplicationEngine engine;
 
-    engine.addImportPath("../CommonPlugin");
+    engine.addPluginPath("qrc:/");
+    engine.addImportPath("qrc:/");
+
+    //qDebug()<<engine.pluginPathList();
+    //engine.addImportPath("../../AcqTool/Resources");
     //engine.addImportPath("qrc:/Forms");
 
 

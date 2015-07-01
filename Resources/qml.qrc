@@ -1,7 +1,8 @@
 <RCC>
     <qresource prefix="/">
         <file>main.qml</file>
-        <file alias="UIqmldir">qmldir</file>
+        <file>qmldir</file>
+        <file>MPlotModule/qmldir</file>
     </qresource>
     <qresource prefix="/Forms">
         <file>AnalysisForm.qml</file>

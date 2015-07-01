@@ -1,0 +1,29 @@
+module MPlotModule
+#plots
+MPlot2D 1.0              MPlot2D.qml
+MPlot2DStack 1.0         MPlot2DStack.qml
+MPlot2DRealStack 1.0     MPlot2DRealStack.qml
+MPlot2DRealTime 1.0      MPlot2DRealTime.qml
+#Tools
+DHAxes 1.0               Tools/DHAxes.qml
+DVAxes 1.0               Tools/DVAxes.qml
+MColorMap 1.0            Tools/MColorMap.qml
+MColorStrip 1.0          Tools/MColorStrip.qml
+MCursorX 1.0             Tools/MCursorX.qml
+MCursorY 1.0             Tools/MCursorY.qml
+MFrame 1.0               Tools/MFrame.qml
+MFrameStack 1.0          Tools/MFrameStack.qml
+MLegend 1.0              Tools/MLegend.qml
+MMarker 1.0              Tools/MMarker.qml
+MMarkerStack 1.0         Tools/MMarkerStack.qml
+MXYCursor 1.0            Tools/MXYCursor.qml
+MZoomer 1.0              Tools/MZoomer.qml
+#Models
+FrameModel 1.0           Models/FrameModel.qml
+MarkerModel 1.0          Models/MarkerModel.qml
+ParameterModel 1.0       Models/ParameterModel.qml
+PlotModel 1.0            Models/PlotModel.qml
+TrackModel 1.0           Models/TrackModel.qml
+#CPP and plugin
+ConfigManager 1.0
+plugin QmlPlotter

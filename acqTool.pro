@@ -6,6 +6,7 @@ RESOURCES += Resources/qml.qrc
 
 
 
+
 # Additional import path used to resolve QML modules in Qt Creator's code model
 QML_IMPORT_PATH +=  ../Build/CommonPlugin\
                     ../AcqTool \
