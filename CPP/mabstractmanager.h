@@ -29,7 +29,7 @@ signals:
 
 public slots:
     bool load(void);
-    QString plotConfigFileName(){return m_applicationPath+"/cur.xml";}
+    QString plotConfigFileName();
 
 
 protected:

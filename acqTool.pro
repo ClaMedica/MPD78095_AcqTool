@@ -15,7 +15,7 @@ QT +=multimedia
 QT +=xml
 QT +=core
 
-#DEFINES += ANDROID
+DEFINES += ANDROID
 DEFINES += QT_MESSAGELOGCONTEXT
 # The .cpp file which was generated for your project. Feel free to hack it.
 SOURCES += main.cpp \

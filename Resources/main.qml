@@ -11,7 +11,8 @@ ApplicationWindow {
     //@@@@@@@@@@ Definitions @@@@@@@@@@
     property string examFolder:settings.datafilePath
     property string configFolder:settings.appPath()
-    property string platform:Qt.platform.os//"android"//
+    property string platform:"android"
+    //property alias platform:Qt.platform.os
     //@@@@@@@@@@    Properties      @@@@@@@@@@
     id: root
     visible: true
@@ -19,23 +20,24 @@ ApplicationWindow {
     height:platform==="android"?480:Screen.height*0.94
     color:"steelblue"
 
-    Rectangle{
-        anchors.centerIn: parent
-        height:200
-        width:200
-        color:"red"
-        Plot2DRealTime{
-            anchors.centerIn: parent
-            height:100
-            width:100
-        }
-    }
+//    Rectangle{
+//        anchors.centerIn: parent
+//        height:400
+//        width:400
+//        color:"red"
+//        MPlot2DRealTime{
+//            anchors.centerIn: parent
+//            height:200
+//            width:200
+//        }
+//    }
 
 
 
 
     function launch(arguments)
     {
+
         if(arguments.length>1)
         {
             console.log("arguments founded",arguments,arguments.length)
@@ -58,12 +60,19 @@ ApplicationWindow {
             {
                 forAna.initialize()
                 mngData.load()
-                mngData.loadFile(arguments[2]);
+                if(platform!=="android")
+                    mngData.loadFile(arguments[2]);
+                else
+                    mngData.loadFile("/mnt/sdcard/Medica/pv000461A.pic")
             }
         }
         else
         {
             console.log("No arguments founded")
+            forAna.initialize()
+            mngData.load()
+            if(platform==="android")
+                mngData.loadFile("/mnt/sdcard/Medica/pv000461A.pic")
         }
         console.log("Application Ready!")
     }

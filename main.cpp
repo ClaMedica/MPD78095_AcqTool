@@ -21,7 +21,7 @@
 
 int main(int argc, char *argv[])
 {
-    Q_INIT_RESOURCE(qml);
+    //Q_INIT_RESOURCE(qml);
     //creo il file di report
     qInstallMessageHandler(myMessageOutput); //install : set the callback
     QGuiApplication app(argc, argv);
@@ -51,8 +51,11 @@ int main(int argc, char *argv[])
     QQmlApplicationEngine engine;
 
     engine.addPluginPath("qrc:/");
-    engine.addImportPath("qrc:/");
-
+    engine.addImportPath("../../AcqTool/Resources");
+#ifdef ANDROID
+    engine.addImportPath("/mnt/sdcard/Medica");
+#endif
+    qDebug()<<engine.importPathList();
     //qDebug()<<engine.pluginPathList();
     //engine.addImportPath("../../AcqTool/Resources");
     //engine.addImportPath("qrc:/Forms");

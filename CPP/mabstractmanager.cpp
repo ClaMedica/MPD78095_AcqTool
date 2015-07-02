@@ -34,29 +34,38 @@ QVariantList MAbstractManager::markersInfo(QString __filterType,
 
 bool MAbstractManager::load()
 {//in questa funzione inizializzo tutto caricando i file di configurazione fissi
-    if(!m_configLocale.loadFromXML(m_applicationPath+"/Config_Locale.xml"))
+    if(!m_configLocale.loadFromXML(":/Config/Config_Locale.xml"))
     {qCritical()<<"Error on locale configuration file";return false;}
 
-    if(!m_configUser.loadFromXML(m_applicationPath+"/Config_User.xml"))
+    if(!m_configUser.loadFromXML(":/Config/Config_User.xml"))
     {qCritical()<<"Error on user configuration file";return false;}
 
-    if(!m_configMarkers.loadFromXML(m_applicationPath+"/markers.xml"))
+    if(!m_configMarkers.loadFromXML(":/Config/markers.xml"))
     {qCritical()<<"Error on user configuration file";return false;}
 
     buildMarkerInfoMap();
+}
+
+QString MAbstractManager::plotConfigFileName()
+{
+#ifdef ANDROID
+    return "/mnt/sdcard/Medica/cur.xml";
+#else
+    return m_applicationPath+"/cur.xml";
+#endif
 }
 
 
 
 bool MAbstractManager::buildConfigurationFile()
 {
-    qDebug()<<"qui";
+    //qDebug()<<"qui";
     Ancestry configPlot;//iniziamo col creare una classe vergine
     //aggiungo il campo graphs
     Ancestry *graph=configPlot.addChild(XML_GRAPHS);
-    qDebug()<<"qui";
+    //qDebug()<<"qui";
     if(graph==NULL){qCritical()<<"Could not create child";return false;}
-    qDebug()<<"qui";
+    //qDebug()<<"qui";
     //ok iniziamo con calma a scrivere qualcosa, peschiamo il numero totale di canali
     int32_t chanlNum=m_mng->GetChanNum();
     qDebug()<<"N° Canali: "<<chanlNum;
@@ -112,7 +121,12 @@ bool MAbstractManager::buildConfigurationFile()
         }
     }
     //ora salvo il file di configurazione come cur.xml
+#ifdef ANDROID
+    configPlot.saveToXML("/mnt/sdcard/Medica/cur.xml");
+#else
     configPlot.saveToXML(m_applicationPath+"/cur.xml");
+#endif
+
     qDebug()<<"Configuration file builded succesfully";
     return true;
 }
