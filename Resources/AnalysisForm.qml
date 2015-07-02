@@ -4,8 +4,8 @@ import QtQuick.Dialogs 1.0
 import QtQuick.Controls.Styles 1.2
 import MPlotModule 1.0
 import Managers 1.0
-import Resources 1.0
-
+//import Resources 1.0
+import "qrc:/Components"
 MForm{
     //@@@@@@@@@@    Definitions     @@@@@@@@@@
     property alias configurationFile:mngCon.fileName

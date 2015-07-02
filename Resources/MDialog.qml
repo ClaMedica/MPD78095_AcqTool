@@ -1,8 +1,8 @@
 import QtQuick 2.2
 import QtQuick.Controls 1.1
 import QtQuick.Dialogs 1.1
-import Resources 1.0
-
+//import Resources 1.0
+import "qrc:/Components"
 Rectangle {
     //@@@@@@@@@@    Definitions     @@@@@@@@@@
     property var plotList:[]

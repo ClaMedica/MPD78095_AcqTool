@@ -74,7 +74,6 @@ void MAcqManager::dataOnTCP(QObject *__pParent, SimpleTCPClient *__pTCP, QByteAr
 
 bool MAcqManager::newAcquisition(QString __dataFile)
 {
-
     if(m_acqFileOpened)
     {
         //sono già in acquisizione e voglio farne partire un altra...strano ma

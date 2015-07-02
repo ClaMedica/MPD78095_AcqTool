@@ -1,6 +1,6 @@
 import QtQuick 2.0
-import Resources 1.0
-
+//import Resources 1.0
+import "qrc:/Components"
 Rectangle{
     //@@@@@@@@@@    Definitions     @@@@@@@@@@
     property string title:"Lista"

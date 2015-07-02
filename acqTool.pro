@@ -70,7 +70,7 @@ DEPENDPATH += $$PWD/../Build/DataBuild/release
 
 contains(ANDROID_TARGET_ARCH,armeabi-v7a) {
     ANDROID_EXTRA_LIBS = \
-        M:/Lavoro/Software/AcqTool/../Build/Emulator/DataBuild/libDatafileManager.so \
+        $$PWD/../Build/Emulator/DataBuild/libDatafileManager.so \
         $$PWD/../Build/Emulator/MPlotModule/libQmlPlotter.so
 }
 
