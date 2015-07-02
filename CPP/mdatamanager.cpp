@@ -64,6 +64,12 @@ bool MDataManager::addSignal(MSignal *__pSignal)
 
 }
 
+void MDataManager::analysis()
+{
+ //aggiungi quel che vuoi
+    int c = 0;
+}
+
 void MDataManager::loadFile(QString __fileName)
 {
     __fileName.remove("file:///");

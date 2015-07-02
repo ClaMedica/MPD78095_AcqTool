@@ -305,7 +305,8 @@ MForm{
 
             if (itemClicked == "Analysis")
             {
-                plotDial.visible=true
+                //plotDial.visible=true
+                mngData.analysis();
             }
 
 

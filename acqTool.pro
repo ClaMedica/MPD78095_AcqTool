@@ -53,15 +53,11 @@ HEADERS += \
 
 INCLUDEPATH += CPP\
                 ../MGlobal \
-                ../Source/Libcpp \
-                ../Source/Plot \
-                ../Source/Plot/Tools \
-                ../Source/QML \
-                ../Source/QML/Models \
-                ../Source/QML/Tools \
+                ../SuperFlowBt \
                 ../DataFileManager \
                 CPP/TCP \
                 ../CellaBluetooth/Supervisor
+
 
 # Default rules for deployment.
 include(deployment.pri)

@@ -36,7 +36,7 @@ signals:
     void loadingCompleted();
 
 public slots:
-
+    void analysis(void);
     void loadFile(QString __fileName);
     float getStartTime(){return m_start;}
     float getEndTime(){return m_end;}
