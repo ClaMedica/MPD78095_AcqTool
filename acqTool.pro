@@ -2,6 +2,9 @@ TEMPLATE = app
 TARGET = acqTool
 QT += qml quick widgets sql network
 
+
+
+
 RESOURCES += Resources/qml.qrc
 
 
@@ -15,7 +18,7 @@ QT +=multimedia
 QT +=xml
 QT +=core
 
-DEFINES += ANDROID
+
 DEFINES += QT_MESSAGELOGCONTEXT
 # The .cpp file which was generated for your project. Feel free to hack it.
 SOURCES += main.cpp \
@@ -33,7 +36,9 @@ SOURCES += main.cpp \
     CPP/mstorage.cpp \
     CPP/alarmmanager.cpp \
     ../MGlobal/p7settingsmanager.cpp \
-    CPP/mabstractmanager.cpp
+    CPP/mabstractmanager.cpp \
+    CPP/native.cpp \
+    CPP/androidmanager.cpp
 
 HEADERS += \
     CPP/parametermanager.h \
@@ -50,7 +55,8 @@ HEADERS += \
     CPP/mstorage.h \
     CPP/alarmmanager.h \
     ../MGlobal/p7settingsmanager.h \
-    CPP/mabstractmanager.h
+    CPP/mabstractmanager.h \
+    CPP/androidmanager.h
 
 INCLUDEPATH += CPP\
                 ../MGlobal \
@@ -68,12 +74,19 @@ INCLUDEPATH += $$PWD/../Build/DataBuild/release
 DEPENDPATH += $$PWD/../Build/DataBuild/release
 
 contains(ANDROID_TARGET_ARCH,armeabi-v7a) {
+DEFINES += ANDROID
+QT += androidextras
     ANDROID_EXTRA_LIBS = \
         $$PWD/../Build/Emulator/DataBuild/libDatafileManager.so \
         $$PWD/../Build/Emulator/MPlotModule/libQmlPlotter.so
+
+ANDROID_PACKAGE_SOURCE_DIR = $$PWD/android-sources
 }
 
 unix:!macx: LIBS += -L$$PWD/../Build/Emulator/DataBuild/ -lDatafileManager
 
 INCLUDEPATH += $$PWD/../Build/Emulator/DataBuild
 DEPENDPATH += $$PWD/../Build/Emulator/DataBuild
+
+
+

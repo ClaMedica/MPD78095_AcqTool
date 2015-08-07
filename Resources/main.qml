@@ -11,8 +11,6 @@ ApplicationWindow {
     //@@@@@@@@@@ Definitions @@@@@@@@@@
     property string examFolder:settings.datafilePath
     property string configFolder:settings.appPath()
-    property string platform:"android"
-    //property alias platform:Qt.platform.os
     //@@@@@@@@@@    Properties      @@@@@@@@@@
     id: root
     visible: true
