@@ -27,7 +27,7 @@
 
 int main(int argc, char *argv[])
 {
-    //Q_INIT_RESOURCE(qml);
+    Q_INIT_RESOURCE(qml);
     //creo il file di report
     qInstallMessageHandler(myMessageOutput); //install : set the callback
 
@@ -74,7 +74,7 @@ int main(int argc, char *argv[])
 #endif
     qDebug()<<engine.importPathList();
     engine.load(QUrl(QStringLiteral("qrc:/main.qml")));
-
+    qDebug()<<"engine caricato";
 
 
     int ret=app.exec();

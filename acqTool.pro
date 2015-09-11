@@ -1,23 +1,12 @@
 TEMPLATE = app
 TARGET = acqTool
-QT += qml quick widgets sql network
-
-
-
+QT += qml quick widgets sql network multimedia xml core
 
 RESOURCES += Resources/qml.qrc
-
-
-
 
 # Additional import path used to resolve QML modules in Qt Creator's code model
 QML_IMPORT_PATH +=  ../Build/CommonPlugin\
                     ../AcqTool \
-
-QT +=multimedia
-QT +=xml
-QT +=core
-
 
 DEFINES += QT_MESSAGELOGCONTEXT
 # The .cpp file which was generated for your project. Feel free to hack it.
