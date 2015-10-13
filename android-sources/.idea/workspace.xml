@@ -7,16 +7,26 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="ad3c4db8-ed28-4804-8512-a6590236687e" name="Default" comment="">
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/AndroidManifest.xml" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/src/medica/acqTool/RegisterReceiverRunnable.java" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/../CPP/androidmanager.cpp" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/../CPP/androidmanager.h" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/../CPP/native.cpp" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/../Resources/AnalysisForm.qml" afterPath="$PROJECT_DIR$/../Resources/AnalysisForm.qml" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/../acqTool.pro" afterPath="$PROJECT_DIR$/../acqTool.pro" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/../main.cpp" afterPath="$PROJECT_DIR$/../main.cpp" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/../Resources/main.qml" afterPath="$PROJECT_DIR$/../Resources/main.qml" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/../Resources/qml.qrc" afterPath="$PROJECT_DIR$/../Resources/qml.qrc" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/../Resources/AlarmModel.qml" afterPath="$PROJECT_DIR$/../Resources/AlarmModel.qml" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/../Resources/HomeForm.qml" afterPath="$PROJECT_DIR$/../Resources/HomeForm.qml" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/../Resources/MAlarmBox.qml" afterPath="$PROJECT_DIR$/../Resources/MAlarmBox.qml" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/../Resources/MButton.qml" afterPath="$PROJECT_DIR$/../Resources/MButton.qml" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/../Resources/MDialog.qml" afterPath="$PROJECT_DIR$/../Resources/MDialog.qml" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/../Resources/MGridView.qml" afterPath="$PROJECT_DIR$/../Resources/MGridView.qml" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/../Resources/MListSelector.qml" afterPath="$PROJECT_DIR$/../Resources/MListSelector.qml" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/../Resources/MMarkerButton.qml" afterPath="$PROJECT_DIR$/../Resources/MMarkerButton.qml" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/../Resources/MMenu.qml" afterPath="$PROJECT_DIR$/../Resources/MMenu.qml" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/../Resources/MMenuBar.qml" afterPath="$PROJECT_DIR$/../Resources/MMenuBar.qml" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/../Resources/MMenuButton.qml" afterPath="$PROJECT_DIR$/../Resources/MMenuButton.qml" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/../Resources/MMessageYesNo.qml" afterPath="$PROJECT_DIR$/../Resources/MMessageYesNo.qml" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/../Resources/MNewName.qml" afterPath="$PROJECT_DIR$/../Resources/MNewName.qml" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/../Resources/MPopUp.qml" afterPath="$PROJECT_DIR$/../Resources/MPopUp.qml" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/../Resources/Parameter.qml" afterPath="$PROJECT_DIR$/../Resources/Parameter.qml" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/../Resources/ParameterBox.qml" afterPath="$PROJECT_DIR$/../Resources/ParameterBox.qml" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/../Resources/Player.qml" afterPath="$PROJECT_DIR$/../Resources/Player.qml" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/../Resources/RealTimeForm.qml" afterPath="$PROJECT_DIR$/../Resources/RealTimeForm.qml" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/../Resources/SupervisorForm.qml" afterPath="$PROJECT_DIR$/../Resources/SupervisorForm.qml" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/local.properties" afterPath="$PROJECT_DIR$/local.properties" />
     </list>
     <ignored path="android-sources.iws" />
     <ignored path=".idea/workspace.xml" />
@@ -867,7 +877,6 @@
       <sortByType />
     </navigator>
     <panes>
-      <pane id="PackagesPane" />
       <pane id="ProjectPane" />
       <pane id="Scope" />
       <pane id="AndroidView">
@@ -880,6 +889,7 @@
           </PATH>
         </subPane>
       </pane>
+      <pane id="PackagesPane" />
       <pane id="Scratches" />
     </panes>
   </component>
@@ -1096,7 +1106,7 @@
   </component>
   <component name="ToolWindowManager">
     <frame x="-8" y="-8" width="1835" height="1096" extended-state="6" />
-    <editor active="true" />
+    <editor active="false" />
     <layout>
       <window_info id="Palette&#9;" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.33" sideWeight="0.5" order="2" side_tool="false" content_ui="tabs" />
       <window_info id="Designer" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.33" sideWeight="0.5" order="5" side_tool="false" content_ui="tabs" />
@@ -1116,8 +1126,8 @@
       <window_info id="Application Servers" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.33" sideWeight="0.5" order="10" side_tool="false" content_ui="tabs" />
       <window_info id="Project" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="true" weight="0.17859155" sideWeight="0.5" order="0" side_tool="false" content_ui="combo" />
       <window_info id="Ant Build" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.25" sideWeight="0.5" order="1" side_tool="false" content_ui="tabs" />
-      <window_info id="Run" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.33" sideWeight="0.5" order="2" side_tool="false" content_ui="tabs" />
       <window_info id="Hierarchy" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.25" sideWeight="0.5" order="2" side_tool="false" content_ui="combo" />
+      <window_info id="Run" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.33" sideWeight="0.5" order="2" side_tool="false" content_ui="tabs" />
       <window_info id="Cvs" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.25" sideWeight="0.5" order="4" side_tool="false" content_ui="tabs" />
       <window_info id="Message" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.33" sideWeight="0.5" order="0" side_tool="false" content_ui="tabs" />
       <window_info id="Find" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.33" sideWeight="0.5" order="1" side_tool="false" content_ui="tabs" />
@@ -1152,6 +1162,40 @@
     <watches-manager />
   </component>
   <component name="editorHistoryManager">
+    <entry file="file://$PROJECT_DIR$/src/medica/acqTool/AcqToolActivity.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state vertical-scroll-proportion="0.0">
+          <caret line="0" column="0" selection-start-line="0" selection-start-column="0" selection-end-line="0" selection-end-column="0" />
+          <folding>
+            <element signature="imports" expanded="true" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/medica/acqTool/RegisterReceiverRunnable.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state vertical-scroll-proportion="0.0">
+          <caret line="9" column="13" selection-start-line="9" selection-start-column="13" selection-end-line="9" selection-end-column="13" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/medica/acqTool/AcqToolReceiver.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state vertical-scroll-proportion="0.0">
+          <caret line="18" column="88" selection-start-line="18" selection-start-column="88" selection-end-line="18" selection-end-column="88" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/medica/acqTool/NativeFunctions.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state vertical-scroll-proportion="0.0">
+          <caret line="2" column="13" selection-start-line="2" selection-start-column="13" selection-end-line="2" selection-end-column="13" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
     <entry file="file://$PROJECT_DIR$/src/medica/acqTool/AcqToolActivity.java">
       <provider selected="true" editor-type-id="text-editor">
         <state vertical-scroll-proportion="0.0">

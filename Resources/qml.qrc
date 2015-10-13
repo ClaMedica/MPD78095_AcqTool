@@ -50,11 +50,8 @@
         <file alias="Supervisor">Supervisor.jpg</file>
     </qresource>
     <qresource prefix="/Config">
-        <file>Config_Acq.xml</file>
         <file>Config_Alarms_it.xml</file>
-        <file>Config_BT.xml</file>
         <file>Config_Locale.xml</file>
-        <file>Config_SAU.xml</file>
         <file>Config_User.xml</file>
         <file>markers.xml</file>
     </qresource>

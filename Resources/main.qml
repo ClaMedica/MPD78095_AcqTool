@@ -45,7 +45,7 @@ ApplicationWindow {
             if(arguments[1]==="acq")
             {
                 mngAcq.load()
-                mngAcq.startSupe("hide")
+                mngAcq.startSupe(arguments[3])
                 mngAcq.newAcquisition(arguments[2]);
                 console.log("Start configuring screen")
                 forReal.setMarkersInfo(mngAcq.markersInfo("type",[1,6]))
@@ -80,10 +80,7 @@ ApplicationWindow {
 
 
     //@@@@@@@@@@    Objects         @@@@@@@@@@
-    MSettings{
-        id:settings
-        Component.onCompleted: loadSettings()
-    }
+
 
     MAcqManager{
         //@@@@@@@@@@    Properties      @@@@@@@@@@
@@ -91,7 +88,7 @@ ApplicationWindow {
 
         //@@@@@@@@@@    Events          @@@@@@@@@@
         Component.onCompleted: console.log("MAcqManager Ready!")
-        //onSystemInAcqStatus:forReal.displayMessage("Go go go!",2000)
+        onSystemInAcqStatus:forReal.displayMessage("Go go go!",2000)
     }
 
     MDataManager{

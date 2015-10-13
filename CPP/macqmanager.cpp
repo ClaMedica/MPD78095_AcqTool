@@ -81,17 +81,17 @@ bool MAcqManager::newAcquisition(QString __dataFile)
     else
     {
         //carico la configurazione per l'acquisizione
-        if(!m_configAcq.loadFromXML(m_applicationPath+"/Config_Acq.xml"))
-        {qCritical()<<"Error on acq configuration file";return false;}
+        if(!m_configAcq.loadFromXML(g_P7SettingsManager.progPath()+"/Config_Acq.xml"))
+            qCritical()<<"Error on acq configuration file";
 
         //e infine carico il file degli allarmi con la lingua giusta
         QString lang=m_configLocale.getChild(XML_LOCALE)->getAttribute("Value");
         if(!m_alarmMng.load(m_applicationPath+"/Config_Alarms_"+lang+".xml"))
-        {qCritical()<<"Error on alarm configuration file";return false;}
+            qCritical()<<"Error on alarm configuration file";
 
         //carico info di connettività
         if(m_configAcq.getChild(XML_CONNECTIONS)==NULL)
-        {qCritical()<<"XML file corrupted";return false;}
+            qCritical()<<"XML file corrupted";
         loadConnectivityInfo(m_configAcq.getChild(XML_CONNECTIONS));
 
 
@@ -106,7 +106,7 @@ bool MAcqManager::newAcquisition(QString __dataFile)
         //controllo l'esistenza dei file
 
         if(!QFile::exists(__dataFile))
-        {qCritical()<<"File does not exists";return false;}
+            qCritical()<<"File does not exists";
 
         m_mng=new DatafileManager;
 
@@ -120,11 +120,11 @@ bool MAcqManager::newAcquisition(QString __dataFile)
 
         qDebug()<<"Reading configuration file";
         if(!readConfigurationFile())
-        {qCritical()<<"Error during reading of configuration file";return false;}
+            qCritical()<<"Error during reading of configuration file";
 
         qDebug()<<"Building configuration file for plots";
         if(!buildConfigurationFile())
-        {qCritical()<<"Error during building of configuration file";return false;}
+            qCritical()<<"Error during building of configuration file";
 
         //aggiorno il datafile con i dati relativi alla mia configurazione #BUG da togliere non appena il file verrà scritto correttamente
         qDebug()<<"Updating datafile...";
@@ -224,6 +224,7 @@ void MAcqManager::endAcquisition(QString __exit)
     m_superProcess->close();
 
     m_mng=NULL;
+    exit(1);
 }
 
 void MAcqManager::addMarker(QVariant __key)
@@ -569,10 +570,10 @@ void MAcqManager::saveBuffersToFile()
                 type.append(chanName.at(i));
         }
         if(!m_channelMap.contains(type) || number.toInt()<1 || number.isEmpty())
-        {qCritical()<<type<<number<<"Not recognized";return;}
+            qCritical()<<type<<number<<"Not recognized";
         int index=number.toInt()-1;
         int32_t chanNum=m_dataChanNameMap[chanName];
-        //svuta tutto
+        //svuota tutto
         //qDebug()<<"Saving"<<m_channelMap[type].at(index)->size()<<"samples in channel"<<chanNum;
         while(m_channelMap[type].at(index)->size()>0){
             float v=m_channelMap[type].at(index)->takeFirst();
@@ -605,7 +606,7 @@ void MAcqManager::sendBuffersToPlot()
             }
 
             if(!m_channelMap.contains(type) || number.toInt()<1 || number.isEmpty())
-            {qCritical()<<type<<number<<"Not recognized";return;}
+                qCritical()<<type<<number<<"Not recognized";
             int index=number.toInt()-1;
             MSignal copy=*(m_channelMap[type].at(index));
             channels<<copy;
@@ -639,7 +640,8 @@ void MAcqManager::removeLastFrame()
 bool MAcqManager::updateDataFile()
 {//viene chiamata per aggiornare il datafile a seconda del file di configurazione del relativo esame
     Ancestry *channels=m_configAcq.getChild(XML_CHANNELS);
-    if(channels==NULL){qCritical("Child not alive");return false;}
+    if(channels==NULL)
+        qCritical("Child not alive");
     //ciclo per ogni canale del datafile alla ricerca di proprietà da completare
     int maxChan=m_mng->GetChanNum();
     for(int i=0;i<maxChan;i++)
@@ -700,7 +702,8 @@ void MAcqManager::applyOperations()
 
             if(name == "threshold")
             {//faccio soglia tra due valori quindi mi aspetto almeno altri due parametri
-                if(opData.length()!=4){qCritical()<<MEX_FILE_CORRUPTED;return;}
+                if(opData.length()!=4)
+                    qCritical()<<MEX_FILE_CORRUPTED;
                 QString smin=opData.at(2);
                 QString smax=opData.at(3);
                 qreal min,max;

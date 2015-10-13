@@ -1,7 +1,7 @@
 import QtQuick 2.0
 import Managers 1.0
 import QtQuick.Controls 1.0
-//import Resources 1.0
+ 
 import MPlotModule 1.0
 import "qrc:/Components"
 Rectangle{

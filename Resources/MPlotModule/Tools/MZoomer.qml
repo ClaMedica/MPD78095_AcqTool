@@ -62,13 +62,13 @@ Rectangle {
         checkLimits()
     }
     function checkLimits(){
-        if(preview.xMin<xAbsoluteMin || preview.xMin>preview.xMax)
+        if(preview.xMin<xAbsoluteMin || preview.xMin>preview.xMax || isNaN(preview.xMin))
             preview.xMin=xAbsoluteMin
-        if(preview.xMax>xAbsoluteMax || preview.xMin>preview.xMax)
+        if(preview.xMax>xAbsoluteMax || preview.xMin>preview.xMax || isNaN(preview.xMax))
             preview.xMax=xAbsoluteMax
-        if(preview.yMin<yAbsoluteMin || preview.yMin>preview.yMax)
+        if(preview.yMin<yAbsoluteMin || preview.yMin>preview.yMax || isNaN(preview.yMin))
             preview.yMin=yAbsoluteMin
-        if(preview.yMax>yAbsoluteMax || preview.yMin>preview.yMax)
+        if(preview.yMax>yAbsoluteMax || preview.yMin>preview.yMax || isNaN(preview.yMax))
             preview.yMax=yAbsoluteMax
         //applico le modifiche
         xMin=preview.xMin
@@ -85,36 +85,57 @@ Rectangle {
         //console.log(xMin,xMax,yMin,yMax)
     }
 
-    function doZoom(x,y,magn){
+    function fromXtoAU(x){
+        return (xMax-xMin)*x/rootZoom.width
+    }
+
+    function fromYtoAU(y){
+        return (yMax-yMin)*y/rootZoom.height
+    }
+
+    function setLimFromSectionX(min,max,x1,x2){
+        var m=(max-min)/(x2-x1)
+        preview.xMin=min-m*x1
+        preview.xMax=m*rootZoom.width+preview.xMin
+    }
+
+    function setLimFromSectionY(min,max,y1,y2){
+        var m=(max-min)/(y2-y1)
+        preview.yMax=min-m*y1
+        preview.yMin=preview.yMax+m*rootZoom.height
+    }
+
+    function doZoom(x,y,magnX,magnY){
         //x posizione orizzontale centro dello zoom in pixel
         //y posizione verticale centro dello zoom in pixel
         //magn ingrandimento ]-1,1[ compreso con estremi esclusi
 
 
-        var incX=(xMax-xMin)*Math.abs(magn) //incremento unilaterale in a.u.
-        var incY=(yMax-yMin)*Math.abs(magn) //incremento unilaterale in a.u.
+        var incX=(xMax-xMin)*Math.abs(magnX) //incremento unilaterale in a.u.
+        var incY=(yMax-yMin)*Math.abs(magnY) //incremento unilaterale in a.u.
 
 
         var percX=x/rootZoom.width //posizione del centro in %
         var percY=y/rootZoom.height//posizione del centro in %
-        var d=magn>0?1:-1;
+        var dx=magnX>0?1:-1;
+        var dy=magnY>0?1:-1;
 
-        console.log("doZoom",magn,incX,incY,percX,percY,d)
+        console.log("doZoom",magnX,magnY,incX,incY,percX,percY,dx,dy)
         switch(rootZoom.state)
         {
         case "idle":            //zoom bidirezionale
-            preview.xMin=xMin + d*incX*percX
-            preview.xMax=xMax - d*incX*(1-percX)
-            preview.yMin=yMin + d*incY*(1-percY)
-            preview.yMax=yMax - d*incY*percY
+            preview.xMin=xMin + dx*incX*percX
+            preview.xMax=xMax - dx*incX*(1-percX)
+            preview.yMin=yMin + dy*incY*(1-percY)
+            preview.yMax=yMax - dy*incY*percY
             break;
         case "wheeling h":      //zoom orizzontale
-            preview.xMin=xMin+d*incX*percX
-            preview.xMax=xMax-d*incX*(1-percX)
+            preview.xMin=xMin+dx*incX*percX
+            preview.xMax=xMax-dx*incX*(1-percX)
             break;
         case "wheeling v":      //zoom verticale
-            preview.yMin=yMin+d*incY*(1-percY)
-            preview.yMax=yMax-d*incY*percY
+            preview.yMin=yMin+dy*incY*(1-percY)
+            preview.yMax=yMax-dy*incY*percY
             break;
         }
         console.log("before check",preview.xMin,preview.xMax,preview.yMin,preview.yMax)
@@ -122,8 +143,13 @@ Rectangle {
         console.log("after check",xMin,xMax,yMin,yMax)
     }
 
-    function polarZoom(x,y,spanX,spanY){
-
+    function setView(x,y,spanX,spanY){
+        //questa funzione setta la view in termini di a.u.
+        preview.xMax=x+spanX/2
+        preview.xMin=x-spanX/2
+        preview.yMax=y+spanY/2
+        preview.yMin=y-spanY/2
+        checkLimits()
     }
 
     Timer{
@@ -139,7 +165,7 @@ Rectangle {
                 inc=-0.9
             doZoom(zoomArea.mouseX,
                    zoomArea.mouseY,
-                   inc)
+                   inc,inc)
             zoomArea.angle=0
         }
     }
@@ -147,7 +173,7 @@ Rectangle {
     MouseArea{
         property int angle:0
         id:zoomArea
-        //enabled: platform==="android"?false:true
+        enabled: platform==="android"?false:true
         anchors.fill:parent
         hoverEnabled: true
 
@@ -321,6 +347,13 @@ Rectangle {
 
     MultiPointTouchArea{
         property TouchPoint prev
+        Item{
+            id:old
+            property real x1:0
+            property real x2:0
+            property real y1:0
+            property real y2:0
+        }
 
         id:zoomTouchArea
         minimumTouchPoints: 1
@@ -333,13 +366,23 @@ Rectangle {
             TouchPoint { id: p2 }
         ]
         onPressed:{//quando premo
-
+            old.x1=fromXtoAU(p1.startX)
+            old.y1=fromYtoAU(p1.startY)
+            old.x2=fromXtoAU(p2.startX)
+            old.y2=fromYtoAU(p2.startY)
         }
         onTouchUpdated: {//quando cambiano i punti
-        console.log("touch changed")
+            if(touchPoints.length===2)
+            {
+                setLimFromSectionX(old.x1,old.x2,p1.x,p2.x)
+                setLimFromSectionY(old.y1,old.y2,p1.y,p2.y)
+                checkLimits()
+            }
+
         }
 
         onReleased:{//quando lascio
+
         }
     }
 }

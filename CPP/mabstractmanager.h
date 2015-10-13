@@ -11,6 +11,7 @@
 #include "TcpServerFlowBt_types.h"
 #include "inheritEnum.h"
 #include "alarmmanager.h"
+#include "p7settingsmanager.h"
 #include "QtGlobal"
 
 class MAbstractManager : public QObject

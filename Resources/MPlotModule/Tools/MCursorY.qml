@@ -1,9 +1,5 @@
 import QtQuick 2.2
 import MPlotModule 1.0
-//da decommentare per debug con Test
-//import QuickRealTimeGraph 1.0
-
-
 Rectangle{
 
     id:root_cursor
@@ -36,7 +32,8 @@ Rectangle{
     function updateY(v)
     {
         valPer=(v-vMin)/(vMax-vMin)
-        y=(max-min)*valPer-arrow.height/2+min
+        y=(max-min)*(1-valPer)-arrow.height/2+min
+        //console.log(v,valPer,height,y)
         if(modM.visible)
             visible=(valPer<0 || valPer>1)?false:true
     }
@@ -44,12 +41,13 @@ Rectangle{
     onYChanged:if(!remoteControl)updateY(value)
     onVMaxChanged: updateY(value)
     onVMinChanged: updateY(value)
+    onMaxChanged:updateY(value)
+    onMinChanged:updateY(value)
     onValueChanged:
     {
         if(!created || remoteControl)
         {
-            valPer=value/(vMax-vMin)
-            y=min+(max-min)*(1-valPer)-arrow.height/2
+            updateY(value)
             created=true
             if(remoteControl)
                 label.opacity=1
@@ -58,16 +56,15 @@ Rectangle{
 
     Component.onCompleted:
     {
-        valPer=value/(vMax-vMin)
-        y=min+(max-min)*(1-valPer)-arrow.height/2
+        valPer=value-vMin/(vMax-vMin)
+        y=(max-min)*valPer-arrow.height/2+min
         focus=false
         animate()
     }
 
 
 
-    onMaxChanged:y=min+(max-min)*(1-valPer)-arrow.height/2
-    onMinChanged:y=min+(max-min)*(1-valPer)-arrow.height/2
+
     onSelectedChanged: animate()
     onFocusChanged: selected=focus
 
@@ -171,4 +168,5 @@ Rectangle{
 
 
 }
+
 

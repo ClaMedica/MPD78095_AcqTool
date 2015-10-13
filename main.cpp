@@ -32,6 +32,8 @@ int main(int argc, char *argv[])
     qInstallMessageHandler(myMessageOutput); //install : set the callback
 
     QGuiApplication app(argc, argv);
+    //carico i settaggi
+    g_P7SettingsManager.loadSettings();
 #ifdef ANDROID
     QtAndroid::androidActivity().callMethod<void>("registerBroadcastReceiver", "()V");
 #endif
@@ -56,6 +58,7 @@ int main(int argc, char *argv[])
     qmlRegisterType<ModelManager>("Managers",1,0,"ModelManager");
     qmlRegisterType<MAcqManager>("Managers",1,0,"MAcqManager");
     qmlRegisterType<MDataManager>("Managers",1,0,"MDataManager");
+
     qmlRegisterType<P7Settings>("Managers",1,0,"MSettings");
 
     QQmlApplicationEngine engine;
@@ -72,6 +75,7 @@ int main(int argc, char *argv[])
 #else
     engine.rootContext()->setContextProperty(QLatin1String("platform"),"win");
 #endif
+    engine.rootContext()->setContextProperty("settings",&g_P7SettingsManager);
     qDebug()<<engine.importPathList();
     engine.load(QUrl(QStringLiteral("qrc:/main.qml")));
     qDebug()<<"engine caricato";
