@@ -77,5 +77,15 @@ unix:!macx: LIBS += -L$$PWD/../Build/Emulator/DataBuild/ -lDatafileManager
 INCLUDEPATH += $$PWD/../Build/Emulator/DataBuild
 DEPENDPATH += $$PWD/../Build/Emulator/DataBuild
 
+#percorso tecnoideal
+rootPath = M:
+#percorso acer luca
+#rootPath = C:\Users\Mez
 
+win32{
+    #creo la cartella da copiare in giro
+    plugin.path = $${rootPath}\Lavoro\Software\Build\StandAlone
+    plugin.files += $$shell_path($$OUT_PWD)\release\acqTool.exe
+    INSTALLS += plugin
+}
 
