@@ -10,7 +10,7 @@ MAcqManager::MAcqManager(QObject *parent)
     m_acqFileOpened=false;//nessuna acquisizione in atto
     m_sendingToPlot=false;//nessuno sta spedendo qualcosa per cui ci si può scrivere sopra
     m_serverReady=false;//i server non sono inizializzati quindi falso
-    m_autoStartStop=true;
+    m_autoStartStop=false;
     m_superProcess=NULL;//nessun supervisore avviato
     m_saving=false;//non sto salvando i dati
     m_tcpAttempts=0;
@@ -128,7 +128,7 @@ bool MAcqManager::newAcquisition(QString __dataFile)
 
         //aggiorno il datafile con i dati relativi alla mia configurazione #BUG da togliere non appena il file verrà scritto correttamente
         qDebug()<<"Updating datafile...";
-        updateDataFile();
+        handleDataFile();
         //ripristino il file in acquisizione
         qDebug()<<"Continue ..."<<m_mng->Continue();
         //inizializzo i server di comunicazione con i plotter
@@ -360,6 +360,7 @@ void MAcqManager::handleTCP(SimpleTCPClient *__client, QByteArray __block)
 
 
             if(!m_saving){
+
                 if(m_autoStartStop)
                     checkAutomaticStartStop("Start");//finchè non devo salvare riempo il buffer e controllo
                 else
@@ -637,7 +638,7 @@ void MAcqManager::removeLastFrame()
         m_bufferMap[hwc]->remove(0,m_frameMap[hwc]);
 }
 
-bool MAcqManager::updateDataFile()
+bool MAcqManager::handleDataFile()
 {//viene chiamata per aggiornare il datafile a seconda del file di configurazione del relativo esame
     Ancestry *channels=m_configAcq.getChild(XML_CHANNELS);
     if(channels==NULL)
@@ -655,11 +656,17 @@ bool MAcqManager::updateDataFile()
                         m_mng->SetGain(i,channel->getTextOfChild(XML_GAIN).toFloat());
                     if(channel->getTextOfChild(XML_OFFSET)!="")
                         m_mng->SetOffset(i,channel->getTextOfChild(XML_OFFSET).toFloat());
+
                 }
         }
-        qDebug()<<m_mng->GetGain(i)<<m_mng->GetOffset(i);
+
+        //controllo se questo canale ha i requisiti per fare l'acq automatica
+        //mi fido del software archivio pazienti
+        if(m_mng->GetLoc(i) == "a")
+            m_autoStartStop=true;
+        //qDebug()<<m_mng->GetGain(i)<<m_mng->GetOffset(i);
     }
-    qDebug()<<"stato"<<m_mng->GetState();
+    //qDebug()<<"stato"<<m_mng->GetState();
     qDebug()<<"Commit Parameters?"<<m_mng->CommitParameters();
     qDebug()<<"Close?"<<m_mng->Close();
     qDebug()<<"Open?"<<m_mng->Open();
