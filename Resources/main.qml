@@ -3,9 +3,11 @@ import QtQuick.Controls 1.3
 import QtQuick.Dialogs 1.2
 //import Resources 1.0
 import "qrc:/Forms"
+import "qrc:/Dialog"
 import MPlotModule 1.0
 import Managers 1.0
 import QtQuick.Window 2.2
+
 
 ApplicationWindow {
     //@@@@@@@@@@ Definitions @@@@@@@@@@
@@ -30,9 +32,6 @@ ApplicationWindow {
             width:100
         }
     }
-
-
-
 
     function launch(arguments)
     {
@@ -98,6 +97,16 @@ ApplicationWindow {
             forHome.whoIsVisilbe=forAna.name
         }
 
+        onReloadingCompleted: forAna.populate()
+
+        onSg_openVolResDlg:{
+            volRes.focus = true
+            volRes.volResVal = "0"
+            volRes.titleDlg = __tipoAn
+            volRes.visible = true
+        }
+
+
         Component.onCompleted: console.log("MDataManager Ready!")
     }
 
@@ -134,4 +143,11 @@ ApplicationWindow {
     }
 
 
+    VolResDlg{
+        //@@@@@@@@@@    Properties      @@@@@@@@@@
+        id: volRes
+
+        //@@@@@@@@@@    Events          @@@@@@@@@@
+
+    }
 }

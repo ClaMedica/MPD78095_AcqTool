@@ -5,7 +5,6 @@ QT += qml quick widgets sql network
 RESOURCES += Resources/qml.qrc
 
 
-
 # Additional import path used to resolve QML modules in Qt Creator's code model
 QML_IMPORT_PATH +=  ../Build/CommonPlugin\
                     ../AcqTool \
@@ -32,7 +31,8 @@ SOURCES += main.cpp \
     CPP/mstorage.cpp \
     CPP/alarmmanager.cpp \
     ../MGlobal/p7settingsmanager.cpp \
-    CPP/mabstractmanager.cpp
+    CPP/mabstractmanager.cpp \
+
 
 HEADERS += \
     CPP/parametermanager.h \
@@ -51,12 +51,24 @@ HEADERS += \
     ../MGlobal/p7settingsmanager.h \
     CPP/mabstractmanager.h
 
-INCLUDEPATH += CPP\
+SOURCES += ../AnaUro/anauro.cpp \
+    ../AnaUro/analysis.cpp \
+    ../AnaUro/anautils.cpp \
+
+HEADERS += ../AnaUro/anauro.h\
+        ../AnaUro/anauro_global.h \
+    ../AnaUro/analysis.h \
+    ../AnaUro/Anaerrorcodes.h \
+    ../AnaUro/anautils.h \
+
+INCLUDEPATH +=  CPP \
+                ../AnaUro \
                 ../MGlobal \
                 ../SuperFlowBt \
                 ../DataFileManager \
                 CPP/TCP \
                 ../CellaBluetooth/Supervisor
+
 
 
 # Default rules for deployment.
@@ -65,8 +77,12 @@ include(deployment.pri)
 win32:CONFIG(release, debug|release): LIBS += -L$$PWD/../Build/DataBuild/release/ -lDatafileManager1
 else:win32:CONFIG(debug, debug|release): LIBS += -L$$PWD/../Build/DataBuild/debug/ -lDatafileManager1
 
-INCLUDEPATH += $$PWD/../Build/DataBuild/release
-DEPENDPATH += $$PWD/../Build/DataBuild/release
+
+win32:CONFIG(release, debug|release): LIBS += -L$$PWD/../Build/AnaUro7Build/release/ -lAnaUro
+else:win32:CONFIG(debug, debug|release): LIBS += -L$$PWD/../Build/AnaUro7Build/debug/ -lAnaUro
+
+#INCLUDEPATH += $$PWD/../Build/DataBuild/release
+#DEPENDPATH += $$PWD/../Build/DataBuild/release
 
 contains(ANDROID_TARGET_ARCH,armeabi-v7a) {
     ANDROID_EXTRA_LIBS = \
@@ -76,5 +92,11 @@ contains(ANDROID_TARGET_ARCH,armeabi-v7a) {
 
 unix:!macx: LIBS += -L$$PWD/../Build/Emulator/DataBuild/ -lDatafileManager
 
-INCLUDEPATH += $$PWD/../Build/Emulator/DataBuild
-DEPENDPATH += $$PWD/../Build/Emulator/DataBuild
+#INCLUDEPATH += $$PWD/../Build/Emulator/DataBuild
+#DEPENDPATH += $$PWD/../Build/Emulator/DataBuild
+
+
+
+
+
+

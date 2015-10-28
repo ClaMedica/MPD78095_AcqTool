@@ -257,7 +257,8 @@ MForm{
             ["File","Open Audio","Open Exam","Save","Back"],
             ["Add","Data to Plot","New Marker","New Definer"],
             ["Select Signal","To Analyze","To Play"],
-            ["Analisys","Spectrum","Time Warping","Energy","Time Spectrum"],
+            //["Analisys","Spectrum","Time Warping","Energy","Time Spectrum"],
+            ["Analisys", "Analizza"],
             ["Plot","Load Settings"]
         ]
 
@@ -303,13 +304,6 @@ MForm{
             //if (itemClicked == "Cursors")
             //mngMar.addMarker(["$Marker","doppler","number",Func.newId(),"&Marker"])
 
-            if (itemClicked == "Analysis")
-            {
-                //plotDial.visible=true
-                mngData.analysis();
-            }
-
-
             //Select
             if (itemClicked == "To Play")
             {
@@ -321,18 +315,25 @@ MForm{
             }
             //Analysis
 
-            var str=items[3];
-            if (str.indexOf(itemClicked)!==-1)
+            if (itemClicked == "Analizza")
             {
-                mngPar.curAnalysis=itemClicked
-
-                box.ready=false
-                box.currentAna=itemClicked
-                box.items=mngPar.items
-                box.width=parent.width/2
-                box.popola()
-                box.ready=true
+                //plotDial.visible=true
+                console.log("Sono dentro il click analysis")
+                mngData.analysis();
             }
+
+//            var str=items[3];
+//            if (str.indexOf(itemClicked)!==-1)
+//            {
+//                mngPar.curAnalysis=itemClicked
+
+//                box.ready=false
+//                box.currentAna=itemClicked
+//                box.items=mngPar.items
+//                box.width=parent.width/2
+//                box.popola()
+//                box.ready=true
+//            }
 
             //Settings
             if (itemClicked == "Load Settings")

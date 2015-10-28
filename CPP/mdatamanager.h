@@ -15,11 +15,17 @@ public:
     Q_PROPERTY(QStringList availableTracks READ availableTracks NOTIFY availableTracksChanged())
     Q_PROPERTY(QStringList availableData READ availableData NOTIFY availableDataChanged)
 
+    Q_PROPERTY(int valVolRes READ getValVolRes WRITE setValVolRes NOTIFY infoValVolRes)
+
     QStringList availableData(){return m_availableData;}
     QStringList availableTracks(){return m_data.keys();}
 
     QVariantList infoList(){return m_infoList;}
     void setInfoList(QVariantList __list);
+
+    int getValVolRes();
+    void setValVolRes(int __val);
+
 
     //analysis manager
 
@@ -34,6 +40,10 @@ signals:
     void availableTracksChanged();
     void infoListChanged();
     void loadingCompleted();
+    void reloadingCompleted();
+
+    void sg_openVolResDlg(QString __tipoAn);
+    void infoValVolRes();
 
 public slots:
     void analysis(void);
@@ -49,6 +59,8 @@ public slots:
     bool changeObject(QVariantList __curObj);
     QVariant getSignal(QString __name);
     QStringList getLinks(QString __what, QStringList __filterFamily=QStringList(), QStringList __filterType=QStringList());
+
+     void volRelDlgOk(QString __anaType);
 
 private:
     QVector<MSignal *> m_signalVector;
@@ -87,12 +99,22 @@ private:
 
     QMap<QString,QStringList> m_modelMap;
 
+    QString m_VolRes;
+    bool m_analized;
+    bool m_autoPrint;
 
 //----
     bool saveDataAndUpdate(QString __family, QString __name, VarMapVec*__elements,bool __whatIfAlreadyPresent=OVERWRITE);
     void updateAvailableData();
     bool buildInfoList();
+    void updateInfoList();
+
+
+    void InitPageGraphs(QString __anaType);
+    bool InitArraysFLW(int __start, int __end, QVector<unsigned char> __chEn, int __curDef, byte __auto);
+    int ReadResult(int __numEv = 1);
 };
+
 
 
 

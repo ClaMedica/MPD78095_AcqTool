@@ -23,5 +23,7 @@ MAlarm 1.0 MAlarm.qml
 MMarkerButton 1.0 MMarkerButton.qml
 #Models
 AlarmModel 1.0 AlarmModel.qml
+#Dialog
+VolResDlg 1.0 VolResDlg.qml
 #Scripts
 Func 1.0 func.js

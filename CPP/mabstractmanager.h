@@ -3,6 +3,7 @@
 
 #include <QObject>
 #include <datafilemanager.h>
+#include <analysis.h>
 #include "SimpleTCPClient.h"
 #include "TcpServers.h"
 #include "ancestry.h"
@@ -12,6 +13,7 @@
 #include "inheritEnum.h"
 #include "alarmmanager.h"
 #include "QtGlobal"
+
 
 class MAbstractManager : public QObject
 {
@@ -36,6 +38,7 @@ protected:
     QString m_applicationPath;
 
     DatafileManager *m_mng;
+    Analyze *m_ana;
 
     QMap<QVariant,VarMap> m_markerMap;//mappa di tutti i possibili marker ordinati per key
 
@@ -52,6 +55,8 @@ protected:
 
     bool buildConfigurationFile();
     bool buildMarkerInfoMap();
+
+
 };
 
 #endif // MABSTRACTMANAGER_H

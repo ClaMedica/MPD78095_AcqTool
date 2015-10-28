@@ -79,7 +79,7 @@ bool MStorage::archive(QString __family, QString __name, VarMapVec *__elements, 
 
     }
     //in questo modo ogni elemento ha un suo codice identificativo uguale all'indirizzo a cui punta
-    //qDebug()<<*m_allMap;
+    qDebug()<<"stampo all map"<<m_allMap;
     if(present)
     {
         if(__whatIfAlreadyPresent==OVERWRITE)
