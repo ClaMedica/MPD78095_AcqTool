@@ -12,6 +12,7 @@
 #include "TcpServerFlowBt_types.h"
 #include "inheritEnum.h"
 #include "alarmmanager.h"
+#include "p7settingsmanager.h"
 #include "QtGlobal"
 
 
@@ -31,7 +32,7 @@ signals:
 
 public slots:
     bool load(void);
-    QString plotConfigFileName(){return m_applicationPath+"/cur.xml";}
+    QString plotConfigFileName();
 
 
 protected:

@@ -4,6 +4,7 @@ import QtQuick.Dialogs 1.0
 import QtQuick.Controls.Styles 1.2
 import MPlotModule 1.0
 import Managers 1.0
+import QtQml 2.0
 //import Resources 1.0
 import "qrc:/Components"
 MForm{
@@ -259,12 +260,23 @@ MForm{
             ["Select Signal","To Analyze","To Play"],
             //["Analisys","Spectrum","Time Warping","Energy","Time Spectrum"],
             ["Analisys", "Analizza"],
+            ["Actions","Send Toast","Start Service","Connect Client"],
             ["Plot","Load Settings"]
         ]
 
         //@@@@@@@@@@    Events          @@@@@@@@@@
         onSelected: {
            // dopAna.handleMenu(itemClicked)
+            if (itemClicked === "Send Toast"){
+                androidmanager.showToast("ciao dal qml");
+            }
+            if(itemClicked === "Start Service"){
+                androidmanager.launchService("medica.blue.START_SERVICE");
+            }
+            if(itemClicked === "Connect Client"){
+                androidmanager.connectClient();
+            }
+
             if (itemClicked == "Open Audio") {
                 fileDial.owner="mngData"
                 fileDial.folder="../../ProgettoDoppler/Exams/Audio di Prova"

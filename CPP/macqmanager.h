@@ -94,7 +94,7 @@ private:
     void saveBuffersToFile();
     void sendBuffersToPlot();
     void removeLastFrame();
-    bool updateDataFile();
+    bool handleDataFile();
     void applyOperations();
     void fillBuffers(QByteArray __block);
     bool buffersReady();

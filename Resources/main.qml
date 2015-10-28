@@ -13,7 +13,6 @@ ApplicationWindow {
     //@@@@@@@@@@ Definitions @@@@@@@@@@
     property string examFolder:settings.datafilePath
     property string configFolder:settings.appPath()
-    property string platform:Qt.platform.os//"android"//
     //@@@@@@@@@@    Properties      @@@@@@@@@@
     id: root
     visible: true
@@ -21,20 +20,21 @@ ApplicationWindow {
     height:platform==="android"?480:Screen.height*0.94
     color:"steelblue"
 
-    Rectangle{
-        anchors.centerIn: parent
-        height:200
-        width:200
-        color:"red"
-        Plot2DRealTime{
-            anchors.centerIn: parent
-            height:100
-            width:100
-        }
-    }
+//    Rectangle{
+//        anchors.centerIn: parent
+//        height:400
+//        width:400
+//        color:"red"
+//        MPlot2DRealTime{
+//            anchors.centerIn: parent
+//            height:200
+//            width:200
+//        }
+//    }
 
     function launch(arguments)
     {
+
         if(arguments.length>1)
         {
             console.log("arguments founded",arguments,arguments.length)
@@ -44,7 +44,7 @@ ApplicationWindow {
             if(arguments[1]==="acq")
             {
                 mngAcq.load()
-                mngAcq.startSupe("hide")
+                mngAcq.startSupe(arguments[3])
                 mngAcq.newAcquisition(arguments[2]);
                 console.log("Start configuring screen")
                 forReal.setMarkersInfo(mngAcq.markersInfo("type",[1,6]))
@@ -57,12 +57,19 @@ ApplicationWindow {
             {
                 forAna.initialize()
                 mngData.load()
-                mngData.loadFile(arguments[2]);
+                if(platform!=="android")
+                    mngData.loadFile(arguments[2]);
+                else
+                    mngData.loadFile("/mnt/sdcard/Medica/pv000461A.pic")
             }
         }
         else
         {
             console.log("No arguments founded")
+            forAna.initialize()
+            mngData.load()
+            if(platform==="android")
+                mngData.loadFile("/mnt/sdcard/Medica/pv000461A.pic")
         }
         console.log("Application Ready!")
     }
@@ -72,10 +79,7 @@ ApplicationWindow {
 
 
     //@@@@@@@@@@    Objects         @@@@@@@@@@
-    MSettings{
-        id:settings
-        Component.onCompleted: loadSettings()
-    }
+
 
     MAcqManager{
         //@@@@@@@@@@    Properties      @@@@@@@@@@
@@ -83,7 +87,7 @@ ApplicationWindow {
 
         //@@@@@@@@@@    Events          @@@@@@@@@@
         Component.onCompleted: console.log("MAcqManager Ready!")
-        //onSystemInAcqStatus:forReal.displayMessage("Go go go!",2000)
+        onSystemInAcqStatus:forReal.displayMessage("Go go go!",2000)
     }
 
     MDataManager{

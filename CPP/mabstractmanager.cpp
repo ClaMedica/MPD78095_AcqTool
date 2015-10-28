@@ -34,33 +34,44 @@ QVariantList MAbstractManager::markersInfo(QString __filterType,
 
 bool MAbstractManager::load()
 {//in questa funzione inizializzo tutto caricando i file di configurazione fissi
-    if(!m_configLocale.loadFromXML(m_applicationPath+"/Config_Locale.xml"))
+    if(!m_configLocale.loadFromXML(":/Config/Config_Locale.xml"))
     {qCritical()<<"Error on locale configuration file";return false;}
 
-    if(!m_configUser.loadFromXML(m_applicationPath+"/Config_User.xml"))
+    if(!m_configUser.loadFromXML(":/Config/Config_User.xml"))
     {qCritical()<<"Error on user configuration file";return false;}
 
-    if(!m_configMarkers.loadFromXML(m_applicationPath+"/markers.xml"))
+    if(!m_configMarkers.loadFromXML(":/Config/markers.xml"))
     {qCritical()<<"Error on user configuration file";return false;}
 
     buildMarkerInfoMap();
+}
+
+QString MAbstractManager::plotConfigFileName()
+{
+#ifdef ANDROID
+    return "/mnt/sdcard/Medica/cur.xml";
+#else
+    return m_applicationPath+"/cur.xml";
+#endif
 }
 
 
 
 bool MAbstractManager::buildConfigurationFile()
 {
-    qDebug()<<"qui";
+    //qDebug()<<"qui";
     Ancestry configPlot;//iniziamo col creare una classe vergine
     //aggiungo il campo graphs
     Ancestry *graph=configPlot.addChild(XML_GRAPHS);
-    qDebug()<<"qui";
-    if(graph==NULL){qCritical()<<"Could not create child";return false;}
-    qDebug()<<"qui";
+    //qDebug()<<"qui";
+    if(graph==NULL)
+        qCritical()<<"Could not create child";
+    //qDebug()<<"qui";
     //ok iniziamo con calma a scrivere qualcosa, peschiamo il numero totale di canali
     int32_t chanlNum=m_mng->GetChanNum();
     qDebug()<<"N° Canali: "<<chanlNum;
-    if(chanlNum==0){qCritical()<<"No channels in file";return false;}
+    if(chanlNum==0)
+        qCritical()<<"No channels in file";
     for(int32_t nc=0;nc<chanlNum;nc++)
     {//contiamo i grafici e popoliamo le mappe di associazione
         QString chanName=m_mng->GetChanName(nc);
@@ -81,20 +92,16 @@ bool MAbstractManager::buildConfigurationFile()
 
     foreach (QString graphName, m_chanInPlots.keys()) {//scorro per ogni grafico
         Ancestry *  graphN=graph->addChild(graphName);
-        if(graphN==NULL){qCritical()<<"Could not create child";return false;}
         Ancestry *  prop=graphN->addChild(XML_PROPERTIES);
         Ancestry *  tracks=graphN->addChild(XML_TRACKS);
-        if(prop==NULL){qCritical()<<"Could not create child";return false;}
-        if(tracks==NULL){qCritical()<<"Could not create child";return false;}
+
         //ho la certezza che i canali su ogni grafico hanno tutti le stesse proprietà grafiche per cui vado tranquillo
         QString chanName=m_chanInPlots[graphName].first();
         int32_t nc=m_dataChanNameMap[chanName];
         Ancestry *  axis=prop->addChild(XML_AXIS);
         Ancestry *  time=prop->addChild(XML_TIME);
         Ancestry *  network=prop->addChild(XML_NETWORK);
-        if(axis==NULL){qCritical()<<"Could not create child";return false;}
-        if(time==NULL){qCritical()<<"Could not create child";return false;}
-        if(network==NULL){qCritical()<<"Could not create child";return false;}
+
         axis->setAttribute("yAUOM",QString::number(m_mng->GetUdM(nc)));
         axis->setAttribute("yAbsoluteMax",QString::number(m_mng->GetSupLim(nc)));
         axis->setAttribute("yAbsoluteMin",QString::number(m_mng->GetInfLim(nc)));
@@ -106,13 +113,17 @@ bool MAbstractManager::buildConfigurationFile()
         foreach (QString chanName, m_chanInPlots[graphName])
         {//qui scrivo le proprietà delle tracce
             Ancestry * trkN=tracks->addChild(chanName);
-            if(trkN==NULL){qCritical()<<"Could not create child";return false;}
             trkN->setAttribute(ATT_THICK,"3");
             trkN->setAttribute(ATT_COLOR,"white");
         }
     }
     //ora salvo il file di configurazione come cur.xml
+#ifdef ANDROID
+    configPlot.saveToXML("/mnt/sdcard/Medica/cur.xml");
+#else
     configPlot.saveToXML(m_applicationPath+"/cur.xml");
+#endif
+
     qDebug()<<"Configuration file builded succesfully";
     return true;
 }

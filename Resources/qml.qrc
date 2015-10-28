@@ -1,7 +1,7 @@
 <RCC>
     <qresource prefix="/">
         <file>main.qml</file>
-        <file alias="UIqmldir">qmldir</file>
+        <file>MPlotModule</file>
     </qresource>
     <qresource prefix="/Forms">
         <file>AnalysisForm.qml</file>
@@ -30,6 +30,7 @@
     </qresource>
     <qresource prefix="/Scripts">
         <file>func.js</file>
+        <file>pippo.java</file>
     </qresource>
     <qresource prefix="/Models">
         <file>AlarmModel.qml</file>
@@ -49,11 +50,8 @@
         <file alias="Supervisor">Supervisor.jpg</file>
     </qresource>
     <qresource prefix="/Config">
-        <file>Config_Acq.xml</file>
         <file>Config_Alarms_it.xml</file>
-        <file>Config_BT.xml</file>
         <file>Config_Locale.xml</file>
-        <file>Config_SAU.xml</file>
         <file>Config_User.xml</file>
         <file>markers.xml</file>
     </qresource>
