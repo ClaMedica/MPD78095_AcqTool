@@ -51,16 +51,13 @@ INCLUDEPATH += CPP\
                 ../MGlobal \
                 ../DataFileManager \
                 CPP/TCP \
-                ../CellaBluetooth/Supervisor
+                ../CellaBluetooth/Supervisor \
+                ../SupeFlowBT
 
 # Default rules for deployment.
 include(deployment.pri)
 
-win32:CONFIG(release, debug|release): LIBS += -L$$PWD/../Build/DataBuild/release/ -lDatafileManager1
-else:win32:CONFIG(debug, debug|release): LIBS += -L$$PWD/../Build/DataBuild/debug/ -lDatafileManager1
 
-INCLUDEPATH += $$PWD/../Build/DataBuild/release
-DEPENDPATH += $$PWD/../Build/DataBuild/release
 
 contains(ANDROID_TARGET_ARCH,armeabi-v7a) {
 DEFINES += ANDROID
@@ -70,12 +67,15 @@ QT += androidextras
         $$PWD/../Build/Emulator/MPlotModule/libQmlPlotter.so
 
 ANDROID_PACKAGE_SOURCE_DIR = $$PWD/android-sources
-}
 
 unix:!macx: LIBS += -L$$PWD/../Build/Emulator/DataBuild/ -lDatafileManager
 
 INCLUDEPATH += $$PWD/../Build/Emulator/DataBuild
 DEPENDPATH += $$PWD/../Build/Emulator/DataBuild
+
+}
+
+
 
 #percorso tecnoideal
 rootPath = M:
@@ -87,5 +87,15 @@ win32{
     plugin.path = $${rootPath}\Lavoro\Software\Build\StandAlone
     plugin.files += $$shell_path($$OUT_PWD)\release\acqTool.exe
     INSTALLS += plugin
+
+win32:CONFIG(release, debug|release): LIBS += -L$$PWD/../Build/DataBuild/release/ -lDatafileManager1
+else:win32:CONFIG(debug, debug|release): LIBS += -L$$PWD/../Build/DataBuild/debug/ -lDatafileManager1
+
+INCLUDEPATH += $$PWD/../Build/DataBuild/release
+DEPENDPATH += $$PWD/../Build/DataBuild/release
 }
 
+unix:!macx: LIBS += -L$$PWD/../Build/DataFileManager/ -lDatafileManager
+
+INCLUDEPATH += $$PWD/../Build/DataFileManager
+DEPENDPATH += $$PWD/../Build/DataFileManager
