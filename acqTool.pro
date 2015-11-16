@@ -27,7 +27,8 @@ SOURCES += main.cpp \
     ../MGlobal/p7settingsmanager.cpp \
     CPP/mabstractmanager.cpp \
     CPP/native.cpp \
-    CPP/androidmanager.cpp
+    CPP/androidmanager.cpp \
+    ../MGlobal/MyMessageOutput.cpp
 
 HEADERS += \
     CPP/parametermanager.h \
@@ -51,7 +52,6 @@ INCLUDEPATH += CPP\
                 ../MGlobal \
                 ../DataFileManager \
                 CPP/TCP \
-                ../CellaBluetooth/Supervisor \
                 ../SupeFlowBT
 
 # Default rules for deployment.
