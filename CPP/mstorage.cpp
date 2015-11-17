@@ -115,13 +115,13 @@ bool MStorage::modifyElement(qulonglong __whoAmI, QVariantList __news)
     foreach(QString cat,m_allMap.keys())
     {
         if(!m_allMap[cat]->contains(elementToModify))
-        {qCritical()<<"Data corrupted";return false;}
+            continue;
 
         if(__news.length()==0)
         {//provvedo a cavarlo via
             delete elementToModify;
             if(!m_allMap[cat]->removeOne(elementToModify))
-            {qCritical()<<"Data corrupted";return false;}
+                qCritical()<<"Data corrupted";
         }
         else
         {//provvedo a modificarlo
