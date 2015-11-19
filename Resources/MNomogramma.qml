@@ -1,0 +1,346 @@
+import QtQuick 2.0
+import Managers 1.0
+import MPlotModule 1.0
+
+
+Rectangle {
+    id: rootPlot
+    property var traksToDraw:[]
+    property int xMin: 0
+    property int yMin: 0
+    property int xMax: 100
+    property int yMax: 100
+
+    property var tracksColors: []
+    property var tracksWidth: [1,1,1,1,1,1,1]
+    property string nome: "nome"
+
+    property string udmY: "left"
+    property string udmX: "bottom"
+
+    property double xPoint: 10
+    property double yPoint: 30
+
+    property string colorEsterno: "grey"
+    property string colorTesti: "black"
+    property string colorLabelAssi: "white"
+    property string colorGriglia: "grey"
+
+    border.width: 1
+
+    color: "lightgrey"
+    border.color: "black"
+
+    function drawTracks()
+    {
+        var l=[]
+        var index=0
+        var trackIndex=0
+
+        for(var i=0;i<traksToDraw.length;i++)
+        {
+            if(traksToDraw[i]==="$Track")
+            {
+                l=[];
+                index=0;
+                continue;
+            }
+            if(traksToDraw[i]==="&Track")
+            {
+                plotter.drawTrack(l);
+                trackIndex++
+                continue
+            }
+            //inizia la lettura
+            l[index]=traksToDraw[i]
+            index++
+        }
+    }
+
+
+    function updateY(v)
+    {
+        var valPer=v/yMax
+        point.y =(rCenter.height*(1-valPer))-point.height/2
+    }
+
+    onYPointChanged: updateY(yPoint)
+
+    function updateX(v)
+    {
+        var valPer=v/xMax
+        point.x =(rCenter.width*valPer)-point.width/2
+    }
+
+    onXPointChanged: updateX(xPoint)
+
+
+    Rectangle{
+        id: rRightMargin
+        color: colorEsterno
+        width: 20
+        anchors.top: rootPlot.top
+        anchors.bottom: rootPlot.bottom
+        anchors.right: rootPlot.right
+
+    }
+
+    Rectangle{
+        id: rTopMargin
+        color: colorEsterno
+        height: 30
+        anchors.top: rootPlot.top
+        anchors.left: rootPlot.left
+        anchors.right: rootPlot.right
+
+        Text {
+            text: nome
+            color: colorTesti
+            x: rootPlot.width/2 - nome.length*4
+            y: 10
+            font {
+                family: "Arial"
+                pointSize: 8
+            }
+        }
+    }
+
+    Rectangle{
+        id: rLeftMargin
+        color: colorEsterno
+        width: 50
+        anchors.bottom: rootPlot.bottom
+        anchors.top: rootPlot.top
+        anchors.left: rootPlot.left
+        Text {
+            text: udmY
+            color: colorTesti
+            x: 10
+            y: rootPlot.height/2 + udmY.length*4
+            font {
+                family: "Arial"
+                pointSize: 8
+            }
+            transform: Rotation {
+                angle: -90
+            }
+        }
+    }
+
+    Rectangle{
+        id: rBottomMargin
+        color: colorEsterno
+        height: 50
+        anchors.bottom: rootPlot.bottom
+        anchors.left: rootPlot.left
+        anchors.right: rootPlot.right
+        Text {
+            text: udmX
+            color: colorTesti
+            x: rootPlot.width/2 - udmX.length*4
+            y: 20
+            font {
+                family: "Arial"
+                pointSize: 8
+            }
+        }
+    }
+
+
+    DVAxes{ //Y AXIS LABELS
+        id: yAxisLabels
+        anchors.bottom: rootPlot.bottom
+        anchors.top: rootPlot.top
+        anchors.right: yAxisNotches.left
+        anchors.left: rLeftMargin.right
+        topMargin: 30
+        bottomMargin: 50
+        major:rootPlot.yMax/10 +1
+        minor:0
+        max:rootPlot.yMax
+        min:rootPlot.yMin
+        // Y Axis General properties
+        format:            AxisSettings.EFORMAT_FLOAT
+        decimalsMaj:       1
+        //Y Proprietà del testo Major
+        fontMajFamily:     "Arial"
+        fontMajColor:      colorLabelAssi
+        fontMajSize:       8
+        textMajDist:       2
+        textMajVisible:    true
+        //Y Proprietà del testo Minor
+        textMinDist:       0
+        textMinVisible:    true
+        // Y Axis unit of measure
+        unitOfMeasureRotation:       -90
+    }
+
+    PlotGrid2D{ //Y AXIS NOTECHES
+        id: yAxisNotches
+        visible: true
+        anchors.top: rTopMargin.bottom
+        anchors.bottom: rBottomMargin.top
+        anchors.right: rCenter.left
+        width: 7
+        anchors.margins:0
+
+        lineColor: "white"
+        lineWidth:  plotter_grid.lineWidth
+        stippleEn: false
+
+        lineColorSub: "white"
+        lineWidthSub: plotter_grid.lineWidthSub
+        stippleEnSub: false
+
+        xMax: 1
+        xMin: 0
+        yMax: rootPlot.yMax
+        yMin: rootPlot.yMin
+
+        numXlines: 0
+        numXlinesSub: 0
+        numYlines: plotter_grid.numYlines
+        numYlinesSub: plotter_grid.numYlinesSub
+
+        clip: true
+    }
+
+    DHAxes{  //X AXIS LABELS
+        id: xAxisLabels
+        anchors.bottom: rootPlot.bottom
+        anchors.top: xAxisNotches.bottom
+        anchors.right: rootPlot.right
+        anchors.left: rootPlot.left
+        leftMargin:50
+        rightMargin:20
+        major: rootPlot.xMax/100 +1
+        minor: 0
+        max: plotter.xMax
+        min: plotter.xMin
+        // X Axis General properties
+        format:             AxisSettings.EFORMAT_FLOAT
+        decimalsMaj:        1
+        fontMajColor:      colorLabelAssi
+        fontMajSize:       8
+        textMajDist:       2
+        textMajVisible:    true
+        unitOfMeasureVisible:        false
+    }
+
+    PlotGrid2D{ //X AXIS NOTECHES
+        id: xAxisNotches
+        visible: true
+        anchors.top: rCenter.bottom
+        anchors.right: rRightMargin.left
+        anchors.left: rLeftMargin.right
+        height: 7
+        anchors.margins:0
+
+        lineColor: "white"
+        lineWidth: plotter_grid.lineWidth
+        stippleEn: false
+
+        lineColorSub: "white"
+        lineWidthSub:  plotter_grid.lineWidthSub
+        stippleEnSub: false
+
+        xMax: plotter.xMax
+        xMin: plotter.xMin
+        yMax: 1
+        yMin: 0
+
+        numXlines: plotter_grid.numXlines
+        numXlinesSub: plotter_grid.numXlinesSub
+        numYlines: 0
+        numYlinesSub: 0
+        clip: true
+    }
+
+    Rectangle{
+        id: rCenter
+        color: rootPlot.color
+
+        anchors.bottom: rBottomMargin.top
+        anchors.top: rTopMargin.bottom
+        anchors.left: rLeftMargin.right
+        anchors.right: rRightMargin.left
+
+        //prima la griglia
+        PlotGrid2D{
+            id: plotter_grid
+            visible: true
+            anchors.fill: parent
+            anchors.margins:0
+            stippleEn: false
+            stippleEnSub: false
+
+            xMax: rootPlot.xMax
+            xMin: rootPlot.xMin
+            yMax: rootPlot.yMax
+            yMin: rootPlot.yMin
+
+            clip: true
+
+            lineColor: colorGriglia
+            lineColorSub:colorGriglia
+
+            numXlines:   rootPlot.xMax/100 + 1
+            numYlines:   rootPlot.yMax/10 + 1
+            numXlinesSub:2
+            numYlinesSub:1
+        }
+
+        //tracce
+        Plot2DStationary {
+            id: plotter
+            anchors.fill: parent
+            anchors.margins: 2
+            clip: true
+            plotName: rootPlot.nome
+            trackColors:rootPlot.tracksColors
+            lineWidth: rootPlot.tracksWidth
+            xMax: rootPlot.xMax
+            xMin: rootPlot.xMin
+            yMax: rootPlot.yMax
+            yMin: rootPlot.yMin
+
+            xAbsoluteMax: rootPlot.xMax
+            xAbsoluteMin: rootPlot.xMin
+            yAbsoluteMax: rootPlot.yMax
+            yAbsoluteMin: rootPlot.yMin
+        }
+
+        Rectangle{
+            id: point
+            color: "skyblue"
+            border.color: "slateblue"
+            height: 10
+            width: 10
+        }
+
+
+        Rectangle{
+            id:lineaO
+            height:1
+            width:rCenter.width
+            anchors.left:rCenter.left
+            y: point.y + point.height/2
+            x: 0
+            color: "slateblue"
+            opacity: 1
+        }
+
+        Rectangle{
+            id:lineaV
+            height: rCenter.height
+            width: 1
+            anchors.bottom: rCenter.bottom
+            y: 0
+            x: point.x + point.width/2
+            color: "slateblue"
+            opacity: 1
+        }
+
+    }
+}
+

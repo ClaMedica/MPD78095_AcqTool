@@ -8,6 +8,7 @@
         <file>HomeForm.qml</file>
         <file>RealTimeForm.qml</file>
         <file>SupervisorForm.qml</file>
+        <file>ResultForm.qml</file>
     </qresource>
     <qresource prefix="/Components">
         <file>MAlarm.qml</file>
@@ -27,6 +28,9 @@
         <file>Parameter.qml</file>
         <file>ParameterBox.qml</file>
         <file>Player.qml</file>
+        <file>MAnaTableView.qml</file>
+        <file>MAnaButton.qml</file>
+        <file>MNomogramma.qml</file>
     </qresource>
     <qresource prefix="/Scripts">
         <file>func.js</file>
@@ -54,6 +58,7 @@
         <file>Config_Locale.xml</file>
         <file>Config_User.xml</file>
         <file>markers.xml</file>
+        <file>ParAna.xml</file>
     </qresource>
     <qresource prefix="/Dialog">
         <file>VolResDlg.qml</file>

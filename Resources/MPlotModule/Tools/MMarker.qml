@@ -22,7 +22,7 @@ Rectangle{
     property real realX:x+icon.width/2
 
     property bool deselectOnRelease:false
-    property var fullCode:[modM.family,modM.name,modM.code]
+    property real whoAmI:modM.whoAmI
 
 
     signal modifyMe

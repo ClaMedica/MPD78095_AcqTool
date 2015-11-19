@@ -1,0 +1,215 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Configuration Ver="03.00.00">
+  <Analysis>
+    <AnaType Type="102" Desc="Flowmetry">
+      <Q>
+        <StartTh>
+          <value>0</value>
+          <udm>ml/sec</udm>
+          <Desc>Start Threshold &gt;</Desc>
+          <FullDesc>Threshold to determine flow start</FullDesc>
+        </StartTh>
+        <AmpTh>
+          <value>1</value>
+          <udm>ml/sec</udm>
+          <Desc>Amplitude Threshold &gt;</Desc>
+          <FullDesc>Minimum amplitude the flow must reach to be considered valid</FullDesc>
+        </AmpTh>
+        <DurTh>
+          <value>0.2</value>
+          <udm>s</udm>
+          <Desc>Duration Threshold &gt;</Desc>
+          <FullDesc>Minimum duration the flow must reach to be considered valid</FullDesc>
+        </DurTh>
+      </Q>
+    </AnaType>
+    <AnaType Type="104" Desc="Cistometry (filling)">
+      <Q>
+        <StartTh>
+          <value>0</value>
+          <udm>ml/sec</udm>
+          <Desc>Start Threshold &gt;</Desc>
+          <FullDesc>Threshold to determine flow start</FullDesc>
+        </StartTh>
+        <AmpTh>
+          <value>2</value>
+          <udm>cmH2O</udm>
+          <Desc>Amplitude Threshold &gt;</Desc>
+          <FullDesc>Minimum amplitude the flow must reach to be considered valid</FullDesc>
+        </AmpTh>
+        <DurTh>
+          <value>0.5</value>
+          <udm>s</udm>
+          <Desc>Duration Threshold &gt;</Desc>
+          <FullDesc>Minimu duration the flow must reach to be considered valid</FullDesc>
+        </DurTh>
+      </Q>
+    </AnaType>
+    <AnaType Type="103" Desc="Cistometry (voiding)">
+      <p>
+        <StartTh>
+          <value>0</value>
+          <udm>cmH2O</udm>
+          <Desc>Start Threshold &gt;</Desc>
+          <FullDesc>Threshold to determine contraction start</FullDesc>
+        </StartTh>
+        <AmpTh>
+          <value>1</value>
+          <udm>cmH2O</udm>
+          <Desc>Amplitude Threshold &gt;</Desc>
+          <FullDesc>Minimum amplitude the contraction must reach to be considered valid </FullDesc>
+        </AmpTh>
+        <DurTh>
+          <value>0.2</value>
+          <udm>s</udm>
+          <Desc>Duration Threshold &gt;</Desc>
+          <FullDesc>Minimum duration the contraction must have to be considered valid</FullDesc>
+        </DurTh>
+      </p>
+      <Q>
+        <StartTh>
+          <value>0</value>
+          <udm>ml/sec</udm>
+          <Desc>Start Threshold &gt;</Desc>
+          <FullDesc>Threshold to determine flow start</FullDesc>
+        </StartTh>
+        <AmpTh>
+          <value>2</value>
+          <udm>ml/sec</udm>
+          <Desc>Amplitude Threshold &gt;</Desc>
+          <FullDesc>Minimum amplitude the flow must reach to be considered valid</FullDesc>
+        </AmpTh>
+        <DurTh>
+          <value>0.5</value>
+          <udm>s</udm>
+          <Desc>Duration Threshold &gt;</Desc>
+          <FullDesc>Minimu duration the flow must reach to be considered valid</FullDesc>
+        </DurTh>
+      </Q>
+    </AnaType>
+    <AnaType Type="101" Desc="Static UPP">
+      <p>
+        <StartTh>
+          <value>2</value>
+          <udm>cmH2O</udm>
+          <Desc>Start Threshold &gt;</Desc>
+          <FullDesc>Threshold to determine profile start</FullDesc>
+        </StartTh>
+        <AmpTh>
+          <value>10</value>
+          <udm>cmH2O</udm>
+          <Desc>Amplitude Threshold &gt;</Desc>
+          <FullDesc>Minimum amplitude the profile must reach to be considered valid </FullDesc>
+        </AmpTh>
+        <DurTh>
+          <value>5</value>
+          <udm>mm</udm>
+          <Desc>Length Threshold &gt;</Desc>
+          <FullDesc>Minimum duration the profile must have to be considered valid</FullDesc>
+        </DurTh>
+      </p>
+    </AnaType>
+    <AnaType Type="100" Desc="Dynamic UPP">
+      <p>
+        <StartTh>
+          <value>2</value>
+          <udm>cmH2O</udm>
+          <Desc>Start Threshold &gt;</Desc>
+          <FullDesc>Threshold to determine contraction start</FullDesc>
+        </StartTh>
+        <AmpTh>
+          <value>20</value>
+          <udm>cmH2O</udm>
+          <Desc>Amplitude Threshold &gt;</Desc>
+          <FullDesc>Minimum amplitude the contraction must reach to be considered valid </FullDesc>
+        </AmpTh>
+        <DurTh>
+          <value>0.2</value>
+          <udm>mm</udm>
+          <Desc>Length Threshold &gt;</Desc>
+          <FullDesc>Minimum duration the cntraction must have to be considered valid</FullDesc>
+        </DurTh>
+      </p>
+    </AnaType>
+    <AnaType Type="108" Desc="Leak Point Pressure">
+      <p>
+        <TmBef>
+          <value>10</value>
+          <udm>s</udm>
+          <Desc>Time before</Desc>
+          <FullDesc />
+        </TmBef>
+        <TmAft>
+          <value>2</value>
+          <udm>s</udm>
+          <Desc>Time After</Desc>
+          <FullDesc />
+        </TmAft>
+        <lpMet>
+          <value>1</value>
+          <udm>/</udm>
+          <Desc>1=standard (maximum) 2=Marker</Desc>
+          <FullDesc />
+        </lpMet>
+        <TmBas>
+          <value>60</value>
+          <udm>s</udm>
+          <Desc>Interval to calculate detrusor basal pressure</Desc>
+          <FullDesc />
+        </TmBas>
+        <TmRil>
+          <value>10</value>
+          <udm>s</udm>
+          <Desc>Interval of init detrusor relaxation</Desc>
+          <FullDesc />
+        </TmRil>
+        <ThAmpRil>
+          <value>5</value>
+          <udm>cmH2O</udm>
+          <Desc>Amplitude threshold of relaxation</Desc>
+          <FullDesc />
+        </ThAmpRil>
+        <ThDurRil>
+          <value>1</value>
+          <udm>cmH2O</udm>
+          <Desc>Duration threshold of relaxation</Desc>
+          <FullDesc />
+        </ThDurRil>
+      </p>
+    </AnaType>
+    <AnaType Type="110" Desc="Detrusor Overactivity">
+      <p>
+        <TmBef>
+          <value>10</value>
+          <udm>s</udm>
+          <Desc>Time Before</Desc>
+          <FullDesc />
+        </TmBef>
+        <TmAft>
+          <value>2</value>
+          <udm>s</udm>
+          <Desc>Time After</Desc>
+          <FullDesc />
+        </TmAft>
+        <StartTh>
+          <value>5</value>
+          <udm>cmH2O</udm>
+          <Desc>Start Threshold &gt;</Desc>
+          <FullDesc />
+        </StartTh>
+        <DurTh>
+          <value>0.5</value>
+          <udm>s</udm>
+          <Desc>Minimum Duration &gt;</Desc>
+          <FullDesc />
+        </DurTh>
+        <AmpTh>
+          <value>10</value>
+          <udm>cmH2O</udm>
+          <Desc>Minimum Amplitude &gt;</Desc>
+          <FullDesc />
+        </AmpTh>
+      </p>
+    </AnaType>
+  </Analysis>
+</Configuration>

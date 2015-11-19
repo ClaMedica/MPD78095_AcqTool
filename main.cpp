@@ -10,6 +10,7 @@
 #include <modelmanager.h>
 #include <macqmanager.h>
 #include <mdatamanager.h>
+#include <mflowdatas.h>
 #include <QProcess>
 #include <QtGlobal>
 #include <QtMessageHandler>
@@ -58,8 +59,11 @@ int main(int argc, char *argv[])
     qmlRegisterType<ModelManager>("Managers",1,0,"ModelManager");
     qmlRegisterType<MAcqManager>("Managers",1,0,"MAcqManager");
     qmlRegisterType<MDataManager>("Managers",1,0,"MDataManager");
-
     qmlRegisterType<P7Settings>("Managers",1,0,"MSettings");
+
+    qmlRegisterUncreatableType<mflowdatas>("Managers",1,0,"mflowdata","error on anaFlwAdv creation");
+    qmlRegisterUncreatableType<mflowdatasModel>("Managers",1,0,"mflowdatamodel","error on anaFlwAdv creation");
+    qmlRegisterUncreatableType<Nomogramma>("Managers",1,0,"nomogramma","error on Nomogramma creation");
 
     QQmlApplicationEngine engine;
 
@@ -76,6 +80,7 @@ int main(int argc, char *argv[])
     engine.rootContext()->setContextProperty(QLatin1String("platform"),"win");
 #endif
     engine.rootContext()->setContextProperty("settings",&g_P7SettingsManager);
+
     qDebug()<<engine.importPathList();
     engine.load(QUrl(QStringLiteral("qrc:/main.qml")));
     qDebug()<<"engine caricato";

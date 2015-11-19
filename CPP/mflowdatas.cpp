@@ -1,0 +1,913 @@
+#include "mflowdatas.h"
+#include <QtMath>
+
+mflowdatas::mflowdatas(QObject *parent) : QObject(parent)
+{
+    m_waitingTime = DUMMYVALUE;
+    m_qMax = DUMMYVALUE;
+    m_qAve = DUMMYVALUE;
+    m_timeAtV3 = DUMMYVALUE;
+    m_timeAtV2 = DUMMYVALUE;
+    m_timeAtQmax = DUMMYVALUE;
+    m_time90 = DUMMYVALUE;
+    m_flowTime = DUMMYVALUE;
+    m_descTime = DUMMYVALUE;
+    m_voidingTime = DUMMYVALUE;
+    m_volAtQqmax = DUMMYVALUE;
+    m_voidedVolume = DUMMYVALUE;
+    m_acceleration = DUMMYVALUE;
+    m_residualVolume = DUMMYVALUE;
+    m_vDetMax = DUMMYVALUE;
+    m_cQ = DUMMYVALUE;
+
+    m_datasInfo = new mflowdatasModel();
+
+    m_liverpoolMax = new Nomogramma("flowmetry",G_LIVERPOOL_MAX);
+    m_liverpoolAve = new Nomogramma("flowmetry",G_LIVERPOOL_AVE);
+}
+mflowdatas::~mflowdatas()
+{
+    //delete m_datasInfo;
+    //delete m_liverpoolMax;
+    //delete m_liverpoolAve;
+
+}
+
+void mflowdatas::buildTable()
+{
+    m_datasInfo->setData(0,"descr",tr("Waiting Time (sec)"));
+    m_datasInfo->setData(0,"value",QString::number(getWaitingTime(),'f',1));
+
+    m_datasInfo->setData(1,"descr",tr("Maximum flow rate (ml/sec)"));
+    m_datasInfo->setData(1,"value",QString::number(getQMax(),'f',1));
+
+    m_datasInfo->setData(2,"descr",tr("Average flow rate (ml/sec)"));
+    m_datasInfo->setData(2,"value",QString::number(getQAve(),'f',1));
+
+    m_datasInfo->setData(3,"descr",tr("Time to maximun flow (sec)"));
+    m_datasInfo->setData(3,"value",QString::number(getTimeAtQmax(),'f',1));
+
+    m_datasInfo->setData(4,"descr",tr("Time between 5% and 95% (sec)"));
+    m_datasInfo->setData(4,"value",QString::number(getTime90(),'f',1));
+
+    m_datasInfo->setData(5,"descr",tr("Flow time (sec)"));
+    m_datasInfo->setData(5,"value",QString::number(getFlowTime(),'f',1));
+
+    m_datasInfo->setData(6,"descr",tr("Descent time (sec"));
+    m_datasInfo->setData(6,"value",QString::number(getDescTime(),'f',1));
+
+    m_datasInfo->setData(7,"descr",tr("Voiding time (sec)"));
+    m_datasInfo->setData(7,"value",QString::number(getVoidingTime(),'f',1));
+
+    m_datasInfo->setData(8,"descr",tr("Volume to maxinum flow (ml)"));
+    m_datasInfo->setData(8,"value",QString::number(getVolAtQqmax(),'f',1));
+
+    m_datasInfo->setData(9,"descr",tr("Voiding volume (ml)"));
+    m_datasInfo->setData(9,"value",QString::number(getVoidedVolume(),'f',1));
+
+    m_datasInfo->setData(10,"descr",tr("Corrected maximun flow (ml)"));
+    m_datasInfo->setData(10,"value",QString::number(getCQ(),'f',1));
+
+    m_datasInfo->setData(11,"descr",tr("Flow acceleration (ml/sec^2))"));
+    m_datasInfo->setData(11,"value",QString::number(getAcceleration(),'f',1));
+
+    m_datasInfo->setData(12,"descr",tr("Maximun contraction speed (mm/sec)"));
+    m_datasInfo->setData(12,"value",QString::number(getVDetMax(),'f',1));
+
+    m_datasInfo->setData(13,"descr",tr("Residual volume (ml)"));
+    m_datasInfo->setData(13,"value",QString::number(getResidualVolume(),'f',1));
+
+}
+
+void mflowdatas::buildNomogrammi(bool __sex, int __age)
+{
+    //Liverpool MAX
+    m_liverpoolMax->setTitle(tr("Liverpool (Q Max)"));
+    m_liverpoolMax->setUnitx(tr("Q (ml/sec)"));
+    m_liverpoolMax->setUnity(tr("Vol. (ml)"));
+    m_liverpoolMax->setXmin(0);
+    m_liverpoolMax->setYmin(0);
+    m_liverpoolMax->setXmax(600);
+    if (__sex)
+        m_liverpoolMax->setYmax(80);
+    else
+        m_liverpoolMax->setYmax(60);
+
+    m_liverpoolMax->setDatoX(getVoidedVolume());
+    m_liverpoolMax->setDatoY(getQMax());
+
+   // m_liverpoolMax->setNumLines(7);
+
+    //da sistemare
+    int N_LIVERPOOL = 24;
+    int N_LIVERPOOL_CENT = 5;
+    double Step_Liverpool = m_liverpoolMax->getXmax() / N_LIVERPOOL;//25
+
+    QVector<double> yValue;
+    yValue.append(0);
+    for (int i=0; i<N_LIVERPOOL; i++)
+    {
+        if (!__sex)
+        {
+            if (__age < 50)
+                //Liverpool uomini età < 50
+                yValue.append(qPow((2.37 + 0.18 * qSqrt((i+1) * Step_Liverpool) - 0.014 * 35),2));
+            else
+                //Liverpool uomini >= 50
+                yValue.append(qPow((2.37 + 0.18 * qSqrt((i+1) * Step_Liverpool) - 0.014 * 60),2));
+        }
+        else
+            //Liverpool donne
+            yValue.append(qPow(2.718282,(0.511 + 0.505 * qLn((i+1) * Step_Liverpool))));
+    }
+
+
+    int pos = 0;
+    double midValue = 0, valueToAdd = 0;
+    for (int i=0; i< m_liverpoolMax->getXmax(); i++)
+    {
+        if (i==(Step_Liverpool*pos))
+        {
+            m_liverpoolMax->addToLiney(0,yValue.at(pos));
+            midValue = (yValue.at(pos+1) - yValue.at(pos))/Step_Liverpool;
+            valueToAdd = midValue;
+            pos++;
+        }
+        else
+        {
+            m_liverpoolMax->addToLiney(0,yValue.at(pos-1)+valueToAdd);
+            valueToAdd=valueToAdd+midValue;
+        }
+
+    }
+
+    QMap<int,QVector<double> > yVal,xVal;
+    xVal[0].append(0);
+    yVal[0].append(0);
+    xVal[1].append(0);
+    yVal[1].append(0);
+    xVal[2].append(0);
+    yVal[2].append(0);
+    xVal[3].append(0);
+    yVal[3].append(0);
+    xVal[4].append(0);
+    yVal[4].append(0);
+    xVal[5].append(0);
+    yVal[5].append(0);
+    ReadLiverpoolParameter(true,__sex,__age);
+    for (int i=0; i<=N_LIVERPOOL_CENT; i++)
+    {
+        xVal[0].append(m_arrLineX1.at(i));
+        yVal[0].append(m_arrLineY1.at(i));
+
+        xVal[1].append(m_arrLineX2.at(i));
+        yVal[1].append(m_arrLineY2.at(i));
+
+        xVal[2].append(m_arrLineX3.at(i));
+        yVal[2].append(m_arrLineY3.at(i));
+
+        xVal[3].append(m_arrLineX4.at(i));
+        yVal[3].append(m_arrLineY4.at(i));
+
+        xVal[4].append(m_arrLineX5.at(i));
+        yVal[4].append(m_arrLineY5.at(i));
+
+        xVal[5].append(m_arrLineX6.at(i));
+        yVal[5].append(m_arrLineY6.at(i));
+    }
+
+
+    for (int j=0; j<xVal[0].length()-1; j++)
+    {
+        pos = 0;
+        midValue = 0;
+        valueToAdd = 0;
+        for (int i=0; i< m_liverpoolMax->getXmax(); i++)
+        {
+            if (i==xVal[j].at(pos))
+            {
+                m_liverpoolMax->addToLiney(j+1,yVal[j].at(pos));
+                midValue = (yVal[j].at(pos+1) - yVal[j].at(pos))/(xVal[j].at(pos+1) - xVal[j].at(pos));
+                valueToAdd = midValue;
+                pos++;
+            }
+            else
+            {
+                m_liverpoolMax->addToLiney(j+1,yVal[j].at(pos-1)+valueToAdd);
+                valueToAdd=valueToAdd+midValue;
+            }
+
+        }
+    }
+
+    //Liverpool AVE
+    m_liverpoolAve->setTitle(tr("Liverpool (Q Ave)"));
+    m_liverpoolAve->setUnitx(tr("Q (ml/sec)"));
+    m_liverpoolAve->setUnity(tr("Vol. (ml)"));
+    m_liverpoolAve->setXmin(0);
+    m_liverpoolAve->setYmin(0);
+    m_liverpoolAve->setXmax(600);
+    m_liverpoolAve->setYmax(40);
+    m_liverpoolAve->setDatoX(getVoidedVolume());
+    m_liverpoolAve->setDatoY(getQAve());
+
+    yValue.clear();
+    yValue.append(0);
+    for (int i=0; i<N_LIVERPOOL; i++)
+    {
+        m_liverpoolAve->addToLinex(1,(i+1) * Step_Liverpool);
+        if (!__sex)
+        {
+            if (__age < 50)
+                //Liverpool uomini età < 50
+                yValue.append(qPow((1.8 + 0.14 * qSqrt((i+1) * Step_Liverpool) - 0.011 * 35),2));
+            else
+                //Liverpool uomini >= 50
+                yValue.append(qPow((1.8 + 0.14 * qSqrt((i+1) * Step_Liverpool) - 0.011 * 60),2));
+        }
+        else
+        {
+            //Liverpool donne
+            yValue.append( qPow((-0.921 + 0.869 * qLn((i+1) * Step_Liverpool)),2));
+        }
+    }
+
+    pos = 0;
+    midValue = 0;
+    valueToAdd = 0;
+    for (int i=0; i< m_liverpoolAve->getXmax(); i++)
+    {
+        if (i==(Step_Liverpool*pos))
+        {
+            m_liverpoolAve->addToLiney(0,yValue.at(pos));
+            midValue = (yValue.at(pos+1) - yValue.at(pos))/Step_Liverpool;
+            valueToAdd = midValue;
+            pos++;
+        }
+        else
+        {
+            m_liverpoolAve->addToLiney(0,yValue.at(pos-1)+valueToAdd);
+            valueToAdd=valueToAdd+midValue;
+        }
+
+    }
+
+    xVal.clear();
+    yVal.clear();
+    xVal[0].append(0);
+    yVal[0].append(0);
+    xVal[1].append(0);
+    yVal[1].append(0);
+    xVal[2].append(0);
+    yVal[2].append(0);
+    xVal[3].append(0);
+    yVal[3].append(0);
+    xVal[4].append(0);
+    yVal[4].append(0);
+    xVal[5].append(0);
+    yVal[5].append(0);
+
+    ReadLiverpoolParameter(false,__sex,__age);
+    for (int i=0; i<=N_LIVERPOOL_CENT; i++)
+    {
+        xVal[0].append(m_arrLineX1.at(i));
+        yVal[0].append(m_arrLineY1.at(i));
+
+        xVal[1].append(m_arrLineX2.at(i));
+        yVal[1].append(m_arrLineY2.at(i));
+
+        xVal[2].append(m_arrLineX3.at(i));
+        yVal[2].append(m_arrLineY3.at(i));
+
+        xVal[3].append(m_arrLineX4.at(i));
+        yVal[3].append(m_arrLineY4.at(i));
+
+        xVal[4].append(m_arrLineX5.at(i));
+        yVal[4].append(m_arrLineY5.at(i));
+
+        xVal[5].append(m_arrLineX6.at(i));
+        yVal[5].append(m_arrLineY6.at(i));
+    }
+
+    for (int j=0; j<xVal[0].length()-1; j++)
+    {
+        pos = 0;
+        midValue = 0;
+        valueToAdd = 0;
+        for (int i=0; i< m_liverpoolAve->getXmax(); i++)
+        {
+            if (i==xVal[j].at(pos))
+            {
+                m_liverpoolAve->addToLiney(j+1,yVal[j].at(pos));
+                midValue = (yVal[j].at(pos+1) - yVal[j].at(pos))/(xVal[j].at(pos+1) - xVal[j].at(pos));
+                valueToAdd = midValue;
+                pos++;
+            }
+            else
+            {
+                m_liverpoolAve->addToLiney(j+1,yVal[j].at(pos-1)+valueToAdd);
+                valueToAdd=valueToAdd+midValue;
+            }
+        }
+    }
+}
+
+void mflowdatas::ReadLiverpoolParameter(bool __flowMax, bool __sex, int __age)
+{
+    m_arrLineX1.clear();
+    m_arrLineX2.clear();
+    m_arrLineX3.clear();
+    m_arrLineX4.clear();
+    m_arrLineX5.clear();
+    m_arrLineX6.clear();
+
+    m_arrLineY1.clear();
+    m_arrLineY2.clear();
+    m_arrLineY3.clear();
+    m_arrLineY4.clear();
+    m_arrLineY5.clear();
+    m_arrLineY6.clear();
+
+    if (__flowMax && !__sex && __age < 50)
+    {
+        //Qmax, pazienti maschi età < 50
+        //5th Centile
+        m_arrLineX1.append(20);
+        m_arrLineX1.append(60);
+        m_arrLineX1.append(127);
+        m_arrLineX1.append(200);
+        m_arrLineX1.append(300);
+        m_arrLineX1.append(600);
+
+        m_arrLineY1.append(2);
+        m_arrLineY1.append(4.2);
+        m_arrLineY1.append(7.5);
+        m_arrLineY1.append(11);
+        m_arrLineY1.append(15.5);
+        m_arrLineY1.append(27.5);
+
+        //10th Centile
+        m_arrLineX2.append(20);
+        m_arrLineX2.append(60);
+        m_arrLineX2.append(127);
+        m_arrLineX2.append(200);
+        m_arrLineX2.append(300);
+        m_arrLineX2.append(600);
+
+        m_arrLineY2.append(3);
+        m_arrLineY2.append(5.5);
+        m_arrLineY2.append(9);
+        m_arrLineY2.append(13);
+        m_arrLineY2.append(7.5);
+        m_arrLineY2.append(29.5);
+
+        //25th centile
+        m_arrLineX3.append(20);
+        m_arrLineX3.append(60);
+        m_arrLineX3.append(127);
+        m_arrLineX3.append(200);
+        m_arrLineX3.append(300);
+        m_arrLineX3.append(600);
+
+        m_arrLineY3.append(4.5);
+        m_arrLineY3.append(8);
+        m_arrLineY3.append(12);
+        m_arrLineY3.append(16);
+        m_arrLineY3.append(21);
+        m_arrLineY3.append(35);
+
+        //75th centile
+        m_arrLineX4.append(20);
+        m_arrLineX4.append(60);
+        m_arrLineX4.append(127);
+        m_arrLineX4.append(200);
+        m_arrLineX4.append(300);
+        m_arrLineX4.append(600);
+
+        m_arrLineY4.append(10);
+        m_arrLineY4.append(14.5);
+        m_arrLineY4.append(20);
+        m_arrLineY4.append(25);
+        m_arrLineY4.append(31);
+        m_arrLineY4.append(48);
+
+        //90th centile
+        m_arrLineX5.append(20);
+        m_arrLineX5.append(60);
+        m_arrLineX5.append(127);
+        m_arrLineX5.append(200);
+        m_arrLineX5.append(300);
+        m_arrLineX5.append(600);
+
+        m_arrLineY5.append(13.5);
+        m_arrLineY5.append(18);
+        m_arrLineY5.append(24);
+        m_arrLineY5.append(29.5);
+        m_arrLineY5.append(36.5);
+        m_arrLineY5.append(54);
+
+        //95th centile
+        m_arrLineX6.append(20);
+        m_arrLineX6.append(60);
+        m_arrLineX6.append(127);
+        m_arrLineX6.append(200);
+        m_arrLineX6.append(300);
+        m_arrLineX6.append(600);
+
+        m_arrLineY6.append(15.5);
+        m_arrLineY6.append(20.5);
+        m_arrLineY6.append(26.5);
+        m_arrLineY6.append(32.5);
+        m_arrLineY6.append(39);
+        m_arrLineY6.append(58);
+
+    }
+    if (!__flowMax && !__sex && __age < 50)
+    {
+        //Qave, pazienti maschi età < 50
+        //5th Centile
+        m_arrLineX1.append(20);
+        m_arrLineX1.append(50);
+        m_arrLineX1.append(100);
+        m_arrLineX1.append(200);
+        m_arrLineX1.append(300);
+        m_arrLineX1.append(600);
+
+        m_arrLineY1.append(1.5);
+        m_arrLineY1.append(2.3);
+        m_arrLineY1.append(3.9);
+        m_arrLineY1.append(6.5);
+        m_arrLineY1.append(9);
+        m_arrLineY1.append(16.1);
+
+        //10th Centile
+        m_arrLineX2.append(20);
+        m_arrLineX2.append(50);
+        m_arrLineX2.append(100);
+        m_arrLineX2.append(200);
+        m_arrLineX2.append(300);
+        m_arrLineX2.append(600);
+
+        m_arrLineY2.append(1.9);
+        m_arrLineY2.append(3);
+        m_arrLineY2.append(4.7);
+        m_arrLineY2.append(7.5);
+        m_arrLineY2.append(10);
+        m_arrLineY2.append(17.8);
+
+        //25th centile
+        m_arrLineX3.append(20);
+        m_arrLineX3.append(50);
+        m_arrLineX3.append(100);
+        m_arrLineX3.append(200);
+        m_arrLineX3.append(300);
+        m_arrLineX3.append(600);
+
+        m_arrLineY3.append(2.9);
+        m_arrLineY3.append(4.2);
+        m_arrLineY3.append(6.2);
+        m_arrLineY3.append(9.5);
+        m_arrLineY3.append(12.3);
+        m_arrLineY3.append(20.5);
+
+        //75th centile
+        m_arrLineX4.append(20);
+        m_arrLineX4.append(50);
+        m_arrLineX4.append(100);
+        m_arrLineX4.append(200);
+        m_arrLineX4.append(300);
+        m_arrLineX4.append(600);
+
+        m_arrLineY4.append(5.8);
+        m_arrLineY4.append(7.9);
+        m_arrLineY4.append(10.1);
+        m_arrLineY4.append(14.4);
+        m_arrLineY4.append(18);
+        m_arrLineY4.append(27.7);
+
+        //90th centile
+        m_arrLineX5.append(20);
+        m_arrLineX5.append(50);
+        m_arrLineX5.append(100);
+        m_arrLineX5.append(200);
+        m_arrLineX5.append(300);
+        m_arrLineX5.append(600);
+
+        m_arrLineY5.append(7.7);
+        m_arrLineY5.append(9.9);
+        m_arrLineY5.append(12.5);
+        m_arrLineY5.append(17);
+        m_arrLineY5.append(21);
+        m_arrLineY5.append(31.2);
+
+        //95th centile
+        m_arrLineX6.append(20);
+        m_arrLineX6.append(50);
+        m_arrLineX6.append(100);
+        m_arrLineX6.append(200);
+        m_arrLineX6.append(300);
+        m_arrLineX6.append(600);
+
+        m_arrLineY6.append(8.8);
+        m_arrLineY6.append(11);
+        m_arrLineY6.append(13.9);
+        m_arrLineY6.append(18.5);
+        m_arrLineY6.append(22.6);
+        m_arrLineY6.append(33.2);
+    }
+
+    if (__flowMax && !__sex && __age >= 50)
+    {
+        //Qmax, pazienti maschi età >= 50
+        //5th Centile
+        m_arrLineX1.append(20);
+        m_arrLineX1.append(50);
+        m_arrLineX1.append(100);
+        m_arrLineX1.append(200);
+        m_arrLineX1.append(300);
+        m_arrLineX1.append(600);
+
+        m_arrLineY1.append(1.5);
+        m_arrLineY1.append(2.5);
+        m_arrLineY1.append(5);
+        m_arrLineY1.append(9);
+        m_arrLineY1.append(12.5);
+        m_arrLineY1.append(23.5);
+
+        //10th Centile
+        m_arrLineX2.append(20);
+        m_arrLineX2.append(50);
+        m_arrLineX2.append(100);
+        m_arrLineX2.append(200);
+        m_arrLineX2.append(300);
+        m_arrLineX2.append(600);
+
+        m_arrLineY2.append(2);
+        m_arrLineY2.append(3.8);
+        m_arrLineY2.append(6);
+        m_arrLineY2.append(10.5);
+        m_arrLineY2.append(14.8);
+        m_arrLineY2.append(26);
+
+        //25th centile
+        m_arrLineX3.append(20);
+        m_arrLineX3.append(50);
+        m_arrLineX3.append(100);
+        m_arrLineX3.append(200);
+        m_arrLineX3.append(300);
+        m_arrLineX3.append(600);
+
+        m_arrLineY3.append(3.7);
+        m_arrLineY3.append(5.5);
+        m_arrLineY3.append(8.5);
+        m_arrLineY3.append(13.5);
+        m_arrLineY3.append(18);
+        m_arrLineY3.append(30.5);
+
+        //75th centile
+        m_arrLineX4.append(20);
+        m_arrLineX4.append(50);
+        m_arrLineX4.append(100);
+        m_arrLineX4.append(200);
+        m_arrLineX4.append(300);
+        m_arrLineX4.append(600);
+
+        m_arrLineY4.append(8);
+        m_arrLineY4.append(11.5);
+        m_arrLineY4.append(15);
+        m_arrLineY4.append(21.8);
+        m_arrLineY4.append(27.5);
+        m_arrLineY4.append(42.8);
+
+        //90th centile
+        m_arrLineX5.append(20);
+        m_arrLineX5.append(50);
+        m_arrLineX5.append(100);
+        m_arrLineX5.append(200);
+        m_arrLineX5.append(300);
+        m_arrLineX5.append(600);
+
+        m_arrLineY5.append(11);
+        m_arrLineY5.append(14.2);
+        m_arrLineY5.append(18.8);
+        m_arrLineY5.append(26);
+        m_arrLineY5.append(32.2);
+        m_arrLineY5.append(49);
+
+
+        //95th centile
+        m_arrLineX6.append(20);
+        m_arrLineX6.append(50);
+        m_arrLineX6.append(100);
+        m_arrLineX6.append(200);
+        m_arrLineX6.append(300);
+        m_arrLineX6.append(600);
+
+        m_arrLineY6.append(13);
+        m_arrLineY6.append(16.5);
+        m_arrLineY6.append(21.2);
+        m_arrLineY6.append(28.8);
+        m_arrLineY6.append(35.5);
+        m_arrLineY6.append(52.5);
+
+    }
+    if ( !__flowMax && !__sex && __age >= 50)
+    {
+        //Qave, pazienti maschi età >= 50
+        //5th Centile
+        m_arrLineX1.append(20);
+        m_arrLineX1.append(50);
+        m_arrLineX1.append(100);
+        m_arrLineX1.append(200);
+        m_arrLineX1.append(300);
+        m_arrLineX1.append(600);
+
+        m_arrLineY1.append(0.7);
+        m_arrLineY1.append(1.5);
+        m_arrLineY1.append(2.8);
+        m_arrLineY1.append(5.2);
+        m_arrLineY1.append(7.4);
+        m_arrLineY1.append(13.9);
+
+        //10th Centile
+        m_arrLineX2.append(20);
+        m_arrLineX2.append(50);
+        m_arrLineX2.append(100);
+        m_arrLineX2.append(200);
+        m_arrLineX2.append(300);
+        m_arrLineX2.append(600);
+
+        m_arrLineY2.append(1.1);
+        m_arrLineY2.append(2.1);
+        m_arrLineY2.append(3.5);
+        m_arrLineY2.append(6);
+        m_arrLineY2.append(8.4);
+        m_arrLineY2.append(15);
+
+        //25th centile
+        m_arrLineX3.append(20);
+        m_arrLineX3.append(50);
+        m_arrLineX3.append(100);
+        m_arrLineX3.append(200);
+        m_arrLineX3.append(300);
+        m_arrLineX3.append(600);
+
+        m_arrLineY3.append(2);
+        m_arrLineY3.append(3);
+        m_arrLineY3.append(5);
+        m_arrLineY3.append(7.9);
+        m_arrLineY3.append(10.5);
+        m_arrLineY3.append(18);
+
+        //75th centile
+        m_arrLineX4.append(20);
+        m_arrLineX4.append(50);
+        m_arrLineX4.append(100);
+        m_arrLineX4.append(200);
+        m_arrLineX4.append(300);
+        m_arrLineX4.append(600);
+
+        m_arrLineY4.append(4.6);
+        m_arrLineY4.append(6.2);
+        m_arrLineY4.append(8.7);
+        m_arrLineY4.append(12.2);
+        m_arrLineY4.append(15.8);
+        m_arrLineY4.append(25);
+
+        //90th centile
+        m_arrLineX5.append(20);
+        m_arrLineX5.append(50);
+        m_arrLineX5.append(100);
+        m_arrLineX5.append(200);
+        m_arrLineX5.append(300);
+        m_arrLineX5.append(600);
+
+        m_arrLineY5.append(6);
+        m_arrLineY5.append(8);
+        m_arrLineY5.append(10.5);
+        m_arrLineY5.append(14.7);
+        m_arrLineY5.append(18.5);
+        m_arrLineY5.append(28);
+
+        //95th centile
+        m_arrLineX6.append(20);
+        m_arrLineX6.append(50);
+        m_arrLineX6.append(100);
+        m_arrLineX6.append(200);
+        m_arrLineX6.append(300);
+        m_arrLineX6.append(600);
+
+        m_arrLineY6.append(6.9);
+        m_arrLineY6.append(9.1);
+        m_arrLineY6.append(11.9);
+        m_arrLineY6.append(16.2);
+        m_arrLineY6.append(20);
+        m_arrLineY6.append(30);
+    }
+    if ( __flowMax && __sex)
+    {
+        //Qmax, pazienti femmine
+        //5th Centile
+        m_arrLineX1.append(20);
+        m_arrLineX1.append(50);
+        m_arrLineX1.append(100);
+        m_arrLineX1.append(200);
+        m_arrLineX1.append(300);
+        m_arrLineX1.append(600);
+
+        m_arrLineY1.append(4);
+        m_arrLineY1.append(7);
+        m_arrLineY1.append(10);
+        m_arrLineY1.append(14);
+        m_arrLineY1.append(16.8);
+        m_arrLineY1.append(24);
+
+        //10th Centile
+        m_arrLineX2.append(20);
+        m_arrLineX2.append(50);
+        m_arrLineX2.append(100);
+        m_arrLineX2.append(200);
+        m_arrLineX2.append(300);
+        m_arrLineX2.append(600);
+
+        m_arrLineY2.append(4.8);
+        m_arrLineY2.append(8);
+        m_arrLineY2.append(11);
+        m_arrLineY2.append(15.5);
+        m_arrLineY2.append(19.2);
+        m_arrLineY2.append(27.2);
+
+        //25th centile
+        m_arrLineX3.append(20);
+        m_arrLineX3.append(50);
+        m_arrLineX3.append(100);
+        m_arrLineX3.append(200);
+        m_arrLineX3.append(300);
+        m_arrLineX3.append(600);
+
+        m_arrLineY3.append(6);
+        m_arrLineY3.append(9.5);
+        m_arrLineY3.append(13.8);
+        m_arrLineY3.append(19.2);
+        m_arrLineY3.append(23.5);
+        m_arrLineY3.append(33.5);
+
+        //75th centile
+        m_arrLineX4.append(20);
+        m_arrLineX4.append(50);
+        m_arrLineX4.append(100);
+        m_arrLineX4.append(200);
+        m_arrLineX4.append(300);
+        m_arrLineX4.append(600);
+
+        m_arrLineY4.append(9.8);
+        m_arrLineY4.append(15);
+        m_arrLineY4.append(21.5);
+        m_arrLineY4.append(30.5);
+        m_arrLineY4.append(37.2);
+        m_arrLineY4.append(52.5);
+
+        //90th centile
+        m_arrLineX5.append(20);
+        m_arrLineX5.append(50);
+        m_arrLineX5.append(100);
+        m_arrLineX5.append(200);
+        m_arrLineX5.append(300);
+        m_arrLineX5.append(600);
+
+        m_arrLineY5.append(11.8);
+        m_arrLineY5.append(18.5);
+        m_arrLineY5.append(26.5);
+        m_arrLineY5.append(37.5);
+        m_arrLineY5.append(46);
+        m_arrLineY5.append(64.8);
+
+        //95th centile
+        m_arrLineX6.append(20);
+        m_arrLineX6.append(50);
+        m_arrLineX6.append(100);
+        m_arrLineX6.append(200);
+        m_arrLineX6.append(300);
+        m_arrLineX6.append(600);
+
+        m_arrLineY6.append(13.8);
+        m_arrLineY6.append(21);
+        m_arrLineY6.append(30);
+        m_arrLineY6.append(42.5);
+        m_arrLineY6.append(52);
+        m_arrLineY6.append(75);
+    }
+    if ( !__flowMax && __sex)
+    {
+        //Qave, pazienti femmine
+        //5th Centile
+        m_arrLineX1.append(20);
+        m_arrLineX1.append(50);
+        m_arrLineX1.append(100);
+        m_arrLineX1.append(200);
+        m_arrLineX1.append(300);
+        m_arrLineX1.append(600);
+
+        m_arrLineY1.append(0.4);
+        m_arrLineY1.append(2);
+        m_arrLineY1.append(4.1);
+        m_arrLineY1.append(7);
+        m_arrLineY1.append(9);
+        m_arrLineY1.append(12.7);
+
+        //10th Centile
+        m_arrLineX2.append(20);
+        m_arrLineX2.append(50);
+        m_arrLineX2.append(100);
+        m_arrLineX2.append(200);
+        m_arrLineX2.append(300);
+        m_arrLineX2.append(600);
+
+        m_arrLineY2.append(0.8);
+        m_arrLineY2.append(2.9);
+        m_arrLineY2.append(5.1);
+        m_arrLineY2.append(8.3);
+        m_arrLineY2.append(10.4);
+        m_arrLineY2.append(14.5);
+
+        //25th centile
+        m_arrLineX3.append(20);
+        m_arrLineX3.append(50);
+        m_arrLineX3.append(100);
+        m_arrLineX3.append(200);
+        m_arrLineX3.append(300);
+        m_arrLineX3.append(600);
+
+        m_arrLineY3.append(1.7);
+        m_arrLineY3.append(4.3);
+        m_arrLineY3.append(7);
+        m_arrLineY3.append(10.5);
+        m_arrLineY3.append(13);
+        m_arrLineY3.append(17.5);
+
+        //75th centile
+        m_arrLineX4.append(20);
+        m_arrLineX4.append(50);
+        m_arrLineX4.append(100);
+        m_arrLineX4.append(200);
+        m_arrLineX4.append(300);
+        m_arrLineX4.append(600);
+
+        m_arrLineY4.append(5);
+        m_arrLineY4.append(8.7);
+        m_arrLineY4.append(12.2);
+        m_arrLineY4.append(16.9);
+        m_arrLineY4.append(20);
+        m_arrLineY4.append(25.7);
+
+        //90th centile
+        m_arrLineX5.append(20);
+        m_arrLineX5.append(50);
+        m_arrLineX5.append(100);
+        m_arrLineX5.append(200);
+        m_arrLineX5.append(300);
+        m_arrLineX5.append(600);
+
+        m_arrLineY5.append(6.5);
+        m_arrLineY5.append(11.1);
+        m_arrLineY5.append(15.1);
+        m_arrLineY5.append(20.3);
+        m_arrLineY5.append(23.5);
+        m_arrLineY5.append(30);
+
+        //95th centile
+        m_arrLineX6.append(20);
+        m_arrLineX6.append(50);
+        m_arrLineX6.append(100);
+        m_arrLineX6.append(200);
+        m_arrLineX6.append(300);
+        m_arrLineX6.append(600);
+
+        m_arrLineY6.append(7.5);
+        m_arrLineY6.append(12.5);
+        m_arrLineY6.append(17);
+        m_arrLineY6.append(22.3);
+        m_arrLineY6.append(25.9);
+        m_arrLineY6.append(32.3);
+    }
+
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

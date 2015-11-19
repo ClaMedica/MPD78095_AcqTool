@@ -4,6 +4,48 @@
 #include "mabstractmanager.h"
 #include "mstorage.h"
 #include "modelmanager.h"
+#include "mflowdatas.h"
+
+
+typedef struct {
+    float waiting_time;			// waiting time
+    float q_max;					// maximum flow
+    float q_ave;					// average flow
+    float time_at_v3;             // time at Vol/3
+    float time_at_v2;             // time at Vol/2
+    float time_at_qmax;			// time at Q max
+    float time_90;				// time between 5% and 95% of the voided volume
+    float flow_time;				// flow time
+    float desc_time;				// time between Q max and 95% of the voided volume
+    float voiding_time;			// voiding time
+    float vol_at_qmax;			// volume at Q max
+    int voided_volume;          // voided volume
+    float acceleration;           // Q max / T qmax
+    int residual_volume;		// residual volume inserted by the user
+    float v_det_max;              // detrusor contraction maximum speed
+    float cQ;						// Flow corrective factor
+
+} FLWAdvRepStruct;
+
+
+enum {
+    WAITING_TIME = 0,
+    MAXIMUM_FLOW = 4,
+    AVERAGE_FLOW = 8,
+    TIME_AT_VOL3 = 12,
+    TIME_AT_VOL2 = 16,
+    TIME_AT_QMAX = 20,
+    TIME_5_95_VOIDED_VOL = 24,
+    FLOW_TIME  = 28,
+    TIME_QMAX_95_VOIDED_VOL = 32,
+    VOIDING_TIME = 36,
+    VOLUME_QMAX = 40,
+    VOIDED_VOLUME = 44,
+    ACCELERATION = 48,
+    RESIDUAL_USER = 52,
+    DETRUSOR = 56,
+    FLOW_CORR_FACTOR = 60
+}  ;
 
 class MDataManager : public MAbstractManager
 {
@@ -17,6 +59,9 @@ public:
 
     Q_PROPERTY(int valVolRes READ getValVolRes WRITE setValVolRes NOTIFY infoValVolRes)
 
+    Q_PROPERTY(int numAnaFlwAdv READ getNumAnaFlwAdv)
+    Q_INVOKABLE int getNumAnaFlwAdv(){return m_aflwdatas.length();}
+
     QStringList availableData(){return m_availableData;}
     QStringList availableTracks(){return m_data.keys();}
 
@@ -26,12 +71,12 @@ public:
     int getValVolRes();
     void setValVolRes(int __val);
 
-
     //analysis manager
-
     bool addSignal(MSignal *__pSignal);
     void storeNews(QString __family, QString __name, qulonglong __element);
 
+
+    Q_INVOKABLE mflowdatas *getFlowDatas(int __i);
 
 signals:
     void dataNewsChanged();
@@ -43,6 +88,7 @@ signals:
     void reloadingCompleted();
 
     void sg_openVolResDlg(QString __tipoAn);
+    void sg_loadResult();
     void infoValVolRes();
 
 public slots:
@@ -60,7 +106,6 @@ public slots:
     QVariant getSignal(QString __name);
     QStringList getLinks(QString __what, QStringList __filterFamily=QStringList(), QStringList __filterType=QStringList());
 
-     void volRelDlgOk(QString __anaType);
 
 private:
     QVector<MSignal *> m_signalVector;
@@ -103,16 +148,21 @@ private:
     bool m_analized;
     bool m_autoPrint;
 
+    int m_numAna; //numero di analisi --> non sappiamo se serve
+    QVector<mflowdatas*> m_aflwdatas; //array di analisi di tipo flussimetria
+
+
 //----
     bool saveDataAndUpdate(QString __family, QString __name, VarMapVec*__elements,bool __whatIfAlreadyPresent=OVERWRITE);
     void updateAvailableData();
     bool buildInfoList();
-    void updateInfoList();
+    bool updateInfoList();
 
 
     void InitPageGraphs(QString __anaType);
     bool InitArraysFLW(int __start, int __end, QVector<unsigned char> __chEn, int __curDef, byte __auto);
     int ReadResult(int __numEv = 1);
+    bool checkForVolRes();
 };
 
 

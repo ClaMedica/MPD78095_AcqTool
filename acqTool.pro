@@ -27,7 +27,10 @@ SOURCES += main.cpp \
     ../MGlobal/p7settingsmanager.cpp \
     CPP/mabstractmanager.cpp \
     CPP/native.cpp \
-    CPP/androidmanager.cpp
+    CPP/androidmanager.cpp \
+    CPP/mflowdatas.cpp \
+    CPP/manatablemodel.cpp \
+    CPP/nomogramma.cpp
 
 HEADERS += \
     CPP/parametermanager.h \
@@ -45,7 +48,10 @@ HEADERS += \
     CPP/alarmmanager.h \
     ../MGlobal/p7settingsmanager.h \
     CPP/mabstractmanager.h \
-    CPP/androidmanager.h
+    CPP/androidmanager.h \
+    CPP/mflowdatas.h \
+    CPP/manatablemodel.h \
+    CPP/nomogramma.h
 
 SOURCES += ../AnaUro/anauro.cpp \
     ../AnaUro/analysis.cpp \

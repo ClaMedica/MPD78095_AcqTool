@@ -1,7 +1,6 @@
 #include "mdatamanager.h"
 
 
-
 MDataManager::MDataManager(QObject *parent)
 {
     m_mng=NULL;
@@ -18,6 +17,8 @@ MDataManager::MDataManager(QObject *parent)
 
     m_analized = false;
     m_autoPrint = false;
+    m_numAna = 0;
+    setValVolRes(-999);
 }
 
 MDataManager::~MDataManager()
@@ -119,10 +120,6 @@ void MDataManager::loadFile(QString __fileName)
         if(!buildConfigurationFile())
         {qCritical()<<MEX_FILE_CORRUPTED;return;}
 
-        qDebug()<<"Building infoList ...";
-        if(!buildInfoList())
-        {qCritical()<<"Error building infolist";return;}
-
         QString patientName=m_mng->GetPatient().section(";",0,1);
         patientName.replace(";","_");
         n=m_mng->GetDuration();
@@ -202,8 +199,9 @@ void MDataManager::loadFile(QString __fileName)
                 defEn[i]<<chEn[nc];
 
             (*def)["key"]=key;
-            (*def)["xMin"]=(tStart[0]*1000)/m_mng->GetNAS(0);
-            (*def)["xMax"]=(tEnd[0]*1000)/m_mng->GetNAS(0);
+            (*def)["name"] = descr;
+            (*def)["xMin"]=(tStart[0]*1)/m_mng->GetNAS(0);
+            (*def)["xMax"]=(tEnd[0]*1)/m_mng->GetNAS(0);
             (*def)["yMin"]=sigMin;
             (*def)["yMax"]=sigMax;
             (*def)["enCh"]=defEn[i];
@@ -218,7 +216,7 @@ void MDataManager::loadFile(QString __fileName)
         {
             QString family="Definers";
             QString name="Operative";
-            saveDataAndUpdate(family,name,defVec);
+            saveDataAndUpdate(family,descr,defVec);
         }
 
         for(int nc=0;nc<m_mng->GetChanNum();nc++)
@@ -257,6 +255,7 @@ void MDataManager::loadFile(QString __fileName)
             (*mrk)["visible"]=true;
             (*mrk)["category"]=CAT_MARKER;
             mrkAnVec->append(mrk);
+
         }
         if(!mrkAnVec->isEmpty())
         {
@@ -275,6 +274,11 @@ void MDataManager::loadFile(QString __fileName)
             if(!subVec->isEmpty())
                 saveDataAndUpdate(m_mng->GetChanName(nc),"Analytical Markers",subVec);
         }
+
+
+        qDebug()<<"Building infoList ...";
+        if(!updateInfoList())
+        {qCritical()<<"Error building infolist";return;}
 
         //libreria di analisi: creo oggetto.
         m_ana = new Analyze();
@@ -461,9 +465,9 @@ void MDataManager::updateAvailableData()
     emit availableDataChanged();
 }
 
-void MDataManager::updateInfoList()
+bool MDataManager::updateInfoList()
 {
- // grafici
+    // grafici
 
     QStringList graphs=m_chanInPlots.keys();
 
@@ -483,20 +487,20 @@ void MDataManager::updateInfoList()
         }
 
         //markers
-        VarMapVec *op = m_storage.getAll(CAT_MARKER);
-        if (op->size() > 0)
-            elements<<"Markers:Operative";
+        //        VarMapVec *op = m_storage.getAll(CAT_MARKER);
+        //        if (op->size() > 0)
+        //            elements<<"Markers:Operative";
 
-//        if (m_mng->GetNumDefiners()> 0)
-//           elements<<"Definers:Operative";
+        //        if (m_mng->GetNumDefiners()> 0)
+        //           elements<<"Definers:Operative";
 
         VarMapVec *def = m_storage.getAll(CAT_DEFINER);
-//        if (def->size() > 0)
-//            elements<<"Definers:Operative";
+        //        if (def->size() > 0)
+        //            elements<<"Definers:Operative";
         foreach (VarMap *curMap, (*def)) {
             QStringList enabled = curMap->value("enCh").toStringList();
             if (enabled.at(countGraphs) == "1")
-                 elements<<"Definers:"+curMap->value("descr").toString();
+                elements<<"Definers:"+curMap->value("name").toString();
         }
 
         //elementi finiti
@@ -508,10 +512,11 @@ void MDataManager::updateInfoList()
 
         countGraphs++;
     }
-
+    qDebug()<<"infolist update   "<< infoList;
     m_infoList=infoList;
 
-    return;
+
+    return true;
 }
 
 bool MDataManager::buildInfoList()
@@ -549,7 +554,7 @@ bool MDataManager::buildInfoList()
             elements<<"Markers:Operative";
 
         if (m_mng->GetNumDefiners()> 0)
-           elements<<"Definers:Operative";
+            elements<<"Definers:Operative";
 
         //elementi finiti
         gElemPack=elements;
@@ -559,6 +564,7 @@ bool MDataManager::buildInfoList()
         infoList<<row;
     }
 
+    qDebug()<<"infolist   "<< infoList;
     m_infoList=infoList;
 
     return true;
@@ -715,6 +721,32 @@ bool MDataManager::saveDataAndUpdate(QString __family, QString __name, VarMapVec
 
 }
 
+bool MDataManager::checkForVolRes()
+{
+    if (getValVolRes() != -999)
+        return false;
+
+    //ciclo per individuare se è necessario aprire la dlg del volume residuo
+    bool volRes = false;
+    for (int i=0; i<m_numAna; i++)
+    {
+        QString anaType = m_mng->GetAnalysis(i);
+        if (anaType == "Flussimetria")
+        {
+            if (m_autoPrint)
+                setValVolRes(-1);
+            else
+            {
+                volRes = true;
+                setValVolRes(0);//in futuro sarà letto da proprietà xml
+                emit sg_openVolResDlg("Flowmetry");
+                break;
+            }
+        }
+
+    }
+    return volRes;
+}
 
 void MDataManager::analysis()
 {
@@ -736,8 +768,12 @@ void MDataManager::analysis()
     int anaProg = QDateTime::currentDateTime().toTime_t();
     QVariantList En;
 
-    int numAna = m_mng->GetAnalysiNum();
-    for (int i=0; i<numAna; i++)
+    m_numAna = m_mng->GetAnalysiNum();
+
+    if (checkForVolRes())
+        return;
+
+    for (int i=0; i<m_numAna; i++)
     {
         QString anaType = m_mng->GetAnalysis(i);
         if (anaType == "Flussimetria")
@@ -748,13 +784,13 @@ void MDataManager::analysis()
             VarMapVec* elements=m_storage.getAll(CAT_DEFINER);
             foreach (VarMap *curMap, (*elements))
             {
-               QChar tempChar = curMap->value("key").toChar();
-               unsigned char key = tempChar.toLatin1();
-               if (key == MK_FLOWMETRY)
-               {
-                   mkOpAnIn = *curMap;
-                   found = true;
-               }
+                QChar tempChar = curMap->value("key").toChar();
+                unsigned char key = tempChar.toLatin1();
+                if (key == MK_FLOWMETRY)
+                {
+                    mkOpAnIn = *curMap;
+                    found = true;
+                }
             }
 
             if (!found)
@@ -772,7 +808,7 @@ void MDataManager::analysis()
                     i++;
                 }
 
-                if (numAna == 1 || posQ > -1)
+                if (m_numAna == 1 || posQ > -1)
                 {
                     //se non c'è il defintore, ma questa è l'unica analisi,
                     //viene inserito automaticamente sul canale del flusso.
@@ -789,12 +825,13 @@ void MDataManager::analysis()
 
                     VarMap *def=new VarMap;
                     (*def)["key"] = MK_FLOWMETRY;
+                    (*def)["name"] = "FLW";
                     (*def)["xMin"]= 1;
-                    (*def)["xMax"]= m_end*1000;
+                    (*def)["xMax"]= m_end-1;
                     (*def)["yMin"]=0;
                     (*def)["yMax"]=100;
                     (*def)["enCh"]= En;
-                    (*def)["descr"]="FLW";
+                    (*def)["descr"]="Flowmetry";
                     (*def)["color"]="green";
                     (*def)["category"]=CAT_DEFINER;
                     (*def)["resizeable"]=1;
@@ -809,102 +846,125 @@ void MDataManager::analysis()
                     found = true;
 
                     //saveall?? se si la updateinfolist puo leggere da datafile?
-                   // saveChanges();//(?)
+                    //saveChanges();//(?)
+                    //buildInfoList();
                     updateInfoList();
                     emit reloadingCompleted();
 
                 }
-//                else
-//                {
-//                    //cotrolliamo se c'è il marker 'ff' free flow
-//                    //nel qual caso, il definitore viene inserito da lì fino a:
-//                    //fine esame o inizio FILL o inizio VOID
-//                    VarMapVec* elements=m_storage.getAll(CAT_MARKER);
-//                    foreach (VarMap *curMap, (*elements))
-//                    {
-//                        if(curMap->value("color").toString()==COLOR_OPERATIVE)
-//                        {
-//                            QChar tempChar = curMap->value("key").toChar();
-//                            unsigned char key = tempChar.toLatin1();
-//                            if (key == MK_FREEFLOW)
-//                            {
-//                                int defEnd = m_end;
-//                                for (int i=0;i<m_mng->GetChanNum();i++)
-//                                    En << 0;
+                //                else
+                //                {
+                //                    //cotrolliamo se c'è il marker 'ff' free flow
+                //                    //nel qual caso, il definitore viene inserito da lì fino a:
+                //                    //fine esame o inizio FILL o inizio VOID
+                //                    VarMapVec* elements=m_storage.getAll(CAT_MARKER);
+                //                    foreach (VarMap *curMap, (*elements))
+                //                    {
+                //                        if(curMap->value("color").toString()==COLOR_OPERATIVE)
+                //                        {
+                //                            QChar tempChar = curMap->value("key").toChar();
+                //                            unsigned char key = tempChar.toLatin1();
+                //                            if (key == MK_FREEFLOW)
+                //                            {
+                //                                int defEnd = m_end;
+                //                                for (int i=0;i<m_mng->GetChanNum();i++)
+                //                                    En << 0;
 
-//                                En[posQ] = 1;
-//                                if (posV > -1)
-//                                    En[posV] = 1;
+                //                                En[posQ] = 1;
+                //                                if (posV > -1)
+                //                                    En[posV] = 1;
 
-//                                //ho tralasciato la parte che gestisce l'iconizzazione che forse non c'è
-
-
-//                                VarMapVec* definers=m_storage.getAll(CAT_DEFINER);
-//                                foreach (VarMap *curDef, (*definers))
-//                                {
-//                                    QChar tempChar = curDef->value("key").toChar();
-//                                    unsigned char key = tempChar.toLatin1();
-//                                    if ((key == MK_VOIDING) || (key == MK_FILLING))
-//                                    {
-//                                      //  int startDef = curDef->value("xMin");
-
-//                                   //     if (defEnd > startQ || startQ > )
+                //                                //ho tralasciato la parte che gestisce l'iconizzazione che forse non c'è
 
 
-//                                                //
-//                                                //                            For k = 0 To MarkerUtils.getNumOpMarkerAn() - 1
-//                                                //                                If MarkerUtils.getOpMarkerAn(k).myKey = MK_VOID Or MarkerUtils.getOpMarkerAn(k).myKey = MK_FILL Then
-//                                                //                                    If (defEnd > MarkerUtils.getOpMarkerAn(k).myNumStart(myGraphPlot.posQ)) And (MarkerUtils.getOpMarkerAn(k).myNumStart(myGraphPlot.posQ) > MarkerUtils.getOpMarker(j).myNumCamp(myGraphPlot.MaxNASCh)) Then
-//                                                //                                        defEnd = MarkerUtils.getOpMarkerAn(k).myNumStart(myGraphPlot.posQ)
-//                                                //                                    End If
-//                                                //                                End If
-//                                                //                            Next k
+                //                                VarMapVec* definers=m_storage.getAll(CAT_DEFINER);
+                //                                foreach (VarMap *curDef, (*definers))
+                //                                {
+                //                                    QChar tempChar = curDef->value("key").toChar();
+                //                                    unsigned char key = tempChar.toLatin1();
+                //                                    if ((key == MK_VOIDING) || (key == MK_FILLING))
+                //                                    {
+                //                                      //  int startDef = curDef->value("xMin");
 
-//                                    }
-//                                }
+                //                                   //     if (defEnd > startQ || startQ > )
 
-//                                //                            For k = 0 To MarkerUtils.getNumOpMarker() - 1
-//                                //                                If MarkerUtils.getOpMarker(k).myKey = MK_INVITATION Or MarkerUtils.getOpMarker(k).myKey = MK_FIRSTDESIRE Or MarkerUtils.getOpMarker(k).myKey = MK_STRONG_DESIRE Or MarkerUtils.getOpMarker(k).myKey = MK_MAXCYSCAP Then
-//                                //                                    If (defEnd > MarkerUtils.getOpMarker(k).myNumCamp(myGraphPlot.GetTruePosChannel(myGraphPlot.MaxNASCh))) And (MarkerUtils.getOpMarker(k).myNumCamp(myGraphPlot.GetTruePosChannel(myGraphPlot.MaxNASCh)) > MarkerUtils.getOpMarker(j).myNumCamp(myGraphPlot.GetTruePosChannel(myGraphPlot.MaxNASCh))) Then
-//                                //                                        defEnd = MarkerUtils.getOpMarker(k).myNumCamp(myGraphPlot.GetTruePosChannel(myGraphPlot.MaxNASCh))
-//                                //                                    End If
-//                                //                                End If
-//                                //                            Next k
-//                                //                            If defEnd > 1 And MarkerUtils.getOpMarker(j).myNumCamp(myGraphPlot.GetTruePosChannel(myGraphPlot.MaxNASCh)) Then
-//                                //                                Dim TdefEnd As Double = myGraphPlot.calcPosByNumCampTotal(defEnd, myGraphPlot.GetTruePosChannel(myGraphPlot.MaxNASCh))
-//                                //                                Dim TdefStart As Double = myGraphPlot.calcPosByNumCampTotal(MarkerUtils.getOpMarker(j).myNumCamp(myGraphPlot.GetTruePosChannel(myGraphPlot.MaxNASCh)), myGraphPlot.GetTruePosChannel(myGraphPlot.MaxNASCh))
-//                                //                                Dim imageDef As Image = Nothing
-//                                //                                Dim tempB As Boolean = findOpMarkerAnIcon(MK_FLW, imageDef, "f1")
 
-//                                //                                MarkerUtils.drawOpMarkerAn(myGraphPlot, MK_FLW, "f1", "f1", En, TdefStart, TdefEnd, New Point2D(1, 0.0), imageDef)
-//                                //                                mkOpAnIn = MarkerUtils.getNumOpMarkerAn()
-//                                //                                myGraphPlot.saveAllChanges()
-//                                //                                found = True
-//                                //                                Exit For
-//                                //                            End If
-//                            }
-//                        }
+                //                                                //
+                //                                                //                            For k = 0 To MarkerUtils.getNumOpMarkerAn() - 1
+                //                                                //                                If MarkerUtils.getOpMarkerAn(k).myKey = MK_VOID Or MarkerUtils.getOpMarkerAn(k).myKey = MK_FILL Then
+                //                                                //                                    If (defEnd > MarkerUtils.getOpMarkerAn(k).myNumStart(myGraphPlot.posQ)) And (MarkerUtils.getOpMarkerAn(k).myNumStart(myGraphPlot.posQ) > MarkerUtils.getOpMarker(j).myNumCamp(myGraphPlot.MaxNASCh)) Then
+                //                                                //                                        defEnd = MarkerUtils.getOpMarkerAn(k).myNumStart(myGraphPlot.posQ)
+                //                                                //                                    End If
+                //                                                //                                End If
+                //                                                //                            Next k
 
-//                    }
-//                }
+                //                                    }
+                //                                }
+
+                //                                //                            For k = 0 To MarkerUtils.getNumOpMarker() - 1
+                //                                //                                If MarkerUtils.getOpMarker(k).myKey = MK_INVITATION Or MarkerUtils.getOpMarker(k).myKey = MK_FIRSTDESIRE Or MarkerUtils.getOpMarker(k).myKey = MK_STRONG_DESIRE Or MarkerUtils.getOpMarker(k).myKey = MK_MAXCYSCAP Then
+                //                                //                                    If (defEnd > MarkerUtils.getOpMarker(k).myNumCamp(myGraphPlot.GetTruePosChannel(myGraphPlot.MaxNASCh))) And (MarkerUtils.getOpMarker(k).myNumCamp(myGraphPlot.GetTruePosChannel(myGraphPlot.MaxNASCh)) > MarkerUtils.getOpMarker(j).myNumCamp(myGraphPlot.GetTruePosChannel(myGraphPlot.MaxNASCh))) Then
+                //                                //                                        defEnd = MarkerUtils.getOpMarker(k).myNumCamp(myGraphPlot.GetTruePosChannel(myGraphPlot.MaxNASCh))
+                //                                //                                    End If
+                //                                //                                End If
+                //                                //                            Next k
+                //                                //                            If defEnd > 1 And MarkerUtils.getOpMarker(j).myNumCamp(myGraphPlot.GetTruePosChannel(myGraphPlot.MaxNASCh)) Then
+                //                                //                                Dim TdefEnd As Double = myGraphPlot.calcPosByNumCampTotal(defEnd, myGraphPlot.GetTruePosChannel(myGraphPlot.MaxNASCh))
+                //                                //                                Dim TdefStart As Double = myGraphPlot.calcPosByNumCampTotal(MarkerUtils.getOpMarker(j).myNumCamp(myGraphPlot.GetTruePosChannel(myGraphPlot.MaxNASCh)), myGraphPlot.GetTruePosChannel(myGraphPlot.MaxNASCh))
+                //                                //                                Dim imageDef As Image = Nothing
+                //                                //                                Dim tempB As Boolean = findOpMarkerAnIcon(MK_FLW, imageDef, "f1")
+
+                //                                //                                MarkerUtils.drawOpMarkerAn(myGraphPlot, MK_FLW, "f1", "f1", En, TdefStart, TdefEnd, New Point2D(1, 0.0), imageDef)
+                //                                //                                mkOpAnIn = MarkerUtils.getNumOpMarkerAn()
+                //                                //                                myGraphPlot.saveAllChanges()
+                //                                //                                found = True
+                //                                //                                Exit For
+                //                                //                            End If
+                //                            }
+                //                        }
+
+                //                    }
+                //                }
             }
 
             if (found)
             {
-//                                        'Salva l'immagine dei tracciati all'interno del definitore
-//                                        myGraphPlot.RedrawGraphForPrint("GR200", MarkerUtils.getOpMarkerAn(mkOpAnIn - 1).myNumStart(myGraphPlot.GetTruePosChannel(myGraphPlot.MaxNASCh)), MarkerUtils.getOpMarkerAn(mkOpAnIn - 1).myNumEnd(myGraphPlot.GetTruePosChannel(myGraphPlot.MaxNASCh)))
-               m_analized = True;
-                if (m_autoPrint)
-                        setValVolRes(-1);
-                else {
-                    setValVolRes(0);//in futuro sarà letto da proprietà xml
-                    emit sg_openVolResDlg("Flowmetry");
-                }
+                //                                        'Salva l'immagine dei tracciati all'interno del definitore
+                //                                        myGraphPlot.RedrawGraphForPrint("GR200", MarkerUtils.getOpMarkerAn(mkOpAnIn - 1).myNumStart(myGraphPlot.GetTruePosChannel(myGraphPlot.MaxNASCh)), MarkerUtils.getOpMarkerAn(mkOpAnIn - 1).myNumEnd(myGraphPlot.GetTruePosChannel(myGraphPlot.MaxNASCh)))
+                m_analized = True;
+                //                                            UpdateTestOther()
+                //Lancia analisi e Inizializza nomogrammi
+                InitPageGraphs("Flowmetry");
+                //                                            'ridimensiono il definitore sulla base del marker F2 del flusso
+                //                                            'For k = 1 To theGraphs.NMarkerAn
+                //                                            '    If MarkerAn(k).NumOpMark = mkOpAnIn And MarkerAn(k).key = 3 Then
+                //                                            '        MarkerOpAn(mkOpAnIn).end = MarkerAn(k).index * (theGraphs.MaximumNAS / curve(MarkerAn(k).NumGraph).NAS) + 1 * theGraphs.MaximumNAS
+                //                                            '    End If
+                //                                            'Next k
+
+                //                                            'Dim objDef As objectOpMarkerAn = MarkerUtils.getOpMarkerAn(mkOpAnIn)
+                //                                            'For k = 1 To objDef.getNumAnMarker()
+                //                                            '    If objDef.getAnMarker(k).myKey = 3 Then
+                //                                            '        objDef.myNumEnd(0) = objDef.getAnMarker(k).myNumCamp(0) * ((1000/myGraphPlot.getPeriod())/
+                //                                            '    End If
+
+                //                                            'Next k
+                //                                            'theGraphs.Reset_Zoom()
+                //                                            'TODO: implementare una gestione degli errori che mostri
+                //                                            'su DlgReport il messaggio d'errore anzichè il risultato.
+                //                                            'TODO: implementare un sistema per ottenere il numero di
+                //                                            'analisi dello stesso tipo effettuate.
+                //                                            'MarkerOpAn(mkOpAnIn).Warn = True
+                //                                            WaitForDone = 2
             }
         }
     }
 
+
+
+    emit sg_loadResult();
 }
+
 
 void MDataManager::setValVolRes(int __val)
 {
@@ -921,39 +981,6 @@ int MDataManager::getValVolRes()
     return m_VolRes.toInt();
 }
 
-void MDataManager::volRelDlgOk(QString __anaType)
-{
-    //                                            myGraphPlot.FreeQMax = formSelAna.FreeQMax
-    //                                            UpdateTestOther()
-
-    //Lancia analisi e Inizializza nomogrammi
-    InitPageGraphs(__anaType);
-    //                                            InitPageGraphs(TypeAnalysis, DescAna)
-
-    //                                            'ridimensiono il definitore sulla base del marker F2 del flusso
-    //                                            'For k = 1 To theGraphs.NMarkerAn
-    //                                            '    If MarkerAn(k).NumOpMark = mkOpAnIn And MarkerAn(k).key = 3 Then
-    //                                            '        MarkerOpAn(mkOpAnIn).end = MarkerAn(k).index * (theGraphs.MaximumNAS / curve(MarkerAn(k).NumGraph).NAS) + 1 * theGraphs.MaximumNAS
-    //                                            '    End If
-    //                                            'Next k
-
-    //                                            'Dim objDef As objectOpMarkerAn = MarkerUtils.getOpMarkerAn(mkOpAnIn)
-    //                                            'For k = 1 To objDef.getNumAnMarker()
-    //                                            '    If objDef.getAnMarker(k).myKey = 3 Then
-    //                                            '        objDef.myNumEnd(0) = objDef.getAnMarker(k).myNumCamp(0) * ((1000/myGraphPlot.getPeriod())/
-    //                                            '    End If
-
-    //                                            'Next k
-    //                                            'theGraphs.Reset_Zoom()
-    //                                            'TODO: implementare una gestione degli errori che mostri
-    //                                            'su DlgReport il messaggio d'errore anzichè il risultato.
-    //                                            'TODO: implementare un sistema per ottenere il numero di
-    //                                            'analisi dello stesso tipo effettuate.
-    //                                            'MarkerOpAn(mkOpAnIn).Warn = True
-    //                                            WaitForDone = 2
-    //                                        End If
-
-}
 
 void MDataManager::InitPageGraphs(QString __anaType)
 {
@@ -971,196 +998,63 @@ void MDataManager::InitPageGraphs(QString __anaType)
         VarMapVec* elements=m_storage.getAll(CAT_DEFINER);
         foreach (VarMap *curMap, (*elements))
         {
-           QChar tempChar = curMap->value("key").toChar();
-           unsigned char key = tempChar.toLatin1();
-           if (key == MK_FLOWMETRY)
-           {
-               evStart = curMap->value("xMin").toInt();
-               evEnd = curMap->value("xMax").toInt();
-               evMarkOpIn = *curMap;
-               evAuto = 1;
+            QChar tempChar = curMap->value("key").toChar();
+            unsigned char key = tempChar.toLatin1();
+            if (key == MK_FLOWMETRY)
+            {
+                evStart = curMap->value("xMin").toInt();
+                evEnd = curMap->value("xMax").toInt()*1000;
+                evMarkOpIn = *curMap;
+                evAuto = 1;
 
-               //ogni volta che si passano i definitori alla libreria di analisi dopo aver nascosto/rivisualizzato i canali
-               //è necessario sistemare l'array dei canali abilitati considerando tutti i canali dell'analisi.
-               //Se un canale non era visibile al momento dell'analisi,
-               //consideriamo quel canale abilitato
-               //                            If objOpMAn.myEnabled.Length < myGraphPlot.totAnalisysChannel Then
-               //                                For k As Integer = 0 To myGraphPlot.totAnalisysChannel - 1
-               //                                    ChEn(k) = 1
-               //                                Next
-               //                                For k = 0 To myGraphPlot.myPosChannelShow.Length - 1
-               //                                    ChEn(myGraphPlot.GetTruePosChannel(k)) = objOpMAn.myEnabled(k)
-               //                                Next
-               //                            Else
-               //                                ChEn = objOpMAn.myEnabled
-               //                            End If
-
-
-
-               for(int i=0;i<m_mng->GetChanNum();i++)
-                   enCh.append(curMap->value("enCh").toList().at(i).toBool());
+                //ogni volta che si passano i definitori alla libreria di analisi dopo aver nascosto/rivisualizzato i canali
+                //è necessario sistemare l'array dei canali abilitati considerando tutti i canali dell'analisi.
+                //Se un canale non era visibile al momento dell'analisi,
+                //consideriamo quel canale abilitato
+                //                            If objOpMAn.myEnabled.Length < myGraphPlot.totAnalisysChannel Then
+                //                                For k As Integer = 0 To myGraphPlot.totAnalisysChannel - 1
+                //                                    ChEn(k) = 1
+                //                                Next
+                //                                For k = 0 To myGraphPlot.myPosChannelShow.Length - 1
+                //                                    ChEn(myGraphPlot.GetTruePosChannel(k)) = objOpMAn.myEnabled(k)
+                //                                Next
+                //                            Else
+                //                                ChEn = objOpMAn.myEnabled
+                //                            End If
 
 
-               // marker analitici
-               VarMapVec* eleAnMarkers=m_storage.getAll(CAT_MARKER);
-               foreach (VarMap *curMarker, (*eleAnMarkers))
-               {
-                   if ((curMarker->value("color") == COLOR_ANALYTICAL) && (curMarker->value("defCode") == evMarkOpIn))
-                   {
-                       evAuto = 0;
-                       break;
-                   }
 
-               }
-
-               //eventuali marker analitici nascosti
-               //                            For i = 1 To MarkerUtils.getNumAnMarkerHide - 1
-               //                                Dim objOpM As objectAnMarkerHide = MarkerUtils.getAnMarkerHide(i - 1)
-               //                                If objOpM.myMarkOp = j Then
-               //                                    evAuto = 0
-               //                                    Exit For
-               //                                End If
-               //                            Next i
+                for(int i=0;i<m_mng->GetChanNum();i++)
+                    enCh.append(curMap->value("enCh").toList().at(i).toBool());
 
 
-           }
+                // marker analitici
+                VarMapVec* eleAnMarkers=m_storage.getAll(CAT_MARKER);
+                foreach (VarMap *curMarker, (*eleAnMarkers))
+                {
+                    if ((curMarker->value("color") == COLOR_ANALYTICAL) && (curMarker->value("defCode") == evMarkOpIn))
+                    {
+                        evAuto = 0;
+                        break;
+                    }
+
+                }
+
+                //eventuali marker analitici nascosti
+                //                            For i = 1 To MarkerUtils.getNumAnMarkerHide - 1
+                //                                Dim objOpM As objectAnMarkerHide = MarkerUtils.getAnMarkerHide(i - 1)
+                //                                If objOpM.myMarkOp = j Then
+                //                                    evAuto = 0
+                //                                    Exit For
+                //                                End If
+                //                            Next i
+
+
+            }
         }
 
         //init arrays and perform analysis
         bool ret = InitArraysFLW(evStart,evEnd,enCh,evMarkOpIn.value("defCode").toInt(),evAuto);
-        //                    If Not InitArraysFLW(evStart, evEnd, ChEn, evMarkOpIn, evAuto) Then
-        //                        MessageBox.Show(DescAnalysis + RMLoc.GetString("VERIFYANMARKER"), RMLoc.GetString("ERRORE"), MessageBoxButtons.OK, MessageBoxIcon.Error)
-        //                        Exit Sub
-        //                    End If
-        //                    Dim tempPage As New TabPage
-        //                    tempPage.Text = RMLoc.GetString("FLOWMETRY")
-
-        //                    'Tabella risultati
-        //                    TabRisFlw = New DataGridView()
-        //                    TabRisFlw.Location = New Point(6, 6)
-        //                    TabRisFlw.BorderStyle = BorderStyle.None
-        //                    TabRisFlw.AllowUserToAddRows = False
-        //                    TabRisFlw.AllowUserToDeleteRows = False
-        //                    TabRisFlw.AllowUserToOrderColumns = False
-        //                    TabRisFlw.AllowUserToResizeColumns = False
-        //                    TabRisFlw.AllowUserToResizeRows = False
-        //                    TabRisFlw.ReadOnly = True
-        //                    TabRisFlw.SelectionMode = DataGridViewSelectionMode.RowHeaderSelect
-        //                    TabRisFlw.MultiSelect = False
-        //                    TabRisFlw.AutoSizeRowsMode = DataGridViewAutoSizeRowsMode.None
-        //                    TabRisFlw.AllowUserToResizeColumns = False
-        //                    TabRisFlw.AllowUserToResizeRows = False
-        //                    TabRisFlw.RowHeadersWidthSizeMode = DataGridViewRowHeadersWidthSizeMode.AutoSizeToAllHeaders
-        //                    TabRisFlw.BackgroundColor = Color.Silver
-        //                    TabRisFlw.RowHeadersBorderStyle = DataGridViewHeaderBorderStyle.Single
-        //                    TabRisFlw.RowHeadersDefaultCellStyle.BackColor = Color.LightSkyBlue
-        //                    TabRisFlw.ColumnHeadersVisible = False
-        //                    TabRisFlw.Columns.Add("valore", "valore")
-        //                    TabRisFlw.Columns.Item(0).Width = 40
-
-        //                    TabRisFlw.Rows.Insert(0, Format(FLWAdvReport(1).waiting_time, "##0.0"))
-        //                    TabRisFlw.Rows.Item(0).HeaderCell.Value = RMLoc.GetString("WAITTIME") & RMLoc.GetString("MISSEC")
-        //                    TabRisFlw.Rows.Insert(1, Format(FLWAdvReport(1).Q_MAX, "##0.0"))
-        //                    TabRisFlw.Rows.Item(1).HeaderCell.Value = RMLoc.GetString("MAXFLOW") & RMLoc.GetString("MISMLSEC")
-        //                    TabRisFlw.Rows.Insert(2, Format(FLWAdvReport(1).q_ave, "##0.0"))
-        //                    TabRisFlw.Rows.Item(2).HeaderCell.Value = RMLoc.GetString("AVEFLOW") & RMLoc.GetString("MISMLSEC")
-        //                    TabRisFlw.Rows.Insert(3, Format(FLWAdvReport(1).time_at_qmax, "##0.0"))
-        //                    TabRisFlw.Rows.Item(3).HeaderCell.Value = RMLoc.GetString("TMAXFLOW") & RMLoc.GetString("MISSEC")
-        //                    TabRisFlw.Rows.Insert(4, Format(FLWAdvReport(1).time_90, "##0.0"))
-        //                    TabRisFlw.Rows.Item(4).HeaderCell.Value = RMLoc.GetString("TIME5_95") & RMLoc.GetString("MISSEC")
-        //                    TabRisFlw.Rows.Insert(5, Format(FLWAdvReport(1).flow_time, "##0.0"))
-        //                    TabRisFlw.Rows.Item(5).HeaderCell.Value = RMLoc.GetString("FLOWTIME") & RMLoc.GetString("MISSEC")
-        //                    TabRisFlw.Rows.Insert(6, Format(FLWAdvReport(1).desc_time, "##0.0"))
-        //                    TabRisFlw.Rows.Item(6).HeaderCell.Value = RMLoc.GetString("DESCTIME") & RMLoc.GetString("MISSEC")
-        //                    TabRisFlw.Rows.Insert(7, Format(FLWAdvReport(1).voiding_time, "##0.0"))
-        //                    TabRisFlw.Rows.Item(7).HeaderCell.Value = RMLoc.GetString("VOIDINGTIME") & RMLoc.GetString("MISSEC")
-        //                    TabRisFlw.Rows.Insert(8, Format(FLWAdvReport(1).vol_at_qmax, "0"))
-        //                    TabRisFlw.Rows.Item(8).HeaderCell.Value = RMLoc.GetString("MAXVOL") & RMLoc.GetString("MISML")
-        //                    TabRisFlw.Rows.Insert(9, Format(FLWAdvReport(1).voided_volume, "0"))
-        //                    TabRisFlw.Rows.Item(9).HeaderCell.Value = RMLoc.GetString("VOIDVOL") & RMLoc.GetString("MISML")
-        //                    TabRisFlw.Rows.Insert(10, Format(FLWAdvReport(1).cQ, "##0.0"))
-        //                    TabRisFlw.Rows.Item(10).HeaderCell.Value = RMLoc.GetString("MAXFLOWCR") & RMLoc.GetString("MISML12SEC")
-        //                    TabRisFlw.Rows.Insert(11, Format(FLWAdvReport(1).acceleration, "##0.0"))
-        //                    TabRisFlw.Rows.Item(11).HeaderCell.Value = RMLoc.GetString("ACCELFLOW") & RMLoc.GetString("MISMLSEC2")
-        //                    TabRisFlw.Rows.Insert(12, Format(FLWAdvReport(1).v_det_max, "##0.0"))
-        //                    TabRisFlw.Rows.Item(12).HeaderCell.Value = RMLoc.GetString("MAXCONTRSPEED") & RMLoc.GetString("MISMMSEC")
-        //                    If FLWAdvReport(1).residual_volume = -999 Then
-        //                        TabRisFlw.Rows.Insert(13, Format(FLWAdvReport(1).residual_volume, "-"))
-        //                    Else
-        //                        TabRisFlw.Rows.Insert(13, Format(FLWAdvReport(1).residual_volume, "0"))
-        //                    End If
-        //                    TabRisFlw.Rows.Item(13).HeaderCell.Value = RMLoc.GetString("RESVOL") & RMLoc.GetString("MISML")
-
-        //                    TabRisFlw.Size = New Size(314, 310)
-
-        //                    'creo i bottoni da mettere nella barra dei nomogrammi
-        //                    Dim Bt_Liverpool_Max As ToolStripButton = New ToolStripButton()
-        //                    Bt_Liverpool_Max.Text() = RMLoc.GetString("LIVERPOOLQMAX")
-        //                    Bt_Liverpool_Max.Size = New Size(WBUTTON, HBUTTON)
-        //                    AddHandler Bt_Liverpool_Max.Click, AddressOf Bt_NomoFLW_Click
-        //                    Dim Bt_Liverpool_Ave As ToolStripButton = New ToolStripButton()
-        //                    Bt_Liverpool_Ave.Text() = RMLoc.GetString("LIVERPOOLQAVE")
-        //                    Bt_Liverpool_Ave.Size = New Size(WBUTTON, HBUTTON)
-        //                    AddHandler Bt_Liverpool_Ave.Click, AddressOf Bt_NomoFLW_Click
-        //                    Dim Bt_Siroky_Ave As ToolStripButton = New ToolStripButton()
-        //                    Bt_Siroky_Ave.Text() = RMLoc.GetString("SIROKYAVE")
-        //                    Bt_Siroky_Ave.Size = New Size(WBUTTON, HBUTTON)
-        //                    AddHandler Bt_Siroky_Ave.Click, AddressOf Bt_NomoFLW_Click
-        //                    Dim Bt_Siroky_Max As ToolStripButton = New ToolStripButton()
-        //                    Bt_Siroky_Max.Text() = RMLoc.GetString("SIROKYMAX")
-        //                    Bt_Siroky_Max.Size = New Size(WBUTTON, HBUTTON)
-        //                    AddHandler Bt_Siroky_Max.Click, AddressOf Bt_NomoFLW_Click
-        //                    Dim Bt_Miskloc_Max As ToolStripButton = New ToolStripButton()
-        //                    Bt_Miskloc_Max.Text() = RMLoc.GetString("MISKOLCQMAX")
-        //                    Bt_Miskloc_Max.Size = New Size(WBUTTON, HBUTTON)
-        //                    AddHandler Bt_Miskloc_Max.Click, AddressOf Bt_NomoFLW_Click
-        //                    Dim Bt_Miskloc_Ave As ToolStripButton = New ToolStripButton()
-        //                    Bt_Miskloc_Ave.Text() = RMLoc.GetString("MISKOLCQAVE")
-        //                    Bt_Miskloc_Ave.Size = New Size(WBUTTON, HBUTTON)
-        //                    AddHandler Bt_Miskloc_Ave.Click, AddressOf Bt_NomoFLW_Click
-
-        //                    'creo la barra
-        //                    BrNomogrammi = New ToolStrip()
-        //                    BrNomogrammi.RenderMode = System.Windows.Forms.ToolStripRenderMode.Professional
-        //                    BrNomogrammi.GripStyle = System.Windows.Forms.ToolStripGripStyle.Hidden
-        //                    BrNomogrammi.Font = New System.Drawing.Font("Arial", 9.0, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, CType(0, Byte))
-        //                    BrNomogrammi.Dock = System.Windows.Forms.DockStyle.None
-        //                    BrNomogrammi.BackColor = Color.LightGray
-        //                    BrNomogrammi.AutoSize = True
-
-        //                    BrNomogrammi.Items.Add(New ToolStripSeparator)
-        //                    BrNomogrammi.Items.Add(Bt_Liverpool_Max)
-        //                    BrNomogrammi.Items.Add(New ToolStripSeparator)
-        //                    BrNomogrammi.Items.Add(Bt_Liverpool_Ave)
-        //                    BrNomogrammi.Items.Add(New ToolStripSeparator)
-        //                    If Not TestDescription.Sex Then
-        //                        BrNomogrammi.Items.Add(Bt_Siroky_Ave)
-        //                        BrNomogrammi.Items.Add(New ToolStripSeparator)
-        //                        BrNomogrammi.Items.Add(Bt_Siroky_Max)
-        //                        BrNomogrammi.Items.Add(New ToolStripSeparator)
-        //                    End If
-        //                    If TestDescription.Age >= 3 And TestDescription.Age <= 18 And TestDescription.Peso <> 0 And TestDescription.Altezza <> 0 Then
-        //                        BrNomogrammi.Items.Add(New ToolStripSeparator)
-        //                        BrNomogrammi.Items.Add(Bt_Miskloc_Max)
-        //                        'BrNomogrammi.Items.Add(New ToolStripSeparator)
-        //                        'BrNomogrammi.Items.Add(Bt_Miskloc_Ave)
-        //                    End If
-
-        //                    'aggiungo gli elementi al tab
-        //                    tempPage.BackColor = Color.Silver
-        //                    tempPage.Controls.Add(TabRisFlw)
-        //                    tempPage.Controls.Add(N_Liverpool_Max(NumAnalysis))
-        //                    tempPage.Controls.Add(N_Liverpool_Ave(NumAnalysis))
-        //                    If Not TestDescription.Sex Then
-        //                        tempPage.Controls.Add(N_Siroky_Ave(NumAnalysis))
-        //                        tempPage.Controls.Add(N_Siroky_Max(NumAnalysis))
-        //                    End If
-        //                    If TestDescription.Age >= 3 And TestDescription.Age <= 18 And TestDescription.Peso <> 0 And TestDescription.Altezza <> 0 Then
-        //                        tempPage.Controls.Add(N_Miskolc_Max(NumAnalysis))
-        //                        'tempPage.Controls.Add(N_Miskolc_Ave(NumAnalysis))
-        //                    End If
-        //                    tempPage.Controls.Add(BrNomogrammi)
-        //                    RisAnaTab.TabPages.Add(tempPage)
 
 
     }
@@ -1173,16 +1067,32 @@ bool MDataManager::InitArraysFLW(int __start,
                                  int __curDef,
                                  byte __auto)
 {
-    //da leggere da file
-
-    //           Dim parList As New PrjReviewConfig.ReviewConfig
-    //           parList.FileName = configPath + "\ParAna.xml"
-    //           parList.Load()
-    //           Dim Sth As Double, Ath As Double, Lth As Double
-    //           Dim b As Boolean = parList.GetTh(102, "Q", Sth, Ath, Lth)
     double startTh = 0;
-    double heightTh = 2;
+    double heightTh = 0;
     double widthTth = 0;
+
+    Ancestry *config_ana = new Ancestry;
+    config_ana->loadFromXML(":/Config/ParAna.xml");
+
+    QString value;
+    foreach (Ancestry *child,config_ana->getChildren())
+    {
+        if (child->name() == "Analysis")
+        {
+          foreach (Ancestry *def,child->getChildren())
+          {
+              value=def->getAttribute("Type");
+              if (value.toInt() == MK_FLOWMETRY)
+              {
+                  Ancestry *flusso = def->getChild("Q");
+                  startTh = flusso->getChild("StartTh")->getTextOfChild("value").toDouble();
+                  heightTh = flusso->getChild("AmpTh")->getTextOfChild("value").toDouble();
+                  widthTth = flusso->getChild("DurTh")->getTextOfChild("value").toDouble();
+              }
+          }
+        }
+
+    }
 
     int res = m_ana->FLW_Adv_Analysis_Time(1,__chEn,__start,__end,__curDef,startTh,heightTh,widthTth,__auto,getValVolRes(), 0);
     if (res < 0)
@@ -1190,249 +1100,88 @@ bool MDataManager::InitArraysFLW(int __start,
 
 
     //Legge i risultati
-    int ris = ReadResult();
+    res = ReadResult();
+    if (res < 0)
+        return false;
 
+    //costruisco i segnali da disegnare nel plot per i nomogrammi
+
+    //nomogramma LiverpoolQMax
+    MSignal *sig0=new MSignal;
+    MSignal *sig1=new MSignal;
+    MSignal *sig2=new MSignal;
+    MSignal *sig3=new MSignal;
+    MSignal *sig4=new MSignal;
+    MSignal *sig5=new MSignal;
+    MSignal *sig6=new MSignal;
+    int lunx = m_aflwdatas.at(1)->getLiverpoolMax()->getXmax();
+    sig0->setData(m_aflwdatas.at(1)->getLiverpoolMax()->getLineY(0).data(),lunx);
+    sig0->setName("linea1");
+    sig1->setData(m_aflwdatas.at(1)->getLiverpoolMax()->getLineY(1).data(),lunx);
+    sig1->setName("linea2");
+    sig2->setData(m_aflwdatas.at(1)->getLiverpoolMax()->getLineY(2).data(),lunx);
+    sig2->setName("linea3");
+    sig3->setData(m_aflwdatas.at(1)->getLiverpoolMax()->getLineY(3).data(),lunx);
+    sig3->setName("linea4");
+    sig4->setData(m_aflwdatas.at(1)->getLiverpoolMax()->getLineY(4).data(),lunx);
+    sig4->setName("linea5");
+    sig5->setData(m_aflwdatas.at(1)->getLiverpoolMax()->getLineY(5).data(),lunx);
+    sig5->setName("linea6");
+    sig6->setData(m_aflwdatas.at(1)->getLiverpoolMax()->getLineY(6).data(),lunx);
+    sig6->setName("linea7");
+    QVariantList tracce;
+    tracce<< "$Track"<<"family"<<sig0->getName()<<"name"<<"Signal"<<"Category"<<CAT_TRACK<<"descr"<<"line"<<"pointer"<<(qulonglong)sig0<<"&Track";
+    tracce<< "$Track"<<"family"<<sig1->getName()<<"name"<<"Signal"<<"Category"<<CAT_TRACK<<"descr"<<"line"<<"pointer"<<(qulonglong)sig1<<"&Track";
+    tracce<< "$Track"<<"family"<<sig2->getName()<<"name"<<"Signal"<<"Category"<<CAT_TRACK<<"descr"<<"line"<<"pointer"<<(qulonglong)sig2<<"&Track";
+    tracce<< "$Track"<<"family"<<sig3->getName()<<"name"<<"Signal"<<"Category"<<CAT_TRACK<<"descr"<<"line"<<"pointer"<<(qulonglong)sig3<<"&Track";
+    tracce<< "$Track"<<"family"<<sig4->getName()<<"name"<<"Signal"<<"Category"<<CAT_TRACK<<"descr"<<"line"<<"pointer"<<(qulonglong)sig4<<"&Track";
+    tracce<< "$Track"<<"family"<<sig5->getName()<<"name"<<"Signal"<<"Category"<<CAT_TRACK<<"descr"<<"line"<<"pointer"<<(qulonglong)sig5<<"&Track";
+    tracce<< "$Track"<<"family"<<sig6->getName()<<"name"<<"Signal"<<"Category"<<CAT_TRACK<<"descr"<<"line"<<"pointer"<<(qulonglong)sig6<<"&Track";
+    QVariantList colori;
+    colori << "green" << "red" << "white" << "white" << "white" << "white" << "green";
+    m_aflwdatas.at(1)->getLiverpoolMax()->setColors(colori);
+    m_aflwdatas.at(1)->getLiverpoolMax()->setTracce(tracce);
+
+    //nomogramma LiverpoolQAve
+    MSignal *sig0Ave=new MSignal;
+    MSignal *sig1Ave=new MSignal;
+    MSignal *sig2Ave=new MSignal;
+    MSignal *sig3Ave=new MSignal;
+    MSignal *sig4Ave=new MSignal;
+    MSignal *sig5Ave=new MSignal;
+    MSignal *sig6Ave=new MSignal;
+    lunx = m_aflwdatas.at(1)->getLiverpoolAve()->getXmax();
+    sig0Ave->setData(m_aflwdatas.at(1)->getLiverpoolAve()->getLineY(0).data(),lunx);
+    sig0Ave->setName("linea1");
+    sig1Ave->setData(m_aflwdatas.at(1)->getLiverpoolAve()->getLineY(1).data(),lunx);
+    sig1Ave->setName("linea2");
+    sig2Ave->setData(m_aflwdatas.at(1)->getLiverpoolAve()->getLineY(2).data(),lunx);
+    sig2Ave->setName("linea3");
+    sig3Ave->setData(m_aflwdatas.at(1)->getLiverpoolAve()->getLineY(3).data(),lunx);
+    sig3Ave->setName("linea4");
+    sig4Ave->setData(m_aflwdatas.at(1)->getLiverpoolAve()->getLineY(4).data(),lunx);
+    sig4Ave->setName("linea5");
+    sig5Ave->setData(m_aflwdatas.at(1)->getLiverpoolAve()->getLineY(5).data(),lunx);
+    sig5Ave->setName("linea6");
+    sig6Ave->setData(m_aflwdatas.at(1)->getLiverpoolAve()->getLineY(6).data(),lunx);
+    sig6Ave->setName("linea7");
+    tracce.clear();
+    tracce<< "$Track"<<"family"<<sig0Ave->getName()<<"name"<<"Signal"<<"Category"<<CAT_TRACK<<"descr"<<"line"<<"pointer"<<(qulonglong)sig0Ave<<"&Track";
+    tracce<< "$Track"<<"family"<<sig1Ave->getName()<<"name"<<"Signal"<<"Category"<<CAT_TRACK<<"descr"<<"line"<<"pointer"<<(qulonglong)sig1Ave<<"&Track";
+    tracce<< "$Track"<<"family"<<sig2Ave->getName()<<"name"<<"Signal"<<"Category"<<CAT_TRACK<<"descr"<<"line"<<"pointer"<<(qulonglong)sig2Ave<<"&Track";
+    tracce<< "$Track"<<"family"<<sig3Ave->getName()<<"name"<<"Signal"<<"Category"<<CAT_TRACK<<"descr"<<"line"<<"pointer"<<(qulonglong)sig3Ave<<"&Track";
+    tracce<< "$Track"<<"family"<<sig4Ave->getName()<<"name"<<"Signal"<<"Category"<<CAT_TRACK<<"descr"<<"line"<<"pointer"<<(qulonglong)sig4Ave<<"&Track";
+    tracce<< "$Track"<<"family"<<sig5Ave->getName()<<"name"<<"Signal"<<"Category"<<CAT_TRACK<<"descr"<<"line"<<"pointer"<<(qulonglong)sig5Ave<<"&Track";
+    tracce<< "$Track"<<"family"<<sig6Ave->getName()<<"name"<<"Signal"<<"Category"<<CAT_TRACK<<"descr"<<"line"<<"pointer"<<(qulonglong)sig6Ave<<"&Track";
+    colori.clear();
+    colori << "green" << "red" << "white" << "white" << "white" << "white" << "green";
+    m_aflwdatas.at(1)->getLiverpoolAve()->setColors(colori);
+    m_aflwdatas.at(1)->getLiverpoolAve()->setTracce(tracce);
+
+    return true;
 }
 
-//    Private Function InitArraysFLW(ByVal start_time As Int32, ByVal end_time As Int32, ByVal ChEn() As Byte, ByVal MkId As Int32, ByVal Auto As Byte) As Boolean
 
-
-//           'Legge i risultati
-//           Dim StructType As Integer
-//           StructType = ReadResults(FileGraphName, 1)
-
-//           ReDim N_Liverpool_Max(MAX_ANALYSIS)
-//           N_Liverpool_Max(NumAnalysis) = New Nomogramma(FLW_ADV_STUDY, G_LIVERPOOL_MAX, 310)
-//           ReDim N_Liverpool_Ave(MAX_ANALYSIS)
-//           N_Liverpool_Ave(NumAnalysis) = New Nomogramma(FLW_ADV_STUDY, G_LIVERPOOL_AVE, 310)
-
-//           If Not TestDescription.Sex Then
-//               ReDim N_Siroky_Ave(MAX_ANALYSIS)
-//               N_Siroky_Ave(NumAnalysis) = New Nomogramma(FLW_ADV_STUDY, G_FLW_Siroky_Ave, 310)
-//               ReDim N_Siroky_Max(MAX_ANALYSIS)
-//               N_Siroky_Max(NumAnalysis) = New Nomogramma(FLW_ADV_STUDY, G_FLW_Siroky_Max, 310)
-//           End If
-
-//           N_Liverpool_Max(NumAnalysis).FontSize = FontSel.LabelAxisFontSize
-//           N_Liverpool_Max(NumAnalysis).FontName = FontSel.FontName
-//           N_Liverpool_Max(NumAnalysis).PrintFontSize = PRINT_FONT_SIZE
-//           N_Liverpool_Max(NumAnalysis).strX = RMLoc.GetString("VOIDVOL2")
-//           N_Liverpool_Max(NumAnalysis).strY = RMLoc.GetString("QMAX")
-//           N_Liverpool_Max(NumAnalysis).Name = RMLoc.GetString("LIVERPOOLQMAX")
-//           N_Liverpool_Max(NumAnalysis).flNotCursor = True
-
-//           N_Liverpool_Ave(NumAnalysis).FontSize = FontSel.LabelAxisFontSize
-//           N_Liverpool_Ave(NumAnalysis).PrintFontSize = PRINT_FONT_SIZE
-//           N_Liverpool_Ave(NumAnalysis).FontName = FontSel.FontName
-//           N_Liverpool_Ave(NumAnalysis).strX = RMLoc.GetString("VOIDVOL2")
-//           N_Liverpool_Ave(NumAnalysis).strY = RMLoc.GetString("QMAX")
-//           N_Liverpool_Ave(NumAnalysis).Name = RMLoc.GetString("LIVERPOOLQAVE")
-//           N_Liverpool_Ave(NumAnalysis).flNotCursor = True
-
-
-//           Const N_LIVERPOOL = 24
-//           Const N_LIVERPOOL_CENT = 5
-//           Dim Step_Liverpool As Long
-//           Step_Liverpool = 600 / N_LIVERPOOL
-//           N_Liverpool_Max(NumAnalysis).nPoints1 = N_LIVERPOOL - 1
-//           N_Liverpool_Max(NumAnalysis).nPoints2 = N_LIVERPOOL_CENT
-//           N_Liverpool_Max(NumAnalysis).nPoints3 = N_LIVERPOOL_CENT
-//           N_Liverpool_Max(NumAnalysis).nPoints4 = N_LIVERPOOL_CENT
-//           N_Liverpool_Max(NumAnalysis).nPoints5 = N_LIVERPOOL_CENT
-//           N_Liverpool_Max(NumAnalysis).nPoints6 = N_LIVERPOOL_CENT
-//           N_Liverpool_Max(NumAnalysis).nPoints7 = N_LIVERPOOL_CENT
-//           ReDim N_Liverpool_Max(NumAnalysis).Linex1(N_LIVERPOOL - 1)
-//           ReDim N_Liverpool_Max(NumAnalysis).Liney1(N_LIVERPOOL - 1)
-//           ReDim N_Liverpool_Max(NumAnalysis).Linex2(N_LIVERPOOL_CENT)
-//           ReDim N_Liverpool_Max(NumAnalysis).Liney2(N_LIVERPOOL_CENT)
-//           ReDim N_Liverpool_Max(NumAnalysis).Linex3(N_LIVERPOOL_CENT)
-//           ReDim N_Liverpool_Max(NumAnalysis).Liney3(N_LIVERPOOL_CENT)
-//           ReDim N_Liverpool_Max(NumAnalysis).Linex4(N_LIVERPOOL_CENT)
-//           ReDim N_Liverpool_Max(NumAnalysis).Liney4(N_LIVERPOOL_CENT)
-//           ReDim N_Liverpool_Max(NumAnalysis).Linex5(N_LIVERPOOL_CENT)
-//           ReDim N_Liverpool_Max(NumAnalysis).Liney5(N_LIVERPOOL_CENT)
-//           ReDim N_Liverpool_Max(NumAnalysis).Linex6(N_LIVERPOOL_CENT)
-//           ReDim N_Liverpool_Max(NumAnalysis).Liney6(N_LIVERPOOL_CENT)
-//           ReDim N_Liverpool_Max(NumAnalysis).Linex7(N_LIVERPOOL_CENT)
-//           ReDim N_Liverpool_Max(NumAnalysis).Liney7(N_LIVERPOOL_CENT)
-
-//           N_Liverpool_Ave(NumAnalysis).nPoints1 = N_LIVERPOOL - 1
-//           N_Liverpool_Ave(NumAnalysis).nPoints2 = N_LIVERPOOL_CENT
-//           N_Liverpool_Ave(NumAnalysis).nPoints3 = N_LIVERPOOL_CENT
-//           N_Liverpool_Ave(NumAnalysis).nPoints4 = N_LIVERPOOL_CENT
-//           N_Liverpool_Ave(NumAnalysis).nPoints5 = N_LIVERPOOL_CENT
-//           N_Liverpool_Ave(NumAnalysis).nPoints6 = N_LIVERPOOL_CENT
-//           N_Liverpool_Ave(NumAnalysis).nPoints7 = N_LIVERPOOL_CENT
-//           ReDim N_Liverpool_Ave(NumAnalysis).Linex1(N_LIVERPOOL - 1)
-//           ReDim N_Liverpool_Ave(NumAnalysis).Liney1(N_LIVERPOOL - 1)
-//           ReDim N_Liverpool_Ave(NumAnalysis).Linex2(N_LIVERPOOL_CENT)
-//           ReDim N_Liverpool_Ave(NumAnalysis).Liney2(N_LIVERPOOL_CENT)
-//           ReDim N_Liverpool_Ave(NumAnalysis).Linex3(N_LIVERPOOL_CENT)
-//           ReDim N_Liverpool_Ave(NumAnalysis).Liney3(N_LIVERPOOL_CENT)
-//           ReDim N_Liverpool_Ave(NumAnalysis).Linex4(N_LIVERPOOL_CENT)
-//           ReDim N_Liverpool_Ave(NumAnalysis).Liney4(N_LIVERPOOL_CENT)
-//           ReDim N_Liverpool_Ave(NumAnalysis).Linex5(N_LIVERPOOL_CENT)
-//           ReDim N_Liverpool_Ave(NumAnalysis).Liney5(N_LIVERPOOL_CENT)
-//           ReDim N_Liverpool_Ave(NumAnalysis).Linex6(N_LIVERPOOL_CENT)
-//           ReDim N_Liverpool_Ave(NumAnalysis).Liney6(N_LIVERPOOL_CENT)
-//           ReDim N_Liverpool_Ave(NumAnalysis).Linex7(N_LIVERPOOL_CENT)
-//           ReDim N_Liverpool_Ave(NumAnalysis).Liney7(N_LIVERPOOL_CENT)
-
-//           For i = 1 To N_LIVERPOOL
-//               If Not TestDescription.Sex Then
-//                   If TestDescription.Age < 50 Then
-//                       'Liverpool uomini età < 50
-//                       N_Liverpool_Max(NumAnalysis).Linex1(i - 1) = i * Step_Liverpool
-//                       N_Liverpool_Max(NumAnalysis).Liney1(i - 1) = (2.37 + 0.18 * System.Math.Sqrt(i * Step_Liverpool) - 0.014 * 35) ^ 2
-//                       N_Liverpool_Ave(NumAnalysis).Linex1(i - 1) = i * Step_Liverpool
-//                       N_Liverpool_Ave(NumAnalysis).Liney1(i - 1) = (1.8 + 0.14 * System.Math.Sqrt(i * Step_Liverpool) - 0.011 * 35) ^ 2
-//                   Else
-//                       'Liverpool uomini >= 50
-//                       N_Liverpool_Max(NumAnalysis).Linex1(i - 1) = i * Step_Liverpool
-//                       N_Liverpool_Max(NumAnalysis).Liney1(i - 1) = (2.37 + 0.18 * System.Math.Sqrt(i * Step_Liverpool) - 0.014 * 60) ^ 2
-//                       N_Liverpool_Ave(NumAnalysis).Linex1(i - 1) = i * Step_Liverpool
-//                       N_Liverpool_Ave(NumAnalysis).Liney1(i - 1) = (1.8 + 0.14 * System.Math.Sqrt(i * Step_Liverpool) - 0.011 * 60) ^ 2
-//                   End If
-//               Else
-//                   'Liverpool donne
-//                   N_Liverpool_Max(NumAnalysis).Linex1(i - 1) = i * Step_Liverpool
-//                   N_Liverpool_Max(NumAnalysis).Liney1(i - 1) = 2.718282 ^ (0.511 + 0.505 * System.Math.Log(i * Step_Liverpool)) '(2.37 + 0.18 * Sqr(i * Step_Liverpool) - 0.014 * 35) ^ 2)
-//                   N_Liverpool_Ave(NumAnalysis).Linex1(i - 1) = i * Step_Liverpool
-//                   N_Liverpool_Ave(NumAnalysis).Liney1(i - 1) = (-0.921 + 0.869 * System.Math.Log(i * Step_Liverpool)) ^ 2
-//               End If
-//           Next i
-
-//           Dim LUtil = New ParamSiroky()
-
-//           If Not TestDescription.Sex Then
-//               LUtil.ReadLiverpoolParameter(True, False, TestDescription.Age)
-//               For i = 0 To N_LIVERPOOL_CENT
-//                   N_Liverpool_Max(NumAnalysis).Linex2(i) = LUtil.ArrLineX1(i)
-//                   N_Liverpool_Max(NumAnalysis).Liney2(i) = LUtil.ArrLineY1(i)
-//                   N_Liverpool_Max(NumAnalysis).Linex3(i) = LUtil.ArrLineX2(i)
-//                   N_Liverpool_Max(NumAnalysis).Liney3(i) = LUtil.ArrLineY2(i)
-//                   N_Liverpool_Max(NumAnalysis).Linex4(i) = LUtil.ArrLineX3(i)
-//                   N_Liverpool_Max(NumAnalysis).Liney4(i) = LUtil.ArrLineY3(i)
-//                   N_Liverpool_Max(NumAnalysis).Linex5(i) = LUtil.ArrLineX4(i)
-//                   N_Liverpool_Max(NumAnalysis).Liney5(i) = LUtil.ArrLineY4(i)
-//                   N_Liverpool_Max(NumAnalysis).Linex6(i) = LUtil.ArrLineX5(i)
-//                   N_Liverpool_Max(NumAnalysis).Liney6(i) = LUtil.ArrLineY5(i)
-//                   N_Liverpool_Max(NumAnalysis).Linex7(i) = LUtil.ArrLineX6(i)
-//                   N_Liverpool_Max(NumAnalysis).Liney7(i) = LUtil.ArrLineY6(i)
-//               Next i
-//               LUtil.ReadLiverpoolParameter(False, False, TestDescription.Age)
-//               For i = 0 To N_LIVERPOOL_CENT
-//                   N_Liverpool_Ave(NumAnalysis).Linex2(i) = LUtil.ArrLineX1(i)
-//                   N_Liverpool_Ave(NumAnalysis).Liney2(i) = LUtil.ArrLineY1(i)
-//                   N_Liverpool_Ave(NumAnalysis).Linex3(i) = LUtil.ArrLineX2(i)
-//                   N_Liverpool_Ave(NumAnalysis).Liney3(i) = LUtil.ArrLineY2(i)
-//                   N_Liverpool_Ave(NumAnalysis).Linex4(i) = LUtil.ArrLineX3(i)
-//                   N_Liverpool_Ave(NumAnalysis).Liney4(i) = LUtil.ArrLineY3(i)
-//                   N_Liverpool_Ave(NumAnalysis).Linex5(i) = LUtil.ArrLineX4(i)
-//                   N_Liverpool_Ave(NumAnalysis).Liney5(i) = LUtil.ArrLineY4(i)
-//                   N_Liverpool_Ave(NumAnalysis).Linex6(i) = LUtil.ArrLineX5(i)
-//                   N_Liverpool_Ave(NumAnalysis).Liney6(i) = LUtil.ArrLineY5(i)
-//                   N_Liverpool_Ave(NumAnalysis).Linex7(i) = LUtil.ArrLineX6(i)
-//                   N_Liverpool_Ave(NumAnalysis).Liney7(i) = LUtil.ArrLineY6(i)
-//               Next i
-//           Else
-//               LUtil.ReadLiverpoolParameter(True, True, 0)
-//               For i = 0 To N_LIVERPOOL_CENT
-//                   N_Liverpool_Max(NumAnalysis).Linex2(i) = LUtil.ArrLineX1(i)
-//                   N_Liverpool_Max(NumAnalysis).Liney2(i) = LUtil.ArrLineY1(i)
-//                   N_Liverpool_Max(NumAnalysis).Linex3(i) = LUtil.ArrLineX2(i)
-//                   N_Liverpool_Max(NumAnalysis).Liney3(i) = LUtil.ArrLineY2(i)
-//                   N_Liverpool_Max(NumAnalysis).Linex4(i) = LUtil.ArrLineX3(i)
-//                   N_Liverpool_Max(NumAnalysis).Liney4(i) = LUtil.ArrLineY3(i)
-//                   N_Liverpool_Max(NumAnalysis).Linex5(i) = LUtil.ArrLineX4(i)
-//                   N_Liverpool_Max(NumAnalysis).Liney5(i) = LUtil.ArrLineY4(i)
-//                   N_Liverpool_Max(NumAnalysis).Linex6(i) = LUtil.ArrLineX5(i)
-//                   N_Liverpool_Max(NumAnalysis).Liney6(i) = LUtil.ArrLineY5(i)
-//                   N_Liverpool_Max(NumAnalysis).Linex7(i) = LUtil.ArrLineX6(i)
-//                   N_Liverpool_Max(NumAnalysis).Liney7(i) = LUtil.ArrLineY6(i)
-//               Next i
-//               LUtil.ReadLiverpoolParameter(False, True, 0)
-//               For i = 0 To N_LIVERPOOL_CENT
-//                   N_Liverpool_Ave(NumAnalysis).Linex2(i) = LUtil.ArrLineX1(i)
-//                   N_Liverpool_Ave(NumAnalysis).Liney2(i) = LUtil.ArrLineY1(i)
-//                   N_Liverpool_Ave(NumAnalysis).Linex3(i) = LUtil.ArrLineX2(i)
-//                   N_Liverpool_Ave(NumAnalysis).Liney3(i) = LUtil.ArrLineY2(i)
-//                   N_Liverpool_Ave(NumAnalysis).Linex4(i) = LUtil.ArrLineX3(i)
-//                   N_Liverpool_Ave(NumAnalysis).Liney4(i) = LUtil.ArrLineY3(i)
-//                   N_Liverpool_Ave(NumAnalysis).Linex5(i) = LUtil.ArrLineX4(i)
-//                   N_Liverpool_Ave(NumAnalysis).Liney5(i) = LUtil.ArrLineY4(i)
-//                   N_Liverpool_Ave(NumAnalysis).Linex6(i) = LUtil.ArrLineX5(i)
-//                   N_Liverpool_Ave(NumAnalysis).Liney6(i) = LUtil.ArrLineY5(i)
-//                   N_Liverpool_Ave(NumAnalysis).Linex7(i) = LUtil.ArrLineX6(i)
-//                   N_Liverpool_Ave(NumAnalysis).Liney7(i) = LUtil.ArrLineY6(i)
-//               Next i
-//           End If
-
-//           N_Liverpool_Max(NumAnalysis).Unit = RMLoc.GetString("Q") & RMLoc.GetString("MISMLSEC")
-//           N_Liverpool_Max(NumAnalysis).TitleAxixX = RMLoc.GetString("VOL") & RMLoc.GetString("MISML")
-//           N_Liverpool_Max(NumAnalysis).flGrRight = False
-//           N_Liverpool_Max(NumAnalysis).rxMin = 0
-//           N_Liverpool_Max(NumAnalysis).ryMin = 0
-//           N_Liverpool_Max(NumAnalysis).rxMax = 600
-//           If TestDescription.Sex Then
-//               N_Liverpool_Max(NumAnalysis).ryMax = 60
-//           Else
-//               N_Liverpool_Max(NumAnalysis).ryMax = 80 '75 '70 da chiedere a Davide
-//           End If
-
-//           N_Liverpool_Ave(NumAnalysis).Unit = RMLoc.GetString("Q") & RMLoc.GetString("MISMLSEC")
-//           N_Liverpool_Ave(NumAnalysis).TitleAxixX = RMLoc.GetString("VOL") & RMLoc.GetString("MISML")
-//           N_Liverpool_Ave(NumAnalysis).flGrRight = False
-//           N_Liverpool_Ave(NumAnalysis).rxMax = 600
-//           N_Liverpool_Ave(NumAnalysis).ryMax = 40
-
-//            N_Liverpool_Max(NumAnalysis).DatoAveX = FLWAdvReport(NumAnalysis).voided_volume
-//                   N_Liverpool_Max(NumAnalysis).DatoMaxY = FLWAdvReport(NumAnalysis).Q_MAX
-//                   N_Liverpool_Ave(NumAnalysis).DatoAveX = FLWAdvReport(NumAnalysis).voided_volume
-//                   N_Liverpool_Ave(NumAnalysis).DatoAveY = FLWAdvReport(NumAnalysis).q_ave
-
-
-
-
-typedef struct {
-    float waiting_time;			// waiting time
-    float q_max;					// maximum flow
-    float q_ave;					// average flow
-    float time_at_v3;             // time at Vol/3
-    float time_at_v2;             // time at Vol/2
-    float time_at_qmax;			// time at Q max
-    float time_90;				// time between 5% and 95% of the voided volume
-    float flow_time;				// flow time
-    float desc_time;				// time between Q max and 95% of the voided volume
-    float voiding_time;			// voiding time
-    float vol_at_qmax;			// volume at Q max
-    long voided_volume;          // voided volume
-    float acceleration;           // Q max / T qmax
-    long residual_volume;		// residual volume inserted by the user
-    float v_det_max;              // detrusor contraction maximum speed
-    float cQ;						// Flow corrective factor
-
-} FLWAdvRepStruct;
-
-
-enum {
-    WAITING_TIME = 0,
-    MAXIMUM_FLOW = 4,
-    AVERAGE_FLOW = 8,
-    TIME_AT_VOL3 = 12,
-    TIME_AT_VOL2 = 16,
-    TIME_AT_QMAX = 20,
-    TIME_5_95_VOIDED_VOL = 24,
-    FLOW_TIME  = 28,
-    TIME_QMAX_95_VOIDED_VOL = 32,
-    VOIDING_TIME = 36,
-    VOLUME_QMAX = 40,
-    VOIDED_VOLUME = 44,
-    ACCELERATION = 48,
-    RESIDUAL_USER = 52,
-    DETRUSOR = 56,
-    FLOW_CORR_FACTOR = 60
-}  ;
 
 int MDataManager::ReadResult(int __numEv)
 {
@@ -1443,87 +1192,81 @@ int MDataManager::ReadResult(int __numEv)
 
     __numEv = m_mng->readNumEv();
 
-    FLWAdvRepStruct FLWAdvReport[__numEv+1];
-   // byte* strTemp = new byte(sizeof(FLWAdvReport[0]));
-    byte* strTemp = (byte*) malloc (sizeof(FLWAdvReport[0]));
-
-    switch (StructType) {
+    switch (StructType)
+    {
     case FLW_AVD_STUDY: {
-                //dati analisi
-        FLWAdvReport[0].waiting_time = 0;
-        FLWAdvReport[0].q_max = 0;
-        FLWAdvReport[0].q_ave = 0;
-        FLWAdvReport[0].time_at_v3 = 0;
-        FLWAdvReport[0].time_at_v2 = 0;
-        FLWAdvReport[0].time_90 = 0;
-        FLWAdvReport[0].flow_time = 0;
-        FLWAdvReport[0].desc_time = 0;
-        FLWAdvReport[0].voiding_time = 0;
-        FLWAdvReport[0].vol_at_qmax = 0;
-        FLWAdvReport[0].voided_volume = 0;
-        FLWAdvReport[0].acceleration = 0;
-        FLWAdvReport[0].residual_volume = 0;
-        FLWAdvReport[0].v_det_max = 0;
-        FLWAdvReport[0].cQ = 0;
+        //dati analisi
+        mflowdatas *FLWAdvMedia  = new mflowdatas();
+        byte* strTemp = (byte*) malloc (sizeof(FLWAdvRepStruct));
+
+        FLWAdvMedia->setWaitingTime(0);
+        FLWAdvMedia->setQMax(0);
+        FLWAdvMedia->setQAve(0);
+        FLWAdvMedia->setTimeAtV3(0);
+        FLWAdvMedia->setTimeAtV2(0);
+        FLWAdvMedia->setTime90(0);
+        FLWAdvMedia->setTimeAtQmax(0);
+        FLWAdvMedia->setFlowTime(0);
+        FLWAdvMedia->setDescTime(0);
+        FLWAdvMedia->setVoidingTime(0);
+        FLWAdvMedia->setVolAtQqmax(0);
+        FLWAdvMedia->setVoidedVolume(0);
+        FLWAdvMedia->setAcceleration(0);
+        FLWAdvMedia->setResidualVolume(0);
+        FLWAdvMedia->setVDetMax(0);
+        FLWAdvMedia->setCQ(0);
+
+        m_aflwdatas.append(FLWAdvMedia);
 
         for (int i=1; i<=__numEv; i++)
         {
-            m_mng->readResAna(sizeof(FLWAdvReport[0]),strTemp);
-            FLWAdvReport[i].waiting_time = *((float*)(strTemp + WAITING_TIME));
-            FLWAdvReport[i].q_max = *((float*)(strTemp + MAXIMUM_FLOW));
-            FLWAdvReport[i].q_ave = *((float*)(strTemp + AVERAGE_FLOW));
-            FLWAdvReport[i].time_at_v3 = *((float*)(strTemp + TIME_AT_VOL3));
-            FLWAdvReport[i].time_at_v2 = *((float*)(strTemp + TIME_AT_VOL2));
-            FLWAdvReport[i].time_at_qmax = *((float*)(strTemp + TIME_AT_QMAX));
-            FLWAdvReport[i].time_90 = *((float*)(strTemp + TIME_5_95_VOIDED_VOL));
-            FLWAdvReport[i].flow_time = *((float*)(strTemp + FLOW_TIME));
-            FLWAdvReport[i].desc_time = *((float*)(strTemp + TIME_QMAX_95_VOIDED_VOL));
-            FLWAdvReport[i].voiding_time = *((float*)(strTemp + VOIDING_TIME));
-            FLWAdvReport[i].vol_at_qmax = *((float*)(strTemp + VOLUME_QMAX));
-            FLWAdvReport[i].voided_volume = *((float*)(strTemp + VOIDED_VOLUME));
-            FLWAdvReport[i].acceleration = *((float*)(strTemp + ACCELERATION));
-            FLWAdvReport[i].residual_volume = *((float*)(strTemp + RESIDUAL_USER));
-            FLWAdvReport[i].v_det_max = *((float*)(strTemp + DETRUSOR));
-            FLWAdvReport[i].cQ = *((float*)(strTemp +FLOW_CORR_FACTOR));
+            mflowdatas *FLWAdvEventi = new mflowdatas();
+
+            m_mng->readResAna(sizeof(FLWAdvRepStruct),strTemp);
+            FLWAdvEventi->setWaitingTime(*((float*)(strTemp + WAITING_TIME)));
+            FLWAdvEventi->setQMax(*((float*)(strTemp + MAXIMUM_FLOW)));
+            FLWAdvEventi->setQAve(*((float*)(strTemp + AVERAGE_FLOW)));
+            FLWAdvEventi->setTimeAtV3(*((float*)(strTemp + TIME_AT_VOL3)));
+            FLWAdvEventi->setTimeAtV2(*((float*)(strTemp + TIME_AT_VOL2)));
+            FLWAdvEventi->setTimeAtQmax(*((float*)(strTemp + TIME_AT_QMAX)));
+            FLWAdvEventi->setTime90(*((float*)(strTemp + TIME_5_95_VOIDED_VOL)));
+            FLWAdvEventi->setFlowTime(*((float*)(strTemp + FLOW_TIME)));
+            FLWAdvEventi->setDescTime(*((float*)(strTemp + TIME_QMAX_95_VOIDED_VOL)));
+            FLWAdvEventi->setVoidingTime(*((float*)(strTemp + VOIDING_TIME)));
+            FLWAdvEventi->setVolAtQqmax(*((float*)(strTemp + VOLUME_QMAX)));
+            FLWAdvEventi->setVoidedVolume(*((int*)(strTemp + VOIDED_VOLUME)));
+            FLWAdvEventi->setAcceleration(*((float*)(strTemp + ACCELERATION)));
+            FLWAdvEventi->setResidualVolume(*((int*)(strTemp + RESIDUAL_USER)));
+            FLWAdvEventi->setVDetMax(*((float*)(strTemp + DETRUSOR)));
+            FLWAdvEventi->setCQ(*((float*)(strTemp +FLOW_CORR_FACTOR)));
+            FLWAdvEventi->buildTable();
+            FLWAdvEventi->buildNomogrammi(true, 45);
+            m_aflwdatas.append(FLWAdvEventi);
         }
 
         //calcolo la media
-        for (int i=1; i<=__numEv; i++)
-        {
-            FLWAdvReport[0].waiting_time += FLWAdvReport[i].waiting_time;
-            FLWAdvReport[0].q_max += FLWAdvReport[i].q_max;
-            FLWAdvReport[0].q_ave += FLWAdvReport[i].q_ave;
-            FLWAdvReport[0].time_at_v3 += FLWAdvReport[i].time_at_v3;
-            FLWAdvReport[0].time_at_v2 += FLWAdvReport[i].time_at_v2;
-            FLWAdvReport[0].time_at_qmax += FLWAdvReport[i].time_at_qmax;
-            FLWAdvReport[0].time_90 += FLWAdvReport[i].time_90;
-            FLWAdvReport[0].flow_time += FLWAdvReport[i].flow_time;
-            FLWAdvReport[0].desc_time += FLWAdvReport[i].desc_time;
-            FLWAdvReport[0].voiding_time += FLWAdvReport[i].voiding_time;
-            FLWAdvReport[0].vol_at_qmax += FLWAdvReport[i].vol_at_qmax;
-            FLWAdvReport[0].voided_volume += FLWAdvReport[i].voided_volume;
-            FLWAdvReport[0].acceleration += FLWAdvReport[i].acceleration;
-            FLWAdvReport[0].residual_volume += FLWAdvReport[i].residual_volume;
-            FLWAdvReport[0].v_det_max += FLWAdvReport[i].v_det_max;
-            FLWAdvReport[0].cQ += FLWAdvReport[i].cQ;
-        }
+//        for (int i=1; i<=__numEv; i++)
+//        {
+//            m_aflwdatas.at(0)->addWaitingTime(m_aflwdatas.at(i)->getWaitingTime());
+//            m_aflwdatas.at(0)->addQMax(m_aflwdatas[i]->getQMax());
+//            m_aflwdatas.at(0)->addQAve(m_aflwdatas[i]->getQAve());
+//            m_aflwdatas.at(0)->addTimeAtV3(m_aflwdatas.at(i)->getTimeAtV3());
+//            m_aflwdatas.at(0)->addTimeAtV2(m_aflwdatas.at(i)->getTimeAtV2());
+//            m_aflwdatas.at(0)->addTimeAtQmax(m_aflwdatas.at(i)->getTimeAtQmax());
+//            m_aflwdatas.at(0)->addTime90(m_aflwdatas.at(i)->getTime90());
+//            m_aflwdatas.at(0)->addFlowTime(m_aflwdatas.at(i)->getFlowTime());
+//            m_aflwdatas.at(0)->addDescTime(m_aflwdatas.at(i)->getDescTime());
+//            m_aflwdatas.at(0)->addVoidingTime(m_aflwdatas.at(i)->getVoidingTime());
+//            m_aflwdatas.at(0)->addVolAtQqmax(m_aflwdatas.at(i)->getVolAtQqmax());
+//            m_aflwdatas.at(0)->addVoidedVolume(m_aflwdatas.at(i)->getVoidedVolume());
+//            m_aflwdatas.at(0)->addAcceleration(m_aflwdatas.at(i)->getAcceleration());
+//            m_aflwdatas.at(0)->addResidualVolume(m_aflwdatas.at(i)->getResidualVolume());
+//            m_aflwdatas.at(0)->addVDetMax(m_aflwdatas.at(i)->getVDetMax());
+//            m_aflwdatas.at(0)->addCQ(m_aflwdatas.at(i)->getCQ());
+//        }
+        m_aflwdatas.at(0)->buildTable();
+        free(strTemp);
 
-        FLWAdvReport[0].waiting_time /= __numEv;
-        FLWAdvReport[0].q_max /= __numEv;
-        FLWAdvReport[0].q_ave /= __numEv;
-        FLWAdvReport[0].time_at_v3 /= __numEv;
-        FLWAdvReport[0].time_at_v2 /= __numEv;
-        FLWAdvReport[0].time_at_qmax /= __numEv;
-        FLWAdvReport[0].time_90 /= __numEv;
-        FLWAdvReport[0].flow_time /= __numEv;
-        FLWAdvReport[0].desc_time /= __numEv;
-        FLWAdvReport[0].voiding_time /= __numEv;
-        FLWAdvReport[0].vol_at_qmax /= __numEv;
-        FLWAdvReport[0].voided_volume /= __numEv;
-        FLWAdvReport[0].acceleration /= __numEv;
-        FLWAdvReport[0].residual_volume /= __numEv;
-        FLWAdvReport[0].v_det_max /= __numEv;
-        FLWAdvReport[0].cQ /= __numEv;
 
         break;
     }
@@ -1531,114 +1274,12 @@ int MDataManager::ReadResult(int __numEv)
         break;
     }
 
-    free(strTemp);
     return StructType;
 
 }
 
+mflowdatas *MDataManager::getFlowDatas(int __i)
+{
+    return m_aflwdatas.at(__i);\
+}
 
-
-//Dim StructType As Integer = -1
-//Dim strTemp() As Byte
-
-//Dim pEvAve As Integer
-//Dim pUraAve As Integer
-
-//Dim fileR As New wrapperReadAnalysis(FileGraphName)
-//Dim b As Boolean = fileR.Open()
-//If (Not b) Then
-//    MessageBox.Show(RMLoc.GetString("ERRORFILEREAD"), RMLoc.GetString("ERROR"), MessageBoxButtons.OK, MessageBoxIcon.Error)
-//    Return -1
-//End If
-
-//StructType = fileR.getAnaType()
-//If StructType <= 0 Then
-//    fileR.Close()
-//    MessageBox.Show(RMLoc.GetString("ERRORFILEREAD"), RMLoc.GetString("ERROR"), MessageBoxButtons.OK, MessageBoxIcon.Error)
-//    Return -1
-//End If
-//fileR.readNumEv(NumEv)
-
-//Select Case StructType
-//    Case FLW_ADV_STUDY
-//        'media
-//        FLWAdvReport(0).acceleration = 0
-//        FLWAdvReport(0).cQ = 0
-//        FLWAdvReport(0).desc_time = 0
-//        FLWAdvReport(0).flow_time = 0
-//        FLWAdvReport(0).q_ave = 0
-//        FLWAdvReport(0).Q_MAX = 0
-//        FLWAdvReport(0).residual_volume = 0
-//        FLWAdvReport(0).time_90 = 0
-//        FLWAdvReport(0).time_at_qmax = 0
-//        FLWAdvReport(0).time_at_v2 = 0
-//        FLWAdvReport(0).time_at_v3 = 0
-//        FLWAdvReport(0).v_det_max = 0
-//        FLWAdvReport(0).voided_volume = 0
-//        FLWAdvReport(0).voiding_time = 0
-//        FLWAdvReport(0).vol_at_qmax = 0
-//        FLWAdvReport(0).waiting_time = 0
-//        'dati analisi
-//        For i As Integer = 1 To NumEv
-//            strTemp = Nothing
-//            fileR.readResAna(Len(FLWAdvReport(0)) - 1, strTemp)
-//            FLWAdvReport(i).waiting_time = BitConverter.ToSingle(strTemp, WAITING_TIME)
-//            FLWAdvReport(i).Q_MAX = BitConverter.ToSingle(strTemp, MAXIMUM_FLOW)
-//            FLWAdvReport(i).q_ave = BitConverter.ToSingle(strTemp, AVERAGE_FLOW)
-//            FLWAdvReport(i).time_at_v3 = BitConverter.ToSingle(strTemp, TIME_AT_VOL3)
-//            FLWAdvReport(i).time_at_v2 = BitConverter.ToSingle(strTemp, TIME_AT_VOL2)
-//            FLWAdvReport(i).time_at_qmax = BitConverter.ToSingle(strTemp, TIME_AT_QMAX)
-//            FLWAdvReport(i).time_90 = BitConverter.ToSingle(strTemp, TIME_5_95_VOIDED_VOL)
-//            FLWAdvReport(i).flow_time = BitConverter.ToSingle(strTemp, FLOW_TIME)
-//            FLWAdvReport(i).desc_time = BitConverter.ToSingle(strTemp, TIME_QMAX_95_VOIDED_VOL)
-//            FLWAdvReport(i).voiding_time = BitConverter.ToSingle(strTemp, VOIDING_TIME)
-//            FLWAdvReport(i).vol_at_qmax = BitConverter.ToSingle(strTemp, VOLUME_QMAX)
-//            FLWAdvReport(i).voided_volume = BitConverter.ToInt32(strTemp, VOIDED_VOLUME)
-//            FLWAdvReport(i).acceleration = BitConverter.ToSingle(strTemp, ACCELERATION)
-//            FLWAdvReport(i).residual_volume = BitConverter.ToInt32(strTemp, RESIDUAL_USER)
-//            FLWAdvReport(i).v_det_max = BitConverter.ToSingle(strTemp, DETRUSOR)
-//            FLWAdvReport(i).cQ = BitConverter.ToSingle(strTemp, FLOW_CORR_FACTOR)
-//        Next
-
-//        'calcolo la media
-//        For i = 1 To NumEv
-//            FLWAdvReport(0).waiting_time += FLWAdvReport(i).waiting_time
-//            FLWAdvReport(0).Q_MAX += FLWAdvReport(i).Q_MAX
-//            FLWAdvReport(0).q_ave += FLWAdvReport(i).q_ave
-//            FLWAdvReport(0).time_at_v3 += FLWAdvReport(i).time_at_v3
-//            FLWAdvReport(0).time_at_v2 += FLWAdvReport(i).time_at_v2
-//            FLWAdvReport(0).time_at_qmax += FLWAdvReport(i).time_at_qmax
-//            FLWAdvReport(0).time_90 += FLWAdvReport(i).time_90
-//            FLWAdvReport(0).flow_time += FLWAdvReport(i).flow_time
-//            FLWAdvReport(0).desc_time += FLWAdvReport(i).desc_time
-//            FLWAdvReport(0).voiding_time += FLWAdvReport(i).voiding_time
-//            FLWAdvReport(0).vol_at_qmax += FLWAdvReport(i).vol_at_qmax
-//            FLWAdvReport(0).voided_volume += FLWAdvReport(i).voided_volume
-//            FLWAdvReport(0).acceleration += FLWAdvReport(i).acceleration
-//            FLWAdvReport(0).residual_volume += FLWAdvReport(i).residual_volume
-//            FLWAdvReport(0).v_det_max += FLWAdvReport(i).v_det_max
-//            FLWAdvReport(0).cQ += FLWAdvReport(i).cQ
-//        Next
-
-//        FLWAdvReport(0).waiting_time /= NumEv
-//        FLWAdvReport(0).Q_MAX /= NumEv
-//        FLWAdvReport(0).q_ave /= NumEv
-//        FLWAdvReport(0).time_at_v3 /= NumEv
-//        FLWAdvReport(0).time_at_v2 /= NumEv
-//        FLWAdvReport(0).time_at_qmax /= NumEv
-//        FLWAdvReport(0).time_90 /= NumEv
-//        FLWAdvReport(0).flow_time /= NumEv
-//        FLWAdvReport(0).desc_time /= NumEv
-//        FLWAdvReport(0).voiding_time /= NumEv
-//        FLWAdvReport(0).vol_at_qmax /= NumEv
-//        FLWAdvReport(0).voided_volume /= NumEv
-//        FLWAdvReport(0).acceleration /= NumEv
-//        FLWAdvReport(0).residual_volume /= NumEv
-//        FLWAdvReport(0).v_det_max /= NumEv
-//        FLWAdvReport(0).cQ /= NumEv
-
-//        End Select
-
-//        fileR.Close()
-
-//        Return StructType

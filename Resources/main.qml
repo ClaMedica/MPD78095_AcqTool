@@ -32,6 +32,7 @@ ApplicationWindow {
 //        }
 //    }
 
+
     function launch(arguments)
     {
 
@@ -110,6 +111,13 @@ ApplicationWindow {
             volRes.visible = true
         }
 
+        onSg_loadResult:{
+            forAna.visible = false
+            forRes.loadPageAnalysis()
+            //forRes.testNomogrammi()
+            forRes.visible = true
+        }
+
 
         Component.onCompleted: console.log("MDataManager Ready!")
     }
@@ -147,11 +155,15 @@ ApplicationWindow {
     }
 
 
+    ResultForm{
+        //@@@@@@@@@@    Properties      @@@@@@@@@@
+        id: forRes
+    }
+
+
     VolResDlg{
         //@@@@@@@@@@    Properties      @@@@@@@@@@
         id: volRes
-
-        //@@@@@@@@@@    Events          @@@@@@@@@@
-
+        visible: false
     }
 }

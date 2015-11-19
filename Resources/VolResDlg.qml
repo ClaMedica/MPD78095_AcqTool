@@ -39,7 +39,7 @@ Rectangle {
 
         Text{
             id: textVol
-            text:"Insert Residual Volume"
+            text:qsTr("Insert Residual Volume")
         }
 
         Rectangle {
@@ -74,22 +74,12 @@ Rectangle {
         anchors.bottomMargin: 10
         anchors.rightMargin: 10
         onClicked: {
-            //signal
             volResVal = textInput.text
             volResDlg.visible = false
             mngData.valVolRes = volResVal
-            mngData.volRelDlgOk(titleDlg)
+            mngData.analysis()
         }
     }
-
-    //    Action {
-    //        id: closeDlgAction
-    //        //shortcut: StandardKey.Quit
-
-    //        onTriggered: volResDlg.visible = false
-    //    }
-
-
 
 }
 

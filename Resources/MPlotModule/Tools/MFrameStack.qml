@@ -83,7 +83,7 @@ Rectangle {
             vMinY:rootFrameStack.yMin
             vMaxY:rootFrameStack.yMax
             onZoomMeChanged: rootFrameStack.zoomThis=zoomMe
-            onModifyMe: rootFrameStack.newFrame=["code",fullCode,
+            onModifyMe: rootFrameStack.newFrame=[whoAmI,
                                                  "xMin",xMin,
                                                  "xMax",xMax,
                                                  "yMin",yMin,
