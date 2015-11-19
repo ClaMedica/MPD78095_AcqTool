@@ -29,7 +29,7 @@ SOURCES += main.cpp \
     CPP/native.cpp \
     CPP/androidmanager.cpp \
     CPP/mflowdatas.cpp \
-    ../MGlobal/MyMessageOutput.cpp
+    ../MGlobal/MyMessageOutput.cpp \
     CPP/manatablemodel.cpp \
     CPP/nomogramma.cpp
 

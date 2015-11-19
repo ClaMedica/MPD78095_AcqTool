@@ -82,8 +82,5 @@ int main(int argc, char *argv[])
 
 
     int ret=app.exec();
-    f.open(QIODevice::Append);
-    f.write("</BODY></HTML>");
-    f.close();
     return ret;
 }
