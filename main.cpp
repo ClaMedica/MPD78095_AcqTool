@@ -19,6 +19,7 @@
 #include <stdlib.h>
 #include <QObject>
 #include <p7settingsmanager.h>
+#include <MyMessageOutput.h>
 #ifdef ANDROID
 #include <QAndroidJniObject>
 #include <QtAndroid>
@@ -29,8 +30,6 @@
 int main(int argc, char *argv[])
 {
     Q_INIT_RESOURCE(qml);
-    //creo il file di report
-    qInstallMessageHandler(myMessageOutput); //install : set the callback
 
     QGuiApplication app(argc, argv);
     //carico i settaggi
@@ -45,13 +44,9 @@ int main(int argc, char *argv[])
     gPath_log=QApplication::applicationDirPath()+"/"+logFile;
 #endif
 
-    QFile f;
-    f.setFileName(gPath_log);
-    f.open(QIODevice::WriteOnly);
-    f.write(LOG_HEADER);
-    QString curDateTime=QDateTime::currentDateTime().toString()+"<BR>";
-    f.write(curDateTime.toLatin1());
-    f.close();
+    //dirotto il debug log
+    MyMessageOutput outmsg;
+    outmsg.init(gPath_log);
     qDebug()<<"Partiamo";
     //qDebug()<<fibonacci(5);
 

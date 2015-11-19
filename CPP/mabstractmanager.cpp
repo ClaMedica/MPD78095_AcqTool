@@ -1,5 +1,5 @@
 #include "mabstractmanager.h"
-
+#include "QApplication"
 MAbstractManager::MAbstractManager(QObject *parent) : QObject(parent)
 {
     m_applicationPath=QApplication::applicationDirPath();

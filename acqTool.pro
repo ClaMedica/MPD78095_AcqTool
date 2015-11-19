@@ -29,6 +29,7 @@ SOURCES += main.cpp \
     CPP/native.cpp \
     CPP/androidmanager.cpp \
     CPP/mflowdatas.cpp \
+    ../MGlobal/MyMessageOutput.cpp
     CPP/manatablemodel.cpp \
     CPP/nomogramma.cpp
 
@@ -69,15 +70,13 @@ INCLUDEPATH +=  CPP \
                 ../SuperFlowBt \
                 ../DataFileManager \
                 CPP/TCP \
-                ../CellaBluetooth/Supervisor
+                ../SupeFlowBT
 
 
 
 # Default rules for deployment.
 include(deployment.pri)
 
-win32:CONFIG(release, debug|release): LIBS += -L$$PWD/../Build/DataBuild/release/ -lDatafileManager1
-else:win32:CONFIG(debug, debug|release): LIBS += -L$$PWD/../Build/DataBuild/debug/ -lDatafileManager1
 
 
 win32:CONFIG(release, debug|release): LIBS += -L$$PWD/../Build/AnaUro7Build/release/ -lAnaUro
@@ -94,12 +93,15 @@ QT += androidextras
         $$PWD/../Build/Emulator/MPlotModule/libQmlPlotter.so
 
 ANDROID_PACKAGE_SOURCE_DIR = $$PWD/android-sources
-}
 
 unix:!macx: LIBS += -L$$PWD/../Build/Emulator/DataBuild/ -lDatafileManager
 
 #INCLUDEPATH += $$PWD/../Build/Emulator/DataBuild
 #DEPENDPATH += $$PWD/../Build/Emulator/DataBuild
+
+}
+
+
 
 #percorso tecnoideal
 #rootPath = M:
@@ -115,5 +117,15 @@ win32{
     plugin.path = $${rootPath}\Build\StandAlone
     plugin.files += $$shell_path($$OUT_PWD)\release\acqTool.exe
     INSTALLS += plugin
+
+win32:CONFIG(release, debug|release): LIBS += -L$$PWD/../Build/DataBuild/release/ -lDatafileManager1
+else:win32:CONFIG(debug, debug|release): LIBS += -L$$PWD/../Build/DataBuild/debug/ -lDatafileManager1
+
+INCLUDEPATH += $$PWD/../Build/DataBuild/release
+DEPENDPATH += $$PWD/../Build/DataBuild/release
 }
 
+unix:!macx: LIBS += -L$$PWD/../Build/DataFileManager/ -lDatafileManager
+
+INCLUDEPATH += $$PWD/../Build/DataFileManager
+DEPENDPATH += $$PWD/../Build/DataFileManager

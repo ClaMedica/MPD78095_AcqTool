@@ -11,7 +11,7 @@ MDataManager::MDataManager(QObject *parent)
     m_updateWhenNews=false;
     m_start=0;
     m_end=3600;//fine esame di default a 1 ora
-    m_applicationPath=QApplication::applicationDirPath();
+    //m_applicationPath=applicationDirPath();
     m_configurationFileLoaded=false;//nessun file di configurazione caricato
     m_changesToBeSaved=false;
 
@@ -142,7 +142,7 @@ void MDataManager::loadFile(QString __fileName)
             double val=(double)numSamp[0]/m_mng->GetNAS(0);
             qDebug()<<"Marker"<<key<<val;
             if(m_markerMap.keys().contains(key))
-            {//marker conosciuto le info ce le ho giÃ 
+            {//marker conosciuto le info ce le ho giÃ
                 (*mrk)=m_markerMap[key];
             }
             else
@@ -311,7 +311,7 @@ void MDataManager::resetAll()
 
 void MDataManager::saveChanges()
 {
-    //se c'era giÃ  un'altra copia la cancelliamo
+    //se c'era giÃ  un'altra copia la cancelliamo
     if(m_copy!=NULL)
         delete m_copy;
 
@@ -531,7 +531,7 @@ bool MDataManager::buildInfoList()
      */
 
     //allora dato che questa funzione Ã¨ chiamata dopo aver costruito i plotter
-    //so giÃ  quanti e come si chiamano i grafici
+    //so giÃ  quanti e come si chiamano i grafici
 
     QStringList graphs=m_chanInPlots.keys();
 
@@ -544,7 +544,7 @@ bool MDataManager::buildInfoList()
         gName=graph;
         //riempo con gli elementi che mi servono
 
-        //tracce molto facile dato che ce le ho giÃ 
+        //tracce molto facile dato che ce le ho giÃ
         foreach (QString chanName, m_chanInPlots[graph]) {
             elements<<chanName+":Signal";
         }
@@ -663,7 +663,7 @@ bool MDataManager::changeObject(QVariantList __curObj)
     if(__curObj.length()!=2)
     {
         qulonglong whoAmI=__curObj.first().toULongLong();
-        //tolgo il whoami e lascio solo le proprietÃ 
+        //tolgo il whoami e lascio solo le proprietÃ
         __curObj.removeFirst();
         qDebug()<<"Richiesta di modifica per "<<whoAmI;
         if(m_storage.modifyElement(whoAmI,__curObj))

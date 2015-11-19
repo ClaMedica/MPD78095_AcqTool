@@ -119,8 +119,7 @@ private:
     QString m_currentSignalName,
     m_plotConfigFileName,
     m_fileName,
-    m_configurationFileName,
-    m_applicationPath;
+    m_configurationFileName;
 
     Ancestry m_configLocale,    //è la prima ad essere caricata e contiene la lingua
     m_configAcq,                //contiene le info fisse di acquisizione
