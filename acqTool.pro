@@ -9,6 +9,8 @@ QML_IMPORT_PATH +=  ../Build/CommonPlugin\
                     ../AcqTool \
 
 DEFINES += QT_MESSAGELOGCONTEXT
+#debug campioni di acquisizione
+DEFINES += DEBUG_ACQ
 # The .cpp file which was generated for your project. Feel free to hack it.
 SOURCES += main.cpp \
     CPP/parametermanager.cpp \
@@ -106,7 +108,7 @@ unix:!macx: LIBS += -L$$PWD/../Build/Emulator/DataBuild/ -lDatafileManager
 #percorso tecnoideal
 #rootPath = M:
 #percorso acer luca
-#rootPath = C:\Users\Mez
+rootPath = C:\Users\Mez
 #percorso claudia
 rootPath = E:\Piattaforma_70
 

@@ -35,13 +35,13 @@ QVariantList MAbstractManager::markersInfo(QString __filterType,
 bool MAbstractManager::load()
 {//in questa funzione inizializzo tutto caricando i file di configurazione fissi
     if(!m_configLocale.loadFromXML(":/Config/Config_Locale.xml"))
-    {qCritical()<<"Error on locale configuration file";return false;}
+    qCritical()<<"Error on locale configuration file";
 
     if(!m_configUser.loadFromXML(":/Config/Config_User.xml"))
-    {qCritical()<<"Error on user configuration file";return false;}
+    qCritical()<<"Error on user configuration file";
 
     if(!m_configMarkers.loadFromXML(":/Config/markers.xml"))
-    {qCritical()<<"Error on user configuration file";return false;}
+    qCritical()<<"Error on user configuration file";
 
     buildMarkerInfoMap();
 }
