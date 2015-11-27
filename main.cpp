@@ -20,6 +20,7 @@
 #include <QObject>
 #include <p7settingsmanager.h>
 #include <MyMessageOutput.h>
+#include <QApplication>
 #ifdef ANDROID
 #include <QAndroidJniObject>
 #include <QtAndroid>
