@@ -96,7 +96,7 @@ Rectangle{
             lineLength:rootMarkerStack.height
             anchors.bottom: lista.bottom
             //quando cambia il valore di un marker invio queste informazioni sopra
-            onModifyMe: if(completed){newMarker=["code",fullCode,"val",value];}
+            onModifyMe: if(completed){newMarker=[whoAmI,"val",value];}
             //se ne voglio rimuovere uno invece invio solo il codice
             onDeleteMe: if(completed){newMarker=["code",fullCode];}
         }

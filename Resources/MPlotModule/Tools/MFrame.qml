@@ -12,7 +12,7 @@ Rectangle{
     property real xMax:modF.xMax
     property real yMin:modF.yMin
     property real yMax:modF.yMax
-    property var fullCode:[modF.family,modF.name,modF.code]
+    property real whoAmI:modF.whoAmI
     property var zoomMe
     signal modifyMe
 
@@ -89,7 +89,7 @@ Rectangle{
             anchors.centerIn: parent
             height:parent.height-10
             width:parent.width-10
-            text:modF.popUp
+            text:modF.descr
             color:"white"
             horizontalAlignment: Text.AlignHCenter
             verticalAlignment: Text.AlignVCenter

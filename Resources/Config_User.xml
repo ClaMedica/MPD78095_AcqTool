@@ -1,14 +1,122 @@
 <Configuration>
-	<AutoStarts>
-		<Step chanType="VBT" num="1" repeat="no" bufferSize="50" enabled="true">
-			<Amplitude min="2" max="15"/>
-			<Duration min="10"/>
-		</Step>
-	</AutoStarts>
-	<AutoStops>
-		<Stationary chanType="QBT" num="1" repeat="no">
-			<Value min="-0.5" max="0.5"/>
-			<Duration min="300" max="INF"/>
-		</Stationary>
-	</AutoStops>
+        <AutoStarts>
+                <Step>
+                        <chanType
+                        label="Channel Type"
+                        type="TextField"
+                        unit=""
+                        value="VBT"
+                        />
+                        <num
+                        label="Number"
+                        type="TextField"
+                        unit=""
+                        value="1"
+                        />
+                        <repeat
+                        label="Repeat"
+                        type="CheckBox"
+                        unit=""
+                        value="0"
+                        />
+                        <bufferSize
+                        label="Buffer Size"
+                        type="TextField"
+                        unit=""
+                        value="50"
+                        />
+                        <enabled
+                        label="Enabled"
+                        type="CheckBox"
+                        unit=""
+                        value="1"
+                        />
+                        <Amplitude>
+                                <min
+                                label="Minimum"
+                                type="TextField"
+                                unit="g"
+                                value="2"
+                                />
+                                <max
+                                label="Maximum"
+                                type="TextField"
+                                unit="g"
+                                value="15"
+                                />
+                        </Amplitude>
+                        <Duration>
+                                <min
+                                label="Minimum"
+                                type="TextField"
+                                unit="sec"
+                                value="10"
+                                />
+                        </Duration>
+                </Step>
+        </AutoStarts>
+        <AutoStops>
+                <Stationary>
+                        <chanType
+                        label="Channel Type"
+                        type="TextField"
+                        unit=""
+                        value="QBT"
+                        />
+                        <num
+                        label="Number"
+                        type="TextField"
+                        unit=""
+                        value="1"
+                        />
+                        <repeat
+                        label="Repeat"
+                        type="CheckBox"
+                        unit=""
+                        value="0"
+                        />
+                        <Value>
+                                <min
+                                label="Minimum"
+                                type="TextField"
+                                unit="ml/sec"
+                                value="-1"
+                                />
+                                <max
+                                label="Maximum"
+                                type="TextField"
+                                unit="ml/sec"
+                                value="1"
+                                />
+                        </Value>
+                        <Duration>
+                                <min
+                                label="Minimum"
+                                type="TextField"
+                                unit="sec"
+                                value="300"
+                                />
+                                <max
+                                label="Maximum"
+                                type="TextField"
+                                unit="sec"
+                                value="300"
+                                />
+                        </Duration>
+                </Stationary>
+        </AutoStops>
+        <Supervisor>
+                <Visible
+                label="Visible"
+                type="CheckBox"
+                unit=""
+                value="0"
+                />
+                <Colore
+                label="Colore mio"
+                type="MColorBox"
+                unit=""
+                value="#FFFFFF"
+                />
+        </Supervisor>
 </Configuration>

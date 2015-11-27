@@ -19,6 +19,7 @@
 #include <QObject>
 #include <p7settingsmanager.h>
 #include <MyMessageOutput.h>
+#include <QApplication>
 #ifdef ANDROID
 #include <QAndroidJniObject>
 #include <QtAndroid>
@@ -77,8 +78,5 @@ int main(int argc, char *argv[])
 
 
     int ret=app.exec();
-    f.open(QIODevice::Append);
-    f.write("</BODY></HTML>");
-    f.close();
     return ret;
 }

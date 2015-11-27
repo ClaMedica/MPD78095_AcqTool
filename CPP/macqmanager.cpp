@@ -80,7 +80,7 @@ bool MAcqManager::newAcquisition(QString __dataFile)
     }
     else
     {
-        //carico la configurazione per l'acquisizione
+        qDebug()<<"carico la configurazione per l'acquisizione";
         if(!m_configAcq.loadFromXML(g_P7SettingsManager.progPath()+"/Config_Acq.xml"))
             qCritical()<<"Error on acq configuration file";
 
@@ -90,9 +90,7 @@ bool MAcqManager::newAcquisition(QString __dataFile)
             qCritical()<<"Error on alarm configuration file";
 
         //carico info di connettività
-        if(m_configAcq.getChild(XML_CONNECTIONS)==NULL)
-            qCritical()<<"XML file corrupted";
-        loadConnectivityInfo(m_configAcq.getChild(XML_CONNECTIONS));
+        loadConnectivityInfo(m_configAcq.getSafeChild(XML_CONNECTIONS));
 
 
         /* non sono in acquisizione e quindi posso lanciarne una nuova aprendo il file e leggendo le info
@@ -182,8 +180,8 @@ void MAcqManager::startSupe(QString __mode)
 {
     m_superProcess=new QProcess();
     qDebug()<<"Supervisor starting...";
-    QString path="../StandAlone/";
-    m_superProcess->start(path+"FlowBtSupe.exe",QStringList()<<__mode);
+    QString path=g_P7SettingsManager.progPath();
+    m_superProcess->start(path+"/FlowBtSupe.exe",QStringList()<<__mode);
 }
 
 void MAcqManager::endAcquisition(QString __exit)
@@ -389,11 +387,9 @@ void MAcqManager::initializeServers()
 bool MAcqManager::loadConnectivityInfo(Ancestry *__info)
 {
     qDebug()<<"Loading connectivity info";
-    if(__info==NULL)
-    {qCritical()<<MEX_CHILD_NOT_ALIVE;return false;}
-    Ancestry *tcp=__info->getChild(XML_TCP);
-    if(tcp==NULL)
-    {qCritical()<<MEX_CHILD_NOT_ALIVE;return false;}
+    //__info è sicuro
+    Ancestry *tcp=__info->getSafeChild(XML_TCP);
+
 
 
     foreach (Ancestry *child, tcp->getChildren()) {
@@ -458,28 +454,34 @@ void MAcqManager::analyzeAlarms(alarms_t __alarms)
 void MAcqManager::checkAutomaticStartStop(QString __which)
 {//ok controlliamo se c'è qualche condizione automatica
     //mi salvo il puntatore al livello acquisition
+
     //qDebug()<<"Start check"<<__which;
-    Ancestry *contitions=m_configUser.getChild("Auto"+__which+"s");
-    if(contitions==NULL){qCritical(MEX_CHILD_NOT_ALIVE);return;}
+
+    Ancestry *contitions=m_configUser.getSafeChild("Auto"+__which+"s");
     foreach (Ancestry *condition, contitions->getChildren()) {//scorro le condizioni di autostart anche se ce ne è solo una
         //pesco su quale canale è fatta
         QString chanType=condition->getAttribute(ATT_CHANTYPE);
         int num=condition->getAttribute(ATT_NUM).toInt()-1;//il meno 1 è per ovviare al fatto che si parte da 1
         //e in base a come si chiama vedo che farci
-        //qDebug()<<condition->name();
-        if(condition->name()==XML_STEP)
-        {//condizione a gradino
-            Ancestry *childDur=condition->getChild(XML_DURATION);
-            if(childDur==NULL){qCritical(MEX_CHILD_NOT_ALIVE);return;}
-            Ancestry *childAmp=condition->getChild(XML_AMPLITUDE);
-            if(childAmp==NULL){qCritical(MEX_CHILD_NOT_ALIVE);return;}
-            //per prima cosa controlliamo quanti campioni è
-            int min=childDur->getAttribute(ATT_MIN).toUInt();
 
-            qreal ampMin=childAmp->getAttribute(ATT_MIN).toInt();
-            qreal ampMax=childAmp->getAttribute(ATT_MAX).toInt();
+        //qDebug()<<condition->name();
+
+        if(condition->name()==XML_STEP)
+        {
+
+            qDebug()<<"condizione a gradino";
+
+            Ancestry *childDur=condition->getSafeChild(XML_DURATION);
+            Ancestry *childAmp=condition->getSafeChild(XML_AMPLITUDE);
+            //per prima cosa controlliamo quanti campioni è
+             int min=childDur->getSafeChild(ATT_MIN)->getAttribute(ATT_VALUE).toUInt();
+
+            qreal ampMin=childAmp->getSafeChild(ATT_MIN)->getAttribute(ATT_VALUE).toInt();
+
+            qreal ampMax=childAmp->getSafeChild(ATT_MAX)->getAttribute(ATT_VALUE).toInt();
+
             //qDebug()<<"Buffer"<<chanType<<num<<"="<<*(m_channelMap[chanType].at(num));
-            //qDebug()<<min<<bufferSize<<ampMax<<ampMin;
+
             if(m_channelMap[chanType].at(num)->size()<min)
                 continue;//non ho ancora abbastanza campioni per decidere skip alla prossima condizione
             //ora quindi sono sicuro che arrivo qui solo quando ho abbastanza campioni
@@ -507,21 +509,22 @@ void MAcqManager::checkAutomaticStartStop(QString __which)
             }
             else
             {
-                //qDebug()<<chanType<<num<<(*m_channelMap[chanType].at(num));
+
+                qDebug()<<"Non ho trovato nulla";
+
             }
         }
 
         if(condition->name()==XML_STATIONARY)
         {//statio
-            Ancestry *childDur=condition->getChild(XML_DURATION);
-            if(childDur==NULL){qCritical(MEX_CHILD_NOT_ALIVE);return;}
-            Ancestry *childVal=condition->getChild(XML_VALUE);
-            if(childVal==NULL){qCritical(MEX_CHILD_NOT_ALIVE);return;}
-            //per prima cosa controlliamo quanti campioni è
-            int min=childDur->getAttribute(ATT_MIN).toUInt();
+            Ancestry *childDur=condition->getSafeChild(XML_DURATION);
+            Ancestry *childVal=condition->getSafeChild(XML_VALUE);
 
-            qreal valMin=childVal->getAttribute(ATT_MIN).toDouble();
-            qreal valMax=childVal->getAttribute(ATT_MAX).toDouble();
+            //per prima cosa controlliamo quanti campioni è
+            int min=childDur->getSafeChild(ATT_MIN)->getAttribute(ATT_VALUE).toUInt();
+
+            qreal valMin=childVal->getSafeChild(ATT_MIN)->getAttribute(ATT_VALUE).toDouble();
+            qreal valMax=childVal->getSafeChild(ATT_MAX)->getAttribute(ATT_VALUE).toDouble();
             //qDebug()<<"Buffer"<<chanType<<num<<"="<<*(m_channelMap[chanType].at(num));
 
             m_stopBuffer<<*m_channelMap[chanType].at(num);
@@ -813,25 +816,26 @@ bool MAcqManager::buffersReady()
 
 bool MAcqManager::readConfigurationFile()
 {
+    qDebug()<<"Inizio a leggere il file di configurazione";
     int fmin=INF;
     //in questa funzione leggo il file di configurazione e mi annoto le info che mi servono
-    Ancestry *channels=m_configAcq.getChild(XML_CHANNELS);
-    if(channels==NULL){qCritical()<<MEX_CHILD_NOT_ALIVE;return false;}
-
+    Ancestry *channels=m_configAcq.getSafeChild(XML_CHANNELS);
+    qDebug()<<"Trovati"<<channels->getChildren().size()<<"canali";
     foreach(Ancestry *channel,channels->getChildren()){
         //scorriamo tutti i canali per acquisire le info
         //che supervisore serve?
         QString card=channel->getAttribute("card");
-        if(card==""){qCritical()<<"File corrupted";return false;}
+        if(card=="")qCritical()<<"File corrupted";
+        //se non c'è già questo supe lo aggiungo alla lista di quelli da far partire
         if(!m_superList.contains(card))
             m_superList<<card;
-        QString name=channel->getTextOfChild(XML_NAME);
-        if(name==""){qCritical()<<"File corrupted";return false;}
+        QString name=channel->getSafeChild(XML_NAME)->text();
+        if(name=="")qCritical()<<"File corrupted";
         //ora leggiamo quanti canali di questo tipo ci sono
-        QString num=channel->getTextOfChild(XML_NUM);
-        //
-        QString f=channel->getTextOfChild(XML_FREQUENCY);
-        if(f==""){qCritical()<<"File corrupted";return false;}
+        QString num=channel->getSafeChild(XML_NUM)->text();
+        //e che frequenza hanno
+        QString f=channel->getSafeChild(XML_FREQUENCY)->text();
+        if(f=="")qCritical()<<"File corrupted";
         int sampleFreq=f.toInt();
         if(sampleFreq<fmin)
             fmin=sampleFreq;
@@ -842,20 +846,23 @@ bool MAcqManager::readConfigurationFile()
                 MSignal *p=new MSignal();
                 p->setSamplingFrequency(sampleFreq);
                 m_channelMap[name].append(p);
+                qDebug()<<"Aggiunto canale"<<name<<"con frequenza di campionamento"<<sampleFreq;
             }
         }
         else
             qCritical()<<"Fake channel"<<num;
 
         //ci sono delle operazioni?
-        QString operations=channel->getTextOfChild(XML_OPERATIONS);
-        if(operations==""){qCritical()<<MEX_CHILD_NOT_ALIVE;return false;}
+        QString operations=channel->getSafeChild(XML_OPERATIONS)->text();
+
         int bufMax=0;//massima lunghezza di buffer
+        //memorizzo la mappa delle operazioni
         m_operationMap[name]=operations.split("#");
         foreach(QString operation, m_operationMap[name])
         {
             QStringList opData=operation.split("@");
-            if(opData.length()<2){qCritical()<<"File corrupted";return false;}
+            if(opData.length()<2)
+                qCritical()<<"File corrupted";
             if(opData.at(1)!="")
             {
                 int bufSize=opData.at(1).toInt();
@@ -863,12 +870,13 @@ bool MAcqManager::readConfigurationFile()
                     bufMax=bufSize;
             }
         }
-        //qDebug()<<m_operationMap[name];
+        qDebug()<<m_operationMap[name];
         //ora si suppone che canali dello stesso tipo subiscono le stesse operazioni
 
         //quali canali sono coinvolti?
-        QString hwchans=channel->getTextOfChild(XML_HWCHAN);
-        if(hwchans==""){qCritical()<<"File corrupted";return false;}
+        QString hwchans=channel->getSafeChild(XML_HWCHAN)->text();
+        if(hwchans=="")
+            qCritical()<<"File corrupted";
         //ora si suppone che ci sia scritto num valori
         if(hwchans.split("#").size()==num.toInt())
         {
@@ -876,7 +884,7 @@ bool MAcqManager::readConfigurationFile()
                 m_HWChansMap[name]<<hwc;
                 if(m_sampleFreqMap.keys().contains(hwc))
                     if(m_sampleFreqMap[hwc]!=sampleFreq)//controllo che questo canale abbia una sola frequenza di campionamento
-                    {qCritical()<<"File corrupted";return false;}
+                    qCritical()<<"File corrupted";
                 m_sampleFreqMap[hwc]=sampleFreq;
                 if(m_bufSizeMap[hwc]<bufMax)
                     m_bufSizeMap[hwc]=bufMax;
