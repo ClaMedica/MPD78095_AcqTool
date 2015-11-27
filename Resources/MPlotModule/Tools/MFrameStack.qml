@@ -65,6 +65,7 @@ Rectangle {
         for(var i=0;i<frames.length;i++)
             if(frames[i]==="$Definer")
                 fc++
+
         frameCount=fc
         //console.log("popolato con ",frameCount," frame")
         if(frameCount>0)

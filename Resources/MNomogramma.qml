@@ -26,6 +26,9 @@ Rectangle {
     property string colorLabelAssi: "white"
     property string colorGriglia: "grey"
 
+    property var polygonYpoints: [0,1]
+    property var polygonXpoints: [0,0]
+
     border.width: 1
 
     color: "lightgrey"
@@ -339,6 +342,17 @@ Rectangle {
             x: point.x + point.width/2
             color: "slateblue"
             opacity: 1
+        }
+
+        PolygonItem {
+            id: polUp
+            anchors.fill: parent
+            anchors.margins:2
+            colore: "red"
+            ypoints:polygonYpoints
+            xpoints:polygonXpoints
+            visible: false
+
         }
 
     }

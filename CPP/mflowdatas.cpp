@@ -24,12 +24,16 @@ mflowdatas::mflowdatas(QObject *parent) : QObject(parent)
 
     m_liverpoolMax = new Nomogramma("flowmetry",G_LIVERPOOL_MAX);
     m_liverpoolAve = new Nomogramma("flowmetry",G_LIVERPOOL_AVE);
+
+    m_sirokyMax = new Nomogramma("flowmetry",G_SIROKY_MAX);
+    m_sirokyAve = new Nomogramma("flowmetry",G_SIROKY_AVE);
 }
 mflowdatas::~mflowdatas()
 {
     //delete m_datasInfo;
     //delete m_liverpoolMax;
     //delete m_liverpoolAve;
+    int c= 0;
 
 }
 
@@ -177,7 +181,7 @@ void mflowdatas::buildNomogrammi(bool __sex, int __age)
     }
 
 
-    for (int j=0; j<xVal[0].length()-1; j++)
+    for (int j=0; j<xVal.size(); j++)
     {
         pos = 0;
         midValue = 0;
@@ -215,7 +219,6 @@ void mflowdatas::buildNomogrammi(bool __sex, int __age)
     yValue.append(0);
     for (int i=0; i<N_LIVERPOOL; i++)
     {
-        m_liverpoolAve->addToLinex(1,(i+1) * Step_Liverpool);
         if (!__sex)
         {
             if (__age < 50)
@@ -289,7 +292,7 @@ void mflowdatas::buildNomogrammi(bool __sex, int __age)
         yVal[5].append(m_arrLineY6.at(i));
     }
 
-    for (int j=0; j<xVal[0].length()-1; j++)
+    for (int j=0; j<xVal.size(); j++)
     {
         pos = 0;
         midValue = 0;
@@ -310,6 +313,155 @@ void mflowdatas::buildNomogrammi(bool __sex, int __age)
             }
         }
     }
+
+    //siroky Max - Ave
+    if (!__sex)
+    {
+        //max
+        m_sirokyMax->setTitle(tr("Siroky (Q Max)"));
+        m_sirokyMax->setUnitx(tr("Q (ml/sec)"));
+        m_sirokyMax->setUnity(tr("Vol. (ml)"));
+        m_sirokyMax->setXmin(0);
+        m_sirokyMax->setYmin(0);
+        m_sirokyMax->setXmax(500);
+        m_sirokyMax->setYmax(30);
+
+        m_sirokyMax->setDatoX(getVoidedVolume());
+        m_sirokyMax->setDatoY(getQMax());
+
+        xVal.clear();
+        yVal.clear();
+        xVal[0].append(0);
+        yVal[0].append(0);
+        xVal[1].append(0);
+        yVal[1].append(0);
+        xVal[2].append(0);
+        yVal[2].append(0);
+        xVal[3].append(0);
+        yVal[3].append(0);
+
+        ReadSirokyParameter(false);
+        for (int i=0; i<m_arrLineX1.length(); i++)
+        {
+            xVal[0].append(m_arrLineX1.at(i));
+            yVal[0].append(m_arrLineY1.at(i));
+        }
+        for (int i=0; i<m_arrLineX2.length(); i++)
+        {
+            xVal[1].append(m_arrLineX2.at(i));
+            yVal[1].append(m_arrLineY2.at(i));
+        }
+        for (int i=0; i<m_arrLineX3.length(); i++)
+        {
+            xVal[2].append(m_arrLineX3.at(i));
+            yVal[2].append(m_arrLineY3.at(i));
+        }
+        for (int i=0; i<m_arrLineX4.length(); i++)
+        {
+            xVal[3].append(m_arrLineX4.at(i));
+            yVal[3].append(m_arrLineY4.at(i));
+        }
+//        for (int i=0; i<m_arrMax.length(); i++)
+//        {
+//            Value.append(m_arrMax.at(i));
+//        }
+
+        for (int j=0; j<xVal.size(); j++)
+        {
+            pos = 0;
+            midValue = 0;
+            valueToAdd = 0;
+            for (int i=0; i<m_sirokyMax->getXmax(); i++)
+            {
+                if (i==xVal[j].at(pos) && pos!=xVal[j].length()-1)
+                {
+                    m_sirokyMax->addToLiney(j,yVal[j].at(pos));
+                    midValue = (yVal[j].at(pos+1) - yVal[j].at(pos))/(xVal[j].at(pos+1) - xVal[j].at(pos));
+                    valueToAdd = midValue;
+                    pos++;
+                }
+                else
+                {
+                    m_sirokyMax->addToLiney(j,yVal[j].at(pos-1)+valueToAdd);
+                    valueToAdd=valueToAdd+midValue;
+                }
+            }
+        }
+    }
+
+    //ave
+    m_sirokyAve->setTitle(tr("Siroky (Q Ave)"));
+    m_sirokyAve->setUnitx(tr("Q (ml/sec)"));
+    m_sirokyAve->setUnity(tr("Vol. (ml)"));
+    m_sirokyAve->setXmin(0);
+    m_sirokyAve->setYmin(0);
+    m_sirokyAve->setXmax(500);
+    m_sirokyAve->setYmax(30);
+
+    m_sirokyAve->setDatoX(getVoidedVolume());
+    m_sirokyAve->setDatoY(getQAve());
+
+    xVal.clear();
+    yVal.clear();
+    xVal[0].append(0);
+    yVal[0].append(0);
+    xVal[1].append(0);
+    yVal[1].append(0);
+    xVal[2].append(0);
+    yVal[2].append(0);
+    xVal[3].append(0);
+    yVal[3].append(0);
+    xVal[4].append(0);
+    yVal[4].append(0);
+
+    ReadSirokyParameter(true);
+    for (int i=0; i<m_arrLineX1.length(); i++)
+    {
+        xVal[0].append(m_arrLineX1.at(i));
+        yVal[0].append(m_arrLineY1.at(i));
+    }
+    for (int i=0; i<m_arrLineX2.length(); i++)
+    {
+        xVal[1].append(m_arrLineX2.at(i));
+        yVal[1].append(m_arrLineY2.at(i));
+    }
+    for (int i=0; i<m_arrLineX3.length(); i++)
+    {
+        xVal[2].append(m_arrLineX3.at(i));
+        yVal[2].append(m_arrLineY3.at(i));
+    }
+    for (int i=0; i<m_arrLineX4.length(); i++)
+    {
+        xVal[3].append(m_arrLineX4.at(i));
+        yVal[3].append(m_arrLineY4.at(i));
+    }
+    for (int i=0; i<m_arrLineX5.length(); i++)
+    {
+        xVal[4].append(m_arrLineX5.at(i));
+        yVal[4].append(m_arrLineY5.at(i));
+    }
+    for (int j=0; j<xVal.size(); j++)
+    {
+        pos = 0;
+        midValue = 0;
+        valueToAdd = 0;
+        for (int i=0; i<m_sirokyAve->getXmax(); i++)
+        {
+            if (i==xVal[j].at(pos) && pos!=xVal[j].length()-1)
+            {
+                m_sirokyAve->addToLiney(j,yVal[j].at(pos));
+                midValue = (yVal[j].at(pos+1) - yVal[j].at(pos))/(xVal[j].at(pos+1) - xVal[j].at(pos));
+                valueToAdd = midValue;
+                pos++;
+            }
+            else
+            {
+                m_sirokyAve->addToLiney(j,yVal[j].at(pos-1)+valueToAdd);
+                valueToAdd=valueToAdd+midValue;
+            }
+        }
+    }
+
 }
 
 void mflowdatas::ReadLiverpoolParameter(bool __flowMax, bool __sex, int __age)
@@ -358,7 +510,7 @@ void mflowdatas::ReadLiverpoolParameter(bool __flowMax, bool __sex, int __age)
         m_arrLineY2.append(5.5);
         m_arrLineY2.append(9);
         m_arrLineY2.append(13);
-        m_arrLineY2.append(7.5);
+        m_arrLineY2.append(17.5);
         m_arrLineY2.append(29.5);
 
         //25th centile
@@ -892,6 +1044,397 @@ void mflowdatas::ReadLiverpoolParameter(bool __flowMax, bool __sex, int __age)
     }
 
 }
+
+void mflowdatas::ReadSirokyParameter(bool __flowAve)
+{
+    m_arrLineX1.clear();
+    m_arrLineX2.clear();
+    m_arrLineX3.clear();
+    m_arrLineX4.clear();
+    m_arrLineX5.clear();
+    m_arrLineX6.clear();
+
+    m_arrLineY1.clear();
+    m_arrLineY2.clear();
+    m_arrLineY3.clear();
+    m_arrLineY4.clear();
+    m_arrLineY5.clear();
+    m_arrLineY6.clear();
+
+    m_arrAve.clear();
+    m_arrMax.clear();
+
+    if (__flowAve)
+    {
+        m_arrLineX1.append(75);
+        m_arrLineX1.append(100);
+        m_arrLineX1.append(125);
+        m_arrLineX1.append(150);
+        m_arrLineX1.append(175);
+        m_arrLineX1.append(200);
+        m_arrLineX1.append(225);
+        m_arrLineX1.append(250);
+        m_arrLineX1.append(275);
+        m_arrLineX1.append(300);
+        m_arrLineX1.append(325);
+        m_arrLineX1.append(350);
+        m_arrLineX1.append(375);
+        m_arrLineX1.append(400);
+        m_arrLineX1.append(425);
+        m_arrLineX1.append(450);
+        m_arrLineX1.append(475);
+        m_arrLineX1.append(499);
+
+        m_arrLineY1.append(1.2);
+        m_arrLineY1.append(2.0);
+        m_arrLineY1.append(2.65);
+        m_arrLineY1.append(3.2);
+        m_arrLineY1.append(3.7);
+        m_arrLineY1.append(4.2);
+        m_arrLineY1.append(4.6);
+        m_arrLineY1.append(5);
+        m_arrLineY1.append(5.4);
+        m_arrLineY1.append(5.85);
+        m_arrLineY1.append(6.2);
+        m_arrLineY1.append(6.6);
+        m_arrLineY1.append(6.9);
+        m_arrLineY1.append(7.2);
+        m_arrLineY1.append(7.5);
+        m_arrLineY1.append(7.8);
+        m_arrLineY1.append(8.0);
+        m_arrLineY1.append(8.2);
+
+        m_arrLineX2.append(25);
+        m_arrLineX2.append(50);
+        m_arrLineX2.append(75);
+        m_arrLineX2.append(100);
+        m_arrLineX2.append(125);
+        m_arrLineX2.append(150);
+        m_arrLineX2.append(175);
+        m_arrLineX2.append(200);
+        m_arrLineX2.append(225);
+        m_arrLineX2.append(250);
+        m_arrLineX2.append(275);
+        m_arrLineX2.append(300);
+        m_arrLineX2.append(325);
+        m_arrLineX2.append(350);
+        m_arrLineX2.append(375);
+        m_arrLineX2.append(400);
+        m_arrLineX2.append(425);
+        m_arrLineX2.append(450);
+        m_arrLineX2.append(475);
+        m_arrLineX2.append(499);
+
+        m_arrLineY2.append(1.2);
+        m_arrLineY2.append(2.35);
+        m_arrLineY2.append(3.3);
+        m_arrLineY2.append(4.2);
+        m_arrLineY2.append(5.0);
+        m_arrLineY2.append(5.8);
+        m_arrLineY2.append(6.5);
+        m_arrLineY2.append(7.25);
+        m_arrLineY2.append(8.0);
+        m_arrLineY2.append(8.7);
+        m_arrLineY2.append(9.35);
+        m_arrLineY2.append(9.93);
+        m_arrLineY2.append(10.5);
+        m_arrLineY2.append(11.05);
+        m_arrLineY2.append(11.65);
+        m_arrLineY2.append(12.2);
+        m_arrLineY2.append(12.7);
+        m_arrLineY2.append(13);
+        m_arrLineY2.append(13.2);
+        m_arrLineY2.append(13.3);
+
+        m_arrLineX3.append(18);
+        m_arrLineX3.append(25);
+        m_arrLineX3.append(50);
+        m_arrLineX3.append(75);
+        m_arrLineX3.append(100);
+        m_arrLineX3.append(125);
+        m_arrLineX3.append(150);
+        m_arrLineX3.append(175);
+        m_arrLineX3.append(200);
+        m_arrLineX3.append(225);
+        m_arrLineX3.append(250);
+        m_arrLineX3.append(275);
+        m_arrLineX3.append(300);
+        m_arrLineX3.append(325);
+        m_arrLineX3.append(350);
+        m_arrLineX3.append(375);
+        m_arrLineX3.append(400);
+        m_arrLineX3.append(425);
+        m_arrLineX3.append(450);
+        m_arrLineX3.append(475);
+        m_arrLineX3.append(499);
+
+        m_arrLineY3.append(3.9);
+        m_arrLineY3.append(4.3);
+        m_arrLineY3.append(5.5);
+        m_arrLineY3.append(6.7);
+        m_arrLineY3.append(7.78);
+        m_arrLineY3.append(8.8);
+        m_arrLineY3.append(9.75);
+        m_arrLineY3.append(10.55);
+        m_arrLineY3.append(11.4);
+        m_arrLineY3.append(12.2);
+        m_arrLineY3.append(13);
+        m_arrLineY3.append(13.8);
+        m_arrLineY3.append(14.55);
+        m_arrLineY3.append(15.12);
+        m_arrLineY3.append(15.7);
+        m_arrLineY3.append(16.2);
+        m_arrLineY3.append(16.65);
+        m_arrLineY3.append(17.05);
+        m_arrLineY3.append(17.4);
+        m_arrLineY3.append(17.6);
+        m_arrLineY3.append(17.65);
+
+        m_arrLineX4.append(18);
+        m_arrLineX4.append(25);
+        m_arrLineX4.append(50);
+        m_arrLineX4.append(75);
+        m_arrLineX4.append(100);
+        m_arrLineX4.append(125);
+        m_arrLineX4.append(150);
+        m_arrLineX4.append(175);
+        m_arrLineX4.append(200);
+        m_arrLineX4.append(225);
+        m_arrLineX4.append(250);
+        m_arrLineX4.append(275);
+        m_arrLineX4.append(300);
+        m_arrLineX4.append(325);
+        m_arrLineX4.append(350);
+        m_arrLineX4.append(375);
+        m_arrLineX4.append(400);
+        m_arrLineX4.append(425);
+        m_arrLineX4.append(450);
+        m_arrLineX4.append(475);
+        m_arrLineX4.append(499);
+
+        m_arrLineY4.append(5.85);
+        m_arrLineY4.append(6.3);
+        m_arrLineY4.append(7.9);
+        m_arrLineY4.append(9.25);
+        m_arrLineY4.append(10.55);
+        m_arrLineY4.append(11.85);
+        m_arrLineY4.append(13.1);
+        m_arrLineY4.append(14.22);
+        m_arrLineY4.append(15.33);
+        m_arrLineY4.append(16.45);
+        m_arrLineY4.append(17.45);
+        m_arrLineY4.append(18.35);
+        m_arrLineY4.append(19.25);
+        m_arrLineY4.append(19.99);
+        m_arrLineY4.append(20.7);
+        m_arrLineY4.append(21.25);
+        m_arrLineY4.append(21.7);
+        m_arrLineY4.append(22.05);
+        m_arrLineY4.append(22.2);
+        m_arrLineY4.append(22.3);
+        m_arrLineY4.append(22.35);
+
+        m_arrLineX5.append(20);
+        m_arrLineX5.append(25);
+        m_arrLineX5.append(50);
+        m_arrLineX5.append(75);
+        m_arrLineX5.append(100);
+        m_arrLineX5.append(125);
+        m_arrLineX5.append(150);
+        m_arrLineX5.append(175);
+        m_arrLineX5.append(200);
+        m_arrLineX5.append(225);
+        m_arrLineX5.append(250);
+        m_arrLineX5.append(275);
+        m_arrLineX5.append(300);
+        m_arrLineX5.append(325);
+        m_arrLineX5.append(350);
+        m_arrLineX5.append(375);
+        m_arrLineX5.append(400);
+        m_arrLineX5.append(425);
+        m_arrLineX5.append(450);
+        m_arrLineX5.append(475);
+        m_arrLineX5.append(499);
+
+        m_arrLineY5.append(8.9);
+        m_arrLineY5.append(9.2);
+        m_arrLineY5.append(10.8);
+        m_arrLineY5.append(12.32);
+        m_arrLineY5.append(13.74);
+        m_arrLineY5.append(15.15);
+        m_arrLineY5.append(16.53);
+        m_arrLineY5.append(17.88);
+        m_arrLineY5.append(19.1);
+        m_arrLineY5.append(20.3);
+        m_arrLineY5.append(21.37);
+        m_arrLineY5.append(22.4);
+        m_arrLineY5.append(23.4);
+        m_arrLineY5.append(24.2);
+        m_arrLineY5.append(24.99);
+        m_arrLineY5.append(25.6);
+        m_arrLineY5.append(26.15);
+        m_arrLineY5.append(26.6);
+        m_arrLineY5.append(26.9);
+        m_arrLineY5.append(26.95);
+        m_arrLineY5.append(26.99);
+
+        m_arrAve.append(8.7);
+        m_arrAve.append(13.9);
+        m_arrAve.append(18.2);
+        m_arrAve.append(23.2);
+        m_arrAve.append(27.4);
+    }
+    else
+    {
+        m_arrLineX1.append(50);
+        m_arrLineX1.append(75);
+        m_arrLineX1.append(100);
+        m_arrLineX1.append(125);
+        m_arrLineX1.append(150);
+        m_arrLineX1.append(175);
+        m_arrLineX1.append(200);
+        m_arrLineX1.append(225);
+        m_arrLineX1.append(250);
+        m_arrLineX1.append(275);
+        m_arrLineX1.append(300);
+        m_arrLineX1.append(325);
+        m_arrLineX1.append(350);
+        m_arrLineX1.append(375);
+        m_arrLineX1.append(400);
+        m_arrLineX1.append(425);
+        m_arrLineX1.append(450);
+        m_arrLineX1.append(475);
+        m_arrLineX1.append(499);
+
+        m_arrLineY1.append(5.1);
+        m_arrLineY1.append(5.95);
+        m_arrLineY1.append(6.4);
+        m_arrLineY1.append(6.7);
+        m_arrLineY1.append(6.91);
+        m_arrLineY1.append(7.1);
+        m_arrLineY1.append(7.3);
+        m_arrLineY1.append(7.42);
+        m_arrLineY1.append(7.55);
+        m_arrLineY1.append(7.7);
+        m_arrLineY1.append(7.8);
+        m_arrLineY1.append(7.9);
+        m_arrLineY1.append(7.95);
+        m_arrLineY1.append(7.99);
+        m_arrLineY1.append(8);
+        m_arrLineY1.append(8.05);
+        m_arrLineY1.append(8.1);
+        m_arrLineY1.append(8.15);
+        m_arrLineY1.append(8.2);
+
+        m_arrLineX2.append(50);
+        m_arrLineX2.append(65);
+        m_arrLineX2.append(90);
+        m_arrLineX2.append(125);
+        m_arrLineX2.append(160);
+        m_arrLineX2.append(200);
+        m_arrLineX2.append(250);
+        m_arrLineX2.append(310);
+        m_arrLineX2.append(410);
+        m_arrLineX2.append(500);
+
+        m_arrLineY2.append(7.4);
+        m_arrLineY2.append(8);
+        m_arrLineY2.append(9);
+        m_arrLineY2.append(10);
+        m_arrLineY2.append(11);
+        m_arrLineY2.append(12);
+        m_arrLineY2.append(13);
+        m_arrLineY2.append(14);
+        m_arrLineY2.append(15);
+        m_arrLineY2.append(15.2);
+
+        m_arrLineX3.append(50);
+        m_arrLineX3.append(75);
+        m_arrLineX3.append(100);
+        m_arrLineX3.append(125);
+        m_arrLineX3.append(150);
+        m_arrLineX3.append(175);
+        m_arrLineX3.append(200);
+        m_arrLineX3.append(225);
+        m_arrLineX3.append(250);
+        m_arrLineX3.append(275);
+        m_arrLineX3.append(300);
+        m_arrLineX3.append(325);
+        m_arrLineX3.append(350);
+        m_arrLineX3.append(375);
+        m_arrLineX3.append(400);
+        m_arrLineX3.append(425);
+        m_arrLineX3.append(450);
+        m_arrLineX3.append(475);
+        m_arrLineX3.append(500);
+
+        m_arrLineY3.append(10);
+        m_arrLineY3.append(11.4);
+        m_arrLineY3.append(12.67);
+        m_arrLineY3.append(13.8);
+        m_arrLineY3.append(14.85);
+        m_arrLineY3.append(15.9);
+        m_arrLineY3.append(16.9);
+        m_arrLineY3.append(17.9);
+        m_arrLineY3.append(18.7);
+        m_arrLineY3.append(19.53);
+        m_arrLineY3.append(20.2);
+        m_arrLineY3.append(20.8);
+        m_arrLineY3.append(21.32);
+        m_arrLineY3.append(21.7);
+        m_arrLineY3.append(22);
+        m_arrLineY3.append(22.15);
+        m_arrLineY3.append(22.3);
+        m_arrLineY3.append(22.4);
+        m_arrLineY3.append(22.4);
+
+        m_arrLineX4.append(50);
+        m_arrLineX4.append(75);
+        m_arrLineX4.append(100);
+        m_arrLineX4.append(125);
+        m_arrLineX4.append(150);
+        m_arrLineX4.append(175);
+        m_arrLineX4.append(200);
+        m_arrLineX4.append(225);
+        m_arrLineX4.append(250);
+        m_arrLineX4.append(275);
+        m_arrLineX4.append(300);
+        m_arrLineX4.append(325);
+        m_arrLineX4.append(350);
+        m_arrLineX4.append(375);
+        m_arrLineX4.append(400);
+        m_arrLineX4.append(425);
+        m_arrLineX4.append(450);
+        m_arrLineX4.append(475);
+        m_arrLineX4.append(500);
+
+        m_arrLineY4.append(12);
+        m_arrLineY4.append(13.7);
+        m_arrLineY4.append(15.2);
+        m_arrLineY4.append(16.75);
+        m_arrLineY4.append(18.15);
+        m_arrLineY4.append(19.5);
+        m_arrLineY4.append(20.8);
+        m_arrLineY4.append(22.05);
+        m_arrLineY4.append(23.28);
+        m_arrLineY4.append(24.38);
+        m_arrLineY4.append(25.45);
+        m_arrLineY4.append(26.4);
+        m_arrLineY4.append(27.12);
+        m_arrLineY4.append(27.85);
+        m_arrLineY4.append(28.45);
+        m_arrLineY4.append(28.9);
+        m_arrLineY4.append(29.1);
+        m_arrLineY4.append(29.2);
+        m_arrLineY4.append(29.2);
+
+        m_arrMax.append(8.7);
+        m_arrMax.append(15.8);
+        m_arrMax.append(23.1);
+        m_arrMax.append(29.4);
+    }
+}
+
 
 
 

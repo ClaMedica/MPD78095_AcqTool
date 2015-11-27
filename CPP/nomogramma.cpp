@@ -10,37 +10,19 @@ Nomogramma::Nomogramma(QString __tipoAna, int __tipoNomograma)
 
 Nomogramma::~Nomogramma()
 {
-
 }
 
 void Nomogramma::setNumLines(int __num)
 {
     m_numLines = __num;
-//    for (int i=0; i<__num; i++)
-//    {
-//        m_pLinex.
-//    }
-
 }
 
-void Nomogramma::addToLinex(int __i, double __val)
-{
-    m_pLinex[__i].append(__val);
-}
 
 void Nomogramma::addToLiney(int __i, double __val)
 {
     m_pLiney[__i].append(__val);
 }
 
-QVector<int> Nomogramma::getLineX()
-{
-    QVector<int> datas;
-    for (int i=0; i<m_pLinex.first().length(); i++)
-        datas<<m_pLinex.first().at(i);
-
-    return datas;
-}
 
 QVector<double> Nomogramma::getLineY(int __num)
 {
@@ -51,3 +33,20 @@ QVector<double> Nomogramma::getLineY(int __num)
     return datas;
 }
 
+QVariantList Nomogramma::getXpoints()
+{
+    QVariantList data;
+    for (int i=0; i< m_pLiney[0].length();i++)
+        data<<i;
+    return data;
+}
+
+QVariantList Nomogramma::getYpoints()
+{
+    QVariantList data;
+    for (int j=0; j<m_aline.length();j++)
+        for (int i=0; i< m_pLiney[m_aline.at(j)].size();i++)
+            data<<m_pLiney[m_aline.at(j)].at(i);
+
+    return data;
+}

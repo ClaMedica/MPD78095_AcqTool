@@ -168,6 +168,7 @@ void MDataManager::loadFile(QString __fileName)
 
         //------Aggiungo i canali
 
+        QVariantList defYmax;
         for(int h=0;h<m_mng->GetChanNum();h++)
         {
             MSignal *sig=new MSignal;
@@ -180,6 +181,7 @@ void MDataManager::loadFile(QString __fileName)
             sig->setSamplingFrequency(m_mng->GetNAS(h));
             double M=sig->maximum();
             double m=sig->minimum();
+            defYmax<<sig->maximum();
             if(sigMax<M)
                 sigMax=M;
             if(sigMin>m)
@@ -200,10 +202,10 @@ void MDataManager::loadFile(QString __fileName)
 
             (*def)["key"]=key;
             (*def)["name"] = descr;
-            (*def)["xMin"]=(tStart[0]*1)/m_mng->GetNAS(0);
-            (*def)["xMax"]=(tEnd[0]*1)/m_mng->GetNAS(0);
+            (*def)["xMin"]=(tStart[0]-1)/m_mng->GetNAS(0);
+            (*def)["xMax"]=(tEnd[0]-1)/m_mng->GetNAS(0);
             (*def)["yMin"]=sigMin;
-            (*def)["yMax"]=sigMax;
+            (*def)["yMax"]=sigMax;//defYmax;
             (*def)["enCh"]=defEn[i];
             (*def)["descr"]=descr;
             (*def)["color"]="cyan";
@@ -481,7 +483,7 @@ bool MDataManager::updateInfoList()
         gName=graph;
         //riempo con gli elementi che mi servono
 
-        //tracce molto facile dato che ce le ho gi√†
+        //tracce molto facile dato che ce le ho gi√
         foreach (QString chanName, m_chanInPlots[graph]) {
             elements<<chanName+":Signal";
         }
@@ -738,7 +740,7 @@ bool MDataManager::checkForVolRes()
             else
             {
                 volRes = true;
-                setValVolRes(0);//in futuro sar√† letto da propriet√† xml
+                setValVolRes(0);//in futuro sar√  letto da propriet√  xml
                 emit sg_openVolResDlg("Flowmetry");
                 break;
             }
@@ -1079,17 +1081,17 @@ bool MDataManager::InitArraysFLW(int __start,
     {
         if (child->name() == "Analysis")
         {
-          foreach (Ancestry *def,child->getChildren())
-          {
-              value=def->getAttribute("Type");
-              if (value.toInt() == MK_FLOWMETRY)
-              {
-                  Ancestry *flusso = def->getChild("Q");
-                  startTh = flusso->getChild("StartTh")->getTextOfChild("value").toDouble();
-                  heightTh = flusso->getChild("AmpTh")->getTextOfChild("value").toDouble();
-                  widthTth = flusso->getChild("DurTh")->getTextOfChild("value").toDouble();
-              }
-          }
+            foreach (Ancestry *def,child->getChildren())
+            {
+                value=def->getAttribute("Type");
+                if (value.toInt() == MK_FLOWMETRY)
+                {
+                    Ancestry *flusso = def->getChild("Q");
+                    startTh = flusso->getChild("StartTh")->getTextOfChild("value").toDouble();
+                    heightTh = flusso->getChild("AmpTh")->getTextOfChild("value").toDouble();
+                    widthTth = flusso->getChild("DurTh")->getTextOfChild("value").toDouble();
+                }
+            }
         }
 
     }
@@ -1098,86 +1100,144 @@ bool MDataManager::InitArraysFLW(int __start,
     if (res < 0)
         return false;
 
-
     //Legge i risultati
-    res = ReadResult();
+    int numEv = 1;
+    res = ReadResult(numEv);
     if (res < 0)
         return false;
 
     //costruisco i segnali da disegnare nel plot per i nomogrammi
+    for (int i=0;i<numEv;i++)
+    {
+        //nomogramma LiverpoolQMax
+        MSignal *sig0=new MSignal;
+        MSignal *sig1=new MSignal;
+        MSignal *sig2=new MSignal;
+        MSignal *sig3=new MSignal;
+        MSignal *sig4=new MSignal;
+        MSignal *sig5=new MSignal;
+        MSignal *sig6=new MSignal;
+        int lunx = m_aflwdatas.at(i+1)->getLiverpoolMax()->getXmax();
+        sig0->setData(m_aflwdatas.at(i+1)->getLiverpoolMax()->getLineY(0).data(),lunx);
+        sig0->setName("linea1");
+        sig1->setData(m_aflwdatas.at(i+1)->getLiverpoolMax()->getLineY(1).data(),lunx);
+        sig1->setName("linea2");
+        sig2->setData(m_aflwdatas.at(i+1)->getLiverpoolMax()->getLineY(2).data(),lunx);
+        sig2->setName("linea3");
+        sig3->setData(m_aflwdatas.at(i+1)->getLiverpoolMax()->getLineY(3).data(),lunx);
+        sig3->setName("linea4");
+        sig4->setData(m_aflwdatas.at(i+1)->getLiverpoolMax()->getLineY(4).data(),lunx);
+        sig4->setName("linea5");
+        sig5->setData(m_aflwdatas.at(i+1)->getLiverpoolMax()->getLineY(5).data(),lunx);
+        sig5->setName("linea6");
+        sig6->setData(m_aflwdatas.at(i+1)->getLiverpoolMax()->getLineY(6).data(),lunx);
+        sig6->setName("linea7");
+        QVariantList tracce;
+        tracce<< "$Track"<<"family"<<sig0->getName()<<"name"<<"Signal"<<"Category"<<CAT_TRACK<<"descr"<<"line"<<"pointer"<<(qulonglong)sig0<<"&Track";
+        tracce<< "$Track"<<"family"<<sig1->getName()<<"name"<<"Signal"<<"Category"<<CAT_TRACK<<"descr"<<"line"<<"pointer"<<(qulonglong)sig1<<"&Track";
+        tracce<< "$Track"<<"family"<<sig2->getName()<<"name"<<"Signal"<<"Category"<<CAT_TRACK<<"descr"<<"line"<<"pointer"<<(qulonglong)sig2<<"&Track";
+        tracce<< "$Track"<<"family"<<sig3->getName()<<"name"<<"Signal"<<"Category"<<CAT_TRACK<<"descr"<<"line"<<"pointer"<<(qulonglong)sig3<<"&Track";
+        tracce<< "$Track"<<"family"<<sig4->getName()<<"name"<<"Signal"<<"Category"<<CAT_TRACK<<"descr"<<"line"<<"pointer"<<(qulonglong)sig4<<"&Track";
+        tracce<< "$Track"<<"family"<<sig5->getName()<<"name"<<"Signal"<<"Category"<<CAT_TRACK<<"descr"<<"line"<<"pointer"<<(qulonglong)sig5<<"&Track";
+        tracce<< "$Track"<<"family"<<sig6->getName()<<"name"<<"Signal"<<"Category"<<CAT_TRACK<<"descr"<<"line"<<"pointer"<<(qulonglong)sig6<<"&Track";
+        QVariantList colori;
+        colori << "green" << "red" << "white" << "white" << "white" << "white" << "green";
+        m_aflwdatas.at(i+1)->getLiverpoolMax()->setColors(colori);
+        m_aflwdatas.at(i+1)->getLiverpoolMax()->setTracce(tracce);
 
-    //nomogramma LiverpoolQMax
-    MSignal *sig0=new MSignal;
-    MSignal *sig1=new MSignal;
-    MSignal *sig2=new MSignal;
-    MSignal *sig3=new MSignal;
-    MSignal *sig4=new MSignal;
-    MSignal *sig5=new MSignal;
-    MSignal *sig6=new MSignal;
-    int lunx = m_aflwdatas.at(1)->getLiverpoolMax()->getXmax();
-    sig0->setData(m_aflwdatas.at(1)->getLiverpoolMax()->getLineY(0).data(),lunx);
-    sig0->setName("linea1");
-    sig1->setData(m_aflwdatas.at(1)->getLiverpoolMax()->getLineY(1).data(),lunx);
-    sig1->setName("linea2");
-    sig2->setData(m_aflwdatas.at(1)->getLiverpoolMax()->getLineY(2).data(),lunx);
-    sig2->setName("linea3");
-    sig3->setData(m_aflwdatas.at(1)->getLiverpoolMax()->getLineY(3).data(),lunx);
-    sig3->setName("linea4");
-    sig4->setData(m_aflwdatas.at(1)->getLiverpoolMax()->getLineY(4).data(),lunx);
-    sig4->setName("linea5");
-    sig5->setData(m_aflwdatas.at(1)->getLiverpoolMax()->getLineY(5).data(),lunx);
-    sig5->setName("linea6");
-    sig6->setData(m_aflwdatas.at(1)->getLiverpoolMax()->getLineY(6).data(),lunx);
-    sig6->setName("linea7");
-    QVariantList tracce;
-    tracce<< "$Track"<<"family"<<sig0->getName()<<"name"<<"Signal"<<"Category"<<CAT_TRACK<<"descr"<<"line"<<"pointer"<<(qulonglong)sig0<<"&Track";
-    tracce<< "$Track"<<"family"<<sig1->getName()<<"name"<<"Signal"<<"Category"<<CAT_TRACK<<"descr"<<"line"<<"pointer"<<(qulonglong)sig1<<"&Track";
-    tracce<< "$Track"<<"family"<<sig2->getName()<<"name"<<"Signal"<<"Category"<<CAT_TRACK<<"descr"<<"line"<<"pointer"<<(qulonglong)sig2<<"&Track";
-    tracce<< "$Track"<<"family"<<sig3->getName()<<"name"<<"Signal"<<"Category"<<CAT_TRACK<<"descr"<<"line"<<"pointer"<<(qulonglong)sig3<<"&Track";
-    tracce<< "$Track"<<"family"<<sig4->getName()<<"name"<<"Signal"<<"Category"<<CAT_TRACK<<"descr"<<"line"<<"pointer"<<(qulonglong)sig4<<"&Track";
-    tracce<< "$Track"<<"family"<<sig5->getName()<<"name"<<"Signal"<<"Category"<<CAT_TRACK<<"descr"<<"line"<<"pointer"<<(qulonglong)sig5<<"&Track";
-    tracce<< "$Track"<<"family"<<sig6->getName()<<"name"<<"Signal"<<"Category"<<CAT_TRACK<<"descr"<<"line"<<"pointer"<<(qulonglong)sig6<<"&Track";
-    QVariantList colori;
-    colori << "green" << "red" << "white" << "white" << "white" << "white" << "green";
-    m_aflwdatas.at(1)->getLiverpoolMax()->setColors(colori);
-    m_aflwdatas.at(1)->getLiverpoolMax()->setTracce(tracce);
+        //nomogramma LiverpoolQAve
+        MSignal *sig0Ave=new MSignal;
+        MSignal *sig1Ave=new MSignal;
+        MSignal *sig2Ave=new MSignal;
+        MSignal *sig3Ave=new MSignal;
+        MSignal *sig4Ave=new MSignal;
+        MSignal *sig5Ave=new MSignal;
+        MSignal *sig6Ave=new MSignal;
+        lunx = m_aflwdatas.at(i+1)->getLiverpoolAve()->getXmax();
+        sig0Ave->setData(m_aflwdatas.at(i+1)->getLiverpoolAve()->getLineY(0).data(),lunx);
+        sig0Ave->setName("linea1");
+        sig1Ave->setData(m_aflwdatas.at(i+1)->getLiverpoolAve()->getLineY(1).data(),lunx);
+        sig1Ave->setName("linea2");
+        sig2Ave->setData(m_aflwdatas.at(i+1)->getLiverpoolAve()->getLineY(2).data(),lunx);
+        sig2Ave->setName("linea3");
+        sig3Ave->setData(m_aflwdatas.at(i+1)->getLiverpoolAve()->getLineY(3).data(),lunx);
+        sig3Ave->setName("linea4");
+        sig4Ave->setData(m_aflwdatas.at(i+1)->getLiverpoolAve()->getLineY(4).data(),lunx);
+        sig4Ave->setName("linea5");
+        sig5Ave->setData(m_aflwdatas.at(i+1)->getLiverpoolAve()->getLineY(5).data(),lunx);
+        sig5Ave->setName("linea6");
+        sig6Ave->setData(m_aflwdatas.at(i+1)->getLiverpoolAve()->getLineY(6).data(),lunx);
+        sig6Ave->setName("linea7");
+        tracce.clear();
+        tracce<< "$Track"<<"family"<<sig0Ave->getName()<<"name"<<"Signal"<<"Category"<<CAT_TRACK<<"descr"<<"line"<<"pointer"<<(qulonglong)sig0Ave<<"&Track";
+        tracce<< "$Track"<<"family"<<sig1Ave->getName()<<"name"<<"Signal"<<"Category"<<CAT_TRACK<<"descr"<<"line"<<"pointer"<<(qulonglong)sig1Ave<<"&Track";
+        tracce<< "$Track"<<"family"<<sig2Ave->getName()<<"name"<<"Signal"<<"Category"<<CAT_TRACK<<"descr"<<"line"<<"pointer"<<(qulonglong)sig2Ave<<"&Track";
+        tracce<< "$Track"<<"family"<<sig3Ave->getName()<<"name"<<"Signal"<<"Category"<<CAT_TRACK<<"descr"<<"line"<<"pointer"<<(qulonglong)sig3Ave<<"&Track";
+        tracce<< "$Track"<<"family"<<sig4Ave->getName()<<"name"<<"Signal"<<"Category"<<CAT_TRACK<<"descr"<<"line"<<"pointer"<<(qulonglong)sig4Ave<<"&Track";
+        tracce<< "$Track"<<"family"<<sig5Ave->getName()<<"name"<<"Signal"<<"Category"<<CAT_TRACK<<"descr"<<"line"<<"pointer"<<(qulonglong)sig5Ave<<"&Track";
+        tracce<< "$Track"<<"family"<<sig6Ave->getName()<<"name"<<"Signal"<<"Category"<<CAT_TRACK<<"descr"<<"line"<<"pointer"<<(qulonglong)sig6Ave<<"&Track";
+        colori.clear();
+        colori << "green" << "red" << "white" << "white" << "white" << "white" << "green";
+        m_aflwdatas.at(i+1)->getLiverpoolAve()->setColors(colori);
+        m_aflwdatas.at(i+1)->getLiverpoolAve()->setTracce(tracce);
 
-    //nomogramma LiverpoolQAve
-    MSignal *sig0Ave=new MSignal;
-    MSignal *sig1Ave=new MSignal;
-    MSignal *sig2Ave=new MSignal;
-    MSignal *sig3Ave=new MSignal;
-    MSignal *sig4Ave=new MSignal;
-    MSignal *sig5Ave=new MSignal;
-    MSignal *sig6Ave=new MSignal;
-    lunx = m_aflwdatas.at(1)->getLiverpoolAve()->getXmax();
-    sig0Ave->setData(m_aflwdatas.at(1)->getLiverpoolAve()->getLineY(0).data(),lunx);
-    sig0Ave->setName("linea1");
-    sig1Ave->setData(m_aflwdatas.at(1)->getLiverpoolAve()->getLineY(1).data(),lunx);
-    sig1Ave->setName("linea2");
-    sig2Ave->setData(m_aflwdatas.at(1)->getLiverpoolAve()->getLineY(2).data(),lunx);
-    sig2Ave->setName("linea3");
-    sig3Ave->setData(m_aflwdatas.at(1)->getLiverpoolAve()->getLineY(3).data(),lunx);
-    sig3Ave->setName("linea4");
-    sig4Ave->setData(m_aflwdatas.at(1)->getLiverpoolAve()->getLineY(4).data(),lunx);
-    sig4Ave->setName("linea5");
-    sig5Ave->setData(m_aflwdatas.at(1)->getLiverpoolAve()->getLineY(5).data(),lunx);
-    sig5Ave->setName("linea6");
-    sig6Ave->setData(m_aflwdatas.at(1)->getLiverpoolAve()->getLineY(6).data(),lunx);
-    sig6Ave->setName("linea7");
-    tracce.clear();
-    tracce<< "$Track"<<"family"<<sig0Ave->getName()<<"name"<<"Signal"<<"Category"<<CAT_TRACK<<"descr"<<"line"<<"pointer"<<(qulonglong)sig0Ave<<"&Track";
-    tracce<< "$Track"<<"family"<<sig1Ave->getName()<<"name"<<"Signal"<<"Category"<<CAT_TRACK<<"descr"<<"line"<<"pointer"<<(qulonglong)sig1Ave<<"&Track";
-    tracce<< "$Track"<<"family"<<sig2Ave->getName()<<"name"<<"Signal"<<"Category"<<CAT_TRACK<<"descr"<<"line"<<"pointer"<<(qulonglong)sig2Ave<<"&Track";
-    tracce<< "$Track"<<"family"<<sig3Ave->getName()<<"name"<<"Signal"<<"Category"<<CAT_TRACK<<"descr"<<"line"<<"pointer"<<(qulonglong)sig3Ave<<"&Track";
-    tracce<< "$Track"<<"family"<<sig4Ave->getName()<<"name"<<"Signal"<<"Category"<<CAT_TRACK<<"descr"<<"line"<<"pointer"<<(qulonglong)sig4Ave<<"&Track";
-    tracce<< "$Track"<<"family"<<sig5Ave->getName()<<"name"<<"Signal"<<"Category"<<CAT_TRACK<<"descr"<<"line"<<"pointer"<<(qulonglong)sig5Ave<<"&Track";
-    tracce<< "$Track"<<"family"<<sig6Ave->getName()<<"name"<<"Signal"<<"Category"<<CAT_TRACK<<"descr"<<"line"<<"pointer"<<(qulonglong)sig6Ave<<"&Track";
-    colori.clear();
-    colori << "green" << "red" << "white" << "white" << "white" << "white" << "green";
-    m_aflwdatas.at(1)->getLiverpoolAve()->setColors(colori);
-    m_aflwdatas.at(1)->getLiverpoolAve()->setTracce(tracce);
+        //nomogramma Siroky Max
+        MSignal *sig0SirMax=new MSignal;
+        MSignal *sig1SirMax=new MSignal;
+        MSignal *sig2SirMax=new MSignal;
+        MSignal *sig3SirMax=new MSignal;
+        lunx = m_aflwdatas.at(i+1)->getSirokyMax()->getXmax();
+        sig0SirMax->setData(m_aflwdatas.at(i+1)->getSirokyMax()->getLineY(0).data(),lunx);
+        sig0SirMax->setName("linea1");
+        sig1SirMax->setData(m_aflwdatas.at(i+1)->getSirokyMax()->getLineY(1).data(),lunx);
+        sig1SirMax->setName("linea2");
+        sig2SirMax->setData(m_aflwdatas.at(i+1)->getSirokyMax()->getLineY(2).data(),lunx);
+        sig2SirMax->setName("linea3");
+        sig3SirMax->setData(m_aflwdatas.at(i+1)->getSirokyMax()->getLineY(3).data(),lunx);
+        sig3SirMax->setName("linea4");
+        tracce.clear();
+        tracce<< "$Track"<<"family"<<sig0SirMax->getName()<<"name"<<"Signal"<<"Category"<<CAT_TRACK<<"descr"<<"line"<<"pointer"<<(qulonglong)sig0SirMax<<"&Track";
+        tracce<< "$Track"<<"family"<<sig1SirMax->getName()<<"name"<<"Signal"<<"Category"<<CAT_TRACK<<"descr"<<"line"<<"pointer"<<(qulonglong)sig1SirMax<<"&Track";
+        tracce<< "$Track"<<"family"<<sig2SirMax->getName()<<"name"<<"Signal"<<"Category"<<CAT_TRACK<<"descr"<<"line"<<"pointer"<<(qulonglong)sig2SirMax<<"&Track";
+        tracce<< "$Track"<<"family"<<sig3SirMax->getName()<<"name"<<"Signal"<<"Category"<<CAT_TRACK<<"descr"<<"line"<<"pointer"<<(qulonglong)sig3SirMax<<"&Track";
+        colori.clear();
+        colori << "white" << "red" << "white" << "white";
+        m_aflwdatas.at(i+1)->getSirokyMax()->setColors(colori);
+        m_aflwdatas.at(i+1)->getSirokyMax()->setTracce(tracce);
 
+        QVector<int> linee;
+        linee.append(2);
+        linee.append(3);
+        m_aflwdatas.at(i+1)->getSirokyMax()->setLinea(linee);
+
+        //nomogramma Siroky Ave
+        MSignal *sig0SirAve=new MSignal;
+        MSignal *sig1SirAve=new MSignal;
+        MSignal *sig2SirAve=new MSignal;
+        MSignal *sig3SirAve=new MSignal;
+        MSignal *sig4SirAve=new MSignal;
+        lunx = m_aflwdatas.at(i+1)->getSirokyAve()->getXmax();
+        sig0SirAve->setData(m_aflwdatas.at(i+1)->getSirokyAve()->getLineY(0).data(),lunx);
+        sig0SirAve->setName("linea1");
+        sig1SirAve->setData(m_aflwdatas.at(i+1)->getSirokyAve()->getLineY(1).data(),lunx);
+        sig1SirAve->setName("linea2");
+        sig2SirAve->setData(m_aflwdatas.at(i+1)->getSirokyAve()->getLineY(2).data(),lunx);
+        sig2SirAve->setName("linea3");
+        sig3SirAve->setData(m_aflwdatas.at(i+1)->getSirokyAve()->getLineY(3).data(),lunx);
+        sig3SirAve->setName("linea4");
+        sig4SirAve->setData(m_aflwdatas.at(i+1)->getSirokyAve()->getLineY(4).data(),lunx);
+        sig4SirAve->setName("linea4");
+        tracce.clear();
+        tracce<< "$Track"<<"family"<<sig0SirAve->getName()<<"name"<<"Signal"<<"Category"<<CAT_TRACK<<"descr"<<"line"<<"pointer"<<(qulonglong)sig0SirAve<<"&Track";
+        tracce<< "$Track"<<"family"<<sig1SirAve->getName()<<"name"<<"Signal"<<"Category"<<CAT_TRACK<<"descr"<<"line"<<"pointer"<<(qulonglong)sig1SirAve<<"&Track";
+        tracce<< "$Track"<<"family"<<sig2SirAve->getName()<<"name"<<"Signal"<<"Category"<<CAT_TRACK<<"descr"<<"line"<<"pointer"<<(qulonglong)sig2SirAve<<"&Track";
+        tracce<< "$Track"<<"family"<<sig3SirAve->getName()<<"name"<<"Signal"<<"Category"<<CAT_TRACK<<"descr"<<"line"<<"pointer"<<(qulonglong)sig3SirAve<<"&Track";
+        tracce<< "$Track"<<"family"<<sig4SirAve->getName()<<"name"<<"Signal"<<"Category"<<CAT_TRACK<<"descr"<<"line"<<"pointer"<<(qulonglong)sig4SirAve<<"&Track";
+        colori.clear();
+        colori << "white" << "red" << "white" << "white" << "white";
+        m_aflwdatas.at(i+1)->getSirokyAve()->setColors(colori);
+        m_aflwdatas.at(i+1)->getSirokyAve()->setTracce(tracce);
+    }
     return true;
 }
 
@@ -1196,74 +1256,69 @@ int MDataManager::ReadResult(int __numEv)
     {
     case FLW_AVD_STUDY: {
         //dati analisi
-        mflowdatas *FLWAdvMedia  = new mflowdatas();
+        m_aflwdatas.append(new mflowdatas());
         byte* strTemp = (byte*) malloc (sizeof(FLWAdvRepStruct));
 
-        FLWAdvMedia->setWaitingTime(0);
-        FLWAdvMedia->setQMax(0);
-        FLWAdvMedia->setQAve(0);
-        FLWAdvMedia->setTimeAtV3(0);
-        FLWAdvMedia->setTimeAtV2(0);
-        FLWAdvMedia->setTime90(0);
-        FLWAdvMedia->setTimeAtQmax(0);
-        FLWAdvMedia->setFlowTime(0);
-        FLWAdvMedia->setDescTime(0);
-        FLWAdvMedia->setVoidingTime(0);
-        FLWAdvMedia->setVolAtQqmax(0);
-        FLWAdvMedia->setVoidedVolume(0);
-        FLWAdvMedia->setAcceleration(0);
-        FLWAdvMedia->setResidualVolume(0);
-        FLWAdvMedia->setVDetMax(0);
-        FLWAdvMedia->setCQ(0);
-
-        m_aflwdatas.append(FLWAdvMedia);
-
+        m_aflwdatas.at(0)->setWaitingTime(0);
+        m_aflwdatas.at(0)->setQMax(0);
+        m_aflwdatas.at(0)->setQAve(0);
+        m_aflwdatas.at(0)->setTimeAtV3(0);
+        m_aflwdatas.at(0)->setTimeAtV2(0);
+        m_aflwdatas.at(0)->setTime90(0);
+        m_aflwdatas.at(0)->setTimeAtQmax(0);
+        m_aflwdatas.at(0)->setFlowTime(0);
+        m_aflwdatas.at(0)->setDescTime(0);
+        m_aflwdatas.at(0)->setVoidingTime(0);
+        m_aflwdatas.at(0)->setVolAtQqmax(0);
+        m_aflwdatas.at(0)->setVoidedVolume(0);
+        m_aflwdatas.at(0)->setAcceleration(0);
+        m_aflwdatas.at(0)->setResidualVolume(0);
+        m_aflwdatas.at(0)->setVDetMax(0);
+        m_aflwdatas.at(0)->setCQ(0);
         for (int i=1; i<=__numEv; i++)
         {
-            mflowdatas *FLWAdvEventi = new mflowdatas();
-
+            m_aflwdatas.append(new mflowdatas());
             m_mng->readResAna(sizeof(FLWAdvRepStruct),strTemp);
-            FLWAdvEventi->setWaitingTime(*((float*)(strTemp + WAITING_TIME)));
-            FLWAdvEventi->setQMax(*((float*)(strTemp + MAXIMUM_FLOW)));
-            FLWAdvEventi->setQAve(*((float*)(strTemp + AVERAGE_FLOW)));
-            FLWAdvEventi->setTimeAtV3(*((float*)(strTemp + TIME_AT_VOL3)));
-            FLWAdvEventi->setTimeAtV2(*((float*)(strTemp + TIME_AT_VOL2)));
-            FLWAdvEventi->setTimeAtQmax(*((float*)(strTemp + TIME_AT_QMAX)));
-            FLWAdvEventi->setTime90(*((float*)(strTemp + TIME_5_95_VOIDED_VOL)));
-            FLWAdvEventi->setFlowTime(*((float*)(strTemp + FLOW_TIME)));
-            FLWAdvEventi->setDescTime(*((float*)(strTemp + TIME_QMAX_95_VOIDED_VOL)));
-            FLWAdvEventi->setVoidingTime(*((float*)(strTemp + VOIDING_TIME)));
-            FLWAdvEventi->setVolAtQqmax(*((float*)(strTemp + VOLUME_QMAX)));
-            FLWAdvEventi->setVoidedVolume(*((int*)(strTemp + VOIDED_VOLUME)));
-            FLWAdvEventi->setAcceleration(*((float*)(strTemp + ACCELERATION)));
-            FLWAdvEventi->setResidualVolume(*((int*)(strTemp + RESIDUAL_USER)));
-            FLWAdvEventi->setVDetMax(*((float*)(strTemp + DETRUSOR)));
-            FLWAdvEventi->setCQ(*((float*)(strTemp +FLOW_CORR_FACTOR)));
-            FLWAdvEventi->buildTable();
-            FLWAdvEventi->buildNomogrammi(true, 45);
-            m_aflwdatas.append(FLWAdvEventi);
+            m_aflwdatas.last()->setWaitingTime(*((float*)(strTemp + WAITING_TIME)));
+            m_aflwdatas.last()->setQMax(*((float*)(strTemp + MAXIMUM_FLOW)));
+            m_aflwdatas.last()->setQAve(*((float*)(strTemp + AVERAGE_FLOW)));
+            m_aflwdatas.last()->setTimeAtV3(*((float*)(strTemp + TIME_AT_VOL3)));
+            m_aflwdatas.last()->setTimeAtV2(*((float*)(strTemp + TIME_AT_VOL2)));
+            m_aflwdatas.last()->setTimeAtQmax(*((float*)(strTemp + TIME_AT_QMAX)));
+            m_aflwdatas.last()->setTime90(*((float*)(strTemp + TIME_5_95_VOIDED_VOL)));
+            m_aflwdatas.last()->setFlowTime(*((float*)(strTemp + FLOW_TIME)));
+            m_aflwdatas.last()->setDescTime(*((float*)(strTemp + TIME_QMAX_95_VOIDED_VOL)));
+            m_aflwdatas.last()->setVoidingTime(*((float*)(strTemp + VOIDING_TIME)));
+            m_aflwdatas.last()->setVolAtQqmax(*((float*)(strTemp + VOLUME_QMAX)));
+            m_aflwdatas.last()->setVoidedVolume(*((int*)(strTemp + VOIDED_VOLUME)));
+            m_aflwdatas.last()->setAcceleration(*((float*)(strTemp + ACCELERATION)));
+            m_aflwdatas.last()->setResidualVolume(*((int*)(strTemp + RESIDUAL_USER)));
+            m_aflwdatas.last()->setVDetMax(*((float*)(strTemp + DETRUSOR)));
+            m_aflwdatas.last()->setCQ(*((float*)(strTemp +FLOW_CORR_FACTOR)));
+            m_aflwdatas.last()->buildTable();
+            m_aflwdatas.last()->buildNomogrammi(false, 45);
         }
 
         //calcolo la media
-//        for (int i=1; i<=__numEv; i++)
-//        {
-//            m_aflwdatas.at(0)->addWaitingTime(m_aflwdatas.at(i)->getWaitingTime());
-//            m_aflwdatas.at(0)->addQMax(m_aflwdatas[i]->getQMax());
-//            m_aflwdatas.at(0)->addQAve(m_aflwdatas[i]->getQAve());
-//            m_aflwdatas.at(0)->addTimeAtV3(m_aflwdatas.at(i)->getTimeAtV3());
-//            m_aflwdatas.at(0)->addTimeAtV2(m_aflwdatas.at(i)->getTimeAtV2());
-//            m_aflwdatas.at(0)->addTimeAtQmax(m_aflwdatas.at(i)->getTimeAtQmax());
-//            m_aflwdatas.at(0)->addTime90(m_aflwdatas.at(i)->getTime90());
-//            m_aflwdatas.at(0)->addFlowTime(m_aflwdatas.at(i)->getFlowTime());
-//            m_aflwdatas.at(0)->addDescTime(m_aflwdatas.at(i)->getDescTime());
-//            m_aflwdatas.at(0)->addVoidingTime(m_aflwdatas.at(i)->getVoidingTime());
-//            m_aflwdatas.at(0)->addVolAtQqmax(m_aflwdatas.at(i)->getVolAtQqmax());
-//            m_aflwdatas.at(0)->addVoidedVolume(m_aflwdatas.at(i)->getVoidedVolume());
-//            m_aflwdatas.at(0)->addAcceleration(m_aflwdatas.at(i)->getAcceleration());
-//            m_aflwdatas.at(0)->addResidualVolume(m_aflwdatas.at(i)->getResidualVolume());
-//            m_aflwdatas.at(0)->addVDetMax(m_aflwdatas.at(i)->getVDetMax());
-//            m_aflwdatas.at(0)->addCQ(m_aflwdatas.at(i)->getCQ());
-//        }
+        for (int i=1; i<=__numEv; i++)
+        {
+            m_aflwdatas.at(0)->addWaitingTime(m_aflwdatas.at(i)->getWaitingTime());
+            m_aflwdatas.at(0)->addQMax(m_aflwdatas[i]->getQMax());
+            m_aflwdatas.at(0)->addQAve(m_aflwdatas[i]->getQAve());
+            m_aflwdatas.at(0)->addTimeAtV3(m_aflwdatas.at(i)->getTimeAtV3());
+            m_aflwdatas.at(0)->addTimeAtV2(m_aflwdatas.at(i)->getTimeAtV2());
+            m_aflwdatas.at(0)->addTimeAtQmax(m_aflwdatas.at(i)->getTimeAtQmax());
+            m_aflwdatas.at(0)->addTime90(m_aflwdatas.at(i)->getTime90());
+            m_aflwdatas.at(0)->addFlowTime(m_aflwdatas.at(i)->getFlowTime());
+            m_aflwdatas.at(0)->addDescTime(m_aflwdatas.at(i)->getDescTime());
+            m_aflwdatas.at(0)->addVoidingTime(m_aflwdatas.at(i)->getVoidingTime());
+            m_aflwdatas.at(0)->addVolAtQqmax(m_aflwdatas.at(i)->getVolAtQqmax());
+            m_aflwdatas.at(0)->addVoidedVolume(m_aflwdatas.at(i)->getVoidedVolume());
+            m_aflwdatas.at(0)->addAcceleration(m_aflwdatas.at(i)->getAcceleration());
+            m_aflwdatas.at(0)->addResidualVolume(m_aflwdatas.at(i)->getResidualVolume());
+            m_aflwdatas.at(0)->addVDetMax(m_aflwdatas.at(i)->getVDetMax());
+            m_aflwdatas.at(0)->addCQ(m_aflwdatas.at(i)->getCQ());
+        }
         m_aflwdatas.at(0)->buildTable();
         free(strTemp);
 

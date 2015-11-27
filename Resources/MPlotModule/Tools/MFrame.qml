@@ -52,9 +52,9 @@ Rectangle{
     onModelloChanged:
     {
         //questo modello carica una stringa composta dalla role e poi dal valore
-        //console.log("modello marker",rootCursor.number,"=",modello)
         if(modello.length%2===0 && modello.length>=2)
         {
+            console.log("modello frame",modello)
             for(var i=0;i<modello.length;i+=2)
                 modF.setProperty(modello[i],modello[i+1])
         }
@@ -104,9 +104,9 @@ Rectangle{
         property real posY:0
 
         anchors.fill:parent
-        cursorShape: Qt.SizeAllCursor
-        onPressed: {stato="changing";posX=mouseX;posY=mouseY;timRes.start()}
-        onReleased:{stato="idle";timRes.stop();rootFrame.modifyMe()}
+        //cursorShape: Qt.SizeAllCursor
+        //onPressed: {stato="changing";posX=mouseX;posY=mouseY;timRes.start()}
+        //onReleased:{stato="idle";timRes.stop();rootFrame.modifyMe()}
         onEntered: sfondo.opacity=true
         onExited: sfondo.opacity=false
         onPositionChanged: {if(stato==="changing")timRes.start()}
@@ -156,9 +156,9 @@ Rectangle{
         anchors.left:parent.left
         anchors.top:parent.top
         anchors.right: parent.right
-        cursorShape: Qt.SizeVerCursor
-        onPressed: {stato="changing";pos=mouseY;timRes.start()}
-        onReleased:{stato="idle";timRes.stop();rootFrame.modifyMe()}
+        //cursorShape: Qt.SizeVerCursor
+        //onPressed: {stato="changing";pos=mouseY;timRes.start()}
+        //onReleased:{stato="idle";timRes.stop();rootFrame.modifyMe()}
         onPositionChanged: {if(stato==="changing")timRes.start()}
         hoverEnabled: true
         onEntered:{sizeRecV.rotation=180;sizeRecV.opacity=1}
@@ -173,9 +173,9 @@ Rectangle{
         anchors.right:parent.right
         anchors.left:parent.left
         anchors.bottom: parent.bottom
-        cursorShape: Qt.SizeVerCursor
-        onPressed: {stato="changing";pos=mouseY;timRes.start()}
-        onReleased:{stato="idle";timRes.stop();rootFrame.modifyMe()}
+        //cursorShape: Qt.SizeVerCursor
+        //onPressed: {stato="changing";pos=mouseY;timRes.start()}
+        //onReleased:{stato="idle";timRes.stop();rootFrame.modifyMe()}
         onEntered:{sizeRecV.rotation=0;sizeRecV.opacity=1}
         onExited:{sizeRecV.opacity=0}
         onPositionChanged: {if(stato==="changing")timRes.start()}
@@ -194,19 +194,19 @@ Rectangle{
             var perc2
             var step2
 
-            if(allMove.stato==="changing")
-            {
-                dist=allMove.mouseX-allMove.posX
-                dist2=allMove.mouseY-allMove.posY
-                perc=dist/rec.width
-                perc2=dist2/rec.height
-                step=(vMaxX-vMinX)*perc
-                step2=(vMaxY-vMinY)*perc2
-                modF.xMin+=step
-                modF.xMax+=step
-                modF.yMin-=step2
-                modF.yMax-=step2
-            }
+//            if(allMove.stato==="changing")
+//            {
+//                dist=allMove.mouseX-allMove.posX
+//                dist2=allMove.mouseY-allMove.posY
+//                perc=dist/rec.width
+//                perc2=dist2/rec.height
+//                step=(vMaxX-vMinX)*perc
+//                step2=(vMaxY-vMinY)*perc2
+//                modF.xMin+=step
+//                modF.xMax+=step
+//                modF.yMin-=step2
+//                modF.yMax-=step2
+//            }
 
             if(leftMove.stato==="changing")
             {
@@ -224,21 +224,21 @@ Rectangle{
                 modF.xMax+=step
             }
 
-            if(topMove.stato==="changing")
-            {
-                dist=topMove.mouseY-topMove.pos
-                perc=dist/rec.height
-                step=(vMaxY-vMinY)*perc
-                modF.yMax-=step
-            }
+//            if(topMove.stato==="changing")
+//            {
+//                dist=topMove.mouseY-topMove.pos
+//                perc=dist/rec.height
+//                step=(vMaxY-vMinY)*perc
+//                modF.yMax-=step
+//            }
 
-            if(bottomMove.stato==="changing")
-            {
-                dist=bottomMove.mouseY-bottomMove.pos
-                perc=dist/rec.height
-                step=(vMaxY-vMinY)*perc
-                modF.yMin-=step
-            }
+//            if(bottomMove.stato==="changing")
+//            {
+//                dist=bottomMove.mouseY-bottomMove.pos
+//                perc=dist/rec.height
+//                step=(vMaxY-vMinY)*perc
+//                modF.yMin-=step
+//            }
 
         }
 

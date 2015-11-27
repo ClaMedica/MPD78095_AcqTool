@@ -26,4 +26,4 @@ PlotModel 1.0            Models/PlotModel.qml
 TrackModel 1.0           Models/TrackModel.qml
 #CPP and plugin
 ConfigManager 1.0
-plugin QmlPlotter
+plugin QmlPlotterd

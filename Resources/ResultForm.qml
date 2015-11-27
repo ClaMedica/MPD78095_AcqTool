@@ -64,15 +64,16 @@ Rectangle {
             var firstPage = pagesLocal.length
             var firstPageSameAna = pagesSameAna.length
 
-            for (var i=0; i<mngData.getNumAnaFlwAdv(); i++)
+            //salto la 0 perchè è la media
+            for (var i=1; i<mngData.getNumAnaFlwAdv(); i++)
             {
-                if (mngData.getNumAnaFlwAdv() === 1)
+                if (mngData.getNumAnaFlwAdv() === 2)
                     namePage = "Flow"
                 else
                     namePage = "Flow " + i.toString()
 
                 var btnLeftMargin = 20
-                if (mngData.getNumAnaFlwAdv() !== 1)
+                if (mngData.getNumAnaFlwAdv() !== 2)
                 {
                     var buttonfn = Qt.createQmlObject('import "qrc:/Components"; MAnaButton {}', rectf)
                     buttonfn.buttonId = pagesSameAna.length
@@ -111,16 +112,16 @@ Rectangle {
                 buttonT.buttonId = pagesLocal.length
                 buttonT.anchors.bottom = rectdata.bottom
                 buttonT.anchors.left = rectdata.left
-                buttonT.anchors.bottomMargin = 20
+                buttonT.anchors.bottomMargin = 60
                 buttonT.anchors.leftMargin = btnLeftMargin
                 buttonT.myText = qsTr("Table")
                 buttonT.clicked.connect(clickButton)
-                btnLeftMargin += 110
+               // btnLeftMargin += 110
                 pagesLocal[pagesLocal.length] = tablefn
 
                 //nomogrammi flussimetria
                 //liverpool Qmax
-                nameNomo = mngData.getFlowDatas(1).getLiverpoolMax().getTitle()
+                nameNomo = mngData.getFlowDatas(i).getLiverpoolMax().getTitle()
                 var LQM =  Qt.createQmlObject('import "qrc:/Components"; MNomogramma {}', rectdata)
                 LQM.clip = true
                 LQM.height = 250
@@ -129,17 +130,17 @@ Rectangle {
                 LQM.anchors.top = rectdata.top
                 LQM.anchors.topMargin = 20
                 LQM.anchors.leftMargin = 50
-                LQM.xMin = mngData.getFlowDatas(1).getLiverpoolMax().getXmin()
-                LQM.xMax = mngData.getFlowDatas(1).getLiverpoolMax().getXmax()
-                LQM.yMin = mngData.getFlowDatas(1).getLiverpoolMax().getYmin()
-                LQM.yMax = mngData.getFlowDatas(1).getLiverpoolMax().getYmax()
+                LQM.xMin = mngData.getFlowDatas(i).getLiverpoolMax().getXmin()
+                LQM.xMax = mngData.getFlowDatas(i).getLiverpoolMax().getXmax()
+                LQM.yMin = mngData.getFlowDatas(i).getLiverpoolMax().getYmin()
+                LQM.yMax = mngData.getFlowDatas(i).getLiverpoolMax().getYmax()
                 LQM.nome = nameNomo
-                LQM.xPoint = mngData.getFlowDatas(1).getLiverpoolMax().getDatoX()
-                LQM.yPoint = mngData.getFlowDatas(1).getLiverpoolMax().getDatoY()
-                LQM.udmX =  mngData.getFlowDatas(1).getLiverpoolMax().getUnitx()
-                LQM.udmY =  mngData.getFlowDatas(1).getLiverpoolMax().getUnity()
-                LQM.traksToDraw =  mngData.getFlowDatas(1).getLiverpoolMax().getTracce()
-                LQM.tracksColors =  mngData.getFlowDatas(1).getLiverpoolMax().getColors()
+                LQM.xPoint = mngData.getFlowDatas(i).getLiverpoolMax().getDatoX()
+                LQM.yPoint = mngData.getFlowDatas(i).getLiverpoolMax().getDatoY()
+                LQM.udmX =  mngData.getFlowDatas(i).getLiverpoolMax().getUnitx()
+                LQM.udmY =  mngData.getFlowDatas(i).getLiverpoolMax().getUnity()
+                LQM.traksToDraw =  mngData.getFlowDatas(i).getLiverpoolMax().getTracce()
+                LQM.tracksColors =  mngData.getFlowDatas(i).getLiverpoolMax().getColors()
                 LQM.drawTracks()
                 LQM.visible = false
 
@@ -165,17 +166,17 @@ Rectangle {
                 LQA.anchors.top = rectdata.top
                 LQA.anchors.topMargin = 20
                 LQA.anchors.leftMargin = 50
-                LQA.xMin = mngData.getFlowDatas(1).getLiverpoolAve().getXmin()
-                LQA.xMax = mngData.getFlowDatas(1).getLiverpoolAve().getXmax()
-                LQA.yMin = mngData.getFlowDatas(1).getLiverpoolAve().getYmin()
-                LQA.yMax = mngData.getFlowDatas(1).getLiverpoolAve().getYmax()
+                LQA.xMin = mngData.getFlowDatas(i).getLiverpoolAve().getXmin()
+                LQA.xMax = mngData.getFlowDatas(i).getLiverpoolAve().getXmax()
+                LQA.yMin = mngData.getFlowDatas(i).getLiverpoolAve().getYmin()
+                LQA.yMax = mngData.getFlowDatas(i).getLiverpoolAve().getYmax()
                 LQA.nome = nameNomo
-                LQA.xPoint = mngData.getFlowDatas(1).getLiverpoolAve().getDatoX()
-                LQA.yPoint = mngData.getFlowDatas(1).getLiverpoolAve().getDatoY()
-                LQA.udmX =  mngData.getFlowDatas(1).getLiverpoolAve().getUnitx()
-                LQA.udmY =  mngData.getFlowDatas(1).getLiverpoolAve().getUnity()
-                LQA.traksToDraw =  mngData.getFlowDatas(1).getLiverpoolAve().getTracce()
-                LQA.tracksColors =  mngData.getFlowDatas(1).getLiverpoolAve().getColors()
+                LQA.xPoint = mngData.getFlowDatas(i).getLiverpoolAve().getDatoX()
+                LQA.yPoint = mngData.getFlowDatas(i).getLiverpoolAve().getDatoY()
+                LQA.udmX =  mngData.getFlowDatas(i).getLiverpoolAve().getUnitx()
+                LQA.udmY =  mngData.getFlowDatas(i).getLiverpoolAve().getUnity()
+                LQA.traksToDraw =  mngData.getFlowDatas(i).getLiverpoolAve().getTracce()
+                LQA.tracksColors =  mngData.getFlowDatas(i).getLiverpoolAve().getColors()
                 LQA.drawTracks()
                 LQA.visible = false
 
@@ -191,6 +192,80 @@ Rectangle {
                 btnLeftMargin += 110
                 pagesLocal[pagesLocal.length] = LQA
 
+                //siroky QMax
+                nameNomo = mngData.getFlowDatas(1).getSirokyMax().getTitle()
+                var SQM =  Qt.createQmlObject('import "qrc:/Components"; MNomogramma {}', rectdata)
+                SQM.clip = true
+                SQM.height = 250
+                SQM.width = 380
+                SQM.anchors.left = rectdata.left
+                SQM.anchors.top = rectdata.top
+                SQM.anchors.topMargin = 20
+                SQM.anchors.leftMargin = 50
+                SQM.xMin = mngData.getFlowDatas(i).getSirokyMax().getXmin()
+                SQM.xMax = mngData.getFlowDatas(i).getSirokyMax().getXmax()
+                SQM.yMin = mngData.getFlowDatas(i).getSirokyMax().getYmin()
+                SQM.yMax = mngData.getFlowDatas(i).getSirokyMax().getYmax()
+                SQM.nome = nameNomo
+                SQM.xPoint = mngData.getFlowDatas(i).getSirokyMax().getDatoX()
+                SQM.yPoint = mngData.getFlowDatas(i).getSirokyMax().getDatoY()
+                SQM.udmX =  mngData.getFlowDatas(i).getSirokyMax().getUnitx()
+                SQM.udmY =  mngData.getFlowDatas(i).getSirokyMax().getUnity()
+                SQM.traksToDraw =  mngData.getFlowDatas(1).getSirokyMax().getTracce()
+                SQM.tracksColors =  mngData.getFlowDatas(1).getSirokyMax().getColors()
+                SQM.drawTracks()
+                SQM.polygonXpoints = mngData.getFlowDatas(1).getSirokyMax().getXpoints
+                SQM.polygonYpoints = mngData.getFlowDatas(1).getSirokyMax().getYpoints
+                SQM.visible = false
+
+                //button
+                var buttonSQM = Qt.createQmlObject('import "qrc:/Components"; MAnaButton {}', rectdata)
+                buttonSQM.buttonId = pagesLocal.length
+                buttonSQM.anchors.bottom = rectdata.bottom
+                buttonSQM.anchors.left = rectdata.left
+                buttonSQM.anchors.bottomMargin = 20
+                buttonSQM.anchors.leftMargin = btnLeftMargin
+                buttonSQM.myText = nameNomo
+                buttonSQM.clicked.connect(clickButton)
+                btnLeftMargin += 110
+                pagesLocal[pagesLocal.length] = SQM
+
+                //siroky QAve
+                nameNomo = mngData.getFlowDatas(1).getSirokyAve().getTitle()
+                console.log("name",nameNomo)
+                var SQA =  Qt.createQmlObject('import "qrc:/Components"; MNomogramma {}', rectdata)
+                SQA.clip = true
+                SQA.height = 250
+                SQA.width = 380
+                SQA.anchors.left = rectdata.left
+                SQA.anchors.top = rectdata.top
+                SQA.anchors.topMargin = 20
+                SQA.anchors.leftMargin = 50
+                SQA.xMin = mngData.getFlowDatas(i).getSirokyAve().getXmin()
+                SQA.xMax = mngData.getFlowDatas(i).getSirokyAve().getXmax()
+                SQA.yMin = mngData.getFlowDatas(i).getSirokyAve().getYmin()
+                SQA.yMax = mngData.getFlowDatas(i).getSirokyAve().getYmax()
+                SQA.nome = nameNomo
+                SQA.xPoint = mngData.getFlowDatas(i).getSirokyAve().getDatoX()
+                SQA.yPoint = mngData.getFlowDatas(i).getSirokyAve().getDatoY()
+                SQA.udmX =  mngData.getFlowDatas(i).getSirokyAve().getUnitx()
+                SQA.udmY =  mngData.getFlowDatas(i).getSirokyAve().getUnity()
+                SQA.traksToDraw =  mngData.getFlowDatas(i).getSirokyAve().getTracce()
+                SQA.tracksColors =  mngData.getFlowDatas(i).getSirokyAve().getColors()
+                SQA.drawTracks()
+                SQA.visible = false
+
+                //button
+                var buttonSQA = Qt.createQmlObject('import "qrc:/Components"; MAnaButton {}', rectdata)
+                buttonSQA.buttonId = pagesLocal.length
+                buttonSQA.anchors.bottom = rectdata.bottom
+                buttonSQA.anchors.left = rectdata.left
+                buttonSQA.anchors.bottomMargin = 20
+                buttonSQA.anchors.leftMargin = btnLeftMargin
+                buttonSQA.myText = nameNomo
+                buttonSQA.clicked.connect(clickButton)
+                //btnLeftMargin += 110
+                pagesLocal[pagesLocal.length] = SQA
 
             }
 

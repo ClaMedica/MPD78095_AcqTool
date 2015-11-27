@@ -33,6 +33,8 @@ public:
     Q_INVOKABLE mflowdatasModel * datasInfo(){return m_datasInfo;}
     Q_INVOKABLE Nomogramma * getLiverpoolMax(){return m_liverpoolMax;}
     Q_INVOKABLE Nomogramma * getLiverpoolAve(){return m_liverpoolAve;}
+    Q_INVOKABLE Nomogramma * getSirokyMax(){return m_sirokyMax;}
+    Q_INVOKABLE Nomogramma * getSirokyAve(){return m_sirokyAve;}
 
     float getWaitingTime(){return m_waitingTime;}
     void setWaitingTime(float __val){m_waitingTime = __val;}
@@ -130,9 +132,12 @@ private:
     //nomogrammi
     Nomogramma *m_liverpoolMax;
     Nomogramma *m_liverpoolAve;
+    Nomogramma *m_sirokyMax;
+    Nomogramma *m_sirokyAve;
 
     void SetLineaInterpolata(QVector <double> __yVal, int __max, int __step, int __nLinea);
     void ReadLiverpoolParameter(bool __flowMax, bool __sex,int __age);
+    void ReadSirokyParameter(bool __flowAve);
 
     QVector<double> m_arrLineX1;
     QVector<double> m_arrLineY1;
@@ -146,6 +151,9 @@ private:
     QVector<double> m_arrLineY5;
     QVector<double> m_arrLineX6;
     QVector<double> m_arrLineY6;
+
+    QVector<double> m_arrAve;
+    QVector<double> m_arrMax;
 
 //    bool m_sex; //true donna
 //    int m_eta;

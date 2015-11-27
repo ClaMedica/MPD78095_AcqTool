@@ -7,13 +7,21 @@
 //FLW ADV
 #define G_LIVERPOOL_MAX 2
 #define G_LIVERPOOL_AVE 3
+#define G_SIROKY_AVE 4
+#define G_SIROKY_MAX 5
 
 class Nomogramma : public QObject
 {
     Q_OBJECT
+    Q_PROPERTY(QVariantList pointsX READ getXpoints)
+    Q_PROPERTY(QVariantList pointsY READ getYpoints)
+
 public:
     Nomogramma(QString __tipoAna, int __tipoNomograma);
     ~Nomogramma();
+
+    QVariantList getXpoints();
+    QVariantList getYpoints();
 
     Q_PROPERTY(QVariantList tracce READ getTracce WRITE setTracce)
     Q_INVOKABLE QVariantList getTracce(){return m_tracce;}
@@ -23,10 +31,7 @@ public:
     Q_INVOKABLE QVariantList getColors(){return m_colors;}
     Q_INVOKABLE void setColors(QVariantList __cl){m_colors = __cl;}
 
-    QVector<int> getLineX();
-    QVector<double> getLineY(int __num);
-
-    Q_PROPERTY(QString title READ getTitle WRITE setTitle)
+     Q_PROPERTY(QString title READ getTitle WRITE setTitle)
     Q_INVOKABLE void setTitle(QString __title){m_title = __title;}
     Q_INVOKABLE QString getTitle(){return m_title;}
 
@@ -62,12 +67,15 @@ public:
     Q_INVOKABLE double getYmin(){return m_yMin;}
     Q_INVOKABLE void setYmin(double __min){m_yMin = __min;}
 
+
+    QVector<double> getLineY(int __num);
+
     void setNumLines(int __num);
     int getNumLines(){return m_numLines;}
 
-    void addToLinex(int __i, double __val);
     void addToLiney(int __i, double __val);
 
+    void setLinea(QVector<int> __al){m_aline = __al;}
 signals:
 
 public slots:
@@ -83,7 +91,6 @@ private:
     QString m_title;
 
     int m_numLines;
-    QMap<int,QVector<double> > m_pLinex;
     QMap<int,QVector<double> > m_pLiney;
 
     double m_xMax;
@@ -99,6 +106,9 @@ private:
 
     QVariantList m_tracce;
     QVariantList m_colors;
+
+    //traccia di cui prendere i valori in Y per disegnare i poligoni irregolari
+    QVector<int> m_aline;
 };
 
 
