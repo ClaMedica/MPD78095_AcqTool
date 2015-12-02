@@ -211,11 +211,14 @@ Rectangle {
                 SQM.yPoint = mngData.getFlowDatas(i).getSirokyMax().getDatoY()
                 SQM.udmX =  mngData.getFlowDatas(i).getSirokyMax().getUnitx()
                 SQM.udmY =  mngData.getFlowDatas(i).getSirokyMax().getUnity()
-                SQM.traksToDraw =  mngData.getFlowDatas(1).getSirokyMax().getTracce()
-                SQM.tracksColors =  mngData.getFlowDatas(1).getSirokyMax().getColors()
+                SQM.traksToDraw =  mngData.getFlowDatas(i).getSirokyMax().getTracce()
+                SQM.tracksColors =  mngData.getFlowDatas(i).getSirokyMax().getColors()
                 SQM.drawTracks()
-                SQM.polygonXpoints = mngData.getFlowDatas(1).getSirokyMax().getXpoints
-                SQM.polygonYpoints = mngData.getFlowDatas(1).getSirokyMax().getYpoints
+                //bande colorate
+                SQM.numBande = 2
+                SQM.numPunti = mngData.getFlowDatas(i).getSirokyMax().getNumPunti()+1
+                SQM.polygonXpoints = mngData.getFlowDatas(i).getSirokyMax().getXpoints()
+                SQM.polygonYpoints = mngData.getFlowDatas(i).getSirokyMax().getYpoints()
                 SQM.visible = false
 
                 //button
@@ -231,8 +234,7 @@ Rectangle {
                 pagesLocal[pagesLocal.length] = SQM
 
                 //siroky QAve
-                nameNomo = mngData.getFlowDatas(1).getSirokyAve().getTitle()
-                console.log("name",nameNomo)
+                nameNomo = mngData.getFlowDatas(i).getSirokyAve().getTitle()
                 var SQA =  Qt.createQmlObject('import "qrc:/Components"; MNomogramma {}', rectdata)
                 SQA.clip = true
                 SQA.height = 250
@@ -253,6 +255,10 @@ Rectangle {
                 SQA.traksToDraw =  mngData.getFlowDatas(i).getSirokyAve().getTracce()
                 SQA.tracksColors =  mngData.getFlowDatas(i).getSirokyAve().getColors()
                 SQA.drawTracks()
+                SQA.numBande = 2
+                SQA.numPunti = mngData.getFlowDatas(i).getSirokyAve().getNumPunti()+1
+                SQA.polygonXpoints = mngData.getFlowDatas(i).getSirokyAve().getXpoints()
+                SQA.polygonYpoints = mngData.getFlowDatas(i).getSirokyAve().getYpoints()
                 SQA.visible = false
 
                 //button

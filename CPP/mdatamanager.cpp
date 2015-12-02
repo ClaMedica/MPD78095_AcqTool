@@ -1204,10 +1204,10 @@ bool MDataManager::InitArraysFLW(int __start,
         colori << "white" << "red" << "white" << "white";
         m_aflwdatas.at(i+1)->getSirokyMax()->setColors(colori);
         m_aflwdatas.at(i+1)->getSirokyMax()->setTracce(tracce);
-
+        //bande colorate
         QVector<int> linee;
-        linee.append(2);
         linee.append(3);
+        linee.append(1);
         m_aflwdatas.at(i+1)->getSirokyMax()->setLinea(linee);
 
         //nomogramma Siroky Ave
@@ -1237,6 +1237,11 @@ bool MDataManager::InitArraysFLW(int __start,
         colori << "white" << "red" << "white" << "white" << "white";
         m_aflwdatas.at(i+1)->getSirokyAve()->setColors(colori);
         m_aflwdatas.at(i+1)->getSirokyAve()->setTracce(tracce);
+        //bande colorate
+        linee.clear();
+        linee.append(4);
+        linee.append(1);
+        m_aflwdatas.at(i+1)->getSirokyAve()->setLinea(linee);
     }
     return true;
 }

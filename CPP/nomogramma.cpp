@@ -36,8 +36,12 @@ QVector<double> Nomogramma::getLineY(int __num)
 QVariantList Nomogramma::getXpoints()
 {
     QVariantList data;
-    for (int i=0; i< m_pLiney[0].length();i++)
-        data<<i;
+    for (int j=0; j<m_aline.length();j++)
+    {
+        for (double i=0; i< m_pLiney[m_aline.at(j)].length();i++)
+            data<<i;
+        data<<m_xMax<<"$End";
+    }
     return data;
 }
 
@@ -45,8 +49,10 @@ QVariantList Nomogramma::getYpoints()
 {
     QVariantList data;
     for (int j=0; j<m_aline.length();j++)
+    {
         for (int i=0; i< m_pLiney[m_aline.at(j)].size();i++)
             data<<m_pLiney[m_aline.at(j)].at(i);
-
+        data<<m_yMin<<"$End";
+    }
     return data;
 }

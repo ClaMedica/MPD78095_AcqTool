@@ -133,50 +133,28 @@ Rectangle{
         }
     }
 
-    property string valueYmax: ""
-
     function separateFrames(p){
+        //console.log(p)
         if(p.length>0){
             var l=[]
             var nome
-            var defCount = 0
             for(var i=0;i<p.length;i++){
                 if(p[i]==="$DefinerGroup"){
                     l=[];
                     //leggo il nome del plot
                     i++
-                    defCount++;
                     nome=p[i]
                     continue;
                 }
                 if(p[i]==="&DefinerGroup"){
+                    //console.log("group",l)
                     for(var j=0;j<plotNumber;j++)
-                        if(lista.itemAt(j).name===nome){
+                        if(lista.itemAt(j).name===nome)
                             lista.itemAt(j).fraItems=l
-                            console.log("claudia-->>>>", l)
-                        }
                     continue
                 }
                 //inizio la lettura
-
-//                if (p[i]==="yMax"){
-//                    l[l.length]=p[i]
-//                    console.log("yMax",p[i])
-//                    var ddd = p[i+defCount]
-//                    valueYmax = ddd
-//                    console.log("value",valueYmax)
-//                    var split = valueYmax.split(",")
-//                    l[l.length]=split[defCount-1]
-
-//                    console.log("value 1",split[defCount-1])
-//                    while (p[i]!=="yMin"){
-//                        i++
-//                    }
-//                    console.log("yMin",p[i])
-//                }
-
                 l[l.length]=p[i]
-
             }
         }
     }
@@ -245,7 +223,7 @@ Rectangle{
     {
         for(var i=0;i<plotNumber;i++)
             {
-            lista.itemAt(i).setXmax(lista.itemAt(ind).xMax)
+                lista.itemAt(i).setXmax(lista.itemAt(ind).xMax)
                 lista.itemAt(i).setXmin(lista.itemAt(ind).xMin)
             }
 

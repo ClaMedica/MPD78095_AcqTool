@@ -108,7 +108,7 @@ unix:!macx: LIBS += -L$$PWD/../Build/Emulator/DataBuild/ -lDatafileManager
 #percorso tecnoideal
 #rootPath = M:
 #percorso acer luca
-rootPath = C:\Users\Mez
+#rootPath = C:\Users\Mez
 #percorso claudia
 rootPath = E:\Piattaforma_70
 

@@ -16,12 +16,15 @@ class Nomogramma : public QObject
     Q_PROPERTY(QVariantList pointsX READ getXpoints)
     Q_PROPERTY(QVariantList pointsY READ getYpoints)
 
+    Q_PROPERTY(int numPunti READ getNumPunti)
 public:
     Nomogramma(QString __tipoAna, int __tipoNomograma);
     ~Nomogramma();
 
-    QVariantList getXpoints();
-    QVariantList getYpoints();
+    Q_INVOKABLE QVariantList getXpoints();
+    Q_INVOKABLE QVariantList getYpoints();
+
+    Q_INVOKABLE int getNumPunti(){return m_pLiney[0].length();}
 
     Q_PROPERTY(QVariantList tracce READ getTracce WRITE setTracce)
     Q_INVOKABLE QVariantList getTracce(){return m_tracce;}

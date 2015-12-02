@@ -12,7 +12,7 @@ Rectangle {
     property int yMax: 100
 
     property var tracksColors: []
-    property var tracksWidth: [1,1,1,1,1,1,1]
+    property var tracksWidth: [2,2,2,2,2,2,2]
     property string nome: "nome"
 
     property string udmY: "left"
@@ -26,8 +26,11 @@ Rectangle {
     property string colorLabelAssi: "white"
     property string colorGriglia: "grey"
 
-    property var polygonYpoints: [0,1]
-    property var polygonXpoints: [0,0]
+    property var polygonYpoints: [0]
+    property var polygonXpoints: [0]
+    property int numPunti: 0
+    property var bandeColore: ["lightgreen", "peachpuff"]
+    property int numBande: 1
 
     border.width: 1
 
@@ -77,6 +80,56 @@ Rectangle {
 
     onXPointChanged: updateX(xPoint)
 
+    function calculateXarea(vl)
+    {
+        if (vl.length > 1)
+        {
+            var banda = 0
+            var newListPoints = []
+            for(var i=0;i<vl.length;i++)
+            {
+                if (vl[i] !== "$End")
+                {
+                    var valPer=vl[i]/xMax
+                    newListPoints[newListPoints.length] = plotter.width*valPer
+                }
+                else
+                {
+                    listaAree.itemAt(banda).xpoints = newListPoints
+                    newListPoints=[]
+                    banda++
+                }
+            }
+        }
+
+    }
+
+    onPolygonXpointsChanged: calculateXarea(polygonXpoints)
+
+    function calculateYarea(vl)
+    {
+        if (vl.length > 1)
+        {
+            var banda = 0
+            var newListPoints = []
+            for(var i=0;i<vl.length;i++)
+            {
+                if (vl[i] !== "$End")
+                {
+                    var valPer=vl[i]/yMax
+                    newListPoints[newListPoints.length] = plotter.height*valPer
+                }
+                else
+                {
+                    listaAree.itemAt(banda).ypoints = newListPoints
+                    newListPoints=[]
+                    banda++
+                }
+            }
+        }
+    }
+
+    onPolygonYpointsChanged: calculateYarea(polygonYpoints)
 
     Rectangle{
         id: rRightMargin
@@ -268,6 +321,18 @@ Rectangle {
         anchors.left: rLeftMargin.right
         anchors.right: rRightMargin.left
 
+        Repeater{
+            id:listaAree
+            model: numBande
+            PolygonItem {
+                id:area
+                anchors.fill: plotter
+                clip: true
+                npunti: numPunti
+                colore: bandeColore[index]
+            }
+        }
+
         //prima la griglia
         PlotGrid2D{
             id: plotter_grid
@@ -344,16 +409,9 @@ Rectangle {
             opacity: 1
         }
 
-        PolygonItem {
-            id: polUp
-            anchors.fill: parent
-            anchors.margins:2
-            colore: "red"
-            ypoints:polygonYpoints
-            xpoints:polygonXpoints
-            visible: false
 
-        }
+
+
 
     }
 }
