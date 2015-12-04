@@ -62,5 +62,6 @@
     </qresource>
     <qresource prefix="/Dialog">
         <file>VolResDlg.qml</file>
+        <file>ExitDlg.qml</file>
     </qresource>
 </RCC>

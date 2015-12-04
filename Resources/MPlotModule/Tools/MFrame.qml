@@ -59,8 +59,7 @@ Rectangle{
                 modF.setProperty(modello[i],modello[i+1])
         }
 
-        //console.log(x,y,width,height,rec.height)
-        //console.log("I'm cursor n°",number,modM.number)
+        console.log(x,y,width,height,rec.height,rec.width,modF.yMax,modF.yMin,vMaxY,vMinY)
     }
 
     FrameModel{id:modF}
@@ -69,11 +68,10 @@ Rectangle{
     focus:true
 
     color:"transparent"
-
-    height:rec.height*(modF.yMax-modF.yMin)/(vMaxY-vMinY)
+    height:rec.height-20
     width:rec.width*(modF.xMax-modF.xMin)/(vMaxX-vMinX)
     x:rec.width*(modF.xMin-vMinX)/(vMaxX-vMinX)
-    y:rec.height*(vMaxY-modF.yMax)/(vMaxY-vMinY)
+    y:10
     //---------------------------------------------
     Rectangle{
         id:sfondo

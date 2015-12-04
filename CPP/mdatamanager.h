@@ -58,6 +58,7 @@ public:
     Q_PROPERTY(QStringList availableData READ availableData NOTIFY availableDataChanged)
 
     Q_PROPERTY(int valVolRes READ getValVolRes WRITE setValVolRes NOTIFY infoValVolRes)
+    Q_PROPERTY(QString toSave READ getToSave WRITE setToSave NOTIFY infoToSave)
 
     Q_PROPERTY(int numAnaFlwAdv READ getNumAnaFlwAdv)
     Q_INVOKABLE int getNumAnaFlwAdv(){return m_aflwdatas.length();}
@@ -70,6 +71,9 @@ public:
 
     int getValVolRes();
     void setValVolRes(int __val);
+
+    QString getToSave(){return m_toSave;}
+    void setToSave(QString __val);
 
     //analysis manager
     bool addSignal(MSignal *__pSignal);
@@ -90,9 +94,13 @@ signals:
     void sg_openVolResDlg(QString __tipoAn);
     void sg_loadResult();
     void infoValVolRes();
+    void infoToSave();
+
+    void sg_exitFromReview();
 
 public slots:
     void analysis(void);
+    void exitFromReview();
     void loadFile(QString __fileName);
     float getStartTime(){return m_start;}
     float getEndTime(){return m_end;}
@@ -144,6 +152,8 @@ private:
     QMap<QString,QStringList> m_modelMap;
 
     QString m_VolRes;
+    QString m_toSave;
+
     bool m_analized;
     bool m_autoPrint;
 

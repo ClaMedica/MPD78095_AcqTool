@@ -259,7 +259,7 @@ MForm{
             ["Add","Data to Plot","New Marker","New Definer"],
             ["Select Signal","To Analyze","To Play"],
             //["Analisys","Spectrum","Time Warping","Energy","Time Spectrum"],
-            ["Analisys", "Analizza"],
+            ["Analisys", "Analizza",qsTr("Exit")],
             ["Actions","Send Toast","Start Service","Connect Client"],
             ["Plot","Load Settings"]
         ]
@@ -329,9 +329,14 @@ MForm{
 
             if (itemClicked == "Analizza")
             {
-                //plotDial.visible=true
                 console.log("Sono dentro il click analysis")
                 mngData.analysis();
+            }
+
+            if (itemClicked == "Exit")
+            {
+                console.log("Sono dentro il click Exit")
+                mngData.exitFromReview();
             }
 
 //            var str=items[3];

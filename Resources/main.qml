@@ -114,8 +114,11 @@ ApplicationWindow {
         onSg_loadResult:{
             forAna.visible = false
             forRes.loadPageAnalysis()
-            //forRes.testNomogrammi()
             forRes.visible = true
+        }
+
+        onSg_exitFromReview:{
+            exit.visible = true;
         }
 
 
@@ -164,6 +167,12 @@ ApplicationWindow {
     VolResDlg{
         //@@@@@@@@@@    Properties      @@@@@@@@@@
         id: volRes
+        visible: false
+    }
+
+    ExitDlg{
+        //@@@@@@@@@@    Properties      @@@@@@@@@@
+        id: exit
         visible: false
     }
 }

@@ -18,6 +18,7 @@ MDataManager::MDataManager(QObject *parent)
     m_analized = false;
     m_autoPrint = false;
     m_numAna = 0;
+    m_toSave = "";
     setValVolRes(-999);
 }
 
@@ -284,10 +285,9 @@ void MDataManager::loadFile(QString __fileName)
 
         //libreria di analisi: creo oggetto.
         m_ana = new Analyze();
-        m_ana->SetData(__fileName);
-
-        break;
         m_mng->Close();
+        break;
+
     }
     default:qDebug()<<"Should not be here!!!!!";break;
     }
@@ -723,10 +723,39 @@ bool MDataManager::saveDataAndUpdate(QString __family, QString __name, VarMapVec
 
 }
 
+void MDataManager::exitFromReview()
+{
+    if (getToSave() == "")
+        emit sg_exitFromReview();
+    else
+    {
+        QString copyName=m_fileName;
+        copyName.insert(copyName.length()-4,"_copy");
+        if (getToSave() == "yes")
+        {        //copio il file copy nell'originale
+            qDebug()<<"cancello vecchio file"<<QFile::remove(m_fileName);
+            qDebug()<<"copio le modifiche"<<QFile::copy(copyName,m_fileName);
+            qDebug()<<"cancellata copia all'exit"<<QFile::remove(copyName);
+        }
+        else //"no"
+                    //cancello il file copy
+            qDebug()<<"cancellata copia all'exit"<<QFile::remove(copyName);
+        exit(0);
+    }
+
+}
+
 bool MDataManager::checkForVolRes()
 {
     if (getValVolRes() != -999)
         return false;
+
+    m_mng=new DatafileManager;
+    m_mng->SetFileName(m_fileName);
+    m_mng->SetFileType(6);
+
+    qDebug()<<"File Aperto?"<<m_mng->Open();
+    qDebug()<<"File Caricato?"<<m_mng->GetParameters();
 
     //ciclo per individuare se è necessario aprire la dlg del volume residuo
     bool volRes = false;
@@ -747,6 +776,8 @@ bool MDataManager::checkForVolRes()
         }
 
     }
+
+    m_mng->Close();
     return volRes;
 }
 
@@ -764,17 +795,26 @@ void MDataManager::analysis()
     //                Biofeedback
     //                Compliance
 
+
+    if (checkForVolRes())
+        return;
+
+    m_mng=new DatafileManager;
+    m_mng->SetFileName(m_fileName);
+    m_mng->SetFileType(6);
+
+    qDebug()<<"File Aperto?"<<m_mng->Open();
+    qDebug()<<"File Caricato?"<<m_mng->GetParameters();
+
     //per ora salvo io su file pic l'analisi flussimetria ...
     m_mng->SetAnalysis("Flussimetria");
+    m_ana->SetData(m_mng);
+
 
     int anaProg = QDateTime::currentDateTime().toTime_t();
     QVariantList En;
 
     m_numAna = m_mng->GetAnalysiNum();
-
-    if (checkForVolRes())
-        return;
-
     for (int i=0; i<m_numAna; i++)
     {
         QString anaType = m_mng->GetAnalysis(i);
@@ -824,22 +864,21 @@ void MDataManager::analysis()
                     //ho tralasciato la parte che gestisce l'iconizzazione che forse non c'è
 
                     //provo a disegnare il definitore
-
+                    QString family="Definers";
+                    QString name="Flowmetry";
                     VarMap *def=new VarMap;
                     (*def)["key"] = MK_FLOWMETRY;
-                    (*def)["name"] = "FLW";
+                    (*def)["name"] = name;
                     (*def)["xMin"]= 1;
                     (*def)["xMax"]= m_end-1;
                     (*def)["yMin"]=0;
                     (*def)["yMax"]=100;
                     (*def)["enCh"]= En;
-                    (*def)["descr"]="Flowmetry";
+                    (*def)["descr"]=name;
                     (*def)["color"]="green";
                     (*def)["category"]=CAT_DEFINER;
                     (*def)["resizeable"]=1;
 
-                    QString family="Definers";
-                    QString name="FLW";
                     qDebug()<<*def;
                     VarMapVec *defVec=new VarMapVec;
                     defVec->append(def);
@@ -848,7 +887,7 @@ void MDataManager::analysis()
                     found = true;
 
                     //saveall?? se si la updateinfolist puo leggere da datafile?
-                    //saveChanges();//(?)
+                    saveChanges();//(?)
                     //buildInfoList();
                     updateInfoList();
                     emit reloadingCompleted();
@@ -963,12 +1002,21 @@ void MDataManager::analysis()
     }
 
 
-
+    m_mng->Close();
     emit sg_loadResult();
 }
 
 
-void MDataManager::setValVolRes(int __val)
+void MDataManager::setToSave(QString __val)
+{
+    if (m_toSave == __val)
+        return;
+
+    m_toSave = __val;
+    emit infoToSave();
+}
+
+void MDataManager::setValVolRes(int  __val)
 {
     QString valString = QString::number(__val);
     if (m_VolRes == valString)
@@ -977,6 +1025,7 @@ void MDataManager::setValVolRes(int __val)
     m_VolRes = valString;
     emit infoValVolRes();
 }
+
 
 int MDataManager::getValVolRes()
 {
