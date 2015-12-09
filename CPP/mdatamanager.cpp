@@ -123,6 +123,11 @@ void MDataManager::loadFile(QString __fileName)
 
         QString patientName=m_mng->GetPatient().section(";",0,1);
         patientName.replace(";","_");
+        m_sexPatient = true;
+        if (m_mng->GetPatient().section(";",12,12) == "F")
+            m_sexPatient = true;
+        else
+            m_sexPatient = false;
         n=m_mng->GetDuration();
         m_end=n/1000;
         qDebug()<<"Durata esame = "<<m_end;
@@ -131,6 +136,8 @@ void MDataManager::loadFile(QString __fileName)
         //------ Aggiungo i markers operativi, sono comuni a tutti i canali
 
         qDebug()<<"Marker Operativi = "<<m_mng->GetNumOperativeMarkers();
+
+
 
         for(i=0;i<m_mng->GetNumOperativeMarkers();i++)
         {
@@ -169,7 +176,6 @@ void MDataManager::loadFile(QString __fileName)
 
         //------Aggiungo i canali
 
-        QVariantList defYmax;
         for(int h=0;h<m_mng->GetChanNum();h++)
         {
             MSignal *sig=new MSignal;
@@ -182,11 +188,11 @@ void MDataManager::loadFile(QString __fileName)
             sig->setSamplingFrequency(m_mng->GetNAS(h));
             double M=sig->maximum();
             double m=sig->minimum();
-            defYmax<<sig->maximum();
             if(sigMax<M)
                 sigMax=M;
             if(sigMin>m)
                 sigMin=m;
+
             qDebug()<<(*sig);
             this->addSignal(sig);
         }
@@ -206,7 +212,7 @@ void MDataManager::loadFile(QString __fileName)
             (*def)["xMin"]=(tStart[0]-1)/m_mng->GetNAS(0);
             (*def)["xMax"]=(tEnd[0]-1)/m_mng->GetNAS(0);
             (*def)["yMin"]=sigMin;
-            (*def)["yMax"]=sigMax;//defYmax;
+            (*def)["yMax"]=sigMax;
             (*def)["enCh"]=defEn[i];
             (*def)["descr"]=descr;
             (*def)["color"]="cyan";
@@ -489,9 +495,9 @@ bool MDataManager::updateInfoList()
         }
 
         //markers
-        //        VarMapVec *op = m_storage.getAll(CAT_MARKER);
-        //        if (op->size() > 0)
-        //            elements<<"Markers:Operative";
+//        VarMapVec *op = m_storage.getAll(CAT_MARKER);
+//        if (op->size() > 0)
+//            elements<<"Markers:Operative";
 
         //        if (m_mng->GetNumDefiners()> 0)
         //           elements<<"Definers:Operative";
@@ -733,14 +739,17 @@ void MDataManager::exitFromReview()
         copyName.insert(copyName.length()-4,"_copy");
         if (getToSave() == "yes")
         {        //copio il file copy nell'originale
-            qDebug()<<"cancello vecchio file"<<QFile::remove(m_fileName);
-            qDebug()<<"copio le modifiche"<<QFile::copy(copyName,m_fileName);
-            qDebug()<<"cancellata copia all'exit"<<QFile::remove(copyName);
+            if (QFile::exists(copyName))
+            {
+                qDebug()<<"cancello vecchio file"<<QFile::remove(m_fileName);
+                qDebug()<<"copio le modifiche"<<QFile::copy(copyName,m_fileName);
+                qDebug()<<"cancellata copia all'exit"<<QFile::remove(copyName);
+            }
         }
         else //"no"
                     //cancello il file copy
             qDebug()<<"cancellata copia all'exit"<<QFile::remove(copyName);
-        exit(0);
+        exit(0); //poi dovrà tornare al modulo database
     }
 
 }
@@ -1350,7 +1359,7 @@ int MDataManager::ReadResult(int __numEv)
             m_aflwdatas.last()->setVDetMax(*((float*)(strTemp + DETRUSOR)));
             m_aflwdatas.last()->setCQ(*((float*)(strTemp +FLOW_CORR_FACTOR)));
             m_aflwdatas.last()->buildTable();
-            m_aflwdatas.last()->buildNomogrammi(false, 45);
+            m_aflwdatas.last()->buildNomogrammi(m_sexPatient, 45);
         }
 
         //calcolo la media

@@ -156,6 +156,8 @@ private:
 
     bool m_analized;
     bool m_autoPrint;
+    //true se donna, false se uomo
+    bool m_sexPatient;
 
     int m_numAna; //numero di analisi --> non sappiamo se serve
     QVector<mflowdatas*> m_aflwdatas; //array di analisi di tipo flussimetria
