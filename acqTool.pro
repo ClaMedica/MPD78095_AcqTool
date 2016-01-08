@@ -1,6 +1,6 @@
 TEMPLATE = app
 TARGET = acqTool
-QT += qml quick widgets sql network multimedia xml core
+QT += qml quick widgets sql network multimedia xml core serialport
 
 RESOURCES += Resources/qml.qrc
 
@@ -33,7 +33,10 @@ SOURCES += main.cpp \
     CPP/mflowdatas.cpp \
     ../MGlobal/MyMessageOutput.cpp \
     CPP/manatablemodel.cpp \
-    CPP/nomogramma.cpp
+    CPP/nomogramma.cpp \
+    CPP/printermanager.cpp \
+    CPP/printerserialport.cpp
+
 
 HEADERS += \
     CPP/parametermanager.h \
@@ -54,7 +57,10 @@ HEADERS += \
     CPP/androidmanager.h \
     CPP/mflowdatas.h \
     CPP/manatablemodel.h \
-    CPP/nomogramma.h
+    CPP/nomogramma.h \
+    CPP/printermanager.h \
+    CPP/printerserialport.h
+
 
 SOURCES += ../AnaUro/anauro.cpp \
     ../AnaUro/analysis.cpp \

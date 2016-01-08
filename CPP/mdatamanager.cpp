@@ -113,7 +113,7 @@ void MDataManager::loadFile(QString __fileName)
         }
         m_mng=new DatafileManager;
         m_mng->SetFileName(__fileName);
-        m_mng->SetFileType(6);
+        m_mng->SetFileType(7);
         qDebug()<<"File Aperto?"<<m_mng->Open();
         qDebug()<<"File Caricato?"<<m_mng->GetParameters();
 
@@ -331,7 +331,7 @@ void MDataManager::saveChanges()
     //apro il file copia
 
     m_copy->SetFileName(copyName);
-    m_copy->SetFileType(6);
+    m_copy->SetFileType(7);
     qDebug()<<"Copia aperta?"<<m_copy->Open();
     qDebug()<<"Copia caricata?"<<m_copy->GetParameters();
     qDebug()<<"Eliminati marker e definer?"<<m_copy->DeleteAllMarkers();
@@ -761,7 +761,7 @@ bool MDataManager::checkForVolRes()
 
     m_mng=new DatafileManager;
     m_mng->SetFileName(m_fileName);
-    m_mng->SetFileType(6);
+    m_mng->SetFileType(7);
 
     qDebug()<<"File Aperto?"<<m_mng->Open();
     qDebug()<<"File Caricato?"<<m_mng->GetParameters();
@@ -810,7 +810,7 @@ void MDataManager::analysis()
 
     m_mng=new DatafileManager;
     m_mng->SetFileName(m_fileName);
-    m_mng->SetFileType(6);
+    m_mng->SetFileType(7);
 
     qDebug()<<"File Aperto?"<<m_mng->Open();
     qDebug()<<"File Caricato?"<<m_mng->GetParameters();
@@ -1012,6 +1012,28 @@ void MDataManager::analysis()
 
 
     m_mng->Close();
+
+    //printer PROVA
+    printermanager *prova = new printermanager(m_fileName);
+    prova->setTempoAttesa(m_aflwdatas.at(0)->getWaitingTime());
+    prova->setFlussoMax(m_aflwdatas.at(0)->getQMax());
+    prova->setFlussoMedio(m_aflwdatas.at(0)->getQAve());
+    prova->setTempoMax(m_aflwdatas.at(0)->getTimeAtQmax());
+    prova->setTempo595(m_aflwdatas.at(0)->getTime90());
+    prova->setTempoFlusso(m_aflwdatas.at(0)->getFlowTime());
+    prova->setTempoDisc(m_aflwdatas.at(0)->getDescTime());
+    prova->setTempoSvuot(m_aflwdatas.at(0)->getVoidingTime());
+    prova->setVolFlussoMax(m_aflwdatas.at(0)->getVolAtQqmax());
+    prova->setVolVuotato(m_aflwdatas.at(0)->getVoidedVolume());
+    prova->setAccelerazione(m_aflwdatas.at(0)->getAcceleration());
+
+    //letto dai setting
+    //mi dice se la flussimetria automatica o manuale
+    //prova->setMode();
+    //if (m_autoPrint)
+        prova->print();
+
+    //qml
     emit sg_loadResult();
 }
 

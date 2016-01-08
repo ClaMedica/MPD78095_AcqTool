@@ -17,7 +17,7 @@ MAcqManager::MAcqManager(QObject *parent)
     m_supeConnected=0;
     m_oldState=ESTATE_IDLE_NOT_CONNECTED;
 
-    //connetto il gestore degli allarmi alla propriet√† alarms
+    //connetto il gestore degli allarmi alla propriet√  alarms
     connect(&m_alarmMng,SIGNAL(alarmsUpdated(QVariantList)),this,SLOT(setAlarms(QVariantList)));
 }
 
@@ -76,7 +76,7 @@ bool MAcqManager::newAcquisition(QString __dataFile)
 {
     if(m_acqFileOpened)
     {
-        //sono gi√† in acquisizione e voglio farne partire un altra...strano ma
+        //sono gi√  in acquisizione e voglio farne partire un altra...strano ma
     }
     else
     {
@@ -89,7 +89,7 @@ bool MAcqManager::newAcquisition(QString __dataFile)
         if(!m_alarmMng.load(m_applicationPath+"/Config_Alarms_"+lang+".xml"))
             qCritical()<<"Error on alarm configuration file";
 
-        //carico info di connettivit√†
+        //carico info di connettivit√ 
         loadConnectivityInfo(m_configAcq.getSafeChild(XML_CONNECTIONS));
 
 
@@ -109,7 +109,7 @@ bool MAcqManager::newAcquisition(QString __dataFile)
         m_mng=new DatafileManager;
 
         m_mng->SetFileName(__dataFile);
-        m_mng->SetFileType(5);
+        m_mng->SetFileType(7);
 
         qDebug()<<"Opening file ... "<<m_mng->Open();
         qDebug()<<"Loading parameters ... "<<m_mng->GetParameters();
@@ -124,7 +124,7 @@ bool MAcqManager::newAcquisition(QString __dataFile)
         if(!buildConfigurationFile())
             qCritical()<<"Error during building of configuration file";
 
-        //aggiorno il datafile con i dati relativi alla mia configurazione #BUG da togliere non appena il file verr√† scritto correttamente
+        //aggiorno il datafile con i dati relativi alla mia configurazione #BUG da togliere non appena il file verr√  scritto correttamente
         qDebug()<<"Updating datafile...";
         handleDataFile();
         //ripristino il file in acquisizione
@@ -562,7 +562,7 @@ void MAcqManager::checkAutomaticStartStop(QString __which)
 }
 
 void MAcqManager::saveBuffersToFile()
-{//qui so che ho gi√† spedito i campioni al plot per cui salvo sul file ed elimino i campioni dal buffer per sempre
+{//qui so che ho gi√  spedito i campioni al plot per cui salvo sul file ed elimino i campioni dal buffer per sempre
 
     foreach (QString chanName, m_dataChanNameMap.keys()) {
         int size=chanName.size();
@@ -646,7 +646,7 @@ bool MAcqManager::handleDataFile()
     Ancestry *channels=m_configAcq.getChild(XML_CHANNELS);
     if(channels==NULL)
         qCritical("Child not alive");
-    //ciclo per ogni canale del datafile alla ricerca di propriet√† da completare
+    //ciclo per ogni canale del datafile alla ricerca di propriet√  da completare
     int maxChan=m_mng->GetChanNum();
     for(int i=0;i<maxChan;i++)
     {
@@ -801,7 +801,7 @@ void MAcqManager::fillBuffers(QByteArray __block)
         else
             qCritical()<< "currChan out of range"<<currChan;
     }
-    //rimuoviamo roba gi√† processata
+    //rimuoviamo roba gi√  processata
 }
 
 bool MAcqManager::buffersReady()
@@ -826,7 +826,7 @@ bool MAcqManager::readConfigurationFile()
         //che supervisore serve?
         QString card=channel->getAttribute("card");
         if(card=="")qCritical()<<"File corrupted";
-        //se non c'√® gi√† questo supe lo aggiungo alla lista di quelli da far partire
+        //se non c'√® gi√  questo supe lo aggiungo alla lista di quelli da far partire
         if(!m_superList.contains(card))
             m_superList<<card;
         QString name=channel->getSafeChild(XML_NAME)->text();

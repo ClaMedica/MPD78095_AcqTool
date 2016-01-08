@@ -1,6 +1,7 @@
 <Configuration>
-        <Locale Value="it"/>
-        <DataFolder Value="C:/Medica/urodata"/>
-        <ProgFolder Value="C:/Users/MEZ/Lavoro/Software/Build/StandAlone"/>
-        <AndroidFolder Value="/mnt/sdcard/urodata"/>
+	<Locale Value="it"/>
+        <DataFolders Value="C:\Users\Claudia\Documents\urodata"/>
+        <ProgFolders value="C:/Users/Claudia/Documents/urodata"/>
+        <AndroidFolders value=""/>
+        </AndroidFolders>
 </Configuration>
