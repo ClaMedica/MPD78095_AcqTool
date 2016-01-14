@@ -97,10 +97,10 @@ void printermanager::print()
 
     m_dfm->Close();
 
-    //init_printer();
+
 //    printerserialport *port;
      m_port = new printerserialport(this);
-
+     m_port->init_printer();
 
     pri_rep_review();	// qui va subito in stampa
 
@@ -218,115 +218,120 @@ questa funzione gestisce tutta la stampa del report, sia in modalita portrait ch
 */
 void printermanager::Pri_Rep()//byte numCurve, char* num_file_to_print, bool print_mode)
 {	/*	Stampa il Report	*/
+    //m_port->Pri_Set_Serial_Com(0x85);   // 38400bauds
+   // m_serialPort.setBaudRate(9600);
+    m_port->Pri_Speed(0x30);
+    m_port->Pri_Max_Speed(0x08,0x64);
+
     //      Intestazione
 #if PRI_REP_INT
     Intest();
 #endif
 
     //     Identificativi Esame
-//#if PRI_REP_IDE
-//    Report_data();		// scrive i dati del paziente e lo spazio per le note manuali
-//     m_port->Pri_Str(3,(char*)LINE"\x1",0);
-//#endif
+#if PRI_REP_IDE
+    Report_data();		// scrive i dati del paziente e lo spazio per le note manuali
+     m_port->Pri_Str(3,(char*)LINE"\x1",0);
+#endif
 
-//    // Grafico FLW + VOL ed eventualmente EMG
-//#if PRI_REP_GRA
+    // Grafico FLW + VOL ed eventualmente EMG
+#if PRI_REP_GRA
 
-//    if(m_printMode == PORTRAIT_MODE)			// grafico trasversale con numero di punti fisso
-//    {
-//        m_correct = false;
-//        m_PointsToPrintout = m_num_sam;			//Deve stampare solo quelli necessari, quelli calcolati nella funzione review
-//        // il numero di campioni da stampare è il numero di blocchi scritti su card; il -1 è perchè per qualche motivo i campioni buoni nel buffer_vol vanno dallo 0 allo realDots-2
-//        if( m_PointsToPrintout > NUMOF_X_PRINT_DOTS )
-//        {
-//            m_PointsToPrintout = NUMOF_X_PRINT_DOTS;
-//            //tem_exm_corr = rep.num_sam;
-//            m_correct = true;
-//        }
-//        m_max_vol = buffer_vol[0];
-//        m_max_emg = buffer_emg[0];
+    if(m_printMode == PORTRAIT_MODE)			// grafico trasversale con numero di punti fisso
+    {
+        m_correct = false;
+        m_PointsToPrintout = m_num_sam;			//Deve stampare solo quelli necessari, quelli calcolati nella funzione review
+        // il numero di campioni da stampare è il numero di blocchi scritti su card; il -1 è perchè per qualche motivo i campioni buoni nel buffer_vol vanno dallo 0 allo realDots-2
+        if( m_PointsToPrintout > NUMOF_X_PRINT_DOTS )
+        {
+            m_PointsToPrintout = NUMOF_X_PRINT_DOTS;
+            //tem_exm_corr = rep.num_sam;
+            m_correct = true;
+        }
+        m_max_vol = buffer_vol[0];
+        m_max_emg = buffer_emg[0];
 
-//        for (int uw7=0; uw7<NUMOF_X_PRINT_DOTS; uw7++)	{	// cerco il massimo del buffer volume
-//            if (buffer_vol[uw7] > m_max_vol)
-//                m_max_vol = buffer_vol[uw7];
-//            if (buffer_emg[uw7] > m_max_emg)
-//                m_max_emg = buffer_emg[uw7];  // supponiamo 4000 in uVolt
-//        }
+        for (int uw7=0; uw7<NUMOF_X_PRINT_DOTS; uw7++)	{	// cerco il massimo del buffer volume
+            if (buffer_vol[uw7] > m_max_vol)
+                m_max_vol = buffer_vol[uw7];
+            if (buffer_emg[uw7] > m_max_emg)
+                m_max_emg = buffer_emg[uw7];  // supponiamo 4000 in uVolt
+        }
 
-//        if (m_printModeUser)	// è settata la stampa in landscape ma l'esame è trooppo lungo
-//        {
-//            m_port->Pri_justif(0);
-//            m_port->Pri_mode(0x80);	// sottolineato e doppia larghezza
-//            QString strToWrite = tr("! Examination longer than 5 minutes");
-//            char str[60];
-//            sprintf( str, "%s\n", strToWrite.toLatin1().data());
-//            m_port->Pri_Str( strlen(str), str, 1 );
-//            m_port->Pri_justif(2);	// bandiera a sinistra
-//        }
+        if (m_printModeUser)	// è settata la stampa in landscape ma l'esame è trooppo lungo
+        {
+            m_port->Pri_justif(0);
+            m_port->Pri_mode(0x80);	// sottolineato e doppia larghezza
+            QString strToWrite = tr("! Examination longer than 5 minutes");
+            char str[60];
+            sprintf( str, "%s\n", strToWrite.toLatin1().data());
+            m_port->Pri_Str( strlen(str), str, 1 );
+            m_port->Pri_justif(2);	// bandiera a sinistra
+        }
 
-//        Report_flw();	// finalmente stampiamo i grafici di volume e flusso
-//        if(m_emgPresent)
-//            Report_emg();						// EMG
-//    }
-//    else		// print_mode = LANDSCAPE_MODE - grafico longitudinale, con lunghezza legata alla lunghezza dell'esame
-//    {
-//        short samples_to_print;
-//        m_max_y = Calc_Max_Flw();			// fondo scala del flusso
-//        samples_to_print = adatta_buffer_dati(m_realDots, m_max_y);
-//        Calc_Max_RealReport_rel2(samples_to_print);
-//        Report_Real_Time(samples_to_print);		// finalmente stampa
-//    }
-//#endif
+        Report_flw();	// finalmente stampiamo i grafici di volume e flusso
+        if(m_emgPresent)
+            Report_emg();						// EMG
+    }
+    else		// print_mode = LANDSCAPE_MODE - grafico longitudinale, con lunghezza legata alla lunghezza dell'esame
+    {
+        short samples_to_print;
+        m_max_y = Calc_Max_Flw();			// fondo scala del flusso
+        samples_to_print = adatta_buffer_dati(m_realDots, m_max_y);
+        Calc_Max_RealReport_rel2(samples_to_print);
+        Report_Real_Time(samples_to_print);		// finalmente stampa
+    }
+#endif
 
-//    // Grafico Siroky, stampato solo se paziente maschio oppure generico (cioè dove non indicao il sesso)
+    // Grafico Siroky, stampato solo se paziente maschio oppure generico (cioè dove non indicato il sesso)
 
-//#if PRI_REP_SRK
-//    if(m_printSyroky )	{
-//        if( ( m_sex != 'F' ) || (m_test_type != 0x00 ))		// così stampa sempre nel caso di esame veloce e paziente generico
-//        {
-//            Report_siroky();
-//        }
-//    }
-//#endif
+#if PRI_REP_SRK
+    if(m_printSyroky )	{
+        if( ( m_sex != 'F' ) || (m_test_type != 0x00 ))		// così stampa sempre nel caso di esame veloce e paziente generico
+        {
+            Report_siroky();
+        }
+    }
+#endif
 
 //    // scritta relativa al tipo di modalità dell'esame
 
-//#ifndef __NEW_IND_MOD__
-//#if PRI_REP_MODAL
-//    m_port->Pri_justif(F_center);
-//    m_port->Pri_mode(0x10);
-//    char str[60];
-//    if (m_modal_e == 2)
-//    {
-//        QString modal = tr("MANUAL   MODALITY");
-//        sprintf(str,"%s\n",modal.toLatin1().data());
-//    }
-//    else
-//        if (m_modal_e == 0)
-//        {
-//            QString modal = tr("AUTOMATIC  MODALITY ");
-//            sprintf(str,"%s\n",modal.toLatin1().data());
-//        }
-//    m_port->Pri_Str(strlen(str),str,0);
-//    QString line = LINE"\x1";
-//    m_port->Pri_Str(3,line.toLatin1().data(),0);
-//    m_port->Pri_justif(F_left);
-//#endif
-//#endif
+#ifndef __NEW_IND_MOD__
+#if PRI_REP_MODAL
+    m_port->Pri_justif(F_center);
+    m_port->Pri_mode(0x10);
+    char str[60];
+    if (m_modal_e == 2)
+    {
+        QString modal = tr("MANUAL   MODALITY");
+        sprintf(str,"%s\n",modal.toLatin1().data());
+    }
+    else
+        if (m_modal_e == 0)
+        {
+            QString modal = tr("AUTOMATIC  MODALITY ");
+            sprintf(str,"%s\n",modal.toLatin1().data());
+        }
+    m_port->Pri_Str(strlen(str),str,0);
+    QString line = LINE"\x1";
+    m_port->Pri_Str(3,line.toLatin1().data(),0);
+    m_port->Pri_justif(F_left);
+#endif
+#endif
 
 //    // 	Risultati dell'esame ricavati dall'analisi semplificata, implementata nel firmware
 
 //#if PRI_REP_RIS
-//    Report_result();		// scrive in elenco i dati calcolati dall'analisi dell'esame
-//    m_port->Pri_Str(3,(char*)LINE"\x3",0);
+    Report_result();		// scrive in elenco i dati calcolati dall'analisi dell'esame
+    m_port->Pri_Str(3,(char*)LINE"\x3",0);
 //#endif
 
-//    //	Scrive i dati riguardanti versione firmware e date/ora ultima calibrazione
+    //	Scrive i dati riguardanti versione firmware e date/ora ultima calibrazione
 
-//#if PRI_REP_POS
-//    //   Pri_justif(F_center);
-//    //   Report_dati_macchina(numCurve);	// scrive data e ora della stampa e la versione attuale del FW
-//#endif
+#if PRI_REP_POS
+       //m_port->Pri_justif(F_center);
+       //Report_dati_macchina(numCurve);	// scrive data e ora della stampa e la versione attuale del FW
+#endif
 
     // fa avanzare la carta per consentire lo strappo
 
@@ -364,9 +369,7 @@ void printermanager::Intest()
     sprintf( str, "%s\n", msg_title.toLatin1().data());
     m_port->Pri_Str(strlen(str),str,0);			// a capo con il "\n"
 
-    m_port->Pri_mode(0x00); 					// modo default
-    m_port->Pri_justif(F_left);					// tutto a sinistra
-    m_port->Pri_Str(3,(char*)LINE"\x1",0);  			// scrive una riga vuota
+
 
 }
 
@@ -376,6 +379,11 @@ Sono stampati i dati del report paziente, nome, cognome, data di nascita, sesso,
 void printermanager::Report_data()
 {
     char str[60];
+
+    m_port->Pri_mode(0x00); 					// modo default
+    m_port->Pri_justif(F_left);					// tutto a sinistra
+    m_port->Pri_Str(3,(char*)LINE"\x1",0);  			// scrive una riga vuota
+
     m_port->Pri_Font(1);							// font 12x20
 
     const char * puntini = ". . . . . . . . . . . . . . . . . . . . .\n";
@@ -390,7 +398,7 @@ void printermanager::Report_data()
     strToWrite = tr("Test Date ......:");
     sprintf(str," %s %s\n",strToWrite.toLatin1().data(), m_dateofexam.toLatin1().data());
 
-    m_port->Pri_Str(strlen(str),str,1);
+    m_port->Pri_Str(strlen(str),str,0);
 
     // cognome
     strToWrite = tr("Surname ........:");
@@ -473,15 +481,16 @@ void printermanager::Report_flw()
     m_port->Pri_mode(0x10);
 
     QString strToWrite = tr("Flowmetry   ");
-    char str[60];
-    sprintf( str, "   Q ( ml/s )           %s           Vol ( ml )", strToWrite.toLatin1().data());
+    char str[63];
+    sprintf( str, "   Q ( ml/s )              %s              Vol ( ml )", strToWrite.toLatin1().data());
     m_port->Pri_Str( strlen(str), str, 1 );
-
+    //m_port->Pri_Set_Serial_Com(0x85);   // 38400bauds
     for(int ub = 0; ub < 5; ub++ )                        /*scompone la griglia in 10 righe*/
     {
         Pri_Rep_Gra( ub * 2 ); // sì label
         Pri_Rep_Gra( ub * 2 + 1 ); // no label
     }
+   // m_port->Pri_Set_Serial_Com(0x83);   // 9600bauds
     m_port->Pri_mode(0x00);
     m_port->Pri_Font(1);
     m_port->Pri_Str( strlen( str_label_time[ m_i_max_x ] ), (char *)str_label_time[ m_i_max_x ], 1 );
@@ -656,7 +665,7 @@ void printermanager::Pri_Rep_Gra(int __num_riga)
     m_str_gr[3]=0x09;	// n2
     m_str_gr[4]=0x00;	// n3
     m_str_gr[5]=0x02;	// n4	doppia altezza
-    m_str_gr[6]=0x02;	// n5	scrive a n5 byte dal bordo
+    m_str_gr[6]=0x01;	// n5	scrive a 1 byte dal bordo
     m_str_gr[7]=0x66;	// n6	larghezza 4+94+4=102 byte
 
     if( (__num_riga == 0) || ( !(__num_riga % 2) ) )
@@ -1462,7 +1471,7 @@ short printermanager::adatta_buffer_dati(int __num_sample, long __fs_flw)
     unsigned short j, k;		// valore massimo = 20min*60sec*10sample/sec = 12000
     unsigned short num_max_sample = __num_sample;
 
-    for(int i = 0; i < __num_sample; i++)
+    for(int i = 0; i < (FREQ_ACQ * MAX_DURATA_ESAME *60); i++)
     {
         m_vol_store.append(0);
         m_flow_store.append(0);

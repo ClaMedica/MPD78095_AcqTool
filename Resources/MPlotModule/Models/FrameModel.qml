@@ -7,6 +7,7 @@ ListModel {
     property string name:"none"
     property string category: "none"
     property string key:"key nessuna"
+    property int num:0
     property var enCh:[]
     property real xMin:0
     property real xMax:1
@@ -15,7 +16,7 @@ ListModel {
     property int resizeable:0
     property real whoAmI:0 //numero del frame
     property string color:"red"
-    property var strList:["descr","family","name","category","key","enCh","xMin","xMax","yMin","yMax","whoAmI","color","resizeable"]
+    property var strList:["descr","family","name","category","key","num","enCh","xMin","xMax","yMin","yMax","whoAmI","color","resizeable"]
 
     function setProperty(role,value)
     {
@@ -27,6 +28,7 @@ ListModel {
         case "name":name=value;break;
         case "category":category=value;break;
         case "key":key=value;break;
+        case "num":num=value;break;
         case "enCh":enCh=value;break;
         case "xMin":xMin=value;break;
         case "xMax":xMax=value;break;

@@ -137,8 +137,6 @@ void MDataManager::loadFile(QString __fileName)
 
         qDebug()<<"Marker Operativi = "<<m_mng->GetNumOperativeMarkers();
 
-
-
         for(i=0;i<m_mng->GetNumOperativeMarkers();i++)
         {
             VarMap *mrk=new VarMap;
@@ -213,6 +211,7 @@ void MDataManager::loadFile(QString __fileName)
             (*def)["xMax"]=(tEnd[0]-1)/m_mng->GetNAS(0);
             (*def)["yMin"]=sigMin;
             (*def)["yMax"]=sigMax;
+            (*def)["num"] = i;
             (*def)["enCh"]=defEn[i];
             (*def)["descr"]=descr;
             (*def)["color"]="cyan";
@@ -252,9 +251,16 @@ void MDataManager::loadFile(QString __fileName)
             m_mng->GetAnMarker(i,&key,&numCh,numSamp,&numDef);
             numChVec<<numCh;
 
-            double val=(double)numSamp[i]/m_mng->GetNAS(0);
+            double valY = 0;
+            foreach(MSignal *sig,m_signalVector)
+                if(sig->getName()==m_mng->GetChanName(numCh))
+                   valY = m_mng->GetValue(numCh,numSamp[0]);
+
+
+            double val=(double)numSamp[0]/m_mng->GetNAS(0);
             qDebug()<<val;
             (*mrk)["val"]=val;
+            (*mrk)["valY"]=valY;
             (*mrk)["descr"]=descr;
             (*mrk)["lock"]=false;
             (*mrk)["channel"]=numCh;
@@ -273,16 +279,16 @@ void MDataManager::loadFile(QString __fileName)
             saveDataAndUpdate(family,name,mrkAnVec);
         }
 
-        for(int32_t nc=0;nc<m_mng->GetChanNum();nc++)
-        {
-            VarMapVec *subVec=new VarMapVec;
-            for(i=0;i<numChVec.size();i++)
-                if(nc==numChVec[i])
-                    subVec->append(mrkAnVec->at(i));
+//        for(int32_t nc=0;nc<m_mng->GetChanNum();nc++)
+//        {
+//            VarMapVec *subVec=new VarMapVec;
+//            for(i=0;i<numChVec.size();i++)
+//                if(nc==numChVec[i])
+//                    subVec->append(mrkAnVec->at(i));
 
-            if(!subVec->isEmpty())
-                saveDataAndUpdate(m_mng->GetChanName(nc),"Analytical Markers",subVec);
-        }
+//            if(!subVec->isEmpty())
+//                saveDataAndUpdate(m_mng->GetChanName(nc),"Analytical Markers",subVec);
+//        }
 
 
         qDebug()<<"Building infoList ...";
@@ -502,9 +508,24 @@ bool MDataManager::updateInfoList()
         //        if (m_mng->GetNumDefiners()> 0)
         //           elements<<"Definers:Operative";
 
+
+        if(m_mng->GetNumAnalyticalMarkers()>0)
+        {
+            VarMapVec *opAn = m_storage.getAll(CAT_MARKER);
+            foreach (VarMap *curMap, (*opAn))
+            {
+                if (curMap->value("color") == COLOR_ANALYTICAL)
+                {
+                    int ch = curMap->value("channel").toInt();
+                    if (ch == countGraphs) {
+                        elements<<"Markers:Analitical";
+                        break;
+                    }
+                }
+            }
+        }
+
         VarMapVec *def = m_storage.getAll(CAT_DEFINER);
-        //        if (def->size() > 0)
-        //            elements<<"Definers:Operative";
         foreach (VarMap *curMap, (*def)) {
             QStringList enabled = curMap->value("enCh").toStringList();
             if (enabled.at(countGraphs) == "1")
@@ -870,8 +891,7 @@ void MDataManager::analysis()
                     if (posV > -1)
                         En[posV] = 1;
 
-                    //ho tralasciato la parte che gestisce l'iconizzazione che forse non c'Ã¨
-
+                    //ho tralasciato la parte che gestisce l'iconizzazione che forse non c'è
                     //provo a disegnare il definitore
                     QString family="Definers";
                     QString name="Flowmetry";
@@ -882,6 +902,7 @@ void MDataManager::analysis()
                     (*def)["xMax"]= m_end-1;
                     (*def)["yMin"]=0;
                     (*def)["yMax"]=100;
+                    (*def)["num"]=m_mng->GetNumDefiners();
                     (*def)["enCh"]= En;
                     (*def)["descr"]=name;
                     (*def)["color"]="green";
@@ -1114,7 +1135,8 @@ void MDataManager::InitPageGraphs(QString __anaType)
                 VarMapVec* eleAnMarkers=m_storage.getAll(CAT_MARKER);
                 foreach (VarMap *curMarker, (*eleAnMarkers))
                 {
-                    if ((curMarker->value("color") == COLOR_ANALYTICAL) && (curMarker->value("defCode") == evMarkOpIn))
+                    int ff = evMarkOpIn.value("name").toInt();
+                    if ((curMarker->value("color") == COLOR_ANALYTICAL) && (curMarker->value("defCode") == evMarkOpIn.value("whoAmI").toInt()))
                     {
                         evAuto = 0;
                         break;
@@ -1136,7 +1158,8 @@ void MDataManager::InitPageGraphs(QString __anaType)
         }
 
         //init arrays and perform analysis
-        bool ret = InitArraysFLW(evStart,evEnd,enCh,evMarkOpIn.value("defCode").toInt(),evAuto);
+        int def = evMarkOpIn.value("num").toInt();
+        bool ret = InitArraysFLW(evStart,evEnd,enCh,evMarkOpIn.value("num").toInt(),evAuto);
 
 
     }

@@ -20,6 +20,8 @@ public:
     explicit printerserialport(QObject *parent = 0);
     void closeSerialPort();
 
+    void init_printer();
+
     bool Pri_Str(int m_num_car, char *m_str_pri, unsigned char m_flag_lf);
     void Pri_justif(char m_mode);
     void Pri_mode(char m_mode);
@@ -27,6 +29,10 @@ public:
     void Pri_Reset();
     void Pri_Font(char m_font);
     void Pri_Intensity(char m_intens);
+    void Pri_Default();
+    void Pri_Speed( char m_speed );
+    void Pri_Max_Speed(char m_n1, char m_n2);
+    void Pri_Set_Serial_Com(char m_set);
 signals:
 
 public slots:

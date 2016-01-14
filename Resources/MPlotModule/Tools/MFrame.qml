@@ -54,12 +54,12 @@ Rectangle{
         //questo modello carica una stringa composta dalla role e poi dal valore
         if(modello.length%2===0 && modello.length>=2)
         {
-            console.log("modello frame",modello)
+            //console.log("modello frame",modello)
             for(var i=0;i<modello.length;i+=2)
                 modF.setProperty(modello[i],modello[i+1])
         }
 
-        console.log(x,y,width,height,rec.height,rec.width,modF.yMax,modF.yMin,vMaxY,vMinY)
+        //console.log(x,y,width,height,rec.height,rec.width,modF.yMax,modF.yMin,vMaxY,vMinY)
     }
 
     FrameModel{id:modF}

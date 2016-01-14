@@ -5,8 +5,6 @@
 #include "datafilemanager.h"
 #include "printerserialport.h"
 
-//#include "Printer/printer.h"
-
 #define     NUMOF_X_PRINT_DOTS 752 // (96 mm - 2mm dovuti agli assi) * 8 bit al mm = 94 * 8 = 752
 #define 	NUMOFMAX_LEGHT_PORTRAIT_REP 3000	// 10 sample/sec x 5min = 3000
 

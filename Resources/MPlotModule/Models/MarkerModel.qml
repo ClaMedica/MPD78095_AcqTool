@@ -8,6 +8,7 @@ ListModel {
     property string type: "none"
     property string category: "none"
     property real val:0
+    property real valY:0
     property real whoAmI:0 //codice identificativo del singolo marker
     property string code:"code" //codice del tipo di marker
     property int channel:0
@@ -18,7 +19,7 @@ ListModel {
     property int visible:1
     property int count:0
     property int countVisible:0
-    property var strList:["descr","img","family","name","color","type","category","val","code",
+    property var strList:["descr","img","family","name","color","type","category","val","valY","code",
                             "whoAmI","channel","lock","defCode","key","visible","count","countVisible"]
 
     function setProperty(role,value)
@@ -34,6 +35,7 @@ ListModel {
         case "type":type=value;break;
         case "category":category=value;break;
         case "val":val=value;break;
+        case "valY":valY=value;break;
         case "code":code=value;break;
         case "whoAmI":whoAmI=value;break;
         case "channel":channel=value;break;

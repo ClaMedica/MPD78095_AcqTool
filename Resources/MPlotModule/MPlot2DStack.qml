@@ -97,7 +97,7 @@ Rectangle{
                     continue;
                 }
                 if(p[i]==="&MarkerGroup"){
-                    //console.log(l)
+                    console.log(l)
                     for(var j=0;j<plotNumber;j++)
                         if(lista.itemAt(j).name===nome)
                             lista.itemAt(j).markerItems=l
