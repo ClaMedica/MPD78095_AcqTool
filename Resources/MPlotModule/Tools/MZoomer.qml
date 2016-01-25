@@ -120,7 +120,7 @@ Rectangle {
         var dx=magnX>0?1:-1;
         var dy=magnY>0?1:-1;
 
-        console.log("doZoom",magnX,magnY,incX,incY,percX,percY,dx,dy)
+       // console.log("doZoom",magnX,magnY,incX,incY,percX,percY,dx,dy)
         switch(rootZoom.state)
         {
         case "idle":            //zoom bidirezionale
@@ -138,9 +138,9 @@ Rectangle {
             preview.yMax=yMax-dy*incY*percY
             break;
         }
-        console.log("before check",preview.xMin,preview.xMax,preview.yMin,preview.yMax)
+       // console.log("before check",preview.xMin,preview.xMax,preview.yMin,preview.yMax)
         checkLimits()
-        console.log("after check",xMin,xMax,yMin,yMax)
+      //  console.log("after check",xMin,xMax,yMin,yMax)
     }
 
     function setView(x,y,spanX,spanY){
@@ -157,7 +157,7 @@ Rectangle {
         interval: 100
         repeat: false
         onTriggered:{
-            console.log("trig",zoomArea.angle)
+           // console.log("trig",zoomArea.angle)
             var inc=(zoomArea.angle)*0.1
             if(inc>0.9)//limito ad uno zoom in del 90%
                 inc=0.9

@@ -28,7 +28,6 @@ MForm{
 
     function populate()
     {
-        console.log("populate")
         plot.tracks=mngData.getData("Track")
         plot.markers=mngData.getData("Marker")
         plot.frames=mngData.getData("Definer")

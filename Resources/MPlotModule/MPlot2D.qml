@@ -47,7 +47,11 @@ Rectangle {
     function setAYmin(y){zoomer.yAbsoluteMin=y;zoomer.checkLimits();zoomer.restore();}
     function setAYmax(y){zoomer.yAbsoluteMax=y;zoomer.checkLimits();zoomer.restore();}
 
+    onXMaxChanged:
+    {
+       // console.log("zzooommmm")
 
+    }
 
     function setXmin(x)
     {
@@ -57,7 +61,7 @@ Rectangle {
 
     function setXmax(x)
     {
-        zoomer.xMax=x;
+         zoomer.xMax=x;
         //zoomer.txMax=x;
     }
 
@@ -88,7 +92,7 @@ Rectangle {
 
         if(modello.length%2===0 && modello.length>=2)
         {
-            //console.log("modello - ",modello)
+            console.log("modello - ",modello)
             for(var i=0;i<modello.length;i+=2)
                 modP.setProperty(modello[i],modello[i+1])
 
@@ -450,16 +454,6 @@ Rectangle {
 
         }
 
-        //Markers
-        MMarkerStack{
-            id:mark
-            anchors.fill: parent
-            anchors.margins: 2
-            vMax:plotter.xMax
-            vMin:plotter.xMin
-            onNewMarkerChanged:if(completed)currentObject=newMarker
-        }
-
         //zoomer
         MZoomer{
             property var oldZoom:[]
@@ -480,7 +474,7 @@ Rectangle {
             yAbsoluteMax: modP.yAbsoluteMax
             yAbsoluteMin: modP.yAbsoluteMin
             zoomInc: modP.zoomSpeed
-            //onStateChanged: imactive=zoomer.state==="idle"?false:true
+
         }
 
         //analisi a frame
@@ -497,8 +491,22 @@ Rectangle {
                 parent.focus=true
             }
             onNewFrameChanged: if(completed)currentObject=newFrame
+
         }
 
+
+        //Markers
+        MMarkerStack{
+            id:mark
+            anchors.fill: parent
+            anchors.margins: 2
+            vMax:plotter.xMax
+            vMin:plotter.xMin
+            yMax:plotter.yMax
+            yMin:plotter.yMin
+
+            onNewMarkerChanged:if(completed)currentObject=newMarker
+        }
 
 
         Keys.onPressed: {
@@ -526,24 +534,3 @@ Rectangle {
 
 
 
-
-//    MXYCursor{
-//        id:v1
-
-//        dragXmin: 0
-//        dragXmax: 100
-//        dragYmin: rCenter.y
-//        dragYmax: rCenter.y+rCenter.height
-
-//        lineLengthX:rCenter.height
-//        lineLengthY:rCenter.width
-
-//        vMaxX: plotter.xMax
-//        vMinX: plotter.xMin
-//        vMaxY: plotter.yMax
-//        vMinY: plotter.yMin
-//        colore:"red"
-
-//        anchors.bottom: rCenter.bottom
-//        anchors.left: rCenter.left
-//    }

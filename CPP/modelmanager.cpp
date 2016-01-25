@@ -73,8 +73,8 @@ void ModelManager::updateModelList()
                     //qDebug()<<curMap;
                     bool correct=true;
                     foreach (QString curRole, curMap->keys())
-                    if(!m_roles.contains(curRole))
-                        correct=false;
+                        if(!m_roles.contains(curRole))
+                            correct=false;
 
                     //qDebug()<<"Object"<<curMap<<"can be drawn?"<<correct;
                     if(!correct){

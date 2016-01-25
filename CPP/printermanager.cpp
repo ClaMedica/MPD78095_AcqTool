@@ -218,8 +218,7 @@ questa funzione gestisce tutta la stampa del report, sia in modalita portrait ch
 */
 void printermanager::Pri_Rep()//byte numCurve, char* num_file_to_print, bool print_mode)
 {	/*	Stampa il Report	*/
-    //m_port->Pri_Set_Serial_Com(0x85);   // 38400bauds
-   // m_serialPort.setBaudRate(9600);
+
     m_port->Pri_Speed(0x30);
     m_port->Pri_Max_Speed(0x08,0x64);
 
@@ -286,12 +285,15 @@ void printermanager::Pri_Rep()//byte numCurve, char* num_file_to_print, bool pri
     // Grafico Siroky, stampato solo se paziente maschio oppure generico (cioè dove non indicato il sesso)
 
 #if PRI_REP_SRK
-    if(m_printSyroky )	{
-        if( ( m_sex != 'F' ) || (m_test_type != 0x00 ))		// così stampa sempre nel caso di esame veloce e paziente generico
-        {
-            Report_siroky();
-        }
-    }
+
+    Report_siroky();
+
+//    if(m_printSyroky )	{
+//        if( ( m_sex != 'F' ) || (m_test_type != 0x00 ))		// così stampa sempre nel caso di esame veloce e paziente generico
+//        {
+//            Report_siroky();
+//        }
+//    }
 #endif
 
 //    // scritta relativa al tipo di modalità dell'esame
@@ -321,10 +323,10 @@ void printermanager::Pri_Rep()//byte numCurve, char* num_file_to_print, bool pri
 
 //    // 	Risultati dell'esame ricavati dall'analisi semplificata, implementata nel firmware
 
-//#if PRI_REP_RIS
+#if PRI_REP_RIS
     Report_result();		// scrive in elenco i dati calcolati dall'analisi dell'esame
     m_port->Pri_Str(3,(char*)LINE"\x3",0);
-//#endif
+#endif
 
     //	Scrive i dati riguardanti versione firmware e date/ora ultima calibrazione
 
@@ -481,16 +483,15 @@ void printermanager::Report_flw()
     m_port->Pri_mode(0x10);
 
     QString strToWrite = tr("Flowmetry   ");
-    char str[63];
+    char str[90];
     sprintf( str, "   Q ( ml/s )              %s              Vol ( ml )", strToWrite.toLatin1().data());
     m_port->Pri_Str( strlen(str), str, 1 );
-    //m_port->Pri_Set_Serial_Com(0x85);   // 38400bauds
     for(int ub = 0; ub < 5; ub++ )                        /*scompone la griglia in 10 righe*/
     {
         Pri_Rep_Gra( ub * 2 ); // sì label
         Pri_Rep_Gra( ub * 2 + 1 ); // no label
     }
-   // m_port->Pri_Set_Serial_Com(0x83);   // 9600bauds
+
     m_port->Pri_mode(0x00);
     m_port->Pri_Font(1);
     m_port->Pri_Str( strlen( str_label_time[ m_i_max_x ] ), (char *)str_label_time[ m_i_max_x ], 1 );
@@ -2628,20 +2629,27 @@ void printermanager::Report_siroky()
     m_port->Pri_justif(0);
     QString siroky = tr("Siroky Diagram");
     m_port->Pri_Str(strlen(siroky.toLatin1().data()),siroky.toLatin1().data(),1);
+
+    m_port->Pri_Str(3,(char*)LINE"\x1",0);
+    m_port->Pri_Font(1);
+
     m_port->Pri_justif(2);
     m_port->Pri_mode(0x00);
     QString ave = tr(" Average Flow ");
     QString max = tr(" Maximum Flow ");
-    char str[60];
+    char str[90];
     sprintf(str,   "  Q(ml/s)   %s    SD        %s       SD", ave.toLatin1().data(),max.toLatin1().data());
     m_port->Pri_Str(strlen(str),str,1);//Pri_Str(strlen(str),str,0);
+
+    m_port->Pri_Speed('10');
     for(int ub = 0; ub < 10; ub++) {  /*scompone la griglia in 10 righe*/
         Pri_Rep_Gra_Siroky(ub,0);  // qui passo sempre grap=0 così lo resetto ad ogni giro
+
     }
 
     m_port->Pri_Font(0);	// carico per l'ccasione il font + piccolino
     m_port->Pri_mode(0x00);
-    sprintf(str, "     0     100     200     300     400     500  0      100     200     300     400     500\n");
+    sprintf(str, "    0     100     200     300     400     500  0      100     200     300     400     500\n");
     m_port->Pri_Str(strlen(str),str,0);
     // stampo l'indicazione volume sull'asse ordinate dei grafici siroky
     QString voidvol = tr("     Voided Volume (mL)");
@@ -2663,7 +2671,7 @@ void printermanager::Report_siroky()
             m_port->Pri_Str(strlen(str),str,1);
         }
         else
-            if( m_flu_max >= 30 )		// fuori scala flusso massimo, scritta a detsra
+            if( m_flu_max >= 30 )		// fuori scala flusso massimo, scritta a destra
             {
                 m_port->Pri_justif(F_right);
                 sprintf(str, "%s                     ", out.toLatin1().data());

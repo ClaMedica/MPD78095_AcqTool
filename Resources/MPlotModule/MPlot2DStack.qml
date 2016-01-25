@@ -85,7 +85,7 @@ Rectangle{
 
     function separateMarkers(p){
         if(p.length>0){
-
+            //console.log("separate")
             var l=[]
             var nome
             for(var i=0;i<p.length;i++){
@@ -97,7 +97,7 @@ Rectangle{
                     continue;
                 }
                 if(p[i]==="&MarkerGroup"){
-                    console.log(l)
+
                     for(var j=0;j<plotNumber;j++)
                         if(lista.itemAt(j).name===nome)
                             lista.itemAt(j).markerItems=l
@@ -243,7 +243,12 @@ Rectangle{
             y:index*rootPlotStack.height/plotNumber
             height:rootPlotStack.height/plotNumber
             width:rootPlotStack.width
-            onCurrentObjectChanged:if(currentObject.length!==0)curObj=currentObject
+            onCurrentObjectChanged:
+            {
+                if(currentObject.length!==0)
+                    curObj=currentObject
+                //console.log("obj" , curObj)
+            }
 
             onCurrentTimeChanged:{
                 if(curTimeSelected&&completed){
@@ -254,6 +259,7 @@ Rectangle{
                             lista.itemAt(i).currentTime=timeMarker
                 }
             }
+
             onXMaxChanged:
             {
                 //console.log(index,lista.con++)

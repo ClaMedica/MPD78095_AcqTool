@@ -95,13 +95,13 @@
 #define __POINT__
 
 //per stampare
-#define PRI_REP_INT     1    /* Flag Stampa Report : Intestazione          */
-#define PRI_REP_IDE     1   /* Flag Stampa Report : Identificativi Esame  */
-#define PRI_REP_MODAL	1	  /* Flag stampa Report : modalità d'esame		*/
-#define PRI_REP_GRA     1     /* Flag Stampa Report : Grafico               */
+#define PRI_REP_INT     0    /* Flag Stampa Report : Intestazione          */
+#define PRI_REP_IDE     0   /* Flag Stampa Report : Identificativi Esame  */
+#define PRI_REP_MODAL	0	  /* Flag stampa Report : modalità d'esame		*/
+#define PRI_REP_GRA     0     /* Flag Stampa Report : Grafico               */
 #define PRI_REP_SRK     1     /* Flag Stampa Report : Siroky                */
-#define PRI_REP_RIS     1     /* Flag Stampa Report : Risultati             */
-#define PRI_REP_SPA		1	  /* Flag Stampa Report : Spazi per strappare   */
+#define PRI_REP_RIS     0     /* Flag Stampa Report : Risultati             */
+//#define PRI_REP_SPA		1	  /* Flag Stampa Report : Spazi per strappare   */
 #define PRI_REP_POS     1     /* Flag Stampa Report : Postfazione e indicazione calibrazione, per debug */
 //per le stringhe
 #define NON_SOTTLINEA   "\x1bU\x0"	// \x 1B U \x 0 che significa 1B = ESC; U = modo sottolineatura; 0 = stampa normale

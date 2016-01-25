@@ -15,6 +15,8 @@ Rectangle{
     property real min:0
     property real vMax:10
     property real vMin:0
+    property real yMax:10
+    property real yMin:0
     signal update
     //se ci sono novità su di un marker modifico questa proprietà
     property var newMarker:[]
@@ -51,7 +53,6 @@ Rectangle{
                 }
                 if(it[i]==="&Marker")
                 {
-                    //console.log("marker index",markerIndex,l)
                     lista.itemAt(markerIndex).modello=l
                     markerIndex++
                     continue
@@ -76,11 +77,11 @@ Rectangle{
             if(items[i]==="$Marker")
                 mCount++
         markerCount=mCount
-        //console.log("popolato con ",markerCount," marker")
         if(markerCount>0)
             modify(items)
         }
     }
+
 
     Repeater{
         id:lista
@@ -89,16 +90,21 @@ Rectangle{
         delegate:
             MMarker{
             id:mar
-            max: rootMarkerStack.max
-            min: rootMarkerStack.min
+            max:rootMarkerStack.max
+            min:rootMarkerStack.min
             vMax:rootMarkerStack.vMax
             vMin:rootMarkerStack.vMin
+            yMax:rootMarkerStack.yMax
+            yMin:rootMarkerStack.yMin
+
             lineLength:rootMarkerStack.height
             anchors.bottom: lista.bottom
+
             //quando cambia il valore di un marker invio queste informazioni sopra
             onModifyMe: if(completed){newMarker=[whoAmI,"val",value];}
             //se ne voglio rimuovere uno invece invio solo il codice
-            onDeleteMe: if(completed){newMarker=["code",fullCode];}
+            onDeleteMe: if(completed){newMarker=[whoAmI];}
+
         }
     }
 }

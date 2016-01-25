@@ -32,7 +32,7 @@ public:
     void Pri_Default();
     void Pri_Speed( char m_speed );
     void Pri_Max_Speed(char m_n1, char m_n2);
-    void Pri_Set_Serial_Com(char m_set);
+
 signals:
 
 public slots:

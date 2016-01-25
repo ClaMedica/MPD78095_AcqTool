@@ -12,7 +12,7 @@ Rectangle {
     property int yMax: 100
 
     property var tracksColors: []
-    property var tracksWidth: [2,2,2,2,2,2,2]
+    property var tracksWidth: [1,1,2,2,2,2,2]
     property string nome: "nome"
 
     property string udmY: "left"

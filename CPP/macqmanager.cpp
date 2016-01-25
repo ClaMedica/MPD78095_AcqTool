@@ -81,7 +81,7 @@ bool MAcqManager::newAcquisition(QString __dataFile)
     else
     {
         qDebug()<<"carico la configurazione per l'acquisizione";
-        if(!m_configAcq.loadFromXML(g_P7SettingsManager.progPath()+"/Config_Acq.xml"))
+        if(!m_configAcq.loadFromXML(g_P7SettingsManager.progPath()+"Config_Acq.xml"))
             qCritical()<<"Error on acq configuration file";
 
         //e infine carico il file degli allarmi con la lingua giusta

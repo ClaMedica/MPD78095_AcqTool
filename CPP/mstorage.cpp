@@ -57,7 +57,7 @@ QStringList MStorage::getNames(QStringList __families, QStringList __filterCateg
  */
 bool MStorage::archive(QString __family, QString __name, VarMapVec *__elements, bool __whatIfAlreadyPresent)
 {
-    //verifichiamo se c'è già qualcosa con lo stesso nome all'interno della famiglia
+    //verifichiamo se c'è gi�  qualcosa con lo stesso nome all'interno della famiglia
     bool present=false;
     if(m_storage.keys().contains(__family))
         if(m_storage[__family].keys().contains(__name))
@@ -119,9 +119,23 @@ bool MStorage::modifyElement(qulonglong __whoAmI, QVariantList __news)
 
         if(__news.length()==0)
         {//provvedo a cavarlo via
-            delete elementToModify;
             if(!m_allMap[cat]->removeOne(elementToModify))
                 qCritical()<<"Data corrupted";
+
+            QString fm = elementToModify->value("family").toString();
+            QString nm = elementToModify->value("name").toString();
+
+            for (int i=0;i<m_storage[fm][nm]->length();i++)
+            {
+                if (m_storage[fm][nm]->at(i) == elementToModify)
+                {
+                    m_storage[fm][nm]->remove(i);
+                    break;
+                }
+            }
+
+            //elementToModify = NULL;
+            delete elementToModify;
         }
         else
         {//provvedo a modificarlo

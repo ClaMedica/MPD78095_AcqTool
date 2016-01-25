@@ -46,55 +46,13 @@ bool printerserialport::Pri_Str(int m_num_car, char *m_str_pri, unsigned char m_
       Invia alla Stampante "num_car" caratteri della stringa "str_pri"
       Se "flag_lf" invia il carattere LF alla fine
    */
-   /* qua lancio la mia funzione di stampa rout_stampa*/
-    char s[1];
-//    int cicli, count_busy = 0;
 
-    //printer_ready = 1;
-
-//    count_busy += rout_stampa (num_car,str_pri); // non è più ricorsivo, ma fa un solo carattere alla volta poi attiva l'attesa dell'interrupt
     m_serialPort.write(m_str_pri,m_num_car);
-//    cicli = 0;
-//    while( !printer_ready )						// questo è settato true quando sono finiti i caratteri
-//    {
-//        if ( now_print ) {						// solo quando è scatenato l'int.
-//            now_print = false;
-//            count_busy += m_serialPort.write(m_str_pri); 		// carattere successivo
-//            cicli = 0;
-//        }
-//        else {									// se non arriva il via dall'interrupt
-//            cicli++;								// non sto con le mani in mano, conto
-//            if ( cicli > 200 )	{					// se proprio l'int. non arriva, dobbiamo procedere da soli
-//                now_print = false;
-//                count_busy += m_serialPort.write(m_str_pri);	// carattere successivo
-//                cicli = 0;
-//            }
-//        }
-//        if( count_busy == 255 )
-//            return false;
-//    }
-//    now_print = false;
-//    cicli = count_busy = 0;
-    if(m_flag_lf)	{
-            s[0] = LF;
-            m_serialPort.write(s,1);
-
-//        while (!printer_ready)	{
-//            if ( now_print )  		{
-//                now_print = false;
-//                count_busy += rout_stampa( 1, s );
-//                cicli = 0;
-//            } else {
-//                cicli++;
-//                if ( cicli > 100 ) {
-//                    now_print = false;
-//                    count_busy += rout_stampa( 1, s );
-//                    cicli = 0;
-//                }
-//            }
-//            if( count_busy == 255 )
-//                return false;
-//        }
+    if(m_flag_lf)
+    {
+        char s[1];
+        s[0] = LF;
+        m_serialPort.write(s,1);
     }
 
     m_serialPort.flush();
@@ -206,35 +164,3 @@ void printerserialport::Pri_Max_Speed(char m_n1, char m_n2)
     Pri_Str(4,pri_str,0);
 }
 
-/* settaggio della comunicazione seriale
- * default è: n=83h cioè RTS/DTR mode; kow FIFO, 9600 bauds, 8 bit per data, no parity, 1 stop bit
- * */
-void printerserialport::Pri_Set_Serial_Com(char m_set)
-{
-    /*
-     * byte m_set dove i bit hanno il seguente significato
-     * bit 7: 0 Xon/Xoff mode; 1 RTS/DTR mode
-     * bit 6: 0 low FIFO margin (3 byte); 1 high FIFO margin 17 byte
-     * bit 5: n.u.
-     * bit 4: n.u.
-     * bit 3: n.u.
-     * bit 2,1,0: speed come combinazione dei tre bit secondon la tabella
-     *  000 1200bauds
-     *  001 2400
-     *  ...
-     *  011 9600
-     *  ...
-     *  101 38400
-     *  ...
-     *  111 115200
-     */
-    char pri_str[3];
-    pri_str[0]=GS;
-    pri_str[1]='s';
-    pri_str[2]=(char)m_set;
-    Pri_Str(3,pri_str,0);
-    if ((m_set & 0x03) == 0)
-        m_serialPort.setBaudRate(38400);
-    else
-        m_serialPort.setBaudRate(9600);
-}

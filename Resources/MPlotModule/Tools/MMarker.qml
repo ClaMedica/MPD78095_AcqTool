@@ -14,6 +14,8 @@ Rectangle{
     property int lineLength: 100
     property real vMin: 0
     property real vMax: 1
+    property real yMin: 0
+    property real yMax: 1
     property bool moving: false
     property real valPer: (x+icon.width/2-min)/(max-min)
     property bool selected:false
@@ -21,12 +23,14 @@ Rectangle{
     property real value:0
     property real realX:x+icon.width/2
 
+    property var valuesY:[]
+
     property bool deselectOnRelease:false
     property real whoAmI:modM.whoAmI
 
-
     signal modifyMe
     signal deleteMe
+
 
     color:"transparent"
 
@@ -46,7 +50,8 @@ Rectangle{
         }
         updateX(modM.val);
 
-        //console.log("I'm cursor n°",code," at val:",modM.val," valPer: ",valPer," vis ",visible)
+       // if (modM.type === "Analytical")
+            updateY(modM.val);
     }
 
     Component.onCompleted:
@@ -56,11 +61,35 @@ Rectangle{
         animate()
     }
 
+
     height:lineLength+icon.height+label.height
     width:icon.height
     onXChanged:value=(vMax-vMin)*((rootMarker.x+icon.width/2)-min)/(max-min)+vMin
     onVMaxChanged: updateX(value)
     onVMinChanged: updateX(value)
+
+    //onYMaxChanged: updateYZoom()
+    //onYMinChanged: updateYZoom()
+
+
+    function updateYZoom()
+    {
+        //valPer=(rootMarker.x+icon.width/2-min)/(max-min)
+        updateY(value)
+        rootMarker.modifyMe()
+
+    }
+
+    function updateY(yval)
+    {
+        if (modM.type === "Analytical")
+        {
+            var pos = yval*modM.nas
+            pos = pos.toFixed(0)
+            var valPer=(modM.valuesY[pos])/(yMax - yMin)
+            linea.height = (lineLength*valPer)
+        }
+    }
 
 
     function updateX(v)
@@ -155,21 +184,30 @@ Rectangle{
         drag.filterChildren: true
         drag.minimumX: min-icon.width/2
         drag.maximumX: max-icon.width/2
+        hoverEnabled: true
+        //onEntered: showPopUp()
+        //onExited: hidePopUp()
         onPressed: {rootMarker.focus=true;moving=true;selected=true}
         onReleased: {
             moving=false;
+            //if(deselectOnRelease)
+                selected=false
+        }
+        onPositionChanged:{
             valPer=(rootMarker.x+icon.width/2-min)/(max-min)
             rootMarker.modifyMe()
-            if(deselectOnRelease)
-                selected=false
+            updateY(value)
         }
         preventStealing: true
     }
 
-    function timeW(str)
-    {
-        return str.length*15
-    }
+
+
+
+//    function timeW(str)
+//    {
+//        return str.length*15
+//    }
 
     Rectangle{
         id:popRect
