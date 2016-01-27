@@ -248,7 +248,7 @@ void MDataManager::loadFile(QString __fileName)
         for(i=0;i<m_mng->GetNumAnalyticalMarkers();i++)
         {
             VarMap *mrk=new VarMap;
-            m_mng->GetAnMarker(i,&key,&numCh,numSamp,&numDef);
+            m_mng->GetAnMarker(i,&key,&numCh,&numSamp[0],&numDef);
             numChVec<<numCh;
 
             QVariantList valuesY;
@@ -259,7 +259,7 @@ void MDataManager::loadFile(QString __fileName)
             //valY = m_mng->GetValue(numCh,numSamp[0]);
 
 
-            double val=(double)numSamp[numCh]/m_mng->GetNAS(numCh);
+            double val=(double)numSamp[0]/m_mng->GetNAS(numCh);
             qDebug()<<val;
             (*mrk)["val"]=val;
             (*mrk)["type"]=TYPE_ANALYTICAL;
@@ -800,6 +800,11 @@ bool MDataManager::checkForVolRes()
     qDebug()<<"File Aperto?"<<m_mng->Open();
     qDebug()<<"File Caricato?"<<m_mng->GetParameters();
 
+    //per ora salvo io su file pic l'analisi flussimetria ...
+    m_mng->SetAnalysis("Flussimetria");
+
+    m_numAna = m_mng->GetAnalysiNum();
+
     //ciclo per individuare se è necessario aprire la dlg del volume residuo
     bool volRes = false;
     for (int i=0; i<m_numAna; i++)
@@ -851,13 +856,13 @@ void MDataManager::analysis()
 
     //per ora salvo io su file pic l'analisi flussimetria ...
     m_mng->SetAnalysis("Flussimetria");
-    m_ana->SetData(m_mng);
 
+
+    m_ana->SetData(m_mng);
 
     int anaProg = QDateTime::currentDateTime().toTime_t();
     QVariantList En;
 
-    m_numAna = m_mng->GetAnalysiNum();
     for (int i=0; i<m_numAna; i++)
     {
         QString anaType = m_mng->GetAnalysis(i);
@@ -885,10 +890,10 @@ void MDataManager::analysis()
                 foreach(MSignal *sig,m_signalVector)
                 {
                     QString name = sig->getName();
-                    if (name == "Q")
+                    if ((name == "Q")||(name == "QBT1"))
                         posQ = i;
 
-                    if (name == "VLMv")
+                    if ((name == "VLMv")||(name == "VBT1"))
                         posV = i;
                     i++;
                 }
@@ -1181,13 +1186,13 @@ void MDataManager::InitPageGraphs(QString __anaType)
             VarMapVec *mrkAnVec=new VarMapVec;
             byte key;
             int32_t numCh;
-            int32_t numSamp[4];//4 byte per avere il numero del campione
+            int32_t numSamp;
             int32_t numDef;
             QString descr = "flowmetry";
             for (int i = 0; i< m_mng->GetNumAnalyticalMarkers(); i++)
             {
                 VarMap *mrk=new VarMap;
-                m_mng->GetAnMarker(i,&key,&numCh,numSamp,&numDef);
+                m_mng->GetAnMarker(i,&key,&numCh,&numSamp,&numDef);
 
                 QVariantList valuesY;
                 foreach(MSignal *sig,m_signalVector)
@@ -1196,7 +1201,7 @@ void MDataManager::InitPageGraphs(QString __anaType)
                             valuesY.append(sig->at(i));
 
 
-                double val=(double)numSamp[numCh]/m_mng->GetNAS(numCh);
+                double val=(double)numSamp/m_mng->GetNAS(numCh);
                 qDebug()<<val;
                 (*mrk)["val"]=val;
                 (*mrk)["type"]=TYPE_ANALYTICAL;
@@ -1354,66 +1359,69 @@ bool MDataManager::InitArraysFLW(int __start,
         m_aflwdatas.at(i+1)->getLiverpoolAve()->setTracce(tracce);
 
         //nomogramma Siroky Max
-        MSignal *sig0SirMax=new MSignal;
-        MSignal *sig1SirMax=new MSignal;
-        MSignal *sig2SirMax=new MSignal;
-        MSignal *sig3SirMax=new MSignal;
-        lunx = m_aflwdatas.at(i+1)->getSirokyMax()->getXmax();
-        sig0SirMax->setData(m_aflwdatas.at(i+1)->getSirokyMax()->getLineY(0).data(),lunx);
-        sig0SirMax->setName("linea1");
-        sig1SirMax->setData(m_aflwdatas.at(i+1)->getSirokyMax()->getLineY(1).data(),lunx);
-        sig1SirMax->setName("linea2");
-        sig2SirMax->setData(m_aflwdatas.at(i+1)->getSirokyMax()->getLineY(2).data(),lunx);
-        sig2SirMax->setName("linea3");
-        sig3SirMax->setData(m_aflwdatas.at(i+1)->getSirokyMax()->getLineY(3).data(),lunx);
-        sig3SirMax->setName("linea4");
-        tracce.clear();
-        tracce<< "$Track"<<"family"<<sig0SirMax->getName()<<"name"<<"Signal"<<"Category"<<CAT_TRACK<<"descr"<<"line"<<"pointer"<<(qulonglong)sig0SirMax<<"&Track";
-        tracce<< "$Track"<<"family"<<sig1SirMax->getName()<<"name"<<"Signal"<<"Category"<<CAT_TRACK<<"descr"<<"line"<<"pointer"<<(qulonglong)sig1SirMax<<"&Track";
-        tracce<< "$Track"<<"family"<<sig2SirMax->getName()<<"name"<<"Signal"<<"Category"<<CAT_TRACK<<"descr"<<"line"<<"pointer"<<(qulonglong)sig2SirMax<<"&Track";
-        tracce<< "$Track"<<"family"<<sig3SirMax->getName()<<"name"<<"Signal"<<"Category"<<CAT_TRACK<<"descr"<<"line"<<"pointer"<<(qulonglong)sig3SirMax<<"&Track";
-        colori.clear();
-        colori << "white" << "red" << "white" << "white";
-        m_aflwdatas.at(i+1)->getSirokyMax()->setColors(colori);
-        m_aflwdatas.at(i+1)->getSirokyMax()->setTracce(tracce);
-        //bande colorate
-        QVector<int> linee;
-        linee.append(3);
-        linee.append(1);
-        m_aflwdatas.at(i+1)->getSirokyMax()->setLinea(linee);
+        if (!m_sexPatient)
+        {
+            MSignal *sig0SirMax=new MSignal;
+            MSignal *sig1SirMax=new MSignal;
+            MSignal *sig2SirMax=new MSignal;
+            MSignal *sig3SirMax=new MSignal;
+            lunx = m_aflwdatas.at(i+1)->getSirokyMax()->getXmax();
+            sig0SirMax->setData(m_aflwdatas.at(i+1)->getSirokyMax()->getLineY(0).data(),lunx);
+            sig0SirMax->setName("linea1");
+            sig1SirMax->setData(m_aflwdatas.at(i+1)->getSirokyMax()->getLineY(1).data(),lunx);
+            sig1SirMax->setName("linea2");
+            sig2SirMax->setData(m_aflwdatas.at(i+1)->getSirokyMax()->getLineY(2).data(),lunx);
+            sig2SirMax->setName("linea3");
+            sig3SirMax->setData(m_aflwdatas.at(i+1)->getSirokyMax()->getLineY(3).data(),lunx);
+            sig3SirMax->setName("linea4");
+            tracce.clear();
+            tracce<< "$Track"<<"family"<<sig0SirMax->getName()<<"name"<<"Signal"<<"Category"<<CAT_TRACK<<"descr"<<"line"<<"pointer"<<(qulonglong)sig0SirMax<<"&Track";
+            tracce<< "$Track"<<"family"<<sig1SirMax->getName()<<"name"<<"Signal"<<"Category"<<CAT_TRACK<<"descr"<<"line"<<"pointer"<<(qulonglong)sig1SirMax<<"&Track";
+            tracce<< "$Track"<<"family"<<sig2SirMax->getName()<<"name"<<"Signal"<<"Category"<<CAT_TRACK<<"descr"<<"line"<<"pointer"<<(qulonglong)sig2SirMax<<"&Track";
+            tracce<< "$Track"<<"family"<<sig3SirMax->getName()<<"name"<<"Signal"<<"Category"<<CAT_TRACK<<"descr"<<"line"<<"pointer"<<(qulonglong)sig3SirMax<<"&Track";
+            colori.clear();
+            colori << "white" << "red" << "white" << "white";
+            m_aflwdatas.at(i+1)->getSirokyMax()->setColors(colori);
+            m_aflwdatas.at(i+1)->getSirokyMax()->setTracce(tracce);
+            //bande colorate
+            QVector<int> linee;
+            linee.append(3);
+            linee.append(1);
+            m_aflwdatas.at(i+1)->getSirokyMax()->setLinea(linee);
 
-        //nomogramma Siroky Ave
-        MSignal *sig0SirAve=new MSignal;
-        MSignal *sig1SirAve=new MSignal;
-        MSignal *sig2SirAve=new MSignal;
-        MSignal *sig3SirAve=new MSignal;
-        MSignal *sig4SirAve=new MSignal;
-        lunx = m_aflwdatas.at(i+1)->getSirokyAve()->getXmax();
-        sig0SirAve->setData(m_aflwdatas.at(i+1)->getSirokyAve()->getLineY(0).data(),lunx);
-        sig0SirAve->setName("linea1");
-        sig1SirAve->setData(m_aflwdatas.at(i+1)->getSirokyAve()->getLineY(1).data(),lunx);
-        sig1SirAve->setName("linea2");
-        sig2SirAve->setData(m_aflwdatas.at(i+1)->getSirokyAve()->getLineY(2).data(),lunx);
-        sig2SirAve->setName("linea3");
-        sig3SirAve->setData(m_aflwdatas.at(i+1)->getSirokyAve()->getLineY(3).data(),lunx);
-        sig3SirAve->setName("linea4");
-        sig4SirAve->setData(m_aflwdatas.at(i+1)->getSirokyAve()->getLineY(4).data(),lunx);
-        sig4SirAve->setName("linea4");
-        tracce.clear();
-        tracce<< "$Track"<<"family"<<sig0SirAve->getName()<<"name"<<"Signal"<<"Category"<<CAT_TRACK<<"descr"<<"line"<<"pointer"<<(qulonglong)sig0SirAve<<"&Track";
-        tracce<< "$Track"<<"family"<<sig1SirAve->getName()<<"name"<<"Signal"<<"Category"<<CAT_TRACK<<"descr"<<"line"<<"pointer"<<(qulonglong)sig1SirAve<<"&Track";
-        tracce<< "$Track"<<"family"<<sig2SirAve->getName()<<"name"<<"Signal"<<"Category"<<CAT_TRACK<<"descr"<<"line"<<"pointer"<<(qulonglong)sig2SirAve<<"&Track";
-        tracce<< "$Track"<<"family"<<sig3SirAve->getName()<<"name"<<"Signal"<<"Category"<<CAT_TRACK<<"descr"<<"line"<<"pointer"<<(qulonglong)sig3SirAve<<"&Track";
-        tracce<< "$Track"<<"family"<<sig4SirAve->getName()<<"name"<<"Signal"<<"Category"<<CAT_TRACK<<"descr"<<"line"<<"pointer"<<(qulonglong)sig4SirAve<<"&Track";
-        colori.clear();
-        colori << "white" << "red" << "white" << "white" << "white";
-        m_aflwdatas.at(i+1)->getSirokyAve()->setColors(colori);
-        m_aflwdatas.at(i+1)->getSirokyAve()->setTracce(tracce);
-        //bande colorate
-        linee.clear();
-        linee.append(4);
-        linee.append(1);
-        m_aflwdatas.at(i+1)->getSirokyAve()->setLinea(linee);
+            //nomogramma Siroky Ave
+            MSignal *sig0SirAve=new MSignal;
+            MSignal *sig1SirAve=new MSignal;
+            MSignal *sig2SirAve=new MSignal;
+            MSignal *sig3SirAve=new MSignal;
+            MSignal *sig4SirAve=new MSignal;
+            lunx = m_aflwdatas.at(i+1)->getSirokyAve()->getXmax();
+            sig0SirAve->setData(m_aflwdatas.at(i+1)->getSirokyAve()->getLineY(0).data(),lunx);
+            sig0SirAve->setName("linea1");
+            sig1SirAve->setData(m_aflwdatas.at(i+1)->getSirokyAve()->getLineY(1).data(),lunx);
+            sig1SirAve->setName("linea2");
+            sig2SirAve->setData(m_aflwdatas.at(i+1)->getSirokyAve()->getLineY(2).data(),lunx);
+            sig2SirAve->setName("linea3");
+            sig3SirAve->setData(m_aflwdatas.at(i+1)->getSirokyAve()->getLineY(3).data(),lunx);
+            sig3SirAve->setName("linea4");
+            sig4SirAve->setData(m_aflwdatas.at(i+1)->getSirokyAve()->getLineY(4).data(),lunx);
+            sig4SirAve->setName("linea4");
+            tracce.clear();
+            tracce<< "$Track"<<"family"<<sig0SirAve->getName()<<"name"<<"Signal"<<"Category"<<CAT_TRACK<<"descr"<<"line"<<"pointer"<<(qulonglong)sig0SirAve<<"&Track";
+            tracce<< "$Track"<<"family"<<sig1SirAve->getName()<<"name"<<"Signal"<<"Category"<<CAT_TRACK<<"descr"<<"line"<<"pointer"<<(qulonglong)sig1SirAve<<"&Track";
+            tracce<< "$Track"<<"family"<<sig2SirAve->getName()<<"name"<<"Signal"<<"Category"<<CAT_TRACK<<"descr"<<"line"<<"pointer"<<(qulonglong)sig2SirAve<<"&Track";
+            tracce<< "$Track"<<"family"<<sig3SirAve->getName()<<"name"<<"Signal"<<"Category"<<CAT_TRACK<<"descr"<<"line"<<"pointer"<<(qulonglong)sig3SirAve<<"&Track";
+            tracce<< "$Track"<<"family"<<sig4SirAve->getName()<<"name"<<"Signal"<<"Category"<<CAT_TRACK<<"descr"<<"line"<<"pointer"<<(qulonglong)sig4SirAve<<"&Track";
+            colori.clear();
+            colori << "white" << "red" << "white" << "white" << "white";
+            m_aflwdatas.at(i+1)->getSirokyAve()->setColors(colori);
+            m_aflwdatas.at(i+1)->getSirokyAve()->setTracce(tracce);
+            //bande colorate
+            linee.clear();
+            linee.append(4);
+            linee.append(1);
+            m_aflwdatas.at(i+1)->getSirokyAve()->setLinea(linee);
+        }
     }
     return true;
 }

@@ -100,7 +100,7 @@ void mflowdatas::buildNomogrammi(bool __sex, int __age)
     m_liverpoolMax->setDatoX(getVoidedVolume());
     m_liverpoolMax->setDatoY(getQMax());
 
-   // m_liverpoolMax->setNumLines(7);
+    // m_liverpoolMax->setNumLines(7);
 
     //da sistemare
     int N_LIVERPOOL = 24;
@@ -114,7 +114,7 @@ void mflowdatas::buildNomogrammi(bool __sex, int __age)
         if (!__sex)
         {
             if (__age < 50)
-                //Liverpool uomini etÃ  < 50
+                //Liverpool uomini etÃ  < 50
                 yValue.append(qPow((2.37 + 0.18 * qSqrt((i+1) * Step_Liverpool) - 0.014 * 35),2));
             else
                 //Liverpool uomini >= 50
@@ -222,7 +222,7 @@ void mflowdatas::buildNomogrammi(bool __sex, int __age)
         if (!__sex)
         {
             if (__age < 50)
-                //Liverpool uomini etÃ  < 50
+                //Liverpool uomini etÃ  < 50
                 yValue.append(qPow((1.8 + 0.14 * qSqrt((i+1) * Step_Liverpool) - 0.011 * 35),2));
             else
                 //Liverpool uomini >= 50
@@ -361,10 +361,10 @@ void mflowdatas::buildNomogrammi(bool __sex, int __age)
             xVal[3].append(m_arrLineX4.at(i));
             yVal[3].append(m_arrLineY4.at(i));
         }
-//        for (int i=0; i<m_arrMax.length(); i++)
-//        {
-//            Value.append(m_arrMax.at(i));
-//        }
+        //        for (int i=0; i<m_arrMax.length(); i++)
+        //        {
+        //            Value.append(m_arrMax.at(i));
+        //        }
 
         for (int j=0; j<xVal.size(); j++)
         {
@@ -387,77 +387,78 @@ void mflowdatas::buildNomogrammi(bool __sex, int __age)
                 }
             }
         }
-    }
 
-    //ave
-    m_sirokyAve->setTitle(tr("Siroky (Q Ave)"));
-    m_sirokyAve->setUnitx(tr("Q (ml/sec)"));
-    m_sirokyAve->setUnity(tr("Vol. (ml)"));
-    m_sirokyAve->setXmin(0);
-    m_sirokyAve->setYmin(0);
-    m_sirokyAve->setXmax(500);
-    m_sirokyAve->setYmax(30);
 
-    m_sirokyAve->setDatoX(getVoidedVolume());
-    m_sirokyAve->setDatoY(getQAve());
+        //ave
+        m_sirokyAve->setTitle(tr("Siroky (Q Ave)"));
+        m_sirokyAve->setUnitx(tr("Q (ml/sec)"));
+        m_sirokyAve->setUnity(tr("Vol. (ml)"));
+        m_sirokyAve->setXmin(0);
+        m_sirokyAve->setYmin(0);
+        m_sirokyAve->setXmax(500);
+        m_sirokyAve->setYmax(30);
 
-    xVal.clear();
-    yVal.clear();
-    xVal[0].append(0);
-    yVal[0].append(0);
-    xVal[1].append(0);
-    yVal[1].append(0);
-    xVal[2].append(0);
-    yVal[2].append(0);
-    xVal[3].append(0);
-    yVal[3].append(0);
-    xVal[4].append(0);
-    yVal[4].append(0);
+        m_sirokyAve->setDatoX(getVoidedVolume());
+        m_sirokyAve->setDatoY(getQAve());
 
-    ReadSirokyParameter(true);
-    for (int i=0; i<m_arrLineX1.length(); i++)
-    {
-        xVal[0].append(m_arrLineX1.at(i));
-        yVal[0].append(m_arrLineY1.at(i));
-    }
-    for (int i=0; i<m_arrLineX2.length(); i++)
-    {
-        xVal[1].append(m_arrLineX2.at(i));
-        yVal[1].append(m_arrLineY2.at(i));
-    }
-    for (int i=0; i<m_arrLineX3.length(); i++)
-    {
-        xVal[2].append(m_arrLineX3.at(i));
-        yVal[2].append(m_arrLineY3.at(i));
-    }
-    for (int i=0; i<m_arrLineX4.length(); i++)
-    {
-        xVal[3].append(m_arrLineX4.at(i));
-        yVal[3].append(m_arrLineY4.at(i));
-    }
-    for (int i=0; i<m_arrLineX5.length(); i++)
-    {
-        xVal[4].append(m_arrLineX5.at(i));
-        yVal[4].append(m_arrLineY5.at(i));
-    }
-    for (int j=0; j<xVal.size(); j++)
-    {
-        pos = 0;
-        midValue = 0;
-        valueToAdd = 0;
-        for (int i=0; i<m_sirokyAve->getXmax(); i++)
+        xVal.clear();
+        yVal.clear();
+        xVal[0].append(0);
+        yVal[0].append(0);
+        xVal[1].append(0);
+        yVal[1].append(0);
+        xVal[2].append(0);
+        yVal[2].append(0);
+        xVal[3].append(0);
+        yVal[3].append(0);
+        xVal[4].append(0);
+        yVal[4].append(0);
+
+        ReadSirokyParameter(true);
+        for (int i=0; i<m_arrLineX1.length(); i++)
         {
-            if (i==xVal[j].at(pos) && pos!=xVal[j].length()-1)
+            xVal[0].append(m_arrLineX1.at(i));
+            yVal[0].append(m_arrLineY1.at(i));
+        }
+        for (int i=0; i<m_arrLineX2.length(); i++)
+        {
+            xVal[1].append(m_arrLineX2.at(i));
+            yVal[1].append(m_arrLineY2.at(i));
+        }
+        for (int i=0; i<m_arrLineX3.length(); i++)
+        {
+            xVal[2].append(m_arrLineX3.at(i));
+            yVal[2].append(m_arrLineY3.at(i));
+        }
+        for (int i=0; i<m_arrLineX4.length(); i++)
+        {
+            xVal[3].append(m_arrLineX4.at(i));
+            yVal[3].append(m_arrLineY4.at(i));
+        }
+        for (int i=0; i<m_arrLineX5.length(); i++)
+        {
+            xVal[4].append(m_arrLineX5.at(i));
+            yVal[4].append(m_arrLineY5.at(i));
+        }
+        for (int j=0; j<xVal.size(); j++)
+        {
+            pos = 0;
+            midValue = 0;
+            valueToAdd = 0;
+            for (int i=0; i<m_sirokyAve->getXmax(); i++)
             {
-                m_sirokyAve->addToLiney(j,yVal[j].at(pos));
-                midValue = (yVal[j].at(pos+1) - yVal[j].at(pos))/(xVal[j].at(pos+1) - xVal[j].at(pos));
-                valueToAdd = midValue;
-                pos++;
-            }
-            else
-            {
-                m_sirokyAve->addToLiney(j,yVal[j].at(pos-1)+valueToAdd);
-                valueToAdd=valueToAdd+midValue;
+                if (i==xVal[j].at(pos) && pos!=xVal[j].length()-1)
+                {
+                    m_sirokyAve->addToLiney(j,yVal[j].at(pos));
+                    midValue = (yVal[j].at(pos+1) - yVal[j].at(pos))/(xVal[j].at(pos+1) - xVal[j].at(pos));
+                    valueToAdd = midValue;
+                    pos++;
+                }
+                else
+                {
+                    m_sirokyAve->addToLiney(j,yVal[j].at(pos-1)+valueToAdd);
+                    valueToAdd=valueToAdd+midValue;
+                }
             }
         }
     }
@@ -482,7 +483,7 @@ void mflowdatas::ReadLiverpoolParameter(bool __flowMax, bool __sex, int __age)
 
     if (__flowMax && !__sex && __age < 50)
     {
-        //Qmax, pazienti maschi etÃ  < 50
+        //Qmax, pazienti maschi etÃ  < 50
         //5th Centile
         m_arrLineX1.append(20);
         m_arrLineX1.append(60);
@@ -576,7 +577,7 @@ void mflowdatas::ReadLiverpoolParameter(bool __flowMax, bool __sex, int __age)
     }
     if (!__flowMax && !__sex && __age < 50)
     {
-        //Qave, pazienti maschi etÃ  < 50
+        //Qave, pazienti maschi etÃ  < 50
         //5th Centile
         m_arrLineX1.append(20);
         m_arrLineX1.append(50);
@@ -670,7 +671,7 @@ void mflowdatas::ReadLiverpoolParameter(bool __flowMax, bool __sex, int __age)
 
     if (__flowMax && !__sex && __age >= 50)
     {
-        //Qmax, pazienti maschi etÃ  >= 50
+        //Qmax, pazienti maschi etÃ  >= 50
         //5th Centile
         m_arrLineX1.append(20);
         m_arrLineX1.append(50);
@@ -765,7 +766,7 @@ void mflowdatas::ReadLiverpoolParameter(bool __flowMax, bool __sex, int __age)
     }
     if ( !__flowMax && !__sex && __age >= 50)
     {
-        //Qave, pazienti maschi etÃ  >= 50
+        //Qave, pazienti maschi etÃ  >= 50
         //5th Centile
         m_arrLineX1.append(20);
         m_arrLineX1.append(50);

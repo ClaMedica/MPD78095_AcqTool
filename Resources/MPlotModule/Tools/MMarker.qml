@@ -105,19 +105,19 @@ Rectangle{
     onMaxChanged:x=valPer*(max-min)+min-icon.width/2
     onMinChanged:x=valPer*(max-min)+min-icon.width/2
     function animate()
-    {/*
-        if(selected)
-        {
-            animOpa.start()
-            label.opacity=1
-        }
-        else
-        {
-            animOpa.stop()
-            icon.opacity=1
-            label.opacity=0
-        }
-        */
+    {
+//        if(selected)
+//        {
+//            animOpa.start()
+//            label.opacity=1
+//        }
+//        else
+//        {
+//            animOpa.stop()
+//            icon.opacity=1
+//            label.opacity=0
+//        }
+
     }
 
     function markerPopUp(){return timeToText()+"\n["+modM.key+"] "+modM.descr+" "+modM.code}

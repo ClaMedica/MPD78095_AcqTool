@@ -1,7 +1,18 @@
 <Configuration>
-	<Locale Value="it"/>
-        <DataFolders Value="C:\Users\Claudia\Documents\urodata"/>
-        <ProgFolders value="C:/Users/Claudia/Documents/urodata"/>
-        <AndroidFolders value=""/>
+        <Locale value="it"/>
+        <DataFolders>
+            <LucaTecnoideal value="C:/Medica/urodata"/>
+            <LucaPortatile  value="C:/Medica/urodata"/>
+            <Claudia        value="C:/Users/Claudia/Documents/urodata"/>
+        </DataFolders>
+        <ProgFolders>
+            <LucaTecnoideal value="M:/Lavoro/Software/Build/StandAlone"/>
+            <LucaPortatile  value="C:/Users/MEZ/Lavoro/Software/Build/StandAlone"/>
+            <Claudia        value="E:\Piattaforma_70\Build\StandAlone"/>
+        </ProgFolders>
+        <AndroidFolders>
+            <LucaTecnoideal value=""/>
+            <LucaPortatile  value=""/>
+            <Claudia        value=""/>
         </AndroidFolders>
 </Configuration>

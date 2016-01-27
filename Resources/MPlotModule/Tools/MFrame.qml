@@ -59,7 +59,7 @@ Rectangle{
                 modF.setProperty(modello[i],modello[i+1])
         }
 
-        console.log(x,y,width,height,rec.height,rec.width,modF.xMax,modF.xMin,vMaxX,vMinX)
+        //console.log(x,y,width,height,rec.height,rec.width,modF.xMax,modF.xMin,vMaxX,vMinX)
     }
 
     FrameModel{id:modF}

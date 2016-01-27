@@ -81,11 +81,12 @@ bool MAcqManager::newAcquisition(QString __dataFile)
     else
     {
         qDebug()<<"carico la configurazione per l'acquisizione";
-        if(!m_configAcq.loadFromXML(g_P7SettingsManager.progPath()+"Config_Acq.xml"))
+        qDebug()<<g_P7SettingsManager.progPath();
+        if(!m_configAcq.loadFromXML(g_P7SettingsManager.progPath()+"/Config_Acq.xml"))
             qCritical()<<"Error on acq configuration file";
 
         //e infine carico il file degli allarmi con la lingua giusta
-        QString lang=m_configLocale.getChild(XML_LOCALE)->getAttribute("Value");
+        QString lang=m_configLocale.getChild(XML_LOCALE)->getAttribute("value");
         if(!m_alarmMng.load(m_applicationPath+"/Config_Alarms_"+lang+".xml"))
             qCritical()<<"Error on alarm configuration file";
 
@@ -339,6 +340,8 @@ void MAcqManager::handleTCP(SimpleTCPClient *__client, QByteArray __block)
 
             analyzeStatus(status);
             analyzeAlarms(alarms);
+
+            //qDebug()<<"Supervisiore connesso";
         }
 
         if(who=="VAL")
@@ -350,6 +353,7 @@ void MAcqManager::handleTCP(SimpleTCPClient *__client, QByteArray __block)
             //faccio le mie operazioni e rimuovo i primi campioni
             while(buffersReady())
             {
+                qDebug()<<"BUFFER ready";
                 applyOperations();
                 foreach(QString hwc,m_totalHWChan)
                     m_bufferMap[hwc]->remove(0,m_frameMap[hwc]);
@@ -757,7 +761,7 @@ void MAcqManager::fillBuffers(QByteArray __block)
     block=__block;
 
     //e poi lo spacchettiamo
-    //qDebug()<<"new pack"<<dataCount;
+    qDebug()<<"block "<<block.toHex().data();
     qint32 numChan = 0;
     qint32 numBytes = 0;
     qint32 currChan = 0;
