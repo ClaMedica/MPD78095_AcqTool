@@ -101,7 +101,7 @@ Rectangle {
 
     border.width: 1
 
-    color: Qt.rgba(0.1, 0.1, 0.1)
+    color: "whitesmoke"//Qt.rgba(0.1, 0.1, 0.1)
     border.color: "black"
 
     onTraksToDrawChanged:{
@@ -191,26 +191,26 @@ Rectangle {
         id:plotTitle
         anchors.bottom: parent.bottom
         anchors.top: parent.top
-        width:40
+        width:5
         anchors.left: parent.left
 
-        gradient: Gradient {
-            GradientStop { position: 0.0; color: "darkblue" }
-            GradientStop { position: 1.0; color: "black" }
-        }
+//        gradient: Gradient {
+//            GradientStop { position: 0.0; color: "darkblue" }
+//            GradientStop { position: 1.0; color: "black" }
+//        }
 
-    }
-    Text{
-        id:titl
-        anchors.horizontalCenter: plotTitle.horizontalCenter
-        anchors.verticalCenter: plotTitle.verticalCenter
+   }
+//    Text{
+//        id:titl
+//        anchors.horizontalCenter: plotTitle.horizontalCenter
+//        anchors.verticalCenter: plotTitle.verticalCenter
 
-        font.family: modP.yAFontUOMFamily
-        color: modP.yAFontUOMColor
-        font.pointSize: modP.yAFontUOMSize
-        text: modP.name
-        rotation: -90
-    }
+//        font.family: modP.yAFontUOMFamily
+//        color: modP.yAFontUOMColor
+//        font.pointSize: modP.yAFontUOMSize
+//        text: modP.name
+//        rotation: -90
+//    }
 
     DVAxes{ //Y AXIS LABELS
         id: yAxisLabels

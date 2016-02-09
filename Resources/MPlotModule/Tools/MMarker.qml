@@ -137,7 +137,7 @@ Rectangle{
     Rectangle{
         id:linea
         height:lineLength
-        width:1
+        width:2
         anchors.bottom:rootMarker.bottom
         anchors.horizontalCenter: icon.horizontalCenter
         color:modM.color
@@ -158,7 +158,7 @@ Rectangle{
 
     Text{
         id:label
-        color:"white"
+        color:"black"
         font.family: "Courier 10 Pitch"
         font.bold: true
         anchors.bottom:linea.top

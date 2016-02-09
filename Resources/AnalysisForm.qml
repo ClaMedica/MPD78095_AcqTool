@@ -69,9 +69,9 @@ MForm{
             if(completed)
             {
                 mngData.changeObject(curObj)
-                plot.tracks=mngData.getData("Track")
-                plot.markers=mngData.getData("Marker")
-                plot.frames=mngData.getData("Definer")
+//                plot.tracks=mngData.getData("Track")
+//                plot.markers=mngData.getData("Marker")
+//                plot.frames=mngData.getData("Definer")
             }
         }
     }

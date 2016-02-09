@@ -341,7 +341,7 @@ void MAcqManager::handleTCP(SimpleTCPClient *__client, QByteArray __block)
             analyzeStatus(status);
             analyzeAlarms(alarms);
 
-            //qDebug()<<"Supervisiore connesso";
+            //qDebug()<<"Supervisoore connesso";
         }
 
         if(who=="VAL")
@@ -663,7 +663,6 @@ bool MAcqManager::handleDataFile()
                         m_mng->SetGain(i,channel->getTextOfChild(XML_GAIN).toFloat());
                     if(channel->getTextOfChild(XML_OFFSET)!="")
                         m_mng->SetOffset(i,channel->getTextOfChild(XML_OFFSET).toFloat());
-
                 }
         }
 

@@ -241,11 +241,12 @@ void MDataManager::loadFile(QString __fileName)
 
         //------ Aggiungo i markers analitici, sono associati ad un definitore
 
+
         qDebug()<<"Marker Analitici = "<<m_mng->GetNumAnalyticalMarkers();
 
         mrkAnVec->clear();
         QVector<int32_t> numChVec;
-        for(i=0;i<m_mng->GetNumAnalyticalMarkers();i++)
+        for(int i=0;i<m_mng->GetNumAnalyticalMarkers();i++)
         {
             VarMap *mrk=new VarMap;
             m_mng->GetAnMarker(i,&key,&numCh,&numSamp[0],&numDef);

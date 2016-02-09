@@ -4,7 +4,7 @@ import MPlotModule 1.0
 ListModel {
     property string name:"Plot 1"
 
-    property color backgroundColor: "black"
+    property color backgroundColor: "grey"
     property color borderColor: "black"
 
     property real xAbsoluteMax: 10
@@ -12,9 +12,9 @@ ListModel {
     property real yAbsoluteMax: 1
     property real yAbsoluteMin: -1
 
-    property color gridLineColor: "blue"
+    property color gridLineColor: "grey"
     property real gridLineWidth: 3
-    property color subGridLineColor: "red"
+    property color subGridLineColor: "grey"
     property real subGridLineWidth: 1
     property real xGridLines: 5
     property real yGridLines: 3
@@ -32,7 +32,7 @@ ListModel {
     property string xALDateTimeformatMin: "mm:ss.zzz"
     //X Proprietà del testo Major
     property string xALMajFontFamily: "ubuntu"
-    property string xALMajFontColor: "white"
+    property string xALMajFontColor: "black"
     property real xALMajFontSize: 12
     property real xALMajTextDist: 5
     property bool xALMajTextVisible: true
@@ -61,7 +61,7 @@ ListModel {
     property string yALDateTimeformatMin: ""
     //Y Proprietà del testo Major
     property string yALMajFontFamily: "ubuntu"
-    property string yALMajFontColor: "white"
+    property string yALMajFontColor: "grey"
     property real yALMajFontSize: 12
     property real yALMajTextDist: 5
     property bool yALMajTextVisible: true
@@ -75,7 +75,7 @@ ListModel {
     property real yALMinOpacity: 1.0
     // y Axis unit of measure
     property string yAUOM: "[unit]"
-    property bool yAUOMVisible: false
+    property bool yAUOMVisible: true
     property string yAFontUOMFamily: "ubuntu"
     property color yAFontUOMColor: Qt.rgba(0.8, 0.8, 0.8)
     property real yAFontUOMSize: 14

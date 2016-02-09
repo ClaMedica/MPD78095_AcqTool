@@ -32,7 +32,7 @@ Rectangle{
                 anchors.left:colBox.right
                 anchors.right:parent.right
                 text:modelData
-                color:"white"
+                color:"black"
                 font.pixelSize: 14
                 font.bold: true
             }
@@ -42,8 +42,8 @@ Rectangle{
                 anchors.bottom:legBox.bottom
                 anchors.left:colBox.right
                 anchors.right:parent.right
-                text:legend.valori[index]!=undefined?legend.valori[index]:"---"
-                color:"white"
+                text:legend.valori[index]!==undefined?legend.valori[index]:"---"
+                color:"black"
                 font.pixelSize: 14
                 font.bold: true
             }
