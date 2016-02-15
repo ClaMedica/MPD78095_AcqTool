@@ -70,7 +70,7 @@
 #define w_SD 1
 #define a_ave	( (CLS-1)*24 + w_ave*24 + w_SD*24)// area in byte del grafico siroky average
 #define a_max	a_ave
-#define pos_gra 	( LCMD + CLS*24 )
+#define pos_gra ( LCMD + CLS*24 )
 #define pos_lab_vol ( pos_gra + 24*94 ) // prima colonna libera a dx del grafico
 #define pos_lab_SD_ave	( LCMD + (CLS-1)*24 + w_ave*24 )
 #define pos_lab_Q_max	( pos_lab_SD_ave + w_SD*24 )
@@ -98,8 +98,8 @@
 #define PRI_REP_INT     0    /* Flag Stampa Report : Intestazione          */
 #define PRI_REP_IDE     0   /* Flag Stampa Report : Identificativi Esame  */
 #define PRI_REP_MODAL	0	  /* Flag stampa Report : modalità d'esame		*/
-#define PRI_REP_GRA     0     /* Flag Stampa Report : Grafico               */
-#define PRI_REP_SRK     1     /* Flag Stampa Report : Siroky                */
+#define PRI_REP_GRA     1     /* Flag Stampa Report : Grafico               */
+#define PRI_REP_SRK     0     /* Flag Stampa Report : Siroky                */
 #define PRI_REP_RIS     0     /* Flag Stampa Report : Risultati             */
 //#define PRI_REP_SPA		1	  /* Flag Stampa Report : Spazi per strappare   */
 #define PRI_REP_POS     1     /* Flag Stampa Report : Postfazione e indicazione calibrazione, per debug */

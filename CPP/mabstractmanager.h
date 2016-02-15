@@ -27,6 +27,7 @@ public:
 
     Q_INVOKABLE QVariantList markersInfo(QString __filterType="",
                                          QVariantList __filterValues=QVariantList());
+    Q_INVOKABLE QVariantList commandsInfo();
 
 signals:
 

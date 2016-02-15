@@ -219,8 +219,7 @@ questa funzione gestisce tutta la stampa del report, sia in modalita portrait ch
 void printermanager::Pri_Rep()//byte numCurve, char* num_file_to_print, bool print_mode)
 {	/*	Stampa il Report	*/
 
-    m_port->Pri_Speed(0x30);
-    m_port->Pri_Max_Speed(0x08,0x64);
+    m_port->Pri_Speed(0);
 
     //      Intestazione
 #if PRI_REP_INT
@@ -489,13 +488,15 @@ void printermanager::Report_flw()
     for(int ub = 0; ub < 5; ub++ )                        /*scompone la griglia in 10 righe*/
     {
         Pri_Rep_Gra( ub * 2 ); // sì label
+        m_port->waiting();
         Pri_Rep_Gra( ub * 2 + 1 ); // no label
+        m_port->waiting();
     }
 
     m_port->Pri_mode(0x00);
     m_port->Pri_Font(1);
     m_port->Pri_Str( strlen( str_label_time[ m_i_max_x ] ), (char *)str_label_time[ m_i_max_x ], 1 );
-    m_port->Pri_Str( 3, (char*)LINE"\x1", 0 );		// modifica per risparm carta e tempo: da riattivare
+    m_port->Pri_Str( 3, (char*)LINE, 0 );		// modifica per risparm carta e tempo: da riattivare
 }
 
 /**
@@ -666,7 +667,7 @@ void printermanager::Pri_Rep_Gra(int __num_riga)
     m_str_gr[3]=0x09;	// n2
     m_str_gr[4]=0x00;	// n3
     m_str_gr[5]=0x02;	// n4	doppia altezza
-    m_str_gr[6]=0x01;	// n5	scrive a 1 byte dal bordo
+    m_str_gr[6]=0x02;	// n5	scrive a 1 byte dal bordo
     m_str_gr[7]=0x66;	// n6	larghezza 4+94+4=102 byte
 
     if( (__num_riga == 0) || ( !(__num_riga % 2) ) )
@@ -2641,7 +2642,7 @@ void printermanager::Report_siroky()
     sprintf(str,   "  Q(ml/s)   %s    SD        %s       SD", ave.toLatin1().data(),max.toLatin1().data());
     m_port->Pri_Str(strlen(str),str,1);//Pri_Str(strlen(str),str,0);
 
-    m_port->Pri_Speed('10');
+    m_port->Pri_Speed(0);
     for(int ub = 0; ub < 10; ub++) {  /*scompone la griglia in 10 righe*/
         Pri_Rep_Gra_Siroky(ub,0);  // qui passo sempre grap=0 così lo resetto ad ogni giro
 

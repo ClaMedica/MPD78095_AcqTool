@@ -47,6 +47,19 @@ MForm{
        // dopAna.addSignals(pointer)
     }
 
+    function setMarkersInfo(info)
+    {
+        console.log(info)
+        gridMarker.items=info
+    }
+
+    function setCommandsInfo(info)
+    {
+        console.log(info)
+        gridComand.items=info
+    }
+
+
     //@@@@@@@@@@    Objects     @@@@@@@@@@
 
 
@@ -56,9 +69,10 @@ MForm{
         clip:true
         anchors.bottom: parent.bottom
         anchors.left: parent.left
-        anchors.right: box.left
+        anchors.right: gridComand.left
+       // anchors.right: box.left
         Behavior on width {NumberAnimation { duration: 1000 }}
-        height: rootAna.height - 30
+        height: rootAna.height// - 30
         plotProp:mngCon.plotSetting
 
         //@@@@@@@@@@    Events          @@@@@@@@@@
@@ -200,22 +214,11 @@ MForm{
     MarkerModel{id:marMod}
     FrameModel{id:fraMod}
     TrackModel{id:traMod}
-    ParameterModel{id:parMod}
+ //   ParameterModel{id:parMod}
 
     //Managers
 
-    ParameterManager{
-        //@@@@@@@@@@    Properties      @@@@@@@@@@
-        id:mngPar
-        roles:parMod.strList
-        lastParMod:box.valueNews
-
-        //@@@@@@@@@@    Events          @@@@@@@@@@
-        onLastParModChanged: {
-            //dopAna.analyze(mngPar.curAnalysis,mngPar.curPar)
-        }
-    }
-
+//
     ConfigManager{
         //@@@@@@@@@@    Properties      @@@@@@@@@@
         id:mngCon
@@ -226,144 +229,195 @@ MForm{
 
     //@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@---------
 
-    ParameterBox{
+//    ParameterBox{
+//        //@@@@@@@@@@    Properties      @@@@@@@@@@
+//        id:box
+//        anchors.bottom: parent.bottom
+//        anchors.right: parent.right
+//        width:0
+//        height: root.height - 30
+//        Behavior on width {NumberAnimation { duration: 1000 }}
+
+//        //@@@@@@@@@@    Events          @@@@@@@@@@
+//        onUpdate: {
+//            plotDial.visible=true
+//        }
+
+//    }
+
+    MGridView{
         //@@@@@@@@@@    Properties      @@@@@@@@@@
-        id:box
-        anchors.bottom: parent.bottom
-        anchors.right: parent.right
-        width:0
-        height: root.height - 30
-        Behavior on width {NumberAnimation { duration: 1000 }}
-
-        //@@@@@@@@@@    Events          @@@@@@@@@@
-        onUpdate: {
-           // dopAna.analyze(mngPar.curAnalysis,mngPar.curPar)
-            plotDial.visible=true
-        }
-
-
-    }
-    //@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@-
-    MMenuBar {
-        //@@@@@@@@@@    Properties      @@@@@@@@@@
-        id: mainMenu
+        id:gridMarker
+        anchors.right: rootAna.right
         anchors.top: parent.top
-        color: "transparent"
-        height: root.height
-        width: root.width
-        opacity: rootAna.opacity
-        theme: "red"
-        items: [
-            ["File","Open Audio","Open Exam","Save","Back"],
-            ["Add","Data to Plot","New Marker","New Definer"],
-            ["Select Signal","To Analyze","To Play"],
-            //["Analisys","Spectrum","Time Warping","Energy","Time Spectrum"],
-            ["Analisys", "Analizza",qsTr("Exit")],
-            ["Actions","Send Toast","Start Service","Connect Client"],
-            ["Plot","Load Settings"]
-        ]
+        anchors.bottom: parent.bottom
+        width:50
+        owner:"Marker"
+        itemsInRow:1
+        delegate: MMarkerButton{}
+        visible:true
+
 
         //@@@@@@@@@@    Events          @@@@@@@@@@
-        onSelected: {
-           // dopAna.handleMenu(itemClicked)
-            if (itemClicked === "Send Toast"){
-                androidmanager.showToast("ciao dal qml");
-            }
-            if(itemClicked === "Start Service"){
-                androidmanager.launchService("medica.blue.START_SERVICE");
-            }
-            if(itemClicked === "Connect Client"){
-                androidmanager.connectClient();
-            }
-
-            if (itemClicked == "Open Audio") {
-                fileDial.owner="mngData"
-                fileDial.folder="../../ProgettoDoppler/Exams/Audio di Prova"
-                fileDial.setNameFilters("*.wav")
-                fileDial.open()
-            }
-            if (itemClicked == "Open Exam") {
-                fileDial.owner="mngData"
-                fileDial.folder="../../ProgettoDoppler/Exams"
-                fileDial.setNameFilters("*.pic")
-                fileDial.open()
-            }
-            if (itemClicked == "Back") {
-                rootAna.back()
-            }
-            if (itemClicked == "Save") {
-                mngData.saveChanges()
-            }
-            //Add
-            if (itemClicked == "Data to Plot")
-                plotDial.visible=true
-            if (itemClicked == "New Marker")
-            {
-                selector.type="Marker"
-                selector.owner="family"
-                selector.title="Choose a family"
-                selector.multipleChoice=true
-            }
-            if (itemClicked == "New Definer")
-            {
-                selector.type="Definer"
-                selector.owner="family"
-                selector.title="Choose a family"
-                selector.multipleChoice=true
-            }
-
-            //if (itemClicked == "Cursors")
-            //mngMar.addMarker(["$Marker","doppler","number",Func.newId(),"&Marker"])
-
-            //Select
-            if (itemClicked == "To Play")
-            {
-                selector.owner="audioPlayer"
-            }
-            if (itemClicked == "To Analyze")
-            {
-                selector.owner="dopAna"
-            }
-            //Analysis
-
-            if (itemClicked == "Analizza")
-            {
-                console.log("Sono dentro il click analysis")
-                mngData.analysis();
-            }
-
-            if (itemClicked == "Exit")
-            {
-                console.log("Sono dentro il click Exit")
-                mngData.exitFromReview();
-            }
-
-//            var str=items[3];
-//            if (str.indexOf(itemClicked)!==-1)
+//        onClicked:
+//        {
+//            switch(owner)
 //            {
-//                mngPar.curAnalysis=itemClicked
+//            case "Marker":
+//                mngAcq.addMarker(value);
+//                //console.log(mngAcq.acqMarkers)
+//                plot.markers=mngAcq.acqMarkers;
+//                break;
+//            }
+//        }
+    }
 
-//                box.ready=false
-//                box.currentAna=itemClicked
-//                box.items=mngPar.items
-//                box.width=parent.width/2
-//                box.popola()
-//                box.ready=true
+    MGridView{
+        //@@@@@@@@@@    Properties      @@@@@@@@@@
+        id:gridComand
+        anchors.right: gridMarker.left
+        anchors.top: parent.top
+        anchors.bottom: parent.bottom
+        width:50
+        owner:"Commands"
+        itemsInRow:1
+        delegate: MMarkerButton{extImg:".png"}
+        visible:true
+
+
+        //@@@@@@@@@@    Events          @@@@@@@@@@
+        onClicked:
+        {
+            switch(owner)
+            {
+            case "Commands":
+                if (value === "111")
+                    mngData.analysis();
+                if (value === "112") {
+                    mngData.saveChanges()
+                    mngData.exitFromReview();
+                }
+                break;
+            }
+        }
+    }
+
+    //@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@-
+//    MMenuBar {
+//        //@@@@@@@@@@    Properties      @@@@@@@@@@
+//        id: mainMenu
+//        anchors.top: parent.top
+//        color: "transparent"
+//        height: root.height
+//        width: root.width
+//        opacity: rootAna.opacity
+//        theme: "red"
+//        items: [
+//            //["File","Open Audio","Open Exam","Save","Back"],
+//            //["Add","Data to Plot","New Marker","New Definer"],
+//            //["Select Signal","To Analyze","To Play"],
+//            //--["Analisys", "Analizza",qsTr("Exit")],
+//            //["Actions","Send Toast","Start Service","Connect Client"],
+//            //["Plot","Load Settings"]
+//        ]
+
+//        //@@@@@@@@@@    Events          @@@@@@@@@@
+//        onSelected: {
+
+////            if (itemClicked === "Send Toast"){
+////                androidmanager.showToast("ciao dal qml");
+////            }
+////            if(itemClicked === "Start Service"){
+////                androidmanager.launchService("medica.blue.START_SERVICE");
+////            }
+////            if(itemClicked === "Connect Client"){
+////                androidmanager.connectClient();
+////            }
+
+////            if (itemClicked == "Open Audio") {
+////                fileDial.owner="mngData"
+////                fileDial.folder="../../ProgettoDoppler/Exams/Audio di Prova"
+////                fileDial.setNameFilters("*.wav")
+////                fileDial.open()
+////            }
+////            if (itemClicked == "Open Exam") {
+////                fileDial.owner="mngData"
+////                fileDial.folder="../../ProgettoDoppler/Exams"
+////                fileDial.setNameFilters("*.pic")
+////                fileDial.open()
+////            }
+////            if (itemClicked == "Back") {
+////                rootAna.back()
+////            }
+////            if (itemClicked == "Save") {
+////                mngData.saveChanges()
+////            }
+////            //Add
+////            if (itemClicked == "Data to Plot")
+////                plotDial.visible=true
+////            if (itemClicked == "New Marker")
+////            {
+////                selector.type="Marker"
+////                selector.owner="family"
+////                selector.title="Choose a family"
+////                selector.multipleChoice=true
+////            }
+////            if (itemClicked == "New Definer")
+////            {
+////                selector.type="Definer"
+////                selector.owner="family"
+////                selector.title="Choose a family"
+////                selector.multipleChoice=true
+////            }
+////            //Select
+////            if (itemClicked == "To Play")
+////            {
+////                selector.owner="audioPlayer"
+////            }
+////            if (itemClicked == "To Analyze")
+////            {
+////                selector.owner="dopAna"
+////            }
+//            //Analysis
+
+//            if (itemClicked == "Analizza")
+//            {
+//                console.log("Sono dentro il click analysis")
+//                mngData.analysis();
 //            }
 
-            //Settings
-            if (itemClicked == "Load Settings")
-            {
-                fileDial.owner="mngCon"
-                fileDial.folder="../../ProgettoDoppler/Doppler/Config"
-                fileDial.setNameFilters("*.xml")
-                fileDial.open()
-            }
+//            if (itemClicked == "Exit")
+//            {
+//                console.log("Sono dentro il click Exit")
+//                mngData.exitFromReview();
+//            }
+
+////            var str=items[3];
+////            if (str.indexOf(itemClicked)!==-1)
+////            {
+////                mngPar.curAnalysis=itemClicked
+
+////                box.ready=false
+////                box.currentAna=itemClicked
+////                box.items=mngPar.items
+////                box.width=parent.width/2
+////                box.popola()
+////                box.ready=true
+////            }
+
+//            //Settings
+////            if (itemClicked == "Load Settings")
+////            {
+////                fileDial.owner="mngCon"
+////                fileDial.folder="../../ProgettoDoppler/Doppler/Config"
+////                fileDial.setNameFilters("*.xml")
+////                fileDial.open()
+////            }
 
 
 
-        }
-    }
+//        }
+//    }
 
 
 }

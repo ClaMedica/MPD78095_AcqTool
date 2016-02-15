@@ -140,7 +140,8 @@ Rectangle {
             id:unitLabel
             y: textUOMDist
             anchors.verticalCenter: parent.verticalCenter
-
+            anchors.horizontalCenter: parent.horizontalCenter
+            anchors.horizontalCenterOffset: -(parent.width/3)
             font.family: fontUOMFamily
             color: fontUOMColor
             font.pointSize: fontUOMSize

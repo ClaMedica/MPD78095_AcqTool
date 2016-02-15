@@ -32,6 +32,44 @@ QVariantList MAbstractManager::markersInfo(QString __filterType,
     return list;
 }
 
+QVariantList MAbstractManager::commandsInfo()
+{
+    QVariantList list;
+
+    //analisi
+    list<<"$GridElement";
+    list<<"descr"<<tr("analysis");
+    QString rootURL="file:///"+m_applicationPath+"/Icone/";
+    list<<"img"<<rootURL+"analisi";
+    list<<"key"<<111;
+    list<<"visible"<<true;
+    list<<"&GridElement";
+    //save
+    list<<"$GridElement";
+    list<<"descr"<<tr("save");
+    rootURL="file:///"+m_applicationPath+"/Icone/";
+    list<<"img"<<rootURL+"Spoken";
+    list<<"key"<<112;
+    list<<"visible"<<true;
+    list<<"&GridElement";
+
+//    foreach(VarMap marker,m_markerMap.values())
+//    {
+//        if(__filterType!="")
+//            if(!__filterValues.contains(marker.value(__filterType)))
+//                continue;
+//        list<<"$GridElement";
+//        foreach(QString key,marker.keys())
+//        {
+//            list<<key;
+//            list<<marker.value(key);
+//        }
+//        list<<"&GridElement";
+//    }
+
+    return list;
+}
+
 bool MAbstractManager::load()
 {//in questa funzione inizializzo tutto caricando i file di configurazione fissi
     if(!m_configLocale.loadFromXML(":/Config/Config_Locale.xml"))

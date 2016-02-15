@@ -239,8 +239,10 @@ void MDataManager::loadFile(QString __fileName)
                 saveDataAndUpdate(m_mng->GetChanName(nc),"Definers",subVec);
         }
 
-        //------ Aggiungo i markers analitici, sono associati ad un definitore
 
+
+        //------ Aggiungo i markers analitici, sono associati ad un definitore
+        //m_mng->DeleteAllMarkers();
 
         qDebug()<<"Marker Analitici = "<<m_mng->GetNumAnalyticalMarkers();
 
@@ -372,7 +374,7 @@ void MDataManager::saveChanges()
             m_copy->AddAnMarker(curMap->value("channel").toInt(),
                                 numCamp[curMap->value("channel").toInt()],
                     curMap->value("key").toInt(),
-                    curMap->value("defCode").toInt());
+                    curMap->value("num").toInt());
         }
         qDebug()<<"Fine salvataggio marker";
     }
@@ -1214,7 +1216,7 @@ void MDataManager::InitPageGraphs(QString __anaType)
                 (*mrk)["descr"]=descr;
                 (*mrk)["lock"]=false;
                 (*mrk)["channel"]=numCh;
-                (*mrk)["defCode"]=(qulonglong)&evMarkOpIn;
+                (*mrk)["defCode"]=(qulonglong)evMarkOpIn.value("whoAmI").toInt();
                 (*mrk)["key"]=key;
                 (*mrk)["color"]=COLOR_ANALYTICAL;
                 (*mrk)["visible"]=true;
@@ -1311,13 +1313,13 @@ bool MDataManager::InitArraysFLW(int __start,
         sig6->setData(m_aflwdatas.at(i+1)->getLiverpoolMax()->getLineY(6).data(),lunx);
         sig6->setName("linea7");
         QVariantList tracce;
-        tracce<< "$Track"<<"family"<<sig0->getName()<<"name"<<"Signal"<<"Category"<<CAT_TRACK<<"descr"<<"line"<<"pointer"<<(qulonglong)sig0<<"&Track";
-        tracce<< "$Track"<<"family"<<sig1->getName()<<"name"<<"Signal"<<"Category"<<CAT_TRACK<<"descr"<<"line"<<"pointer"<<(qulonglong)sig1<<"&Track";
-        tracce<< "$Track"<<"family"<<sig2->getName()<<"name"<<"Signal"<<"Category"<<CAT_TRACK<<"descr"<<"line"<<"pointer"<<(qulonglong)sig2<<"&Track";
-        tracce<< "$Track"<<"family"<<sig3->getName()<<"name"<<"Signal"<<"Category"<<CAT_TRACK<<"descr"<<"line"<<"pointer"<<(qulonglong)sig3<<"&Track";
-        tracce<< "$Track"<<"family"<<sig4->getName()<<"name"<<"Signal"<<"Category"<<CAT_TRACK<<"descr"<<"line"<<"pointer"<<(qulonglong)sig4<<"&Track";
-        tracce<< "$Track"<<"family"<<sig5->getName()<<"name"<<"Signal"<<"Category"<<CAT_TRACK<<"descr"<<"line"<<"pointer"<<(qulonglong)sig5<<"&Track";
-        tracce<< "$Track"<<"family"<<sig6->getName()<<"name"<<"Signal"<<"Category"<<CAT_TRACK<<"descr"<<"line"<<"pointer"<<(qulonglong)sig6<<"&Track";
+        tracce<< "$Track"<<"family"<<sig0->getName()<<"name"<<"Signal"<<"Category"<<CAT_TRACK<<"descr"<<"line1"<<"pointer"<<(qulonglong)sig0<<"&Track";
+        tracce<< "$Track"<<"family"<<sig1->getName()<<"name"<<"Signal"<<"Category"<<CAT_TRACK<<"descr"<<"line2"<<"pointer"<<(qulonglong)sig1<<"&Track";
+        tracce<< "$Track"<<"family"<<sig2->getName()<<"name"<<"Signal"<<"Category"<<CAT_TRACK<<"descr"<<"line3"<<"pointer"<<(qulonglong)sig2<<"&Track";
+        tracce<< "$Track"<<"family"<<sig3->getName()<<"name"<<"Signal"<<"Category"<<CAT_TRACK<<"descr"<<"line4"<<"pointer"<<(qulonglong)sig3<<"&Track";
+        tracce<< "$Track"<<"family"<<sig4->getName()<<"name"<<"Signal"<<"Category"<<CAT_TRACK<<"descr"<<"line5"<<"pointer"<<(qulonglong)sig4<<"&Track";
+        tracce<< "$Track"<<"family"<<sig5->getName()<<"name"<<"Signal"<<"Category"<<CAT_TRACK<<"descr"<<"line6"<<"pointer"<<(qulonglong)sig5<<"&Track";
+        tracce<< "$Track"<<"family"<<sig6->getName()<<"name"<<"Signal"<<"Category"<<CAT_TRACK<<"descr"<<"line7"<<"pointer"<<(qulonglong)sig6<<"&Track";
         QVariantList colori;
         colori << "green" << "red" << "white" << "white" << "white" << "white" << "green";
         m_aflwdatas.at(i+1)->getLiverpoolMax()->setColors(colori);
@@ -1347,13 +1349,13 @@ bool MDataManager::InitArraysFLW(int __start,
         sig6Ave->setData(m_aflwdatas.at(i+1)->getLiverpoolAve()->getLineY(6).data(),lunx);
         sig6Ave->setName("linea7");
         tracce.clear();
-        tracce<< "$Track"<<"family"<<sig0Ave->getName()<<"name"<<"Signal"<<"Category"<<CAT_TRACK<<"descr"<<"line"<<"pointer"<<(qulonglong)sig0Ave<<"&Track";
-        tracce<< "$Track"<<"family"<<sig1Ave->getName()<<"name"<<"Signal"<<"Category"<<CAT_TRACK<<"descr"<<"line"<<"pointer"<<(qulonglong)sig1Ave<<"&Track";
-        tracce<< "$Track"<<"family"<<sig2Ave->getName()<<"name"<<"Signal"<<"Category"<<CAT_TRACK<<"descr"<<"line"<<"pointer"<<(qulonglong)sig2Ave<<"&Track";
-        tracce<< "$Track"<<"family"<<sig3Ave->getName()<<"name"<<"Signal"<<"Category"<<CAT_TRACK<<"descr"<<"line"<<"pointer"<<(qulonglong)sig3Ave<<"&Track";
-        tracce<< "$Track"<<"family"<<sig4Ave->getName()<<"name"<<"Signal"<<"Category"<<CAT_TRACK<<"descr"<<"line"<<"pointer"<<(qulonglong)sig4Ave<<"&Track";
-        tracce<< "$Track"<<"family"<<sig5Ave->getName()<<"name"<<"Signal"<<"Category"<<CAT_TRACK<<"descr"<<"line"<<"pointer"<<(qulonglong)sig5Ave<<"&Track";
-        tracce<< "$Track"<<"family"<<sig6Ave->getName()<<"name"<<"Signal"<<"Category"<<CAT_TRACK<<"descr"<<"line"<<"pointer"<<(qulonglong)sig6Ave<<"&Track";
+        tracce<< "$Track"<<"family"<<sig0Ave->getName()<<"name"<<"Signal"<<"Category"<<CAT_TRACK<<"descr"<<"line1"<<"pointer"<<(qulonglong)sig0Ave<<"&Track";
+        tracce<< "$Track"<<"family"<<sig1Ave->getName()<<"name"<<"Signal"<<"Category"<<CAT_TRACK<<"descr"<<"line2"<<"pointer"<<(qulonglong)sig1Ave<<"&Track";
+        tracce<< "$Track"<<"family"<<sig2Ave->getName()<<"name"<<"Signal"<<"Category"<<CAT_TRACK<<"descr"<<"line3"<<"pointer"<<(qulonglong)sig2Ave<<"&Track";
+        tracce<< "$Track"<<"family"<<sig3Ave->getName()<<"name"<<"Signal"<<"Category"<<CAT_TRACK<<"descr"<<"line4"<<"pointer"<<(qulonglong)sig3Ave<<"&Track";
+        tracce<< "$Track"<<"family"<<sig4Ave->getName()<<"name"<<"Signal"<<"Category"<<CAT_TRACK<<"descr"<<"line5"<<"pointer"<<(qulonglong)sig4Ave<<"&Track";
+        tracce<< "$Track"<<"family"<<sig5Ave->getName()<<"name"<<"Signal"<<"Category"<<CAT_TRACK<<"descr"<<"line6"<<"pointer"<<(qulonglong)sig5Ave<<"&Track";
+        tracce<< "$Track"<<"family"<<sig6Ave->getName()<<"name"<<"Signal"<<"Category"<<CAT_TRACK<<"descr"<<"line7"<<"pointer"<<(qulonglong)sig6Ave<<"&Track";
         colori.clear();
         colori << "green" << "red" << "white" << "white" << "white" << "white" << "green";
         m_aflwdatas.at(i+1)->getLiverpoolAve()->setColors(colori);
@@ -1376,10 +1378,10 @@ bool MDataManager::InitArraysFLW(int __start,
             sig3SirMax->setData(m_aflwdatas.at(i+1)->getSirokyMax()->getLineY(3).data(),lunx);
             sig3SirMax->setName("linea4");
             tracce.clear();
-            tracce<< "$Track"<<"family"<<sig0SirMax->getName()<<"name"<<"Signal"<<"Category"<<CAT_TRACK<<"descr"<<"line"<<"pointer"<<(qulonglong)sig0SirMax<<"&Track";
-            tracce<< "$Track"<<"family"<<sig1SirMax->getName()<<"name"<<"Signal"<<"Category"<<CAT_TRACK<<"descr"<<"line"<<"pointer"<<(qulonglong)sig1SirMax<<"&Track";
-            tracce<< "$Track"<<"family"<<sig2SirMax->getName()<<"name"<<"Signal"<<"Category"<<CAT_TRACK<<"descr"<<"line"<<"pointer"<<(qulonglong)sig2SirMax<<"&Track";
-            tracce<< "$Track"<<"family"<<sig3SirMax->getName()<<"name"<<"Signal"<<"Category"<<CAT_TRACK<<"descr"<<"line"<<"pointer"<<(qulonglong)sig3SirMax<<"&Track";
+            tracce<< "$Track"<<"family"<<sig0SirMax->getName()<<"name"<<"Signal"<<"Category"<<CAT_TRACK<<"descr"<<"line1"<<"pointer"<<(qulonglong)sig0SirMax<<"&Track";
+            tracce<< "$Track"<<"family"<<sig1SirMax->getName()<<"name"<<"Signal"<<"Category"<<CAT_TRACK<<"descr"<<"line2"<<"pointer"<<(qulonglong)sig1SirMax<<"&Track";
+            tracce<< "$Track"<<"family"<<sig2SirMax->getName()<<"name"<<"Signal"<<"Category"<<CAT_TRACK<<"descr"<<"line3"<<"pointer"<<(qulonglong)sig2SirMax<<"&Track";
+            tracce<< "$Track"<<"family"<<sig3SirMax->getName()<<"name"<<"Signal"<<"Category"<<CAT_TRACK<<"descr"<<"line4"<<"pointer"<<(qulonglong)sig3SirMax<<"&Track";
             colori.clear();
             colori << "white" << "red" << "white" << "white";
             m_aflwdatas.at(i+1)->getSirokyMax()->setColors(colori);
@@ -1408,11 +1410,11 @@ bool MDataManager::InitArraysFLW(int __start,
             sig4SirAve->setData(m_aflwdatas.at(i+1)->getSirokyAve()->getLineY(4).data(),lunx);
             sig4SirAve->setName("linea4");
             tracce.clear();
-            tracce<< "$Track"<<"family"<<sig0SirAve->getName()<<"name"<<"Signal"<<"Category"<<CAT_TRACK<<"descr"<<"line"<<"pointer"<<(qulonglong)sig0SirAve<<"&Track";
-            tracce<< "$Track"<<"family"<<sig1SirAve->getName()<<"name"<<"Signal"<<"Category"<<CAT_TRACK<<"descr"<<"line"<<"pointer"<<(qulonglong)sig1SirAve<<"&Track";
-            tracce<< "$Track"<<"family"<<sig2SirAve->getName()<<"name"<<"Signal"<<"Category"<<CAT_TRACK<<"descr"<<"line"<<"pointer"<<(qulonglong)sig2SirAve<<"&Track";
-            tracce<< "$Track"<<"family"<<sig3SirAve->getName()<<"name"<<"Signal"<<"Category"<<CAT_TRACK<<"descr"<<"line"<<"pointer"<<(qulonglong)sig3SirAve<<"&Track";
-            tracce<< "$Track"<<"family"<<sig4SirAve->getName()<<"name"<<"Signal"<<"Category"<<CAT_TRACK<<"descr"<<"line"<<"pointer"<<(qulonglong)sig4SirAve<<"&Track";
+            tracce<< "$Track"<<"family"<<sig0SirAve->getName()<<"name"<<"Signal"<<"Category"<<CAT_TRACK<<"descr"<<"line1"<<"pointer"<<(qulonglong)sig0SirAve<<"&Track";
+            tracce<< "$Track"<<"family"<<sig1SirAve->getName()<<"name"<<"Signal"<<"Category"<<CAT_TRACK<<"descr"<<"line2"<<"pointer"<<(qulonglong)sig1SirAve<<"&Track";
+            tracce<< "$Track"<<"family"<<sig2SirAve->getName()<<"name"<<"Signal"<<"Category"<<CAT_TRACK<<"descr"<<"line3"<<"pointer"<<(qulonglong)sig2SirAve<<"&Track";
+            tracce<< "$Track"<<"family"<<sig3SirAve->getName()<<"name"<<"Signal"<<"Category"<<CAT_TRACK<<"descr"<<"line4"<<"pointer"<<(qulonglong)sig3SirAve<<"&Track";
+            tracce<< "$Track"<<"family"<<sig4SirAve->getName()<<"name"<<"Signal"<<"Category"<<CAT_TRACK<<"descr"<<"line5"<<"pointer"<<(qulonglong)sig4SirAve<<"&Track";
             colori.clear();
             colori << "white" << "red" << "white" << "white" << "white";
             m_aflwdatas.at(i+1)->getSirokyAve()->setColors(colori);

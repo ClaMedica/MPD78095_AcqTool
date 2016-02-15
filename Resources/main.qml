@@ -20,19 +20,6 @@ ApplicationWindow {
     height:platform==="android"?480:Screen.height*0.94
     color:"steelblue"
 
-//    Rectangle{
-//        anchors.centerIn: parent
-//        height:400
-//        width:400
-//        color:"red"
-//        MPlot2DRealTime{
-//            anchors.centerIn: parent
-//            height:200
-//            width:200
-//        }
-//    }
-
-
     function launch(arguments)
     {
 
@@ -62,6 +49,8 @@ ApplicationWindow {
                     mngData.loadFile(arguments[2]);
                 else
                     mngData.loadFile("/mnt/sdcard/Medica/pv000461A.pic")
+                forAna.setMarkersInfo(mngData.markersInfo("type",[1,6]))
+                forAna.setCommandsInfo(mngData.commandsInfo())
             }
         }
         else

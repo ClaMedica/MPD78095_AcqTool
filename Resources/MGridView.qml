@@ -18,7 +18,7 @@ Rectangle{
 
     //@@@@@@@@@@    Properties      @@@@@@@@@@
     id:rootGrid
-    color:Qt.rgba(1,1,0.5,1)
+    color:"lightgray"//Qt.rgba(1,1,0.5,1)
 
     //@@@@@@@@@@    Functions       @@@@@@@@@@
     function display()
@@ -80,8 +80,8 @@ Rectangle{
         var col=0
         var w=rootGrid.width
         var n=itemsInRow
-        var itemSize=(w/n)/(1+(n+1)*0.3/n)
-        var d=itemSize*0.3
+        var itemSize=(w/n)/(1+(n+1)*0.2/n)
+        var d=itemSize*0.2
         for(var i=0;i<rep.count;i++)
         {
 
@@ -96,7 +96,7 @@ Rectangle{
             rep.itemAt(i).oriX=d+(d+itemSize)*col
             rep.itemAt(i).oriY=d+(d+itemSize)*row
             rep.itemAt(i).click.connect(clicked)
-            console.log("Elemento ",i,rep.itemAt(i).width,rep.itemAt(i).height,rep.itemAt(i).x,rep.itemAt(i).y)
+           // console.log("Elemento ",i,rep.itemAt(i).width,rep.itemAt(i).height,rep.itemAt(i).x,rep.itemAt(i).y)
             col++
         }
 

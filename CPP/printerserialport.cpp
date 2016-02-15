@@ -1,5 +1,6 @@
 #include "printerserialport.h"
 #include <QDebug>
+#include <QThread>
 
 printerserialport::printerserialport(QObject *parent) : QObject(parent)
 {
@@ -7,7 +8,7 @@ printerserialport::printerserialport(QObject *parent) : QObject(parent)
     QList<QSerialPortInfo> list;
     list = m_serialPortInfo->availablePorts();
 
-    m_serialPort.setPortName("COM3");
+    m_serialPort.setPortName("COM6");
     m_serialPort.setBaudRate(9600);
     m_serialPort.setFlowControl(QSerialPort::HardwareControl);
     m_serialPort.setParity(QSerialPort::NoParity);
@@ -56,6 +57,7 @@ bool printerserialport::Pri_Str(int m_num_car, char *m_str_pri, unsigned char m_
     }
 
     m_serialPort.flush();
+    waiting();
     return true;
 }
 
@@ -68,6 +70,7 @@ void printerserialport::Pri_justif(char m_mode)
     pri_str[1]='C'; 	// 0x43
     pri_str[2]=(char)m_mode;
     Pri_Str(3,pri_str,0);
+
 }
 
 void printerserialport::Pri_mode(char m_mode)
@@ -164,3 +167,7 @@ void printerserialport::Pri_Max_Speed(char m_n1, char m_n2)
     Pri_Str(4,pri_str,0);
 }
 
+void printerserialport::waiting()
+{
+    QThread::currentThread()->msleep(50);
+}

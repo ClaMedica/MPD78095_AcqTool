@@ -77,8 +77,8 @@ ListModel {
     property string yAUOM: "[unit]"
     property bool yAUOMVisible: true
     property string yAFontUOMFamily: "ubuntu"
-    property color yAFontUOMColor: Qt.rgba(0.8, 0.8, 0.8)
-    property real yAFontUOMSize: 14
+    property color yAFontUOMColor: "gray"//Qt.rgba(0.8, 0.8, 0.8)
+    property real yAFontUOMSize: 10
     property real yATextUOMDist: 5
     property real yAOpacityUOM: 1.0
     property real yAUOMRotation: -90

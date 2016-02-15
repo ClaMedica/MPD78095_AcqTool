@@ -5,6 +5,8 @@ import "qrc:/Components"
 import "qrc:/Models"
 Rectangle{
     //@@@@@@@@@@    Definitions     @@@@@@@@@@
+    property string extImg:".bmp"
+
     property int oriX:0
     property int oriY:0
     property int oriW:0
@@ -18,6 +20,7 @@ Rectangle{
     y:oriY-oriH/2*zoom
     height:oriH+zoom*oriH
     width:oriW+zoom*oriW
+
     clip:true
     state:"nul"
     states:[
@@ -58,8 +61,7 @@ Rectangle{
 
     Image{
         //@@@@@@@@@@    Properties      @@@@@@@@@@
-        property string ext:".bmp"
-        //@@@@@@@@@@    Properties      @@@@@@@@@@
+        property string ext:extImg
         id:img
         anchors.fill:parent
         //modM.countVisible==0?parent.height:parent.height*0.6
@@ -73,7 +75,7 @@ Rectangle{
         anchors.centerIn: parent
         width:parent.width+radius
         height:parent.height+radius
-        border.color: Qt.rgba(1,1,0.5,1)
+        border.color: "lightgray"//Qt.rgba(1,1,0.5,1)
         border.width:radius/2
         radius:parent.width/2
     }

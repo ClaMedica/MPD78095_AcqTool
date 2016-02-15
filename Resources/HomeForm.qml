@@ -55,7 +55,7 @@ MForm{
         width:rootHom.width/2
         height: rootHom.height/2
         background:"qrc:/Images/Supervisor"
-        onClicked: mngAcq.startSupe("show")
+        onClicked: mngAcq.startSupe("hide")
         enabled:configSelector.visible?false:true
     }
     MButton{
