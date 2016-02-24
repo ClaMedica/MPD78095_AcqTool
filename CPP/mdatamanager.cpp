@@ -300,6 +300,44 @@ void MDataManager::loadFile(QString __fileName)
         //                saveDataAndUpdate(m_mng->GetChanName(nc),"Analytical Markers",subVec);
         //        }
 
+        //mi memorizzo le analisi associate a questo esame e l'associazione con i definitori
+        for (int i=0; i<m_mng->GetAnalysiNum();i++)
+        {
+            int anal = m_mng->GetAnalysis(i).toInt();
+            switch (anal) {
+            case FLW_AVD_STUDY:
+                m_analysisMap[FLW_AVD_STUDY] = MK_FLOWMETRY;
+                break;
+            case CYS_STUDY:
+                m_analysisMap[CYS_STUDY] = MK_FILLING;
+                break;
+            case PFS_STD_STUDY:
+                m_analysisMap[PFS_STD_STUDY] = MK_VOIDING;
+                break;
+            case UPP_STA_STUDY:
+                m_analysisMap[UPP_STA_STUDY] =  MK_STARTPROFILE;
+                break;
+            case UPP_DYN_STUDY:
+                m_analysisMap[UPP_DYN_STUDY] = MK_STARTDYNPROFILE;
+                break;
+            case WTK_STUDY:
+                m_analysisMap[WTK_STUDY] = MK_WTK;
+                break;
+            case LPP_STUDY:
+                m_analysisMap[LPP_STUDY] = MK_LPP;
+                break;
+            case DO_STUDY:
+                m_analysisMap[DO_STUDY] = MK_DO;
+                break;
+            case BIO_STUDY:
+                m_analysisMap[BIO_STUDY] = MK_BIO;
+                break;
+            default:
+                break;
+            }
+            //m_analysisMap
+        }
+
 
         qDebug()<<"Building infoList ...";
         if(!updateInfoList())
@@ -804,7 +842,7 @@ bool MDataManager::checkForVolRes()
     qDebug()<<"File Caricato?"<<m_mng->GetParameters();
 
     //per ora salvo io su file pic l'analisi flussimetria ...
-    m_mng->SetAnalysis("Flussimetria");
+  // m_mng->SetAnalysis("Flussimetria");
 
     m_numAna = m_mng->GetAnalysiNum();
 
@@ -812,8 +850,8 @@ bool MDataManager::checkForVolRes()
     bool volRes = false;
     for (int i=0; i<m_numAna; i++)
     {
-        QString anaType = m_mng->GetAnalysis(i);
-        if (anaType == "Flussimetria")
+        int anaType = m_mng->GetAnalysis(i).toInt();
+        if (anaType == FLW_AVD_STUDY)
         {
             if (m_autoPrint)
                 setValVolRes(-1);
@@ -858,7 +896,7 @@ void MDataManager::analysis()
     qDebug()<<"File Caricato?"<<m_mng->GetParameters();
 
     //per ora salvo io su file pic l'analisi flussimetria ...
-    m_mng->SetAnalysis("Flussimetria");
+    //m_mng->SetAnalysis("Flussimetria");
 
 
     m_ana->SetData(m_mng);
@@ -868,8 +906,8 @@ void MDataManager::analysis()
 
     for (int i=0; i<m_numAna; i++)
     {
-        QString anaType = m_mng->GetAnalysis(i);
-        if (anaType == "Flussimetria")
+        int anaType = m_mng->GetAnalysis(i).toInt();
+        if (anaType == FLW_AVD_STUDY)
         {
             //verifica se c'è un definitore per questa analisi.
             VarMap mkOpAnIn;
@@ -1026,7 +1064,7 @@ void MDataManager::analysis()
                 m_analized = True;
                 //                                            UpdateTestOther()
                 //Lancia analisi e Inizializza nomogrammi
-                InitPageGraphs("Flowmetry");
+                InitPageGraphs(FLW_AVD_STUDY);
                 //                                            'ridimensiono il definitore sulla base del marker F2 del flusso
                 //                                            'For k = 1 To theGraphs.NMarkerAn
                 //                                            '    If MarkerAn(k).NumOpMark = mkOpAnIn And MarkerAn(k).key = 3 Then
@@ -1073,7 +1111,7 @@ void MDataManager::analysis()
     //mi dice se la flussimetria automatica o manuale
     //prova->setMode();
     //if (m_autoPrint)
-    //prova->print();
+    prova->print();
 
     //qml
     emit sg_loadResult();
@@ -1107,9 +1145,9 @@ int MDataManager::getValVolRes()
 }
 
 
-void MDataManager::InitPageGraphs(QString __anaType)
+void MDataManager::InitPageGraphs(int __anaType)
 {
-    if (__anaType == "Flowmetry")
+    if (__anaType == FLW_AVD_STUDY)
     {
         //determina tratti da analizzare.
         //Per ora considera solo il primo.

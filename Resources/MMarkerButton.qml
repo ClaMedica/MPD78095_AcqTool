@@ -5,7 +5,7 @@ import "qrc:/Components"
 import "qrc:/Models"
 Rectangle{
     //@@@@@@@@@@    Definitions     @@@@@@@@@@
-    property string extImg:".bmp"
+    property string extImg:".png"
 
     property int oriX:0
     property int oriY:0

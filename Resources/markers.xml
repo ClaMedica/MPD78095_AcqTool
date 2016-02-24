@@ -46,4 +46,6 @@
   <Marker key="113" code="EXC" descr="Exclude from Analysis" type="5" img="cmEXC" />
   <Marker key="198" code="SNAP" descr="Snapshot" type="5" img="SNAP" />
   <Marker key="199" code="ART" descr="Artefact" type="5" img="cmART" />
+  <Marker key="200" code="Sp" descr="Speak" type="6" img="Spoken" />
+  <Marker key="201" code="Cg" descr="Cough" type="6" img="Cough" />
 </Markers>

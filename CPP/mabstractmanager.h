@@ -28,6 +28,7 @@ public:
     Q_INVOKABLE QVariantList markersInfo(QString __filterType="",
                                          QVariantList __filterValues=QVariantList());
     Q_INVOKABLE QVariantList commandsInfo();
+    Q_INVOKABLE QVariantList definersInfo();
 
 signals:
 
@@ -43,6 +44,7 @@ protected:
     Analyze *m_ana;
 
     QMap<QVariant,VarMap> m_markerMap;//mappa di tutti i possibili marker ordinati per key
+    QMap<int,int> m_analysisMap;//mappa le analisi associate all'esame con i definitori
 
     QMap<QString,QStringList>   m_chanInPlots;//associa nome plot ad una mappa con cui ripescare il buffer
     QMap<QString,int32_t> m_dataChanNameMap;//associa il nome del canale al suo indice

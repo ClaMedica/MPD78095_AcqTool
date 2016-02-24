@@ -20,13 +20,220 @@ QVariantList MAbstractManager::markersInfo(QString __filterType,
         if(__filterType!="")
             if(!__filterValues.contains(marker.value(__filterType)))
                 continue;
-        list<<"$GridElement";
-        foreach(QString key,marker.keys())
+
+        int mrk = marker.value(ATT_KEY).toInt();
+        switch (mrk)
         {
-            list<<key;
-            list<<marker.value(key);
+        case MK_INVITATION:
+            if (m_analysisMap.contains(PFS_STD_STUDY))
+            {
+                list<<"$GridElement";
+                foreach(QString key,marker.keys())
+                {
+                    list<<key;
+                    list<<marker.value(key);
+                }
+                list<<"&GridElement";
+            }
+            break;
+        case MK_FIRSTDESIRE:
+            if (m_analysisMap.contains(CYS_STUDY))
+            {
+                list<<"$GridElement";
+                foreach(QString key,marker.keys())
+                {
+                    list<<key;
+                    list<<marker.value(key);
+                }
+                list<<"&GridElement";
+            }
+            break;
+        case MK_STRONGDESIRE:
+            if (m_analysisMap.contains(CYS_STUDY))
+            {
+                list<<"$GridElement";
+                foreach(QString key,marker.keys())
+                {
+                    list<<key;
+                    list<<marker.value(key);
+                }
+                list<<"&GridElement";
+            }
+            break;
+        case MK_MAXCYSCAPACITY:
+            if (m_analysisMap.contains(CYS_STUDY))
+            {
+                list<<"$GridElement";
+                foreach(QString key,marker.keys())
+                {
+                    list<<key;
+                    list<<marker.value(key);
+                }
+                list<<"&GridElement";
+            }
+            break;
+        case MK_COMP1:
+            if (m_analysisMap.contains(CYS_STUDY))
+            {
+                list<<"$GridElement";
+                foreach(QString key,marker.keys())
+                {
+                    list<<key;
+                    list<<marker.value(key);
+                }
+                list<<"&GridElement";
+            }
+            break;
+        case MK_VALSALVALEAK:
+            if (m_analysisMap.contains(LPP_STUDY))
+            {
+                list<<"$GridElement";
+                foreach(QString key,marker.keys())
+                {
+                    list<<key;
+                    list<<marker.value(key);
+                }
+                list<<"&GridElement";
+            }
+            break;
+        case MK_DETRUSORLEAK:
+            if (m_analysisMap.contains(LPP_STUDY))
+            {
+                list<<"$GridElement";
+                foreach(QString key,marker.keys())
+                {
+                    list<<key;
+                    list<<marker.value(key);
+                }
+                list<<"&GridElement";
+            }
+            break;
+        case MK_MIN_ABD_P:
+            if (m_analysisMap.contains(LPP_STUDY))
+            {
+                list<<"$GridElement";
+                foreach(QString key,marker.keys())
+                {
+                    list<<key;
+                    list<<marker.value(key);
+                }
+                list<<"&GridElement";
+            }
+            break;
+        case MK_COUGHT:
+            if (m_analysisMap.contains(LPP_STUDY))
+            {
+                list<<"$GridElement";
+                foreach(QString key,marker.keys())
+                {
+                    list<<key;
+                    list<<marker.value(key);
+                }
+                list<<"&GridElement";
+            }
+            break;
+        case MK_LPD:
+            if (m_analysisMap.contains(LPP_STUDY))
+            {
+                list<<"$GridElement";
+                foreach(QString key,marker.keys())
+                {
+                    list<<key;
+                    list<<marker.value(key);
+                }
+                list<<"&GridElement";
+            }
+            break;
+        case MK_INSTABILITY:
+            if (m_analysisMap.contains(DO_STUDY))
+            {
+                list<<"$GridElement";
+                foreach(QString key,marker.keys())
+                {
+                    list<<key;
+                    list<<marker.value(key);
+                }
+                list<<"&GridElement";
+            }
+            break;
+            //TO DO: a quale esame associamo il marker operativo ff??
+            //            case MK_FREEFLOW:
+            //                    if (m_analysisMap.contains(PFS_STD_STUDY))
+            //                    {
+            //                        list<<"$GridElement";
+            //                        foreach(QString key,marker.keys())
+            //                        {
+            //                            list<<key;
+            //                            list<<marker.value(key);
+            //                        }
+            //                        list<<"&GridElement";
+            //                    }
+            //                break;
+        case MK_STARTSP:
+            if (m_analysisMap.contains(UPP_STA_STUDY))
+            {
+                list<<"$GridElement";
+                foreach(QString key,marker.keys())
+                {
+                    list<<key;
+                    list<<marker.value(key);
+                }
+                list<<"&GridElement";
+            }
+            break;
+        case MK_STARTDP:
+            if (m_analysisMap.contains(UPP_DYN_STUDY))
+            {
+                list<<"$GridElement";
+                foreach(QString key,marker.keys())
+                {
+                    list<<key;
+                    list<<marker.value(key);
+                }
+                list<<"&GridElement";
+            }
+            break;
+        default:
+            break;
+
         }
-        list<<"&GridElement";
+
+        if (marker.value(__filterType) == "6" )
+        {
+            list<<"$GridElement";
+            foreach(QString key,marker.keys())
+            {
+                list<<key;
+                list<<marker.value(key);
+            }
+            list<<"&GridElement";
+        }
+
+    }
+
+    return list;
+}
+
+QVariantList MAbstractManager::definersInfo()
+{
+    //leggiamo il file di configurazione e riempiamo le info
+    QVariantList list;
+    foreach(VarMap marker,m_markerMap.values())
+    {
+        if(marker.value(ATT_TYPE)!="5") //no definer
+            continue;
+
+        foreach (int key, m_analysisMap.keys() )
+            if (marker.value(ATT_KEY) == m_analysisMap.value(key))
+            {
+                list<<"$GridElement";
+                foreach(QString key,marker.keys())
+                {
+                    list<<key;
+                    list<<marker.value(key);
+                }
+                list<<"&GridElement";
+            }
     }
 
     return list;
@@ -53,19 +260,19 @@ QVariantList MAbstractManager::commandsInfo()
     list<<"visible"<<true;
     list<<"&GridElement";
 
-//    foreach(VarMap marker,m_markerMap.values())
-//    {
-//        if(__filterType!="")
-//            if(!__filterValues.contains(marker.value(__filterType)))
-//                continue;
-//        list<<"$GridElement";
-//        foreach(QString key,marker.keys())
-//        {
-//            list<<key;
-//            list<<marker.value(key);
-//        }
-//        list<<"&GridElement";
-//    }
+    //    foreach(VarMap marker,m_markerMap.values())
+    //    {
+    //        if(__filterType!="")
+    //            if(!__filterValues.contains(marker.value(__filterType)))
+    //                continue;
+    //        list<<"$GridElement";
+    //        foreach(QString key,marker.keys())
+    //        {
+    //            list<<key;
+    //            list<<marker.value(key);
+    //        }
+    //        list<<"&GridElement";
+    //    }
 
     return list;
 }
@@ -73,13 +280,13 @@ QVariantList MAbstractManager::commandsInfo()
 bool MAbstractManager::load()
 {//in questa funzione inizializzo tutto caricando i file di configurazione fissi
     if(!m_configLocale.loadFromXML(":/Config/Config_Locale.xml"))
-    qCritical()<<"Error on locale configuration file";
+        qCritical()<<"Error on locale configuration file";
 
     if(!m_configUser.loadFromXML(":/Config/Config_User.xml"))
-    qCritical()<<"Error on user configuration file";
+        qCritical()<<"Error on user configuration file";
 
     if(!m_configMarkers.loadFromXML(":/Config/markers.xml"))
-    qCritical()<<"Error on user configuration file";
+        qCritical()<<"Error on user configuration file";
 
     buildMarkerInfoMap();
 }
@@ -157,11 +364,11 @@ bool MAbstractManager::buildConfigurationFile()
         {
             if(channel->getChild(XML_NAME)!=NULL)
                 if(chanName.contains(channel->getTextOfChild(XML_NAME))){
-           //         if ((channel->getChild(XML_UDM))->getAttribute("ID")== QString::number(m_mng->GetUdM(nc)))
-           //         {
-                        udm = channel->getTextOfChild(XML_UDM);
-           //             break;
-            //        }
+                    //         if ((channel->getChild(XML_UDM))->getAttribute("ID")== QString::number(m_mng->GetUdM(nc)))
+                    //         {
+                    udm = channel->getTextOfChild(XML_UDM);
+                    //             break;
+                    //        }
                 }
         }
 

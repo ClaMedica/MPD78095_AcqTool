@@ -52,6 +52,11 @@ MForm{
         console.log(info)
         gridMarker.items=info
     }
+    function setDefinersInfo(info)
+    {
+        console.log(info)
+        gridDefiners.items=info
+    }
 
     function setCommandsInfo(info)
     {
@@ -274,14 +279,41 @@ MForm{
 
     MGridView{
         //@@@@@@@@@@    Properties      @@@@@@@@@@
-        id:gridComand
+        id:gridDefiners
         anchors.right: gridMarker.left
+        anchors.top: parent.top
+        anchors.bottom: parent.bottom
+        width:50
+        owner:"Definers"
+        itemsInRow:1
+        delegate: MMarkerButton{}
+        visible:true
+
+
+        //@@@@@@@@@@    Events          @@@@@@@@@@
+//        onClicked:
+//        {
+//            switch(owner)
+//            {
+//            case "Marker":
+//                mngAcq.addMarker(value);
+//                //console.log(mngAcq.acqMarkers)
+//                plot.markers=mngAcq.acqMarkers;
+//                break;
+//            }
+//        }
+    }
+
+    MGridView{
+        //@@@@@@@@@@    Properties      @@@@@@@@@@
+        id:gridComand
+        anchors.right: gridDefiners.left
         anchors.top: parent.top
         anchors.bottom: parent.bottom
         width:50
         owner:"Commands"
         itemsInRow:1
-        delegate: MMarkerButton{extImg:".png"}
+        delegate: MMarkerButton{}
         visible:true
 
 
