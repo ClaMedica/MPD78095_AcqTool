@@ -117,6 +117,9 @@ void MDataManager::loadFile(QString __fileName)
         qDebug()<<"File Aperto?"<<m_mng->Open();
         qDebug()<<"File Caricato?"<<m_mng->GetParameters();
 
+        //m_mng->SetAnalysis(QString::number(FLW_AVD_STUDY));//temporaneo
+       // m_mng->CommitParameters();
+
         qDebug()<<"Building configuration file ...";
         if(!buildConfigurationFile())
         {qCritical()<<MEX_FILE_CORRUPTED;return;}
@@ -207,6 +210,7 @@ void MDataManager::loadFile(QString __fileName)
 
             (*def)["key"]=key;
             (*def)["name"] = descr;
+            (*def)["family"] = "Definers";
             (*def)["xMin"]=(tStart[0]-1)/m_mng->GetNAS(0);
             (*def)["xMax"]=(tEnd[0]-1)/m_mng->GetNAS(0);
             (*def)["yMin"]=sigMin;
@@ -223,7 +227,7 @@ void MDataManager::loadFile(QString __fileName)
         if(!defVec->isEmpty())
         {
             QString family="Definers";
-            QString name="Operative";
+           // QString name="Operative";
             saveDataAndUpdate(family,descr,defVec);
         }
 
@@ -259,11 +263,8 @@ void MDataManager::loadFile(QString __fileName)
                 if(sig->getName()==m_mng->GetChanName(numCh))
                     for (int i=0;i<sig->size();i++)
                         valuesY.append(sig->at(i));
-            //valY = m_mng->GetValue(numCh,numSamp[0]);
-
 
             double val=(double)numSamp[0]/m_mng->GetNAS(numCh);
-            qDebug()<<val;
             (*mrk)["val"]=val;
             (*mrk)["type"]=TYPE_ANALYTICAL;
             (*mrk)["name"]="Analitical";
@@ -280,6 +281,10 @@ void MDataManager::loadFile(QString __fileName)
             (*mrk)["visible"]=true;
             (*mrk)["category"]=CAT_MARKER;
             mrkAnVec->append(mrk);
+            //lo associo al suo definitore
+            QList<QVariant> anM = defVec->value(numDef)->value("anMarkers").toList();
+            anM.append((qulonglong)mrk);
+            (*defVec->value(numDef))["anMarkers"]=anM;
 
         }
         if(!mrkAnVec->isEmpty())
@@ -407,7 +412,7 @@ void MDataManager::saveChanges()
         {
             m_copy->AddOpMarker(numCamp,curMap->value("key").toInt(),curMap->value("descr").toString());
         }
-        if(curMap->value("color").toString()==COLOR_ANALYTICAL)
+        if((curMap->value("color").toString()==COLOR_ANALYTICAL)&&(curMap->value("visible").toBool()==true))
         {
             m_copy->AddAnMarker(curMap->value("channel").toInt(),
                                 numCamp[curMap->value("channel").toInt()],
@@ -740,6 +745,7 @@ bool MDataManager::changeObject(QVariantList __curObj)
         qulonglong whoAmI=__curObj.first().toULongLong();
         //tolgo il whoami e lascio solo le propriet√
         __curObj.removeFirst();
+
         qDebug()<<"Richiesta di modifica per "<<whoAmI;
         if(m_storage.modifyElement(whoAmI,__curObj))
         {
@@ -956,6 +962,7 @@ void MDataManager::analysis()
                     QString name="Flowmetry";
                     VarMap *def=new VarMap;
                     (*def)["key"] = MK_FLOWMETRY;
+                    (*def)["family"] = family;
                     (*def)["name"] = name;
                     (*def)["xMin"]= 1;
                     (*def)["xMax"]= m_end-1;
@@ -1093,6 +1100,8 @@ void MDataManager::analysis()
 
     m_mng->Close();
 
+    //saveChanges();
+
     //printer PROVA
     printermanager *prova = new printermanager(m_fileName);
     prova->setTempoAttesa(m_aflwdatas.at(0)->getWaitingTime());
@@ -1111,7 +1120,7 @@ void MDataManager::analysis()
     //mi dice se la flussimetria automatica o manuale
     //prova->setMode();
     //if (m_autoPrint)
-    prova->print();
+    //prova->print();
 
     //qml
     emit sg_loadResult();
@@ -1154,7 +1163,7 @@ void MDataManager::InitPageGraphs(int __anaType)
 
         int evStart;
         int evEnd;
-        VarMap evMarkOpIn;
+        VarMap *evMarkOpIn;
         byte evAuto;
         QVector<unsigned char> enCh;
 
@@ -1167,7 +1176,7 @@ void MDataManager::InitPageGraphs(int __anaType)
             {
                 evStart = curMap->value("xMin").toInt();
                 evEnd = curMap->value("xMax").toInt()*1000;
-                evMarkOpIn = *curMap;
+                evMarkOpIn = curMap;
                 evAuto = 1;
 
                 //ogni volta che si passano i definitori alla libreria di analisi dopo aver nascosto/rivisualizzato i canali
@@ -1195,8 +1204,8 @@ void MDataManager::InitPageGraphs(int __anaType)
                 VarMapVec* eleAnMarkers=m_storage.getAll(CAT_MARKER);
                 foreach (VarMap *curMarker, (*eleAnMarkers))
                 {
-                    int ff = evMarkOpIn.value("name").toInt();
-                    if ((curMarker->value("type") == TYPE_ANALYTICAL) && (curMarker->value("defCode") == evMarkOpIn.value("whoAmI").toInt()))
+                    int ff = evMarkOpIn->value("name").toInt();
+                    if ((curMarker->value("type") == TYPE_ANALYTICAL) && (curMarker->value("defCode") == evMarkOpIn->value("whoAmI").toInt()))
                     {
                         evAuto = 0;
                         break;
@@ -1218,8 +1227,8 @@ void MDataManager::InitPageGraphs(int __anaType)
         }
 
         //init arrays and perform analysis
-        int def = evMarkOpIn.value("num").toInt();
-        bool ret = InitArraysFLW(evStart,evEnd,enCh,evMarkOpIn.value("num").toInt(),evAuto);
+        int def = evMarkOpIn->value("num").toInt();
+        bool ret = InitArraysFLW(evStart,evEnd,enCh,evMarkOpIn->value("num").toInt(),evAuto);
 
         //se gli anMarker li trovo per la prima volta li inserisco in grafica
         if (evAuto != 0)
@@ -1254,12 +1263,16 @@ void MDataManager::InitPageGraphs(int __anaType)
                 (*mrk)["descr"]=descr;
                 (*mrk)["lock"]=false;
                 (*mrk)["channel"]=numCh;
-                (*mrk)["defCode"]=(qulonglong)evMarkOpIn.value("whoAmI").toInt();
+                (*mrk)["defCode"]=(qulonglong)evMarkOpIn->value("whoAmI").toInt();
                 (*mrk)["key"]=key;
                 (*mrk)["color"]=COLOR_ANALYTICAL;
                 (*mrk)["visible"]=true;
                 (*mrk)["category"]=CAT_MARKER;
                 mrkAnVec->append(mrk);
+                //lo associo al suo definitore
+                QList<QVariant> anM = evMarkOpIn->value("anMarkers").toList();
+                anM.append((qulonglong)mrk);
+                (*evMarkOpIn)["anMarkers"]=anM;
 
             }
 

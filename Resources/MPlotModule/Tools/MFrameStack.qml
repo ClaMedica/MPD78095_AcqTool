@@ -88,6 +88,7 @@ Rectangle {
                                                  "xMax",xMax,
                                                  "yMin",yMin,
                                                  "yMax",yMax]
+            onDeleteMe: rootFrameStack.newFrame=[whoAmI]
         }
     }
 }

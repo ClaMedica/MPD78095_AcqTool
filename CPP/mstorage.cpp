@@ -125,16 +125,32 @@ bool MStorage::modifyElement(qulonglong __whoAmI, QVariantList __news)
             QString fm = elementToModify->value("family").toString();
             QString nm = elementToModify->value("name").toString();
 
-            for (int i=0;i<m_storage[fm][nm]->length();i++)
+            //se ho cancellato un definitore devo provvedere a rimuovere
+            //i markers analitici associati
+            if (fm == "Definers")
             {
-                if (m_storage[fm][nm]->at(i) == elementToModify)
+                QList<QVariant> anM = elementToModify->value("anMarkers").toList();
+                for (int j=0;j<anM.length();j++)
                 {
-                    m_storage[fm][nm]->remove(i);
-                    break;
+                    VarMap *anMarkerToDelete= (VarMap *)anM.at(j).toULongLong();
+                    (*anMarkerToDelete)["visible"] = false;
+
+//                    foreach(QString catAn,m_allMap.keys())
+//                    {
+//                        if(!m_allMap[catAn]->contains(anMarkerToDelete))
+//                            continue;
+//                        if(!m_allMap[catAn]->removeOne(anMarkerToDelete))
+//                            qCritical()<<"Data corrupted";
+
+//                        QString fmAn = anMarkerToDelete->value("family").toString();
+//                        QString nmAn = anMarkerToDelete->value("name").toString();
+//                        m_storage[fmAn][nmAn]->removeOne(anMarkerToDelete);
+//                        delete anMarkerToDelete;
+//                    }
                 }
             }
 
-            //elementToModify = NULL;
+            m_storage[fm][nm]->removeOne(elementToModify);
             delete elementToModify;
         }
         else

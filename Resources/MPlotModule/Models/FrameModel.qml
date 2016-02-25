@@ -14,9 +14,10 @@ ListModel {
     property real yMin:0
     property real yMax:1
     property int resizeable:0
+    property var anMarkers:[]
     property real whoAmI:0 //numero del frame
     property string color:"red"
-    property var strList:["descr","family","name","category","key","num","enCh","xMin","xMax","yMin","yMax","whoAmI","color","resizeable"]
+    property var strList:["descr","family","name","category","key","num","enCh","xMin","xMax","yMin","yMax","whoAmI","color","resizeable","anMarkers"]
 
     function setProperty(role,value)
     {
@@ -37,6 +38,7 @@ ListModel {
         case "whoAmI":whoAmI=value;break;
         case "color":color=value;break;
         case "resizeable":resizeable=value;break;
+        case "anMarkers":anMarkers=value;break;
         default:console.log("WindowModel: Should not be Here!!!",role,value);break;
         }
 

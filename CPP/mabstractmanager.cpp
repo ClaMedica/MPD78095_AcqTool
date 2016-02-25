@@ -251,7 +251,8 @@ QVariantList MAbstractManager::commandsInfo()
     list<<"key"<<111;
     list<<"visible"<<true;
     list<<"&GridElement";
-    //save
+
+    //save PROVVISORIO
     list<<"$GridElement";
     list<<"descr"<<tr("save");
     rootURL="file:///"+m_applicationPath+"/Icone/";
@@ -259,20 +260,6 @@ QVariantList MAbstractManager::commandsInfo()
     list<<"key"<<112;
     list<<"visible"<<true;
     list<<"&GridElement";
-
-    //    foreach(VarMap marker,m_markerMap.values())
-    //    {
-    //        if(__filterType!="")
-    //            if(!__filterValues.contains(marker.value(__filterType)))
-    //                continue;
-    //        list<<"$GridElement";
-    //        foreach(QString key,marker.keys())
-    //        {
-    //            list<<key;
-    //            list<<marker.value(key);
-    //        }
-    //        list<<"&GridElement";
-    //    }
 
     return list;
 }

@@ -15,6 +15,7 @@ Rectangle{
     property real whoAmI:modF.whoAmI
     property var zoomMe
     signal modifyMe
+    signal deleteMe
 
     id:rootFrame
     Rectangle{
@@ -105,12 +106,48 @@ Rectangle{
         //cursorShape: Qt.SizeAllCursor
         //onPressed: {stato="changing";posX=mouseX;posY=mouseY;timRes.start()}
         //onReleased:{stato="idle";timRes.stop();rootFrame.modifyMe()}
+        acceptedButtons: Qt.LeftButton | Qt.RightButton
+        onPressed: {
+             if (mouse.button === Qt.RightButton)
+             {
+                 clicright.y = mouseY
+                 clicright.x = mouseX
+                 clicright.visible = true
+             }
+        }
+
         onEntered: sfondo.opacity=true
         onExited: sfondo.opacity=false
         onPositionChanged: {if(stato==="changing")timRes.start()}
         hoverEnabled: true
-        onDoubleClicked: zoomMe=[modF.xMin,modF.xMax,modF.yMin,modF.yMax]
+        onDoubleClicked: {
+            if (mouse.button === Qt.LeftButton)
+                zoomMe=[modF.xMin,modF.xMax,modF.yMin,modF.yMax]
+        }
     }
+
+    Rectangle
+    {
+        id:clicright
+        height: 20
+        width: 50
+        visible: false
+        Text{
+            anchors.horizontalCenter: parent.horizontalCenter
+            anchors.verticalCenter: parent.verticalCenter
+            color: "blue"
+            text: qsTr("delete")
+        }
+        MouseArea{
+          anchors.fill:parent
+          //delete
+          onClicked: {
+             clicright.visible = false
+             rootFrame.deleteMe()
+          }
+        }
+    }
+
     MouseArea{
         id:leftMove
         property string stato:"idle"

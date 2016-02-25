@@ -22,7 +22,6 @@ Rectangle{
     property bool enablePopUp: true
     property real value:0
     property real realX:x+icon.width/2
-
     property var valuesY:[]
 
     property bool deselectOnRelease:false
@@ -52,6 +51,8 @@ Rectangle{
 
        // if (modM.type === "Analytical")
             updateY(modM.val);
+
+       rootMarker.visible = modM.visible;
     }
 
     Component.onCompleted:
