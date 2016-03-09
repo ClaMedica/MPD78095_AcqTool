@@ -8,6 +8,9 @@ import MPlotModule 1.0
 import Managers 1.0
 import QtQuick.Window 2.2
 
+import QtQuick.VirtualKeyboard 1.0
+
+
 
 ApplicationWindow {
     //@@@@@@@@@@ Definitions @@@@@@@@@@
@@ -16,8 +19,13 @@ ApplicationWindow {
     //@@@@@@@@@@    Properties      @@@@@@@@@@
     id: root
     visible: true
-    width:platform==="android"?640:Screen.width*0.94
-    height:platform==="android"?480:Screen.height*0.94
+
+      width:platform==="android"?640:Screen.width*0.94
+        height:platform==="android"?480:Screen.height*0.94
+
+
+    //   width:640
+    //   height:480
     color:"steelblue"
 
     function launch(arguments)
@@ -95,6 +103,8 @@ ApplicationWindow {
         onReloadingCompleted: forAna.populate()
 
         onSg_openVolResDlg:{
+            //itemVolRes.visible = true
+            //itemVolRes.focus = true
             volRes.focus = true
             volRes.volResVal = "0"
             volRes.titleDlg = __tipoAn
@@ -153,7 +163,6 @@ ApplicationWindow {
         id: forRes
     }
 
-
     VolResDlg{
         //@@@@@@@@@@    Properties      @@@@@@@@@@
         id: volRes
@@ -164,5 +173,35 @@ ApplicationWindow {
         //@@@@@@@@@@    Properties      @@@@@@@@@@
         id: exit
         visible: false
+    }
+
+    //per la tastiera virtuale
+    InputPanelNumeric {
+        id: inputPanelNumeric
+        z: 99
+        y: parent.height
+        anchors.left: parent.left - (parent.left/2)
+        anchors.right: parent.right
+       // visible: false
+        states: State {
+            name: "visible"
+            when: Qt.inputMethod.visible
+            PropertyChanges {
+                target: inputPanelNumeric
+                y: parent.height - inputPanelNumeric.height
+            }
+        }
+        transitions: Transition {
+            from: ""
+            to: "visible"
+            reversible: true
+            ParallelAnimation {
+                NumberAnimation {
+                    properties: "y"
+                    duration: 150
+                    easing.type: Easing.InOutQuad
+                }
+            }
+        }
     }
 }

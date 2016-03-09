@@ -18,6 +18,7 @@ Rectangle {
         volResDlg.visible = false
     }
 
+
     Rectangle{
         color:"dodgerblue"
         implicitWidth: 300
@@ -31,6 +32,7 @@ Rectangle {
         anchors.top: parent.top
 
     }
+
 
     Row{
         spacing:20
@@ -49,18 +51,16 @@ Rectangle {
             anchors.bottom: textVol.bottom
             focus: true
 
-            TextInput {
-                id: textInput
+            TextField {
+                id: textField
                 text: volResVal
                 validator: IntValidator { bottom:0; top: 1000}
                 anchors.bottom: parent.bottom
                 focus: true
 
-                onActiveFocusChanged: {
-                    console.log("focus cambiato", volResVal)
-                    volResVal = ""
+                inputMethodHints: Qt.ImhFormattedNumbersOnly
+                onActiveFocusChanged: volResVal = ""
 
-                }
             }
         }
     }
@@ -74,14 +74,16 @@ Rectangle {
         anchors.bottomMargin: 10
         anchors.rightMargin: 10
         onClicked: {
-            volResVal = textInput.text
+            volResVal = textField.text
             volResDlg.visible = false
+            Qt.inputMethod.hide()
             mngData.valVolRes = volResVal
             mngData.analysis()
         }
     }
 
 }
+
 
 
 

@@ -40,12 +40,28 @@ Rectangle {
     //Colormap
     property var colorMap:[]
 
+    //zoom
+    property int toZoom:0
+    property int oldToZoom:0
+
     id: rootPlot
 
     function setAXmin(x){zoomer.xAbsoluteMin=x;zoomer.checkLimits();zoomer.restore();curTime.value=x}
     function setAXmax(x){zoomer.xAbsoluteMax=x;zoomer.checkLimits();zoomer.restore();}
     function setAYmin(y){zoomer.yAbsoluteMin=y;zoomer.checkLimits();zoomer.restore();}
     function setAYmax(y){zoomer.yAbsoluteMax=y;zoomer.checkLimits();zoomer.restore();}
+
+    onToZoomChanged: {
+        zoomer.state = "idle"
+        if (toZoom > oldToZoom)
+            zoomer.zoomButton(0.5)
+        if (toZoom < oldToZoom)
+            zoomer.zoomButton(-0.5)
+        if (toZoom === 0 && oldToZoom === 0){
+            zoomer.restore()
+
+        }
+    }
 
     onXMaxChanged:
     {
@@ -474,6 +490,7 @@ Rectangle {
             yAbsoluteMax: modP.yAbsoluteMax
             yAbsoluteMin: modP.yAbsoluteMin
             zoomInc: modP.zoomSpeed
+            enableYZoom: false
 
         }
 
@@ -492,6 +509,7 @@ Rectangle {
             }
             onNewFrameChanged: if(completed)currentObject=newFrame
 
+
         }
 
 
@@ -507,6 +525,8 @@ Rectangle {
 
             onNewMarkerChanged:if(completed)currentObject=newMarker
         }
+
+
 
 
         Keys.onPressed: {

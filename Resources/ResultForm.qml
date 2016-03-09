@@ -54,7 +54,7 @@ Rectangle {
             rectf.border.width = 2
             rectf.anchors.right = resultForm.right
             rectf.anchors.top = resultForm.top
-            rectf.anchors.topMargin = 20
+           // rectf.anchors.topMargin = 5
             rectf.anchors.rightMargin = resultForm.width/2 - rectf.width/2
 
             var namePage = ""
@@ -124,12 +124,12 @@ Rectangle {
                 nameNomo = mngData.getFlowDatas(i).getLiverpoolMax().getTitle()
                 var LQM =  Qt.createQmlObject('import "qrc:/Components"; MNomogramma {}', rectdata)
                 LQM.clip = true
-                LQM.height = 250
-                LQM.width = 380
+                LQM.height = 300
+                LQM.width = 450
                 LQM.anchors.left = rectdata.left
                 LQM.anchors.top = rectdata.top
                 LQM.anchors.topMargin = 20
-                LQM.anchors.leftMargin = 50
+                LQM.anchors.leftMargin = 20
                 LQM.xMin = mngData.getFlowDatas(i).getLiverpoolMax().getXmin()
                 LQM.xMax = mngData.getFlowDatas(i).getLiverpoolMax().getXmax()
                 LQM.yMin = mngData.getFlowDatas(i).getLiverpoolMax().getYmin()

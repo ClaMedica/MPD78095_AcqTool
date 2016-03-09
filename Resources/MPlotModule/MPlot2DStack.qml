@@ -21,6 +21,10 @@ Rectangle{
     property real timeMarker:0
     property var saveMe:[]
     property bool timeConnected:true
+
+    property int toZoom:0
+    property int oldToZoom:0
+
     color:"transparent"
 
     Component.onCompleted:goTim.start(10)
@@ -233,13 +237,15 @@ Rectangle{
         id:lista
         property bool completed:false
         property int con:-1
+        property int toZoom:0
+
         anchors.fill:rootPlotStack
         model:plotNumber
-
-
         delegate:MPlot2D{
             id: plot
             clip:true
+            toZoom: rootPlotStack.toZoom
+            oldToZoom: rootPlotStack.oldToZoom
             y:index*rootPlotStack.height/plotNumber
             height:rootPlotStack.height/plotNumber
             width:rootPlotStack.width

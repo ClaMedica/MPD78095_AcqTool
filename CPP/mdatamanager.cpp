@@ -375,21 +375,19 @@ void MDataManager::resetAll()
     //    emit availableDataChanged();
 }
 
-
 void MDataManager::saveChanges()
 {
-    //se c'era gi√  un'altra copia la cancelliamo
+    QString copyName=m_fileName;
+    copyName.insert(copyName.length()-4,"_origin");
+    //la prima volta che salvo mi faccio la copia del file originale
+    if (!QFile(copyName).exists())
+        QFile::copy(m_fileName,copyName);
+
     if(m_copy!=NULL)
         delete m_copy;
 
     m_copy=new DatafileManager;
-    QString copyName=m_fileName;
-    copyName.insert(copyName.length()-4,"_copy");
-
-    qDebug()<<"Faccio la copia?"<<QFile::copy(m_fileName,copyName);
-    //apro il file copia
-
-    m_copy->SetFileName(copyName);
+    m_copy->SetFileName(m_fileName);
     m_copy->SetFileType(7);
     qDebug()<<"Copia aperta?"<<m_copy->Open();
     qDebug()<<"Copia caricata?"<<m_copy->GetParameters();
@@ -446,8 +444,9 @@ void MDataManager::saveChanges()
 
     qDebug()<<"Commit markers?"<<m_copy->CommitMarkers();
     qDebug()<<"Chiudo il file?"<<m_copy->Close();
-
 }
+
+
 /**
  * @brief MDataManager::addCustomObj add a custom object like a marker or a definer linked to __families,
  * @param __families is the list of families were to insert the new obj
@@ -817,8 +816,8 @@ void MDataManager::exitFromReview()
     else
     {
         QString copyName=m_fileName;
-        copyName.insert(copyName.length()-4,"_copy");
-        if (getToSave() == "yes")
+        copyName.insert(copyName.length()-4,"_origin");
+        if (getToSave() == "no")
         {        //copio il file copy nell'originale
             if (QFile::exists(copyName))
             {
@@ -827,12 +826,32 @@ void MDataManager::exitFromReview()
                 qDebug()<<"cancellata copia all'exit"<<QFile::remove(copyName);
             }
         }
-        else //"no"
+        else //"yes"
             //cancello il file copy
             qDebug()<<"cancellata copia all'exit"<<QFile::remove(copyName);
         exit(0); //poi dovr‡ tornare al modulo database
     }
 
+//    if (getToSave() == "")
+//        emit sg_exitFromReview();
+//    else
+//    {
+//        QString copyName=m_fileName;
+//        copyName.insert(copyName.length()-4,"_copy");
+//        if (getToSave() == "yes")
+//        {        //copio il file copy nell'originale
+//            if (QFile::exists(copyName))
+//            {
+//                qDebug()<<"cancello vecchio file"<<QFile::remove(m_fileName);
+//                qDebug()<<"copio le modifiche"<<QFile::copy(copyName,m_fileName);
+//                qDebug()<<"cancellata copia all'exit"<<QFile::remove(copyName);
+//            }
+//        }
+//        else //"no"
+//            //cancello il file copy
+//            qDebug()<<"cancellata copia all'exit"<<QFile::remove(copyName);
+//        exit(0); //poi dovr‡ tornare al modulo database
+//    }
 }
 
 bool MDataManager::checkForVolRes()
@@ -893,6 +912,8 @@ void MDataManager::analysis()
 
     if (checkForVolRes())
         return;
+
+    saveChanges();
 
     m_mng=new DatafileManager;
     m_mng->SetFileName(m_fileName);
@@ -968,7 +989,7 @@ void MDataManager::analysis()
                     (*def)["xMax"]= m_end-1;
                     (*def)["yMin"]=0;
                     (*def)["yMax"]=100;
-                    (*def)["num"]=m_mng->GetNumDefiners();
+                    (*def)["num"]= elements->length();
                     (*def)["enCh"]= En;
                     (*def)["descr"]=name;
                     (*def)["color"]="green";
@@ -983,7 +1004,7 @@ void MDataManager::analysis()
                     found = true;
 
                     //saveall?? se si la updateinfolist puo leggere da datafile?
-                    saveChanges();//(?)
+                    //saveChanges();//(?)
                     //buildInfoList();
                     updateInfoList();
                     emit reloadingCompleted();
@@ -1099,8 +1120,6 @@ void MDataManager::analysis()
 
 
     m_mng->Close();
-
-    //saveChanges();
 
     //printer PROVA
     printermanager *prova = new printermanager(m_fileName);
@@ -1273,7 +1292,6 @@ void MDataManager::InitPageGraphs(int __anaType)
                 QList<QVariant> anM = evMarkOpIn->value("anMarkers").toList();
                 anM.append((qulonglong)mrk);
                 (*evMarkOpIn)["anMarkers"]=anM;
-
             }
 
             if(!mrkAnVec->isEmpty())
@@ -1283,7 +1301,7 @@ void MDataManager::InitPageGraphs(int __anaType)
                 saveDataAndUpdate(family,name,mrkAnVec);
             }
 
-            saveChanges();//(?)
+           // saveChanges();//(?)
             updateInfoList();
             emit reloadingCompleted();
 

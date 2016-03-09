@@ -53,6 +53,24 @@
                                 value="10"
                                 />
                         </Duration>
+                        <Width
+                           label="width trak"
+                           type="TextField"
+                           unit=""
+                           value="1"
+                        />
+                        <Tick
+                            label="tick"
+                            type="TextField"
+                            unit=""
+                            value="3"
+                        />
+                        <Color
+                            label="color track"
+                            type="TextField"
+                            unit=""
+                            value="black"
+                        />
                 </Step>
         </AutoStarts>
         <AutoStops>
@@ -103,7 +121,7 @@
                                 value="300"
                                 />
                         </Duration>
-                </Stationary>
+                       </Stationary>
         </AutoStops>
         <Supervisor>
                 <Visible
@@ -119,4 +137,46 @@
                 value="#FFFFFF"
                 />
         </Supervisor>
+        <channelsProp>
+            <VBT>
+                <width
+                   label="width track"
+                   type="TextField"
+                   unit=""
+                   value="1"
+                />
+                <thick
+                    label="thick"
+                    type="TextField"
+                    unit=""
+                    value="3"
+                />
+                <color
+                    label="color track"
+                    type="TextField"
+                    unit=""
+                    value="black"
+                />
+            </VBT>
+            <QBT>
+                <width
+                   label="width track"
+                   type="TextField"
+                   unit=""
+                   value="1"
+                />
+                <thick
+                    label="thick"
+                    type="TextField"
+                    unit=""
+                    value="3"
+                />
+                <color
+                    label="color track"
+                    type="MColorBox"
+                    unit=""
+                    value="red"
+                />
+            </QBT>
+        </channesProp>
 </Configuration>

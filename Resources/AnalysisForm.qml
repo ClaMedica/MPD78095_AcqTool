@@ -256,11 +256,11 @@ MForm{
         anchors.right: rootAna.right
         anchors.top: parent.top
         anchors.bottom: parent.bottom
-        width:50
+        width:0
         owner:"Marker"
         itemsInRow:1
         delegate: MMarkerButton{}
-        visible:true
+        visible:false
 
 
         //@@@@@@@@@@    Events          @@@@@@@@@@
@@ -327,7 +327,23 @@ MForm{
                     mngData.analysis();
                 if (value === "112") {
                     mngData.saveChanges()
-                    mngData.exitFromReview();
+                    mngData.exitFromReview()
+                }
+                if (value === "113"){
+                    //zoom in
+                    plot.oldToZoom = plot.toZoom
+                    plot.toZoom = plot.toZoom + 1
+                }
+                if (value === "114"){
+                    //zoom out
+                    plot.oldToZoom = plot.toZoom
+                    plot.toZoom = plot.toZoom - 1
+                }
+                if (value === "115"){
+                    //zoom none
+                    plot.oldToZoom = 0
+                    plot.toZoom = 0
+                    console.log("115")
                 }
                 break;
             }

@@ -14,6 +14,7 @@ Rectangle{
     property real yMax:modF.yMax
     property real whoAmI:modF.whoAmI
     property var zoomMe
+
     signal modifyMe
     signal deleteMe
 
@@ -103,6 +104,7 @@ Rectangle{
         property real posY:0
 
         anchors.fill:parent
+        propagateComposedEvents: true
         //cursorShape: Qt.SizeAllCursor
         //onPressed: {stato="changing";posX=mouseX;posY=mouseY;timRes.start()}
         //onReleased:{stato="idle";timRes.stop();rootFrame.modifyMe()}
@@ -114,6 +116,9 @@ Rectangle{
                  clicright.x = mouseX
                  clicright.visible = true
              }
+             else
+                 if (clicright.visible)
+                     clicright.visible = false
         }
 
         onEntered: sfondo.opacity=true
@@ -131,6 +136,7 @@ Rectangle{
         id:clicright
         height: 20
         width: 50
+        radius: 7
         visible: false
         Text{
             anchors.horizontalCenter: parent.horizontalCenter
@@ -183,40 +189,40 @@ Rectangle{
         enabled: modF.resizeable
     }
 
-    MouseArea{
-        id:topMove
-        property string stato:"idle"
-        property real pos:0
-        height:5
-        anchors.left:parent.left
-        anchors.top:parent.top
-        anchors.right: parent.right
-        //cursorShape: Qt.SizeVerCursor
-        //onPressed: {stato="changing";pos=mouseY;timRes.start()}
-        //onReleased:{stato="idle";timRes.stop();rootFrame.modifyMe()}
-        onPositionChanged: {if(stato==="changing")timRes.start()}
-        hoverEnabled: true
-        onEntered:{sizeRecV.rotation=180;sizeRecV.opacity=1}
-        onExited:{sizeRecV.opacity=0}
-        enabled: modF.resizeable
-    }
-    MouseArea{
-        id:bottomMove
-        property string stato:"idle"
-        property real pos:0
-        height: 5
-        anchors.right:parent.right
-        anchors.left:parent.left
-        anchors.bottom: parent.bottom
-        //cursorShape: Qt.SizeVerCursor
-        //onPressed: {stato="changing";pos=mouseY;timRes.start()}
-        //onReleased:{stato="idle";timRes.stop();rootFrame.modifyMe()}
-        onEntered:{sizeRecV.rotation=0;sizeRecV.opacity=1}
-        onExited:{sizeRecV.opacity=0}
-        onPositionChanged: {if(stato==="changing")timRes.start()}
-        hoverEnabled: true
-        enabled: modF.resizeable
-    }
+//    MouseArea{
+//        id:topMove
+//        property string stato:"idle"
+//        property real pos:0
+//        height:5
+//        anchors.left:parent.left
+//        anchors.top:parent.top
+//        anchors.right: parent.right
+//        //cursorShape: Qt.SizeVerCursor
+//        //onPressed: {stato="changing";pos=mouseY;timRes.start()}
+//        //onReleased:{stato="idle";timRes.stop();rootFrame.modifyMe()}
+//        onPositionChanged: {if(stato==="changing")timRes.start()}
+//        hoverEnabled: true
+//        onEntered:{sizeRecV.rotation=180;sizeRecV.opacity=1}
+//        onExited:{sizeRecV.opacity=0}
+//        enabled: modF.resizeable
+//    }
+//    MouseArea{
+//        id:bottomMove
+//        property string stato:"idle"
+//        property real pos:0
+//        height: 5
+//        anchors.right:parent.right
+//        anchors.left:parent.left
+//        anchors.bottom: parent.bottom
+//        //cursorShape: Qt.SizeVerCursor
+//        //onPressed: {stato="changing";pos=mouseY;timRes.start()}
+//        //onReleased:{stato="idle";timRes.stop();rootFrame.modifyMe()}
+//        onEntered:{sizeRecV.rotation=0;sizeRecV.opacity=1}
+//        onExited:{sizeRecV.opacity=0}
+//        onPositionChanged: {if(stato==="changing")timRes.start()}
+//        hoverEnabled: true
+//        enabled: modF.resizeable
+//    }
 
     Timer{id:timRes
         interval:50

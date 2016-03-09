@@ -29,6 +29,8 @@ Rectangle {
     property bool moving:false
     property real zoomInc:0.3
     property real dur:300
+    property bool enableXZoom:true
+    property bool enableYZoom:true
 
     signal clicked
     signal zoom
@@ -111,6 +113,7 @@ Rectangle {
         //magn ingrandimento ]-1,1[ compreso con estremi esclusi
 
 
+
         var incX=(xMax-xMin)*Math.abs(magnX) //incremento unilaterale in a.u.
         var incY=(yMax-yMin)*Math.abs(magnY) //incremento unilaterale in a.u.
 
@@ -121,21 +124,31 @@ Rectangle {
         var dy=magnY>0?1:-1;
 
        // console.log("doZoom",magnX,magnY,incX,incY,percX,percY,dx,dy)
+
+
         switch(rootZoom.state)
         {
         case "idle":            //zoom bidirezionale
+            if(enableXZoom){
             preview.xMin=xMin + dx*incX*percX
             preview.xMax=xMax - dx*incX*(1-percX)
+            }
+            if(enableYZoom){
             preview.yMin=yMin + dy*incY*(1-percY)
             preview.yMax=yMax - dy*incY*percY
+            }
             break;
         case "wheeling h":      //zoom orizzontale
+            if(enableXZoom){
             preview.xMin=xMin+dx*incX*percX
             preview.xMax=xMax-dx*incX*(1-percX)
+            }
             break;
         case "wheeling v":      //zoom verticale
+            if(enableYZoom){
             preview.yMin=yMin+dy*incY*(1-percY)
             preview.yMax=yMax-dy*incY*percY
+            }
             break;
         }
        // console.log("before check",preview.xMin,preview.xMax,preview.yMin,preview.yMax)
@@ -149,6 +162,13 @@ Rectangle {
         preview.xMin=x-spanX/2
         preview.yMax=y+spanY/2
         preview.yMin=y-spanY/2
+        checkLimits()
+    }
+
+    function zoomButton(inc)
+    {
+        preview.xMin=xMin + inc
+        preview.xMax=xMax - inc
         checkLimits()
     }
 

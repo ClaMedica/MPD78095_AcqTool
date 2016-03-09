@@ -252,12 +252,39 @@ QVariantList MAbstractManager::commandsInfo()
     list<<"visible"<<true;
     list<<"&GridElement";
 
-    //save PROVVISORIO
+    //salva e chiudi
     list<<"$GridElement";
     list<<"descr"<<tr("save");
     rootURL="file:///"+m_applicationPath+"/Icone/";
-    list<<"img"<<rootURL+"Spoken";
+    list<<"img"<<rootURL+"salvaChiudi";
     list<<"key"<<112;
+    list<<"visible"<<true;
+    list<<"&GridElement";
+
+    //zoom in
+    list<<"$GridElement";
+    list<<"descr"<<tr("save");
+    rootURL="file:///"+m_applicationPath+"/Icone/";
+    list<<"img"<<rootURL+"zoom";
+    list<<"key"<<113;
+    list<<"visible"<<true;
+    list<<"&GridElement";
+
+    //zoom out
+    list<<"$GridElement";
+    list<<"descr"<<tr("save");
+    rootURL="file:///"+m_applicationPath+"/Icone/";
+    list<<"img"<<rootURL+"zoom_out";
+    list<<"key"<<114;
+    list<<"visible"<<true;
+    list<<"&GridElement";
+
+    //zoom none
+    list<<"$GridElement";
+    list<<"descr"<<tr("save");
+    rootURL="file:///"+m_applicationPath+"/Icone/";
+    list<<"img"<<rootURL+"zoom_none";
+    list<<"key"<<115;
     list<<"visible"<<true;
     list<<"&GridElement";
 
@@ -275,7 +302,7 @@ bool MAbstractManager::load()
     if(!m_configMarkers.loadFromXML(":/Config/markers.xml"))
         qCritical()<<"Error on user configuration file";
 
-    buildMarkerInfoMap();
+    return buildMarkerInfoMap();
 }
 
 QString MAbstractManager::plotConfigFileName()
@@ -312,11 +339,11 @@ bool MAbstractManager::buildConfigurationFile()
 
     }
 
-    QString curfile = plotConfigFileName();
-    if (QFile(curfile).exists())
-    {   //il file già c'è e non va creato uno nuovo ma usiamo quello esistente
-        return true;
-    }
+//    QString curfile = plotConfigFileName();
+//    if (QFile(curfile).exists())
+//    {   //il file già c'è e non va creato uno nuovo ma usiamo quello esistente
+//        return true;
+//    }
 
     //scriviamo un file di configurazione che poi l'utente potrà modificare a suo gusto
     Ancestry configPlot;
@@ -368,11 +395,31 @@ bool MAbstractManager::buildConfigurationFile()
         network->setAttribute(ATT_PORT,QString::number(9000+nc));
         network->setAttribute(ATT_ADDRESS,"127.0.0.1");
 
+        //devo leggere le informazioni sulle dimensioni delle tracce e il loro colore
+        //all'interno del file config_user
         foreach (QString chanName, m_chanInPlots[graphName])
         {//qui scrivo le proprietÃ  delle tracce
             Ancestry * trkN=tracks->addChild(chanName);
-            trkN->setAttribute(ATT_THICK,"3");
-            trkN->setAttribute(ATT_COLOR,"black");
+            if (chanName.startsWith("Q"))
+            {
+                Ancestry* ch = m_configUser.getChild(ATT_CHANQBT);
+                if (ch != NULL)
+                {
+                    trkN->setAttribute(ATT_THICK,ch->getChild(ATT_THICK)->getAttribute("value"));
+                    trkN->setAttribute(ATT_COLOR,ch->getChild(ATT_COLOR)->getAttribute("value"));
+                    trkN->setAttribute(ATT_WIDTH,ch->getChild(ATT_WIDTH)->getAttribute("value"));
+                }
+            }
+            if (chanName.startsWith("V"))
+            {
+                Ancestry* ch = m_configUser.getChild(ATT_CHANVBT);
+                if (ch != NULL)
+                {
+                    trkN->setAttribute(ATT_THICK,ch->getChild(ATT_THICK)->getAttribute("value"));
+                    trkN->setAttribute(ATT_COLOR,ch->getChild(ATT_COLOR)->getAttribute("value"));
+                    trkN->setAttribute(ATT_WIDTH,ch->getChild(ATT_WIDTH)->getAttribute("value"));
+                }
+            }
         }
     }
     //ora salvo il file di configurazione come cur.xml

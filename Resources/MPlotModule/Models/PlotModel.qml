@@ -28,8 +28,10 @@ ListModel {
     property real xALFormat: AxisSettings.EFORMAT_TIME
     property real xALDecimalsMaj: 0
     property real xALDecimalsMin: 0
-    property string xALDateTimeformatMaj: "hh:mm:ss.zzz"
-    property string xALDateTimeformatMin: "mm:ss.zzz"
+    property string xALDateTimeformatMaj: "hh:mm:ss"
+    property string xALDateTimeformatMin: "mm:ss"
+//    property string xALDateTimeformatMaj: "hh:mm:ss.zzz"
+//    property string xALDateTimeformatMin: "mm:ss.zzz"
     //X Proprietà del testo Major
     property string xALMajFontFamily: "ubuntu"
     property string xALMajFontColor: "black"

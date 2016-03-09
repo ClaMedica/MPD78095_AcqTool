@@ -11,6 +11,7 @@ Rectangle {
     property int frameCount
 
     property var zoomThis
+
     id:rootFrameStack
     color:"transparent"
     clip:true

@@ -30,6 +30,9 @@
 
 int main(int argc, char *argv[])
 {
+    // Load virtualkeyboard input context plugin
+    qputenv("QT_IM_MODULE", QByteArray("qtvirtualkeyboard"));
+
     Q_INIT_RESOURCE(qml);
 
     QGuiApplication app(argc, argv);
@@ -50,6 +53,7 @@ int main(int argc, char *argv[])
     outmsg.init(gPath_log);
     qDebug()<<"Partiamo";
     //qDebug()<<fibonacci(5);
+
 
     qmlRegisterType<ParameterManager>("Managers",1,0,"ParameterManager");
     qmlRegisterType<ModelManager>("Managers",1,0,"ModelManager");

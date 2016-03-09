@@ -12,15 +12,15 @@ Rectangle{
     property int min:  0
     property int max:  100
     property int lineLength: 100
-    property real vMin: 0
-    property real vMax: 1
-    property real yMin: 0
-    property real yMax: 1
+    property real vMin: 0 //valore vero convertito in udm min
+    property real vMax: 1 //valore vero convertito in udm max
+    property real yMin: 0 //valore vero convertito in pixel min
+    property real yMax: 1 //valore vero convertito in pixel max
     property bool moving: false
     property real valPer: (x+icon.width/2-min)/(max-min)
     property bool selected:false
     property bool enablePopUp: true
-    property real value:0
+    property real value:0 //valore in x a cui sta il marker in udm
     property real realX:x+icon.width/2
     property var valuesY:[]
 
@@ -32,7 +32,7 @@ Rectangle{
 
 
     color:"transparent"
-
+    visible:modM.visible
 
     MarkerModel{id:modM
     //onImgChanged: if(img!=="")icon.source=img+".bmp"
@@ -52,7 +52,7 @@ Rectangle{
        // if (modM.type === "Analytical")
             updateY(modM.val);
 
-       rootMarker.visible = modM.visible;
+
     }
 
     Component.onCompleted:
@@ -66,8 +66,8 @@ Rectangle{
     height:lineLength+icon.height+label.height
     width:icon.height
     onXChanged:value=(vMax-vMin)*((rootMarker.x+icon.width/2)-min)/(max-min)+vMin
-    onVMaxChanged: updateX(value)
-    onVMinChanged: updateX(value)
+    onVMaxChanged: {updateX(value);updateY(value)}
+    onVMinChanged: {updateX(value);updateY(value)}
 
     //onYMaxChanged: updateYZoom()
     //onYMinChanged: updateYZoom()
@@ -81,11 +81,11 @@ Rectangle{
 
     }
 
-    function updateY(yval)
-    {
+    function updateY(xval)
+    {//aggiorna l'altezza del marker in funzione della traccia a cui è associato
         if (modM.type === "Analytical")
         {
-            var pos = yval*modM.nas
+            var pos = xval*modM.nas
             pos = pos.toFixed(0)
             var valPer=(modM.valuesY[pos])/(yMax - yMin)
             linea.height = (lineLength*valPer)

@@ -11,6 +11,8 @@ QML_IMPORT_PATH +=  ../Build/CommonPlugin\
 DEFINES += QT_MESSAGELOGCONTEXT
 #debug campioni di acquisizione
 DEFINES += DEBUG_ACQ
+
+
 # The .cpp file which was generated for your project. Feel free to hack it.
 SOURCES += main.cpp \
     CPP/parametermanager.cpp \
@@ -109,8 +111,6 @@ unix:!macx: LIBS += -L$$PWD/../Build/Emulator/DataBuild/ -lDatafileManager
 
 }
 
-
-
 #percorso tecnoideal
 #rootPath = M:
 #percorso acer luca
@@ -137,3 +137,17 @@ unix:!macx: LIBS += -L$$PWD/../Build/DataFileManager/ -lDatafileManager
 
 INCLUDEPATH += $$PWD/../Build/DataFileManager
 DEPENDPATH += $$PWD/../Build/DataFileManager
+
+
+#tastiera virutuale
+CONFIG += link_pkgconfig
+
+#linux-buildroot-g++ {
+#    deployment.files = *.qml *.otf *.ttf *.svg
+#    target.path = /vktest
+#    deployment.path = /vktest
+#    INSTALLS += target deployment
+#} else {
+    target.path = $$[QT_INSTALL_PLUGINS]/virtualkeyboard
+    INSTALLS += target
+#}
