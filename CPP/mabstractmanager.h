@@ -14,7 +14,8 @@
 #include "alarmmanager.h"
 #include "p7settingsmanager.h"
 #include "QtGlobal"
-
+//classe per unità di misura
+#include "UDMImpl.h"
 
 class MAbstractManager : public QObject
 {

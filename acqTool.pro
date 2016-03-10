@@ -37,7 +37,8 @@ SOURCES += main.cpp \
     CPP/manatablemodel.cpp \
     CPP/nomogramma.cpp \
     CPP/printermanager.cpp \
-    CPP/printerserialport.cpp
+    CPP/printerserialport.cpp \
+    ../MGlobal/UdMImpl.cpp
 
 
 HEADERS += \
@@ -61,7 +62,8 @@ HEADERS += \
     CPP/manatablemodel.h \
     CPP/nomogramma.h \
     CPP/printermanager.h \
-    CPP/printerserialport.h
+    CPP/printerserialport.h \
+    ../MGlobal/UDMImpl.h
 
 
 SOURCES += ../AnaUro/anauro.cpp \
@@ -126,8 +128,8 @@ win32{
     plugin.files += $$shell_path($$OUT_PWD)\release\acqTool.exe
     INSTALLS += plugin
 
-win32:CONFIG(release, debug|release): LIBS += -L$$PWD/../Build/DataBuild/release/ -lDatafileManager1
-else:win32:CONFIG(debug, debug|release): LIBS += -L$$PWD/../Build/DataBuild/debug/ -lDatafileManager1
+win32:CONFIG(release, debug|release): LIBS += -L$$PWD/../Build/DataBuild/release/ -lDatafileManager
+else:win32:CONFIG(debug, debug|release): LIBS += -L$$PWD/../Build/DataBuild/debug/ -lDatafileManager
 
 INCLUDEPATH += $$PWD/../Build/DataBuild/release
 DEPENDPATH += $$PWD/../Build/DataBuild/release

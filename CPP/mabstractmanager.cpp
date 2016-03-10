@@ -1,5 +1,7 @@
 #include "mabstractmanager.h"
 #include "QApplication"
+
+
 MAbstractManager::MAbstractManager(QObject *parent) : QObject(parent)
 {
     m_applicationPath=QApplication::applicationDirPath();
@@ -339,12 +341,6 @@ bool MAbstractManager::buildConfigurationFile()
 
     }
 
-//    QString curfile = plotConfigFileName();
-//    if (QFile(curfile).exists())
-//    {   //il file già c'è e non va creato uno nuovo ma usiamo quello esistente
-//        return true;
-//    }
-
     //scriviamo un file di configurazione che poi l'utente potrà modificare a suo gusto
     Ancestry configPlot;
     //aggiungo il campo graphs
@@ -377,12 +373,11 @@ bool MAbstractManager::buildConfigurationFile()
         foreach (Ancestry *channel, channels->getChildren())
         {
             if(channel->getChild(XML_NAME)!=NULL)
-                if(chanName.contains(channel->getTextOfChild(XML_NAME))){
-                    //         if ((channel->getChild(XML_UDM))->getAttribute("ID")== QString::number(m_mng->GetUdM(nc)))
-                    //         {
-                    udm = channel->getTextOfChild(XML_UDM);
-                    //             break;
-                    //        }
+                if(chanName.contains(channel->getTextOfChild(XML_NAME).left(1)))
+                {
+                    QString udmID = (channel->getChild(XML_UDM))->getAttribute("ID");
+                    udm = UDMUtil.toString(udmID.toInt());
+                    break;
                 }
         }
 
