@@ -19,13 +19,6 @@ MForm{
     visible:whoIsVisilbe===name?true:false
 
     //@@@@@@@@@@    Functions       @@@@@@@@@@
-    function openFile(file)
-    {
-        mngData.loadFile(file)
-        plot.setAbsXmin(mngData.getStartTime())
-        plot.setAbsXmax(mngData.getEndTime())
-    }
-
     function populate()
     {
         plot.tracks=mngData.getData("Track")
@@ -40,6 +33,7 @@ MForm{
         mngData.registerModel("Track",traMod.strList)
         mngData.registerModel("Marker",marMod.strList)
         mngData.registerModel("Definer",fraMod.strList)
+
     }
 
     function save(pointer)
@@ -72,12 +66,12 @@ MForm{
         //@@@@@@@@@@    Properties      @@@@@@@@@@
         id: plot
         clip:true
-        anchors.bottom: parent.bottom
+        anchors.top: parent.top
         anchors.left: parent.left
         anchors.right: gridComand.left
        // anchors.right: box.left
         Behavior on width {NumberAnimation { duration: 1000 }}
-        height: rootAna.height// - 30
+        height: rootAna.height - 15
         plotProp:mngCon.plotSetting
 
         //@@@@@@@@@@    Events          @@@@@@@@@@
@@ -92,6 +86,56 @@ MForm{
 //                plot.markers=mngData.getData("Marker")
 //                plot.frames=mngData.getData("Definer")
             }
+        }
+        onToZoomChanged:
+        {
+            var startTime = mngData.getStartTime()
+            var endTime = mngData.getEndTime()
+            var numSec = (endTime - startTime)/2
+
+            var pageSize
+            if (toZoom > oldToZoom){
+                pageSize = scroolBar.pageSize - (1/numSec)
+                if (pageSize < 0)
+                    pageSize = 0
+                scroolBar.pageSize = pageSize
+            }
+            if (toZoom < oldToZoom){
+                    pageSize = scroolBar.pageSize + (1/numSec)
+                    var LimitSx,LimitDx
+                    LimitSx = (scroolBar.position * (scroolBar.width-2) + 1 - scroolBar.barW/2)
+                    LimitDx = LimitSx + (scroolBar.pageSize * (scroolBar.width-2))
+                    if (LimitSx <= 0){
+                        scroolBar.position += (0-LimitSx)/(scroolBar.width-2)//0.0075
+                        pageSize = scroolBar.pageSize + (1/numSec)/2
+                    }
+
+                    if (LimitDx >= scroolBar.width-2){
+                        scroolBar.position -= (LimitDx - scroolBar.width-2)/(scroolBar.width-2)
+                        pageSize = scroolBar.pageSize + (1/numSec)/2//0.015
+                    }
+                    if (pageSize > 1)
+                        pageSize = 1
+                    scroolBar.pageSize = pageSize
+            }
+            if (toZoom === 0 && oldToZoom === 0){
+                scroolBar.pageSize = 1.0
+                scroolBar.position = 0.5
+            }
+        }
+    }
+
+    MScroolBar{
+        id: scroolBar
+        clip:true
+        anchors.top:plot.bottom
+        anchors.bottom: parent.bottom
+        anchors.right: gridComand.left
+        anchors.left: parent.left
+        onMoved: {
+            var moved = scroolBar.step
+            plot.movingZoom = moved
+            //console.log("onmoved ",moved)
         }
     }
 
@@ -127,7 +171,6 @@ MForm{
                 mngData.loadFile(fileUrl)
                 plot.setAbsXmin(mngData.getStartTime())
                 plot.setAbsXmax(mngData.getEndTime())
-
                 break;
 
             case "mngCon":

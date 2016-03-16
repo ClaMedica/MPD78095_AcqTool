@@ -1,9 +1,12 @@
 import QtQuick 2.0
 import MPlotModule 1.0
+import QtQuick.Controls 1.4
 import "Tools"
 import "Models"
 //da decommentare per debug con Test
 //import QuickRealTimeGraph 1.0
+
+
 Rectangle {
 
     property string name: modP.name
@@ -43,6 +46,7 @@ Rectangle {
     //zoom
     property int toZoom:0
     property int oldToZoom:0
+    property real movingZoom:0
 
     id: rootPlot
 
@@ -51,16 +55,20 @@ Rectangle {
     function setAYmin(y){zoomer.yAbsoluteMin=y;zoomer.checkLimits();zoomer.restore();}
     function setAYmax(y){zoomer.yAbsoluteMax=y;zoomer.checkLimits();zoomer.restore();}
 
+    onMovingZoomChanged:
+    {
+        zoomer.state = "idle"
+        zoomer.zoomMovingBar(movingZoom)
+    }
+
     onToZoomChanged: {
         zoomer.state = "idle"
         if (toZoom > oldToZoom)
             zoomer.zoomButton(0.5)
         if (toZoom < oldToZoom)
             zoomer.zoomButton(-0.5)
-        if (toZoom === 0 && oldToZoom === 0){
+        if (toZoom === 0 && oldToZoom === 0)
             zoomer.restore()
-
-        }
     }
 
     onXMaxChanged:
@@ -302,10 +310,12 @@ Rectangle {
         clip: true
     }
 
+
+
     DHAxes{  //X AXIS LABELS
         id: xAxisLabels
         color:"transparent"
-        anchors.bottom: parent.bottom
+        anchors.bottom: rootPlot.bottom
         anchors.top: xAxisNotches.bottom
         anchors.right: parent.right
         anchors.left: parent.left
@@ -436,20 +446,20 @@ Rectangle {
         }
 
         //cursore Y
-        MCursorY
-        {
-            id:horMark
+//        MCursorY
+//        {
+//            id:horMark
 
-            visible: true
-            min:2
-            max:rCenter.height-2
-            lineLength: rCenter.width
-            vMax:plotter.yMax
-            vMin:plotter.yMin
-            colore:"green"
-            anchors.left: rCenter.left
-            value: 0
-        }
+//            visible: true
+//            min:2
+//            max:rCenter.height-2
+//            lineLength: rCenter.width
+//            vMax:plotter.yMax
+//            vMin:plotter.yMin
+//            colore:"green"
+//            anchors.left: rCenter.left
+//            value: 0
+//        }
 
         //cursore tempo
         MCursorX{
@@ -528,7 +538,6 @@ Rectangle {
 
 
 
-
         Keys.onPressed: {
 
             switch(event.key)
@@ -549,8 +558,8 @@ Rectangle {
 
     }
 
-}
 
+}
 
 
 

@@ -87,7 +87,7 @@ MForm{
         anchors.bottom: parent.bottom
         anchors.left: parent.left
         anchors.right: grid.left
-        height: root.height - 30 - alarmBox.height
+        height: root.height - alarmBox.height
         plotProp:mngCon.plotSetting
         Behavior on width {NumberAnimation { duration: 1000 }}
 
@@ -202,64 +202,64 @@ MForm{
     }
 
 
-    MMenuBar {
-        //@@@@@@@@@@    Properties      @@@@@@@@@@
-        id: forReaMenu
-        anchors.top: parent.top
-        color: "transparent"
-        height: root.height
-        width: root.width
-        opacity: rootRealTime.opacity
-        theme:"green"
-        items: [
-            ["Acquisition","Start",qsTr("Exit without saving"),qsTr("Exit and save"),qsTr("Exit, save and review")],
-            ["Add","Marker","Start Definer","Stop Definer"],
-            ["Plot","Properties"]
-        ]
+//    MMenuBar {
+//        //@@@@@@@@@@    Properties      @@@@@@@@@@
+//        id: forReaMenu
+//        anchors.top: parent.top
+//        color: "transparent"
+//        height: root.height
+//        width: root.width
+//        opacity: rootRealTime.opacity
+//        theme:"green"
+//        items: [
+//            ["Acquisition","Start",qsTr("Exit without saving"),qsTr("Exit and save"),qsTr("Exit, save and review")],
+//            ["Add","Marker","Start Definer","Stop Definer"],
+//            ["Plot","Properties"]
+//        ]
 
-        //@@@@@@@@@@    Events          @@@@@@@@@@
-        onSelected: {
-            if (itemClicked == "Start") {
-                editName.owner="NewAcq"
-                editName.visible=true
-                box.popola()
-            }
-            if (itemClicked === qsTr("Exit without saving")) {
-                mngAcq.sendStopAcq()
-                plot.stopAll()
-                mngAcq.endAcquisition("TEST_DISCARD")
-                timClose.start(1000);
-            }
-            if (itemClicked === qsTr("Exit and save")) {
-                mngAcq.sendStopAcq()
-                plot.stopAll()
-                mngAcq.endAcquisition("TEST_SAVE")
-                timClose.start(1000);
-            }
-            if (itemClicked === qsTr("Exit, save and review")) {
-                mngAcq.sendStopAcq()
-                plot.stopAll()
-                mngAcq.endAcquisition("TEST_SAVE")
-                var arg=[]
-                arg[0]=Qt.application.arguments[0]
-                arg[1]="vis"
-                arg[2]=Qt.application.arguments[2]
-                arg[3]=Qt.application.arguments[3]
-                console.log("Lancioooo",arg[1])
-                launch(arg)
-            }
+//        //@@@@@@@@@@    Events          @@@@@@@@@@
+//        onSelected: {
+//            if (itemClicked == "Start") {
+//                editName.owner="NewAcq"
+//                editName.visible=true
+//                box.popola()
+//            }
+//            if (itemClicked === qsTr("Exit without saving")) {
+//                mngAcq.sendStopAcq()
+//                plot.stopAll()
+//                mngAcq.endAcquisition("TEST_DISCARD")
+//                timClose.start(1000);
+//            }
+//            if (itemClicked === qsTr("Exit and save")) {
+//                mngAcq.sendStopAcq()
+//                plot.stopAll()
+//                mngAcq.endAcquisition("TEST_SAVE")
+//                timClose.start(1000);
+//            }
+//            if (itemClicked === qsTr("Exit, save and review")) {
+//                mngAcq.sendStopAcq()
+//                plot.stopAll()
+//                mngAcq.endAcquisition("TEST_SAVE")
+//                var arg=[]
+//                arg[0]=Qt.application.arguments[0]
+//                arg[1]="vis"
+//                arg[2]=Qt.application.arguments[2]
+//                arg[3]=Qt.application.arguments[3]
+//                console.log("Lancioooo",arg[1])
+//                launch(arg)
+//            }
 
-            if (itemClicked == "Properties")
-            {
-                //box.ready=false
-                box.width=parent.width/2
+//            if (itemClicked == "Properties")
+//            {
+//                //box.ready=false
+//                box.width=parent.width/2
 
-                //box.popola()
-                //box.ready=true
-            }
+//                //box.popola()
+//                //box.ready=true
+//            }
 
-        }
-    }
+//        }
+//    }
 
     MPopUp{
         id:pop

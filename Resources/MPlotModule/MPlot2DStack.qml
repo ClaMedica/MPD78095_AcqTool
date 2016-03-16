@@ -24,6 +24,7 @@ Rectangle{
 
     property int toZoom:0
     property int oldToZoom:0
+    property real movingZoom:0
 
     color:"transparent"
 
@@ -238,7 +239,6 @@ Rectangle{
         property bool completed:false
         property int con:-1
         property int toZoom:0
-
         anchors.fill:rootPlotStack
         model:plotNumber
         delegate:MPlot2D{
@@ -246,6 +246,7 @@ Rectangle{
             clip:true
             toZoom: rootPlotStack.toZoom
             oldToZoom: rootPlotStack.oldToZoom
+            movingZoom: rootPlotStack.movingZoom
             y:index*rootPlotStack.height/plotNumber
             height:rootPlotStack.height/plotNumber
             width:rootPlotStack.width

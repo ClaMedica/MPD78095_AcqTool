@@ -180,7 +180,7 @@ ApplicationWindow {
         id: inputPanelNumeric
         z: 99
         y: parent.height
-        anchors.left: parent.left - (parent.left/2)
+        anchors.left: parent.left
         anchors.right: parent.right
        // visible: false
         states: State {

@@ -72,6 +72,8 @@ Rectangle {
             preview.yMin=yAbsoluteMin
         if(preview.yMax>yAbsoluteMax || preview.yMin>preview.yMax || isNaN(preview.yMax))
             preview.yMax=yAbsoluteMax
+        if(preview.xMin >= (preview.xMax -1))
+            return
         //applico le modifiche
         xMin=preview.xMin
         xMax=preview.xMax
@@ -169,6 +171,14 @@ Rectangle {
     {
         preview.xMin=xMin + inc
         preview.xMax=xMax - inc
+        checkLimits()
+    }
+    function zoomMovingBar(perc)
+    {
+       // var inc = perc*rootZoom.width
+        var inc = (xMax-xMin)*perc
+        preview.xMin=xMin + inc
+        preview.xMax=xMax + inc
         checkLimits()
     }
 
