@@ -15,7 +15,8 @@ MForm{
 
     //@@@@@@@@@@    Properties      @@@@@@@@@@
     id : rootAna
-    background:"qrc:/Images/Analysis"
+    anchors.fill: parent.fill
+    //background:"qrc:/Images/Analysis"
     visible:whoIsVisilbe===name?true:false
 
     //@@@@@@@@@@    Functions       @@@@@@@@@@
@@ -33,7 +34,6 @@ MForm{
         mngData.registerModel("Track",traMod.strList)
         mngData.registerModel("Marker",marMod.strList)
         mngData.registerModel("Definer",fraMod.strList)
-
     }
 
     function save(pointer)
@@ -70,7 +70,7 @@ MForm{
         anchors.left: parent.left
         anchors.right: gridComand.left
        // anchors.right: box.left
-        Behavior on width {NumberAnimation { duration: 1000 }}
+      //  Behavior on width {NumberAnimation { duration: 1000 }}
         height: rootAna.height - 15
         plotProp:mngCon.plotSetting
 
@@ -141,121 +141,121 @@ MForm{
 
     //@@@@@@@@@@--- Dialogs and Selectors@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@------
 
-    MDialog{
-        //@@@@@@@@@@    Properties      @@@@@@@@@@
-        id:plotDial
-        anchors.centerIn: plot
-        width: plot.width*0.8
-        height: plot.height*0.8
-        dataList: mngData.availableData
-        plotList: mngCon.plotList
-        trackList: mngData.availableTracks
+//    MDialog{
+//        //@@@@@@@@@@    Properties      @@@@@@@@@@
+//        id:plotDial
+//        anchors.centerIn: plot
+//        width: plot.width*0.8
+//        height: plot.height*0.8
+//        dataList: mngData.availableData
+//        plotList: mngCon.plotList
+//        trackList: mngData.availableTracks
 
-        //@@@@@@@@@@    Events          @@@@@@@@@@
-        onReady:{mngData.infoList=news;populate()}
-    }
+//        //@@@@@@@@@@    Events          @@@@@@@@@@
+//        onReady:{mngData.infoList=news;populate()}
+//    }
 
-    FileDialog{
-        //@@@@@@@@@@    Definitions     @@@@@@@@@@
-        property string owner:"none"
+//    FileDialog{
+//        //@@@@@@@@@@    Definitions     @@@@@@@@@@
+//        property string owner:"none"
 
-        //@@@@@@@@@@    Properties      @@@@@@@@@@
-        id: fileDial
+//        //@@@@@@@@@@    Properties      @@@@@@@@@@
+//        id: fileDial
 
-        //@@@@@@@@@@    Events          @@@@@@@@@@
-        onAccepted:
-        {
-            switch(owner)
-            {
-            case "mngData":
-                mngData.loadFile(fileUrl)
-                plot.setAbsXmin(mngData.getStartTime())
-                plot.setAbsXmax(mngData.getEndTime())
-                break;
+//        //@@@@@@@@@@    Events          @@@@@@@@@@
+//        onAccepted:
+//        {
+//            switch(owner)
+//            {
+//            case "mngData":
+//                mngData.loadFile(fileUrl)
+//                plot.setAbsXmin(mngData.getStartTime())
+//                plot.setAbsXmax(mngData.getEndTime())
+//                break;
 
-            case "mngCon":
-                mngCon.fileName=fileUrl
-                mngCon.read()
-                break;
-            default:console.log("Should Not Be Here!",owner);break;
+//            case "mngCon":
+//                mngCon.fileName=fileUrl
+//                mngCon.read()
+//                break;
+//            default:console.log("Should Not Be Here!",owner);break;
 
-            }
-        }
-    }
+//            }
+//        }
+//    }
 
-    MNewName{
-        //@@@@@@@@@@    Properties      @@@@@@@@@@
-        id:editName
-        height: 100
-        width:300
-        anchors.centerIn: parent
-        owner:""
+//    MNewName{
+//        //@@@@@@@@@@    Properties      @@@@@@@@@@
+//        id:editName
+//        height: 100
+//        width:300
+//        anchors.centerIn: parent
+//        owner:""
 
-        //@@@@@@@@@@    Events          @@@@@@@@@@
-        onSelected: {
-            //a seconda di chi lo sta usando decido cosa fare
-            switch(owner)
-            {
-            case "NewObj": mngData.addCustomObj(selector.preSelectedElements,curText,type);plotDial.visible=true;break;
-            default:break;
-            }
-            visible=false
+//        //@@@@@@@@@@    Events          @@@@@@@@@@
+//        onSelected: {
+//            //a seconda di chi lo sta usando decido cosa fare
+//            switch(owner)
+//            {
+//            case "NewObj": mngData.addCustomObj(selector.preSelectedElements,curText,type);plotDial.visible=true;break;
+//            default:break;
+//            }
+//            visible=false
 
-        }
-    }
+//        }
+//    }
 
-    MListSelector{
-        //@@@@@@@@@@    Properties      @@@@@@@@@@
-        id:selector
-        height: 300
-        width:300
-        anchors.centerIn: parent
-        owner:""
+//    MListSelector{
+//        //@@@@@@@@@@    Properties      @@@@@@@@@@
+//        id:selector
+//        height: 300
+//        width:300
+//        anchors.centerIn: parent
+//        owner:""
 
-        //@@@@@@@@@@    Events          @@@@@@@@@@
-        onOwnerChanged:
-        {
-            //a seconda di chi lo controlla decido come riempirlo
-            switch(owner)
-            {
-            case "audioPlayer": elements=audioPlayer.fileList();    break;
-            case "dopAna":      elements=mngData.availableTracks;   break;
-            case "family":      elements=mngData.getLinks("Families");
-                enableNew=false;
-                break;
-            case "name":        enableNew=true;break;
-            default:break;
-            }
-        }
-        onSelected: {
-            //a seconda di chi lo sta usando decido cosa fare
-            switch(owner)
-            {
-            //case "dopAna":      dopAna.currentSignal=mngData.getSignal(curText);      owner="";break;
-            case "family":
-                title="Choose or create an element"
-                elements=mngData.getLinks("Names",selectedElements,type);
-                //mngData.addCustomObj(choices,type);
-                //plotDial.visible=true;
-                owner="name";break;
-            default:break;
-            }
+//        //@@@@@@@@@@    Events          @@@@@@@@@@
+//        onOwnerChanged:
+//        {
+//            //a seconda di chi lo controlla decido come riempirlo
+//            switch(owner)
+//            {
+//            case "audioPlayer": elements=audioPlayer.fileList();    break;
+//            case "dopAna":      elements=mngData.availableTracks;   break;
+//            case "family":      elements=mngData.getLinks("Families");
+//                enableNew=false;
+//                break;
+//            case "name":        enableNew=true;break;
+//            default:break;
+//            }
+//        }
+//        onSelected: {
+//            //a seconda di chi lo sta usando decido cosa fare
+//            switch(owner)
+//            {
+//            //case "dopAna":      dopAna.currentSignal=mngData.getSignal(curText);      owner="";break;
+//            case "family":
+//                title="Choose or create an element"
+//                elements=mngData.getLinks("Names",selectedElements,type);
+//                //mngData.addCustomObj(choices,type);
+//                //plotDial.visible=true;
+//                owner="name";break;
+//            default:break;
+//            }
 
-        }
-        onNuovo: {
-            switch(owner)
-            {
-            case "name":
-                editName.owner="NewObj"
-                editName.type=type
-                editName.setDefText("New Name")
-                editName.visible=true
-                owner="";
-                break;
-            }
-        }
+//        }
+//        onNuovo: {
+//            switch(owner)
+//            {
+//            case "name":
+//                editName.owner="NewObj"
+//                editName.type=type
+//                editName.setDefText("New Name")
+//                editName.visible=true
+//                owner="";
+//                break;
+//            }
+//        }
 
-    }
+//    }
 
     //Models
 
@@ -326,7 +326,7 @@ MForm{
         anchors.right: gridMarker.left
         anchors.top: parent.top
         anchors.bottom: parent.bottom
-        width:50
+        width:0
         owner:"Definers"
         itemsInRow:1
         delegate: MMarkerButton{}
@@ -353,14 +353,26 @@ MForm{
         anchors.right: gridDefiners.left
         anchors.top: parent.top
         anchors.bottom: parent.bottom
-        width:50
+        width:60
         owner:"Commands"
         itemsInRow:1
         delegate: MMarkerButton{}
         visible:true
 
+        onTooltipActived:
+        {
+            if (testo === "")
+                toolTip.visible = false
+            else
+            {
+                toolTip.y = posY
+                toolTip.text = testo
+                toolTip.visible = true
+            }
+        }
 
         //@@@@@@@@@@    Events          @@@@@@@@@@
+
         onClicked:
         {
             switch(owner)
@@ -368,6 +380,7 @@ MForm{
             case "Commands":
                 if (value === "111")
                     mngData.analysis();
+
                 if (value === "112") {
                     mngData.saveChanges()
                     mngData.exitFromReview()
@@ -386,12 +399,37 @@ MForm{
                     //zoom none
                     plot.oldToZoom = 0
                     plot.toZoom = 0
-                    console.log("115")
                 }
                 break;
             }
         }
     }
+
+
+
+    Rectangle{
+        property string text: ""
+        id: toolTip
+        width: toolTipText.width + 4
+        height: toolTipText.height + 4
+        anchors.horizontalCenter: gridComand.horizontalCenter
+        y: 0
+        color: "whitesmoke"
+        border.color: "blue"
+        visible:false
+        Text{
+            //@@@@@@@@@@    Properties      @@@@@@@@@@
+            id:toolTipText
+            color:"blue"
+            font.family: "Courier 8 Pitch"
+            font.bold: false
+            font.pixelSize:12
+            text:toolTip.text
+            horizontalAlignment : Text.AlignHCenter
+            verticalAlignment: Text.AlignVCenter
+        }
+    }
+
 
     //@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@-
 //    MMenuBar {

@@ -256,7 +256,7 @@ QVariantList MAbstractManager::commandsInfo()
 
     //salva e chiudi
     list<<"$GridElement";
-    list<<"descr"<<tr("save");
+    list<<"descr"<<tr("save&exit");
     rootURL="file:///"+m_applicationPath+"/Icone/";
     list<<"img"<<rootURL+"salvaChiudi";
     list<<"key"<<112;
@@ -265,7 +265,7 @@ QVariantList MAbstractManager::commandsInfo()
 
     //zoom in
     list<<"$GridElement";
-    list<<"descr"<<tr("save");
+    list<<"descr"<<tr("zoom in");
     rootURL="file:///"+m_applicationPath+"/Icone/";
     list<<"img"<<rootURL+"zoom";
     list<<"key"<<113;
@@ -274,7 +274,7 @@ QVariantList MAbstractManager::commandsInfo()
 
     //zoom out
     list<<"$GridElement";
-    list<<"descr"<<tr("save");
+    list<<"descr"<<tr("zoom out");
     rootURL="file:///"+m_applicationPath+"/Icone/";
     list<<"img"<<rootURL+"zoom_out";
     list<<"key"<<114;
@@ -283,7 +283,7 @@ QVariantList MAbstractManager::commandsInfo()
 
     //zoom none
     list<<"$GridElement";
-    list<<"descr"<<tr("save");
+    list<<"descr"<<tr("zoom none");
     rootURL="file:///"+m_applicationPath+"/Icone/";
     list<<"img"<<rootURL+"zoom_none";
     list<<"key"<<115;

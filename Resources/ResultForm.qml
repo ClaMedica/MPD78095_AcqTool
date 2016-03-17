@@ -15,6 +15,7 @@ Rectangle {
     property var pagesLocal:[]
     property var pagesSameAna:[]
 
+    property int buttonTable:0
     id : resultForm
     width : forAna.width
     height : forAna.height
@@ -49,7 +50,7 @@ Rectangle {
             var rectf = Qt.createQmlObject('import QtQuick 2.5; Rectangle {}',this)
             rectf.width = 640//forAna.width - 200
             rectf.height = 480 //forAna.height
-            rectf.color = "steelblue"
+            rectf.color = "transparent"
             rectf.border.color = "blue"
             rectf.border.width = 2
             rectf.anchors.right = resultForm.right
@@ -90,8 +91,8 @@ Rectangle {
                 var rectdata = Qt.createQmlObject('import QtQuick 2.5; Rectangle {}',rectf)
                 rectdata.width = 480
                 rectdata.height = 480
-                rectdata.color = "steelblue"
-                rectdata.border.color = "red"
+                rectdata.color = "transparent"
+                rectdata.border.color = "transparent"
                 rectdata.border.width = 2
                 rectdata.anchors.left = rectf.left
                 rectdata.anchors.top = rectf.top
@@ -116,6 +117,7 @@ Rectangle {
                 buttonT.anchors.leftMargin = btnLeftMargin
                 buttonT.myText = qsTr("Table")
                 buttonT.clicked.connect(clickButton)
+                resultForm.buttonTable = buttonT.buttonId
                 // btnLeftMargin += 110
                 pagesLocal[pagesLocal.length] = tablefn
 
@@ -160,12 +162,12 @@ Rectangle {
                 nameNomo = mngData.getFlowDatas(1).getLiverpoolAve().getTitle()
                 var LQA =  Qt.createQmlObject('import "qrc:/Components"; MNomogramma {}', rectdata)
                 LQA.clip = true
-                LQA.height = 250
-                LQA.width = 380
+                LQA.height = 300
+                LQA.width = 450
                 LQA.anchors.left = rectdata.left
                 LQA.anchors.top = rectdata.top
                 LQA.anchors.topMargin = 20
-                LQA.anchors.leftMargin = 50
+                LQA.anchors.leftMargin = 20
                 LQA.xMin = mngData.getFlowDatas(i).getLiverpoolAve().getXmin()
                 LQA.xMax = mngData.getFlowDatas(i).getLiverpoolAve().getXmax()
                 LQA.yMin = mngData.getFlowDatas(i).getLiverpoolAve().getYmin()
@@ -198,12 +200,12 @@ Rectangle {
                 {
                     var SQM =  Qt.createQmlObject('import "qrc:/Components"; MNomogramma {}', rectdata)
                     SQM.clip = true
-                    SQM.height = 250
-                    SQM.width = 380
+                    SQM.height = 300
+                    SQM.width = 450
                     SQM.anchors.left = rectdata.left
                     SQM.anchors.top = rectdata.top
                     SQM.anchors.topMargin = 20
-                    SQM.anchors.leftMargin = 50
+                    SQM.anchors.leftMargin = 20
                     SQM.xMin = mngData.getFlowDatas(i).getSirokyMax().getXmin()
                     SQM.xMax = mngData.getFlowDatas(i).getSirokyMax().getXmax()
                     SQM.yMin = mngData.getFlowDatas(i).getSirokyMax().getYmin()
@@ -240,12 +242,12 @@ Rectangle {
 
                     var SQA =  Qt.createQmlObject('import "qrc:/Components"; MNomogramma {}', rectdata)
                     SQA.clip = true
-                    SQA.height = 250
-                    SQA.width = 380
+                    SQA.height = 300
+                    SQA.width = 450
                     SQA.anchors.left = rectdata.left
                     SQA.anchors.top = rectdata.top
                     SQA.anchors.topMargin = 20
-                    SQA.anchors.leftMargin = 50
+                    SQA.anchors.leftMargin = 20
                     SQA.xMin = mngData.getFlowDatas(i).getSirokyAve().getXmin()
                     SQA.xMax = mngData.getFlowDatas(i).getSirokyAve().getXmax()
                     SQA.yMin = mngData.getFlowDatas(i).getSirokyAve().getYmin()
@@ -295,8 +297,9 @@ Rectangle {
         anchors.bottomMargin: 10
         anchors.rightMargin: 10
         onClicked: {
+            clickButton(resultForm.buttonTable)
             forAna.visible = true
-            resultForm.visible = false
+            resultForm.visible = false            
         }
     }
 }

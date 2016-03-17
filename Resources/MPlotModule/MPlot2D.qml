@@ -136,7 +136,6 @@ Rectangle {
             var index=0
             var trackIndex=0
 
-
             for(var i=0;i<traksToDraw.length;i++)
             {
                 if(traksToDraw[i]==="$Track")
@@ -215,7 +214,7 @@ Rectangle {
         id:plotTitle
         anchors.bottom: parent.bottom
         anchors.top: parent.top
-        width:5
+      //  width:5
         anchors.left: parent.left
 
 //        gradient: Gradient {

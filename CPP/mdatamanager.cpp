@@ -18,7 +18,7 @@ MDataManager::MDataManager(QObject *parent)
     m_analized = false;
     m_autoPrint = false;
     m_numAna = 0;
-    m_toSave = "";
+    m_toSave = "ret";
     setValVolRes(-999);
 }
 
@@ -741,6 +741,8 @@ bool MDataManager::changeObject(QVariantList __curObj)
     //qDebug()<<"Cambio un elemento con queste caratteristiche :"<<__curObj;
     if(__curObj.length()!=2)
     {
+        setToSave("");//necessario chiedere se salvare
+
         qulonglong whoAmI=__curObj.first().toULongLong();
         //tolgo il whoami e lascio solo le proprietÃ
         __curObj.removeFirst();
@@ -811,6 +813,9 @@ bool MDataManager::saveDataAndUpdate(QString __family, QString __name, VarMapVec
 
 void MDataManager::exitFromReview()
 {
+    if (getToSave() == "ret")
+        exit(0); // dovrà tornare al modulo database
+
     if (getToSave() == "")
         emit sg_exitFromReview();
     else
@@ -914,6 +919,7 @@ void MDataManager::analysis()
         return;
 
     saveChanges();
+    setToSave("");//necessario chiedere se salvare
 
     m_mng=new DatafileManager;
     m_mng->SetFileName(m_fileName);
@@ -1193,7 +1199,7 @@ void MDataManager::InitPageGraphs(int __anaType)
             unsigned char key = tempChar.toLatin1();
             if (key == MK_FLOWMETRY)
             {
-                evStart = curMap->value("xMin").toInt();
+                evStart = curMap->value("xMin").toInt()*1000;
                 evEnd = curMap->value("xMax").toInt()*1000;
                 evMarkOpIn = curMap;
                 evAuto = 1;
@@ -1508,6 +1514,8 @@ int MDataManager::ReadResult(int __numEv)
         return -1;
 
     __numEv = m_mng->readNumEv();
+
+    m_aflwdatas.clear();
 
     switch (StructType)
     {

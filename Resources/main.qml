@@ -18,14 +18,15 @@ ApplicationWindow {
     property string configFolder:settings.appPath()
     //@@@@@@@@@@    Properties      @@@@@@@@@@
     id: root
+    flags: Qt.FramelessWindowHint
     visible: true
 
-      width:platform==="android"?640:Screen.width*0.94
-        height:platform==="android"?480:Screen.height*0.94
+    width:platform==="android"?640:Screen.width//*0.94
+     height:platform==="android"?480:Screen.height//*0.94
 
 
-    //   width:640
-    //   height:480
+      // width:640
+      // height:480
     color:"steelblue"
 
     function launch(arguments)

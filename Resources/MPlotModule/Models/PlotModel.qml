@@ -97,7 +97,7 @@ ListModel {
     property real topMargin: 20
     property real bottomMargin: 30
     property real leftMargin: 80
-    property real rightMargin: 100    
+    property real rightMargin: 65
 
     //zoomer
     property real zoomSpeed:300

@@ -1,5 +1,6 @@
 import QtQuick 2.0
 import MPlotModule 1.0
+import QtQuick.Controls 1.4
  
 import "qrc:/Components"
 import "qrc:/Models"
@@ -14,6 +15,8 @@ Rectangle{
     property real zoom:0
     property var modello:[]
     signal click(var value)
+    signal tooltipActive(var testo, var posY)
+
     //@@@@@@@@@@    Properties      @@@@@@@@@@
     id:rootMarkerButton
     x:oriX-oriW/2*zoom
@@ -26,10 +29,10 @@ Rectangle{
     states:[
         State {name: "nul"; },
         State {name: "hov"; PropertyChanges{target: img; source: modM.img+img.ext }
-                            PropertyChanges{target: rootMarkerButton; zoom: 0.2}},
+                            PropertyChanges{target: rootMarkerButton; zoom: 0.2 }
+                            PropertyChanges{target: toolTip; font.pixelSize: 12}},
         State {name: "idl"; PropertyChanges{target: img; source: modM.img+img.ext }
-                            PropertyChanges{target: rootMarkerButton; zoom: 0}
-        },
+                            PropertyChanges{target: rootMarkerButton; zoom: 0}},
         State {name: "pre"; PropertyChanges{target: img; source: modM.img+"_click"+img.ext }
                             PropertyChanges{target: rootMarkerButton; zoom: 0.2}},
         State {name: "dis"; PropertyChanges{target: img; source: modM.img+"_off"+img.ext } },
@@ -80,21 +83,24 @@ Rectangle{
         radius:parent.width/2
     }
 
-//    Text{
-//        //@@@@@@@@@@    Properties      @@@@@@@@@@
-//        color:"black"
-//        font.family: "Courier 10 Pitch"
-//        font.bold: true
-//        font.pixelSize: 16
-//        anchors.top:img.bottom
-//        anchors.bottom: parent.bottom
+    Text{
+        //@@@@@@@@@@    Properties      @@@@@@@@@@
+        id:toolTip
+        color:"black"
+        font.family: "Courier 8 Pitch"
+        font.bold: false
+        font.pixelSize: 8
+        anchors.top:img.top
+
+        //        anchors.bottom: parent.bottom
 //        anchors.right: parent.right
-//        anchors.left: parent.left
-//        visible: type==="text"?true:false
-//        text:type==="text"?data:"M"
-//        horizontalAlignment : Text.AlignHCenter
-//        verticalAlignment: Text.AlignVCenter
-//    }
+//        anchors.left: parent.right
+        visible:false
+        text:modM.descr
+        horizontalAlignment : Text.AlignHCenter
+        verticalAlignment: Text.AlignVCenter
+    }
+
 
     MouseArea{
         //@@@@@@@@@@    Properties      @@@@@@@@@@
@@ -103,9 +109,15 @@ Rectangle{
         hoverEnabled: true
 
         //@@@@@@@@@@    Events          @@@@@@@@@@
-        onEntered:  {rootMarkerButton.state="hov"}
+        onEntered:  {
+            rootMarkerButton.state="hov"
+            tooltipActive(modM.descr,rootMarkerButton.y)
+        }
         onReleased: {rootMarkerButton.state="hov"}
-        onExited:   {rootMarkerButton.state="idl"}
+        onExited:    {
+            rootMarkerButton.state="idl"
+            tooltipActive("",rootMarkerButton.y)
+        }
         onPressed:  {rootMarkerButton.state="pre"}
         onClicked:  {rootMarkerButton.state="idl";click(modM.key)}
     }

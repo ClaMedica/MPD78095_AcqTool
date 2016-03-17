@@ -15,17 +15,13 @@ Rectangle{
     property var currentItem
     property var items:[]
     signal clicked(var value)
+    signal tooltipActived(var testo, var posY)
 
     //@@@@@@@@@@    Properties      @@@@@@@@@@
     id:rootGrid
     color:"lightgray"//Qt.rgba(1,1,0.5,1)
 
     //@@@@@@@@@@    Functions       @@@@@@@@@@
-    function display()
-    {
-        tim.start()
-    }
-
     function modify()
     {//modifico elemento per elemento
         //console.log("modify",it)
@@ -78,7 +74,7 @@ Rectangle{
     {//smista gli elementi
         var row=0
         var col=0
-        var w=rootGrid.width
+        var w=rootGrid.width - 10
         var n=itemsInRow
         var itemSize=(w/n)/(1+(n+1)*0.2/n)
         var d=itemSize*0.2
@@ -96,6 +92,7 @@ Rectangle{
             rep.itemAt(i).oriX=d+(d+itemSize)*col
             rep.itemAt(i).oriY=d+(d+itemSize)*row
             rep.itemAt(i).click.connect(clicked)
+            rep.itemAt(i).tooltipActive.connect(tooltipActived)
            // console.log("Elemento ",i,rep.itemAt(i).width,rep.itemAt(i).height,rep.itemAt(i).x,rep.itemAt(i).y)
             col++
         }
