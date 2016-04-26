@@ -293,6 +293,20 @@ QVariantList MAbstractManager::commandsInfo()
     return list;
 }
 
+QVariantList MAbstractManager::acqInfo()
+{
+    QVariantList list;
+    //salva e chiudi
+    list<<"$GridElement";
+    list<<"descr"<<tr("save&exit");
+    QString rootURL="file:///"+m_applicationPath+"/Icone/";
+    list<<"img"<<rootURL+"salvaChiudi";
+    list<<"key"<<112;
+    list<<"visible"<<true;
+    list<<"&GridElement";
+
+    return list;
+}
 bool MAbstractManager::load()
 {//in questa funzione inizializzo tutto caricando i file di configurazione fissi
     if(!m_configLocale.loadFromXML(":/Config/Config_Locale.xml"))

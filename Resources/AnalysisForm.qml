@@ -307,17 +307,17 @@ MForm{
 
 
         //@@@@@@@@@@    Events          @@@@@@@@@@
-//        onClicked:
-//        {
-//            switch(owner)
-//            {
-//            case "Marker":
-//                mngAcq.addMarker(value);
-//                //console.log(mngAcq.acqMarkers)
-//                plot.markers=mngAcq.acqMarkers;
-//                break;
-//            }
-//        }
+        onClicked:
+        {
+            switch(owner)
+            {
+            case "Marker":
+                mngAcq.addMarker(value);
+                //console.log(mngAcq.acqMarkers)
+                plot.markers=mngAcq.acqMarkers;
+                break;
+            }
+        }
     }
 
     MGridView{
