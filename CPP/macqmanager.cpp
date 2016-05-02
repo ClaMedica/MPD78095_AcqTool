@@ -219,7 +219,7 @@ void MAcqManager::endAcquisition(QString __exit)
                    <<channel->serverAddress().toString().toLatin1()
                   <<channel->serverPort();
     }
-    //delete m_mng;
+
     m_superProcess->close();
 
     m_mng=NULL;
@@ -393,9 +393,6 @@ bool MAcqManager::loadConnectivityInfo(Ancestry *__info)
     qDebug()<<"Loading connectivity info";
     //__info è sicuro
     Ancestry *tcp=__info->getSafeChild(XML_TCP);
-
-
-
     foreach (Ancestry *child, tcp->getChildren()) {
         QString name=child->name();
 
@@ -606,7 +603,8 @@ void MAcqManager::sendBuffersToPlot()
         foreach(QString chanName,m_chanInPlots[plotName]){
             int size=chanName.size();
             QString type,number;
-            for(int i=0;i<size;i++){
+            for(int i=0;i<size;i++)
+            {
                 if(chanName.at(i).isNumber())//se numero
                     number.append(chanName.at(i));
                 else

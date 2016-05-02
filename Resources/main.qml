@@ -21,12 +21,12 @@ ApplicationWindow {
     flags: Qt.FramelessWindowHint
     visible: true
 
-    width:platform==="android"?640:Screen.width//*0.94
-     height:platform==="android"?480:Screen.height//*0.94
+    //width:platform==="android"?640:Screen.width//*0.94
+    // height:platform==="android"?480:Screen.height//*0.94
 
 
-      // width:640
-      // height:480
+       width:640
+       height:480
     color:"steelblue"
 
     function launch(arguments)
@@ -48,6 +48,7 @@ ApplicationWindow {
                 forReal.configurationFile=mngAcq.plotConfigFileName()
                 forReal.displayMessage("Wait for inizialization...",-1)
                 forHome.whoIsVisilbe=forReal.name
+                forReal.setAcqInfo(mngData.acqInfo())
 
             }
             else if(arguments[1]==="vis")

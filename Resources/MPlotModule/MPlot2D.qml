@@ -125,8 +125,8 @@ Rectangle {
 
     border.width: 1
 
-    color: "whitesmoke"//Qt.rgba(0.1, 0.1, 0.1)
-    border.color: "black"
+    color: modP.backgroundColor
+    border.color: modP.borderColor
 
     onTraksToDrawChanged:{
 

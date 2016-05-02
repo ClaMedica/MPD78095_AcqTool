@@ -36,6 +36,12 @@ MForm{
         grid.items=info
     }
 
+    function setAcqInfo(info)
+    {
+        console.log(info)
+        gridAcq.items=info
+    }
+
     //@@@@@@@@@@    Events      @@@@@@@@@@
 
     //@@@@@@@@@@    Objects         @@@@@@@@@@
@@ -73,7 +79,7 @@ MForm{
         anchors.topMargin: 30
         anchors.top:parent.top
         anchors.left:parent.left
-        anchors.right:parent.right
+        anchors.right:grid.left
         alarms: mngAcq.alarms
 
         //@@@@@@@@@@    Events          @@@@@@@@@@
@@ -166,14 +172,14 @@ MForm{
     MGridView{
         //@@@@@@@@@@    Properties      @@@@@@@@@@
         id:grid
-        anchors.right: rootRealTime.right
-        anchors.top: alarmBox.bottom
+        anchors.right: gridAcq.left
+        anchors.top: parent.bottom
         anchors.bottom: parent.bottom
-        width:200
+        width:0
         owner:"Marker"
         itemsInRow:2
         delegate: MMarkerButton{}
-        visible:true
+        visible:false
 
 
         //@@@@@@@@@@    Events          @@@@@@@@@@
@@ -191,7 +197,36 @@ MForm{
     }
 
 
+    MGridView{
+        //@@@@@@@@@@    Properties      @@@@@@@@@@
+        id:gridAcq
+        anchors.right: parent.right
+        anchors.top: parent.top
+        anchors.bottom: parent.bottom
+        width:60
+        owner:"Acq"
+        itemsInRow:1
+        delegate: MMarkerButton{}
+        visible:true
 
+
+        //@@@@@@@@@@    Events          @@@@@@@@@@
+        onClicked:
+        {
+            switch(owner)
+            {
+            case "Acq":
+                if (value === "112") {
+                    mngAcq.sendStopAcq()
+                    plot.stopAll()
+                    mngAcq.endAcquisition("TEST_SAVE")
+                    timClose.start(1000);
+                }
+
+                break;
+            }
+        }
+    }
 
     Timer{
         //@@@@@@@@@@    Properties      @@@@@@@@@@

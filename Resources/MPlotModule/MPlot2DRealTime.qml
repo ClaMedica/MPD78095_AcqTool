@@ -319,7 +319,7 @@ Rectangle {
             lineLength: rCenter.width
             vMax:plotter.yMax
             vMin:plotter.yMin
-            colore:"white"
+            colore:"black"
             anchors.left: rCenter.left
             remoteControl: true
             lock:true

@@ -214,7 +214,7 @@ Rectangle{
 
     Text{
         id:label
-        color:"white"
+        color:"black"
         font.family: "Courier 10 Pitch"
         font.bold: true
         anchors.bottom:arrow.top

@@ -4,7 +4,7 @@ import MPlotModule 1.0
 ListModel {
     property string name:"Plot 1"
 
-    property color backgroundColor: "grey"
+    property color backgroundColor: "whitesmoke"
     property color borderColor: "black"
 
     property real xAbsoluteMax: 10

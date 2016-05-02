@@ -22,7 +22,7 @@ Rectangle {
         Text{
             anchors.horizontalCenter: parent.horizontalCenter
             anchors.verticalCenter: parent.verticalCenter
-            text:titleDlg
+            text:qsTr("close")
         }
 
         anchors.top: parent.top

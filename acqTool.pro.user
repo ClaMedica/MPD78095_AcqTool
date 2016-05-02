@@ -1,10 +1,10 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE QtCreatorProject>
-<!-- Written by QtCreator 3.5.0, 2016-02-09T15:31:18. -->
+<!-- Written by QtCreator 3.5.0, 2016-04-13T12:34:10. -->
 <qtcreator>
  <data>
   <variable>EnvironmentId</variable>
-  <value type="QByteArray">{61842fbc-cdd7-44ba-9804-487ce5ffc7cd}</value>
+  <value type="QByteArray">{80ae3d8a-af9b-48fa-b65d-975ce246ccd6}</value>
  </data>
  <data>
   <variable>ProjectExplorer.Project.ActiveTarget</variable>
@@ -58,21 +58,21 @@
  <data>
   <variable>ProjectExplorer.Project.Target.0</variable>
   <valuemap type="QVariantMap">
-   <value type="QString" key="ProjectExplorer.ProjectConfiguration.DefaultDisplayName">Desktop Qt 5.5.0 MinGW 32bit</value>
-   <value type="QString" key="ProjectExplorer.ProjectConfiguration.DisplayName">Desktop Qt 5.5.0 MinGW 32bit</value>
-   <value type="QString" key="ProjectExplorer.ProjectConfiguration.Id">qt.55.win32_mingw492_kit</value>
-   <value type="int" key="ProjectExplorer.Target.ActiveBuildConfiguration">0</value>
+   <value type="QString" key="ProjectExplorer.ProjectConfiguration.DefaultDisplayName">Desktop 5.5.1</value>
+   <value type="QString" key="ProjectExplorer.ProjectConfiguration.DisplayName">Desktop 5.5.1</value>
+   <value type="QString" key="ProjectExplorer.ProjectConfiguration.Id">{ab8639fa-d895-48eb-8aaf-a1781bd00ae6}</value>
+   <value type="int" key="ProjectExplorer.Target.ActiveBuildConfiguration">1</value>
    <value type="int" key="ProjectExplorer.Target.ActiveDeployConfiguration">0</value>
    <value type="int" key="ProjectExplorer.Target.ActiveRunConfiguration">0</value>
    <valuemap type="QVariantMap" key="ProjectExplorer.Target.BuildConfiguration.0">
-    <value type="QString" key="ProjectExplorer.BuildConfiguration.BuildDirectory">E:/Piattaforma_70/Build/AcqTool</value>
+    <value type="QString" key="ProjectExplorer.BuildConfiguration.BuildDirectory">/media/user/Dati/Piattaforma_70/build/AcqTool</value>
     <valuemap type="QVariantMap" key="ProjectExplorer.BuildConfiguration.BuildStepList.0">
      <valuemap type="QVariantMap" key="ProjectExplorer.BuildStepList.Step.0">
       <value type="bool" key="ProjectExplorer.BuildStep.Enabled">true</value>
       <value type="QString" key="ProjectExplorer.ProjectConfiguration.DefaultDisplayName">qmake</value>
       <value type="QString" key="ProjectExplorer.ProjectConfiguration.DisplayName"></value>
       <value type="QString" key="ProjectExplorer.ProjectConfiguration.Id">QtProjectManager.QMakeBuildStep</value>
-      <value type="bool" key="QtProjectManager.QMakeBuildStep.LinkQmlDebuggingLibrary">false</value>
+      <value type="bool" key="QtProjectManager.QMakeBuildStep.LinkQmlDebuggingLibrary">true</value>
       <value type="bool" key="QtProjectManager.QMakeBuildStep.LinkQmlDebuggingLibraryAuto">false</value>
       <value type="QString" key="QtProjectManager.QMakeBuildStep.QMakeArguments"></value>
       <value type="bool" key="QtProjectManager.QMakeBuildStep.QMakeForced">false</value>
@@ -84,7 +84,10 @@
       <value type="QString" key="ProjectExplorer.ProjectConfiguration.DefaultDisplayName">Make</value>
       <value type="QString" key="ProjectExplorer.ProjectConfiguration.DisplayName"></value>
       <value type="QString" key="ProjectExplorer.ProjectConfiguration.Id">Qt4ProjectManager.MakeStep</value>
-      <valuelist type="QVariantList" key="Qt4ProjectManager.MakeStep.AutomaticallyAddedMakeArguments"/>
+      <valuelist type="QVariantList" key="Qt4ProjectManager.MakeStep.AutomaticallyAddedMakeArguments">
+       <value type="QString">-w</value>
+       <value type="QString">-r</value>
+      </valuelist>
       <value type="bool" key="Qt4ProjectManager.MakeStep.Clean">false</value>
       <value type="QString" key="Qt4ProjectManager.MakeStep.MakeArguments"></value>
       <value type="QString" key="Qt4ProjectManager.MakeStep.MakeCommand"></value>
@@ -100,7 +103,10 @@
       <value type="QString" key="ProjectExplorer.ProjectConfiguration.DefaultDisplayName">Make</value>
       <value type="QString" key="ProjectExplorer.ProjectConfiguration.DisplayName"></value>
       <value type="QString" key="ProjectExplorer.ProjectConfiguration.Id">Qt4ProjectManager.MakeStep</value>
-      <valuelist type="QVariantList" key="Qt4ProjectManager.MakeStep.AutomaticallyAddedMakeArguments"/>
+      <valuelist type="QVariantList" key="Qt4ProjectManager.MakeStep.AutomaticallyAddedMakeArguments">
+       <value type="QString">-w</value>
+       <value type="QString">-r</value>
+      </valuelist>
       <value type="bool" key="Qt4ProjectManager.MakeStep.Clean">true</value>
       <value type="QString" key="Qt4ProjectManager.MakeStep.MakeArguments">clean</value>
       <value type="QString" key="Qt4ProjectManager.MakeStep.MakeCommand"></value>
@@ -120,7 +126,7 @@
     <value type="bool" key="Qt4ProjectManager.Qt4BuildConfiguration.UseShadowBuild">true</value>
    </valuemap>
    <valuemap type="QVariantMap" key="ProjectExplorer.Target.BuildConfiguration.1">
-    <value type="QString" key="ProjectExplorer.BuildConfiguration.BuildDirectory">E:/Piattaforma_70/Build/AcqTool</value>
+    <value type="QString" key="ProjectExplorer.BuildConfiguration.BuildDirectory">/media/user/Dati/Piattaforma_70/build/AcqTool/release</value>
     <valuemap type="QVariantMap" key="ProjectExplorer.BuildConfiguration.BuildStepList.0">
      <valuemap type="QVariantMap" key="ProjectExplorer.BuildStepList.Step.0">
       <value type="bool" key="ProjectExplorer.BuildStep.Enabled">true</value>
@@ -139,7 +145,10 @@
       <value type="QString" key="ProjectExplorer.ProjectConfiguration.DefaultDisplayName">Make</value>
       <value type="QString" key="ProjectExplorer.ProjectConfiguration.DisplayName"></value>
       <value type="QString" key="ProjectExplorer.ProjectConfiguration.Id">Qt4ProjectManager.MakeStep</value>
-      <valuelist type="QVariantList" key="Qt4ProjectManager.MakeStep.AutomaticallyAddedMakeArguments"/>
+      <valuelist type="QVariantList" key="Qt4ProjectManager.MakeStep.AutomaticallyAddedMakeArguments">
+       <value type="QString">-w</value>
+       <value type="QString">-r</value>
+      </valuelist>
       <value type="bool" key="Qt4ProjectManager.MakeStep.Clean">false</value>
       <value type="QString" key="Qt4ProjectManager.MakeStep.MakeArguments"></value>
       <value type="QString" key="Qt4ProjectManager.MakeStep.MakeCommand"></value>
@@ -155,7 +164,10 @@
       <value type="QString" key="ProjectExplorer.ProjectConfiguration.DefaultDisplayName">Make</value>
       <value type="QString" key="ProjectExplorer.ProjectConfiguration.DisplayName"></value>
       <value type="QString" key="ProjectExplorer.ProjectConfiguration.Id">Qt4ProjectManager.MakeStep</value>
-      <valuelist type="QVariantList" key="Qt4ProjectManager.MakeStep.AutomaticallyAddedMakeArguments"/>
+      <valuelist type="QVariantList" key="Qt4ProjectManager.MakeStep.AutomaticallyAddedMakeArguments">
+       <value type="QString">-w</value>
+       <value type="QString">-r</value>
+      </valuelist>
       <value type="bool" key="Qt4ProjectManager.MakeStep.Clean">true</value>
       <value type="QString" key="Qt4ProjectManager.MakeStep.MakeArguments">clean</value>
       <value type="QString" key="Qt4ProjectManager.MakeStep.MakeCommand"></value>
@@ -198,18 +210,20 @@
     <value type="bool" key="Analyzer.Valgrind.Callgrind.EnableEventToolTips">true</value>
     <value type="double" key="Analyzer.Valgrind.Callgrind.MinimumCostRatio">0.01</value>
     <value type="double" key="Analyzer.Valgrind.Callgrind.VisualisationMinimumCostRatio">10</value>
-    <value type="bool" key="Analyzer.Valgrind.FilterExternalIssues">true</value>
+    <value type="bool" key="Analyzer.Valgrind.FilterExternalIssues">false</value>
     <value type="int" key="Analyzer.Valgrind.LeakCheckOnFinish">1</value>
     <value type="int" key="Analyzer.Valgrind.NumCallers">25</value>
     <valuelist type="QVariantList" key="Analyzer.Valgrind.RemovedSuppressionFiles"/>
-    <value type="int" key="Analyzer.Valgrind.SelfModifyingCodeDetection">1</value>
+    <value type="int" key="Analyzer.Valgrind.SelfModifyingCodeDetection">2</value>
     <value type="bool" key="Analyzer.Valgrind.Settings.UseGlobalSettings">true</value>
-    <value type="bool" key="Analyzer.Valgrind.ShowReachable">false</value>
+    <value type="bool" key="Analyzer.Valgrind.ShowReachable">true</value>
     <value type="bool" key="Analyzer.Valgrind.TrackOrigins">true</value>
     <value type="QString" key="Analyzer.Valgrind.ValgrindExecutable">valgrind</value>
     <valuelist type="QVariantList" key="Analyzer.Valgrind.VisibleErrorKinds">
-     <value type="int">0</value>
-     <value type="int">1</value>
+     <value type="int">11</value>
+     <value type="int">14</value>
+     <value type="int">12</value>
+     <value type="int">13</value>
      <value type="int">2</value>
      <value type="int">3</value>
      <value type="int">4</value>
@@ -219,17 +233,15 @@
      <value type="int">8</value>
      <value type="int">9</value>
      <value type="int">10</value>
-     <value type="int">11</value>
-     <value type="int">12</value>
-     <value type="int">13</value>
-     <value type="int">14</value>
+     <value type="int">0</value>
+     <value type="int">1</value>
     </valuelist>
     <value type="int" key="PE.EnvironmentAspect.Base">2</value>
     <valuelist type="QVariantList" key="PE.EnvironmentAspect.Changes"/>
     <value type="QString" key="ProjectExplorer.ProjectConfiguration.DefaultDisplayName">acqTool</value>
     <value type="QString" key="ProjectExplorer.ProjectConfiguration.DisplayName"></value>
-    <value type="QString" key="ProjectExplorer.ProjectConfiguration.Id">Qt4ProjectManager.Qt4RunConfiguration:E:/Piattaforma_70/AcqTool/acqTool.pro</value>
-    <value type="QString" key="Qt4ProjectManager.Qt4RunConfiguration.CommandLineArguments">vis &quot;C:\Users\Claudia\Documents\Pico3000Data\aa\pv00421A.pic&quot;</value>
+    <value type="QString" key="ProjectExplorer.ProjectConfiguration.Id">Qt4ProjectManager.Qt4RunConfiguration:/media/user/Dati/Piattaforma_70/AcqTool/acqTool.pro</value>
+    <value type="QString" key="Qt4ProjectManager.Qt4RunConfiguration.CommandLineArguments"></value>
     <value type="QString" key="Qt4ProjectManager.Qt4RunConfiguration.ProFile">acqTool.pro</value>
     <value type="bool" key="Qt4ProjectManager.Qt4RunConfiguration.UseDyldImageSuffix">false</value>
     <value type="bool" key="Qt4ProjectManager.Qt4RunConfiguration.UseTerminal">false</value>
