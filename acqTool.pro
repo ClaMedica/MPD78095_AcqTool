@@ -5,12 +5,15 @@ QT += qml quick widgets sql network multimedia xml core serialport
 RESOURCES += Resources/qml.qrc
 
 # Additional import path used to resolve QML modules in Qt Creator's code model
-QML_IMPORT_PATH +=  ../Build/CommonPlugin\
+QML_IMPORT_PATH +=  ../build/CommonPlugin\
                     ../AcqTool \
 
 DEFINES += QT_MESSAGELOGCONTEXT
 #debug campioni di acquisizione
 DEFINES += DEBUG_ACQ
+
+win32:DEFINES+= WIN32
+unix:DEFINES+= LINUX
 
 
 # The .cpp file which was generated for your project. Feel free to hack it.
@@ -63,8 +66,7 @@ HEADERS += \
     CPP/nomogramma.h \
     CPP/printermanager.h \
     CPP/printerserialport.h \
-    ../MGlobal/UDMImpl.h
-
+    ../MGlobal/UDMImpl.h \
 
 SOURCES += ../AnaUro/anauro.cpp \
     ../AnaUro/analysis.cpp \
@@ -79,23 +81,18 @@ HEADERS += ../AnaUro/anauro.h\
 INCLUDEPATH +=  CPP \
                 ../AnaUro \
                 ../MGlobal \
-                ../SuperFlowBt \
                 ../DataFileManager \
                 CPP/TCP \
-                ../SupeFlowBT
+                ../SuperFlowBT
 
 
 
 # Default rules for deployment.
 include(deployment.pri)
 
-
-
 win32:CONFIG(release, debug|release): LIBS += -L$$PWD/../Build/AnaUro7Build/release/ -lAnaUro
 else:win32:CONFIG(debug, debug|release): LIBS += -L$$PWD/../Build/AnaUro7Build/debug/ -lAnaUro
 
-#INCLUDEPATH += $$PWD/../Build/DataBuild/release
-#DEPENDPATH += $$PWD/../Build/DataBuild/release
 
 contains(ANDROID_TARGET_ARCH,armeabi-v7a) {
 DEFINES += ANDROID
@@ -107,10 +104,6 @@ QT += androidextras
 ANDROID_PACKAGE_SOURCE_DIR = $$PWD/android-sources
 
 unix:!macx: LIBS += -L$$PWD/../Build/Emulator/DataBuild/ -lDatafileManager
-
-#INCLUDEPATH += $$PWD/../Build/Emulator/DataBuild
-#DEPENDPATH += $$PWD/../Build/Emulator/DataBuild
-
 }
 
 #percorso tecnoideal
@@ -118,7 +111,8 @@ unix:!macx: LIBS += -L$$PWD/../Build/Emulator/DataBuild/ -lDatafileManager
 #percorso acer luca
 #rootPath = C:\Users\Mez
 #percorso claudia
-rootPath = E:\Piattaforma_70
+win32:rootPath = E:\Piattaforma_70
+unix:rootPath = /media/user/Dati/Piattaforma_70
 
 win32{
     #creo la cartella da copiare in giro
@@ -135,13 +129,14 @@ INCLUDEPATH += $$PWD/../Build/DataBuild/release
 DEPENDPATH += $$PWD/../Build/DataBuild/release
 }
 
-unix:!macx: LIBS += -L$$PWD/../Build/DataFileManager/ -lDatafileManager
+unix:!macx: LIBS += -L$$PWD/../build/DataBuild/ -lDatafileManager
+unix:!macx: LIBS += -L$$PWD/../build/AnaUro/ -lAnaUro
 
-INCLUDEPATH += $$PWD/../Build/DataFileManager
-DEPENDPATH += $$PWD/../Build/DataFileManager
+unix:INCLUDEPATH += $$PWD/../build/DataBuild
+unix:DEPENDPATH += $$PWD/../build/DataBuild
 
 
-#tastiera virutuale
+#tastiera virtuale
 CONFIG += link_pkgconfig
 
 #linux-buildroot-g++ {

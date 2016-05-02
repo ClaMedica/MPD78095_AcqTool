@@ -5,7 +5,7 @@
 #include <global.h>
 #include <ancestry.h>
 #include <p7settingsmanager.h>
-#include "flowBT_types.h"
+//#include "flowBT_types.h"
 enum AlarmRecord
 {
     ALA_NOT_CONNECTED=200,
