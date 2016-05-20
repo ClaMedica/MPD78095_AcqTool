@@ -25,8 +25,11 @@ ApplicationWindow {
     // height:platform==="android"?480:Screen.height//*0.94
 
 
-       width:640
-       height:480
+    width:640
+    height:480
+    x: Screen.width/2 - height/2
+    y: Screen.height/2 - height/2
+
     color:"steelblue"
 
     function launch(arguments)

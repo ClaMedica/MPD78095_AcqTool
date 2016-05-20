@@ -23,10 +23,14 @@ mflowdatas::mflowdatas(QObject *parent) : QObject(parent)
     m_datasInfo = new mflowdatasModel();
 
     m_liverpoolMax = new Nomogramma("flowmetry",G_LIVERPOOL_MAX);
+    m_liverpoolMax->setParent(this);
     m_liverpoolAve = new Nomogramma("flowmetry",G_LIVERPOOL_AVE);
+    m_liverpoolAve->setParent(this);
 
     m_sirokyMax = new Nomogramma("flowmetry",G_SIROKY_MAX);
+    m_sirokyMax->setParent(this);
     m_sirokyAve = new Nomogramma("flowmetry",G_SIROKY_AVE);
+    m_sirokyAve->setParent(this);
 }
 mflowdatas::~mflowdatas()
 {

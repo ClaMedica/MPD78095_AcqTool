@@ -3,7 +3,7 @@
 
 #include <QObject>
 #include <datafilemanager.h>
-#include <analysis.h>
+#include  "analysis.h"
 #include "SimpleTCPClient.h"
 #include "TcpServers.h"
 #include "ancestry.h"
@@ -15,7 +15,7 @@
 #include "p7settingsmanager.h"
 #include "QtGlobal"
 //classe per unità di misura
-#include "UDMImpl.h"
+#include "UdMImpl.h"
 
 class MAbstractManager : public QObject
 {

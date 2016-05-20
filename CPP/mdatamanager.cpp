@@ -151,7 +151,7 @@ void MDataManager::loadFile(QString __fileName)
             double val=(double)numSamp[0]/m_mng->GetNAS(0);
             qDebug()<<"Marker"<<key<<val;
             if(m_markerMap.keys().contains(key))
-            {//marker conosciuto le info ce le ho giÃ
+            {//marker conosciuto le info ce le ho giï¿½
                 (*mrk)=m_markerMap[key];
             }
             else
@@ -306,6 +306,8 @@ void MDataManager::loadFile(QString __fileName)
         //        }
 
         //mi memorizzo le analisi associate a questo esame e l'associazione con i definitori
+
+        
         for (int i=0; i<m_mng->GetAnalysiNum();i++)
         {
             int anal = m_mng->GetAnalysis(i).toInt();
@@ -547,7 +549,7 @@ bool MDataManager::updateInfoList()
         gName=graph;
         //riempo con gli elementi che mi servono
 
-        //tracce molto facile dato che ce le ho giÃ
+        //tracce molto facile dato che ce le ho giï¿½
         foreach (QString chanName, m_chanInPlots[graph]) {
             elements<<chanName+":Signal";
         }
@@ -611,7 +613,7 @@ bool MDataManager::buildInfoList()
      */
 
     //allora dato che questa funzione Ã¨ chiamata dopo aver costruito i plotter
-    //so giÃ  quanti e come si chiamano i grafici
+    //so giï¿½  quanti e come si chiamano i grafici
 
     QStringList graphs=m_chanInPlots.keys();
 
@@ -624,7 +626,7 @@ bool MDataManager::buildInfoList()
         gName=graph;
         //riempo con gli elementi che mi servono
 
-        //tracce molto facile dato che ce le ho giÃ
+        //tracce molto facile dato che ce le ho giï¿½
         foreach (QString chanName, m_chanInPlots[graph]) {
             elements<<chanName+":Signal";
         }
@@ -744,7 +746,7 @@ bool MDataManager::changeObject(QVariantList __curObj)
         setToSave("");//necessario chiedere se salvare
 
         qulonglong whoAmI=__curObj.first().toULongLong();
-        //tolgo il whoami e lascio solo le proprietÃ
+        //tolgo il whoami e lascio solo le proprietï¿½
         __curObj.removeFirst();
 
         qDebug()<<"Richiesta di modifica per "<<whoAmI;
@@ -814,7 +816,7 @@ bool MDataManager::saveDataAndUpdate(QString __family, QString __name, VarMapVec
 void MDataManager::exitFromReview()
 {
     if (getToSave() == "ret")
-        exit(0); // dovrà tornare al modulo database
+        exit(0); // dovrï¿½ tornare al modulo database
 
     if (getToSave() == "")
         emit sg_exitFromReview();
@@ -834,7 +836,7 @@ void MDataManager::exitFromReview()
         else //"yes"
             //cancello il file copy
             qDebug()<<"cancellata copia all'exit"<<QFile::remove(copyName);
-        exit(0); //poi dovrà tornare al modulo database
+        exit(0); //poi dovrï¿½ tornare al modulo database
     }
 
 //    if (getToSave() == "")
@@ -855,7 +857,7 @@ void MDataManager::exitFromReview()
 //        else //"no"
 //            //cancello il file copy
 //            qDebug()<<"cancellata copia all'exit"<<QFile::remove(copyName);
-//        exit(0); //poi dovrà tornare al modulo database
+//        exit(0); //poi dovrï¿½ tornare al modulo database
 //    }
 }
 
@@ -888,7 +890,7 @@ bool MDataManager::checkForVolRes()
             else
             {
                 volRes = true;
-                setValVolRes(0);//in futuro sarÃ  letto da proprietÃ  xml
+                setValVolRes(0);//in futuro sarï¿½  letto da proprietï¿½  xml
                 emit sg_openVolResDlg("Flowmetry");
                 break;
             }
@@ -983,7 +985,7 @@ void MDataManager::analysis()
                     if (posV > -1)
                         En[posV] = 1;
 
-                    //ho tralasciato la parte che gestisce l'iconizzazione che forse non c'è
+                    //ho tralasciato la parte che gestisce l'iconizzazione che forse non c'ï¿½
                     //provo a disegnare il definitore
                     QString family="Definers";
                     QString name="Flowmetry";
@@ -1522,6 +1524,7 @@ int MDataManager::ReadResult(int __numEv)
     case FLW_AVD_STUDY: {
         //dati analisi
         m_aflwdatas.append(new mflowdatas());
+        m_aflwdatas.at(0)->setParent(this);
         byte* strTemp = (byte*) malloc (sizeof(FLWAdvRepStruct));
 
         m_aflwdatas.at(0)->setWaitingTime(0);
@@ -1543,6 +1546,7 @@ int MDataManager::ReadResult(int __numEv)
         for (int i=1; i<=__numEv; i++)
         {
             m_aflwdatas.append(new mflowdatas());
+            m_aflwdatas.last()->setParent(this);
             m_mng->readResAna(sizeof(FLWAdvRepStruct),strTemp);
             m_aflwdatas.last()->setWaitingTime(*((float*)(strTemp + WAITING_TIME)));
             m_aflwdatas.last()->setQMax(*((float*)(strTemp + MAXIMUM_FLOW)));
@@ -1600,6 +1604,7 @@ int MDataManager::ReadResult(int __numEv)
 
 mflowdatas *MDataManager::getFlowDatas(int __i)
 {
+    qDebug()<<m_aflwdatas.at(__i)<<"i"<<__i;
     return m_aflwdatas.at(__i);\
 }
 

@@ -1,0 +1,101 @@
+<Layout>
+        <Windows label="Windows Layout">
+            <BackgroundColor
+            label="Background Color"
+            type="MColorBox"
+            dt="string"
+            unit=""
+            value="#355667"
+            />
+            <Margin
+            label="Margin"
+            type="ComboBox"
+            dt="int"
+            unit=""
+            model="5#6#7#8#9#10"
+            value="2"
+            />
+        </Windows>
+        <Fonts label="Fonts">
+            <FFamily
+            label="Font Family"
+            type="ComboBox"
+            dt="string"
+            unit=""
+            model="Arial#Ubuntu"
+            value="Arial"
+            />
+            <F1
+            label="Font 1"
+            type="ComboBox"
+            dt="height"
+            unit="pt"
+            model="1#2#3#4#5#6#7#8#9#10"
+            value="1"
+            />
+            <F2
+            label="Font 2"
+            type="ComboBox"
+            dt="height"
+            unit="pt"
+            model="1#2#3#4#5#6#7#8#9#10"
+            value="2"
+            />
+            <F3
+            label="Font 3"
+            type="ComboBox"
+            dt="height"
+            unit="pt"
+            model="1#2#3#4#5#6#7#8#9#10"
+            value="3"
+            />
+            <F4
+            label="Font 4"
+            type="ComboBox"
+            dt="height"
+            unit="pt"
+            model="1#2#3#4#5#6#7#8#9#10"
+            value="4"
+            />
+            <F5
+            label="Font 5"
+            type="ComboBox"
+            dt="height"
+            unit="pt"
+            model="1#2#3#4#5#6#7#8#9#10"
+            value="5"
+            />
+        </Fonts>
+        <Tables label="Tables Layout">
+            <THF
+            label="Table Header Dim."
+            type="ComboBox"
+            dt="height"
+            unit="pt"
+            model="1#2#3#4#5#6#7#8#9#10"
+            value="6"
+            />
+            <TIF
+            label="Table Element Dim."
+            type="ComboBox"
+            dt="height"
+            unit="pt"
+            model="1#2#3#4#5#6#7#8#9#10"
+            value="4"
+            />
+            <THC1
+            label="Table Header Col. 1"
+            type="MColorBox"
+            dt="string"
+            unit=""
+            value="#6666FF"
+            />
+            <THC2
+            label="Table Header Col. 2"
+            type="MColorBox"
+            dt="string"
+            unit=""
+            value="#3333FF"
+            />
+        </Tables>
+</Layout>

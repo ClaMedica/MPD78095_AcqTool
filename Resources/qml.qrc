@@ -60,6 +60,7 @@
         <file>Config_User.xml</file>
         <file>markers.xml</file>
         <file>ParAna.xml</file>
+        <file>Config_Layout.xml</file>
     </qresource>
     <qresource prefix="/Dialog">
         <file>VolResDlg.qml</file>

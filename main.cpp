@@ -76,9 +76,12 @@ int main(int argc, char *argv[])
     engine.rootContext()->setContextProperty(QLatin1String("androidmanager"),
                                                          androidmanager);
     engine.rootContext()->setContextProperty(QLatin1String("platform"),"android");
+#elif LINUX
+    engine.rootContext()->setContextProperty(QLatin1String("platform"),"linux");
 #else
     engine.rootContext()->setContextProperty(QLatin1String("platform"),"win");
 #endif
+
     engine.rootContext()->setContextProperty("settings",&g_P7SettingsManager);
 
     qDebug()<<engine.importPathList();

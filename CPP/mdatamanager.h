@@ -80,7 +80,6 @@ public:
     bool addSignal(MSignal *__pSignal);
     void storeNews(QString __family, QString __name, qulonglong __element);
 
-
     Q_INVOKABLE mflowdatas *getFlowDatas(int __i);
 
 signals:
