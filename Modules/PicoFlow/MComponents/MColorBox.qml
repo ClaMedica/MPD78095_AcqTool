@@ -1,0 +1,42 @@
+import QtQuick 2.4
+import QtQuick.Controls 1.4
+import QtQuick.Window 2.2
+import "qrc:/GeneralData.js" as DataEngine
+import MComponents 1.0 //import "qrc:/Components"
+
+Rectangle {
+    id:rootColorBox
+    width: 100
+    height: 62
+    border.width: 2
+    border.color: "black"
+    MouseArea{
+        anchors.fill:parent
+        onClicked: {
+
+            var c=Qt.createQmlObject('import MComponents 1.0 //import "qrc:/Components"; MColorPicker{}',rootColorBox)
+            c.oriH=rootColorBox.height
+            c.oriW=rootColorBox.width
+
+            c.build()
+            //var pos=DataEngine.getAbsolutePosition(rootColorBox)
+
+
+            c.beginColor=rootColorBox.color
+            c.show()
+            con.target=c
+        }
+    }
+
+    Connections{
+        id:con
+        ignoreUnknownSignals: true
+        onColorSelected: {
+            rootColorBox.color=target.choosedColor
+            target.erase()
+        }
+        onClosing:target.destroy()
+    }
+
+}
+

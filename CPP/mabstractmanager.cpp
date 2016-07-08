@@ -390,7 +390,8 @@ bool MAbstractManager::buildConfigurationFile()
                 if(chanName.contains(channel->getTextOfChild(XML_NAME).left(1)))
                 {
                     QString udmID = (channel->getChild(XML_UDM))->getAttribute("ID");
-                    udm = UDMUtil.toString(udmID.toInt());
+                    UDMConst c=(UDMConst)udmID.toInt();
+                    udm = UDMUtil.toString(c);
                     break;
                 }
         }

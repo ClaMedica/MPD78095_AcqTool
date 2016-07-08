@@ -8,7 +8,7 @@ import MPlotModule 1.0
 import Managers 1.0
 import QtQuick.Window 2.2
 
-import QtQuick.VirtualKeyboard 1.0
+//import QtQuick.VirtualKeyboard 1.0
 
 
 
@@ -176,7 +176,7 @@ ApplicationWindow {
         id: exit
         visible: false
     }
-
+/*
     //per la tastiera virtuale
     InputPanelNumeric {
         id: inputPanelNumeric
@@ -205,5 +205,5 @@ ApplicationWindow {
                 }
             }
         }
-    }
+    }*/
 }

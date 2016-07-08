@@ -8,7 +8,7 @@ MAcqManager::MAcqManager(QObject *parent)
 
     m_mng=NULL;
     m_acqFileOpened=false;//nessuna acquisizione in atto
-    m_sendingToPlot=false;//nessuno sta spedendo qualcosa per cui ci si pu√≤ scrivere sopra
+    m_sendingToPlot=false;//nessuno sta spedendo qualcosa per cui ci si puÚ scrivere sopra
     m_serverReady=false;//i server non sono inizializzati quindi falso
     m_autoStartStop=false;
     m_superProcess=NULL;//nessun supervisore avviato
@@ -16,6 +16,10 @@ MAcqManager::MAcqManager(QObject *parent)
     m_tcpAttempts=0;
     m_supeConnected=0;
     m_oldState=ESTATE_IDLE_NOT_CONNECTED;
+
+#ifdef PICOFLOW
+
+#endif
 
     //connetto il gestore degli allarmi alla propriet√  alarms
     connect(&m_alarmMng,SIGNAL(alarmsUpdated(QVariantList)),this,SLOT(setAlarms(QVariantList)));
@@ -179,10 +183,29 @@ void MAcqManager::connectToServers()
 
 void MAcqManager::startSupe(QString __mode)
 {
+#ifdef WINDOWS
     m_superProcess=new QProcess();
     qDebug()<<"Supervisor starting...";
     QString path=g_P7SettingsManager.progPath();
     m_superProcess->start(path+"/FlowBtSupe.exe",QStringList()<<__mode);
+#endif
+#ifdef PICOFLOW
+    QString path = g_P7SettingsManager.progPath();
+    QString exeFile="/PicoFlowSupe";
+
+    if(!QFile::exists(path+exeFile))
+        qCritical()<<"No path for"<<path;
+    qDebug()<<"Lancio l'applicativo"<<path+exeFile;
+    QStringList arguments;arguments<<__mode;
+
+    arguments<<"--platform eglfs"<<"-plugin tslib:/dev/input/event0";
+
+    QString command="cd ";
+    command+=path+" && ."+exeFile+" "+arguments.join(" ");
+    qDebug()<<"Running command "<<command;
+    executeCommand(command);
+
+#endif
 }
 
 void MAcqManager::endAcquisition(QString __exit)

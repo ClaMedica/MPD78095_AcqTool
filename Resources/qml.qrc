@@ -1,7 +1,6 @@
 <RCC>
     <qresource prefix="/">
         <file>main.qml</file>
-        <file>MPlotModule</file>
     </qresource>
     <qresource prefix="/Forms">
         <file>AnalysisForm.qml</file>
@@ -58,6 +57,7 @@
         <file>Config_Alarms_it.xml</file>
         <file>Config_Locale.xml</file>
         <file>Config_User.xml</file>
+        <file>Config_Layout.xml</file>
         <file>markers.xml</file>
         <file>ParAna.xml</file>
     </qresource>

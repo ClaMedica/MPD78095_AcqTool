@@ -31,7 +31,7 @@
 int main(int argc, char *argv[])
 {
     // Load virtualkeyboard input context plugin
-    qputenv("QT_IM_MODULE", QByteArray("qtvirtualkeyboard"));
+    //qputenv("QT_IM_MODULE", QByteArray("qtvirtualkeyboard"));
 
     Q_INIT_RESOURCE(qml);
 
@@ -68,7 +68,12 @@ int main(int argc, char *argv[])
     QQmlApplicationEngine engine;
 
     engine.addPluginPath("qrc:/");
-    engine.addImportPath("../../AcqTool/Resources");
+    engine.addPluginPath("qrc:/Modules/PicoFlow/MComponents");
+    engine.addPluginPath("qrc:/Modules/PicoFlow/MPlotModule");
+    engine.addPluginPath("qrc:/Modules/PicoFlow");
+#ifdef PICOFLOW
+    engine.addPluginPath("../PicoFlow");
+#endif
 #ifdef ANDROID
     engine.addImportPath("/mnt/sdcard/Medica");
 

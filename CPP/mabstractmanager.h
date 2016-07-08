@@ -15,7 +15,7 @@
 #include "p7settingsmanager.h"
 #include "QtGlobal"
 //classe per unità di misura
-#include "UDMImpl.h"
+#include "UDMimpl.h"
 
 class MAbstractManager : public QObject
 {

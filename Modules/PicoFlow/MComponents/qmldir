@@ -1,0 +1,26 @@
+module MComponents
+MButton 1.0             MButton.qml
+MAncestry 1.0		MAncestry.qml
+MCheckBox 1.0   	MCheckBox.qml
+MColorBox 1.0 		MColorBox.qml
+MColorPicker 1.0 	MColorPicker.qml
+MDateEdit 1.0		MDateEdit.qml
+MParameterEdit 1.0	MParameterEdit.qml
+MPathEdit 1.0 		MPathEdit.qml
+MSwitch 1.0 		MSwitch.qml
+MTableView 1.0		MTableView.qml
+MEditTree 1.0		MEditTree.qml
+THeaderDelegate 1.0 	THeaderDelegate.qml
+TItemDelegate 1.0	TItemDelegate.qml
+TRowDelegate 1.0	TRowDelegate.qml
+MLabel 1.0		MLabel.qml
+MMenu 1.0		MMenu.qml
+MMenuBar 1.0		MMenuBar.qml
+MMenuButton 1.0		MMenuButton.qml
+MGroupBox 1.0		MGroupBox.qml
+MComboBox 1.0		MComboBox.qml
+MPage 1.0		MPage.qml
+MDialogYesNo 1.0	MDialogYesNo.qml
+MGridLabel 1.0		MGridLabel.qml
+MSpinBox 1.0		MSpinBox.qml
+DataEngine 1.0          GeneralData.js

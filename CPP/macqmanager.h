@@ -3,7 +3,6 @@
 
 #include "mabstractmanager.h"
 
-
 class MAcqManager : public MAbstractManager
 {
     Q_OBJECT

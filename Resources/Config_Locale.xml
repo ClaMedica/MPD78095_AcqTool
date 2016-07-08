@@ -3,12 +3,18 @@
         <DataFolders>
             <LucaTecnoideal value="C:/Medica/urodata"/>
             <LucaPortatile  value="C:/Medica/urodata"/>
-            <Claudia        value="C:/Users/Claudia/Documents/urodata"/>
+	    <Claudia        value="/home/user/Documents/urodata"/>
+	    <falcioni       value="/home/falcioni/Documents/urodata"/>
+            <PicoFlow       value="/root/PicoFlow/urodata"/>
+            <LinuxDesktop   value="/home/urodata"/>
         </DataFolders>
         <ProgFolders>
             <LucaTecnoideal value="M:/Lavoro/Software/Build/StandAlone"/>
             <LucaPortatile  value="C:/Users/MEZ/Lavoro/Software/Build/StandAlone"/>
-            <Claudia        value="E:/Piattaforma_70/Build/StandAlone"/>
+            <Claudia        value="/media/user/Dati/Piattaforma_70/build/StandAlone"/>
+            <falcioni       value="/home/falcioni/Desktop/StandAlone"/>
+            <PicoFlow       value="/root/PicoFlow"/>
+            <LinuxDesktop   value="/mnt/hgfs/Piattaforma70/Build-Linux"/>
         </ProgFolders>
         <AndroidFolders>
             <LucaTecnoideal value=""/>

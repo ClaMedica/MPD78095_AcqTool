@@ -5,8 +5,7 @@ QT += qml quick widgets sql network multimedia xml core serialport
 RESOURCES += Resources/qml.qrc
 
 # Additional import path used to resolve QML modules in Qt Creator's code model
-QML_IMPORT_PATH +=  ../Build/CommonPlugin\
-                    ../AcqTool \
+QML_IMPORT_PATH +=  Modules/MPlotModule
 
 DEFINES += QT_MESSAGELOGCONTEXT
 #debug campioni di acquisizione
@@ -38,8 +37,7 @@ SOURCES += main.cpp \
     CPP/nomogramma.cpp \
     CPP/printermanager.cpp \
     CPP/printerserialport.cpp \
-    ../MGlobal/UdMImpl.cpp
-
+    ../MGlobal/UdMImpl.cpp \
 
 HEADERS += \
     CPP/parametermanager.h \
@@ -63,7 +61,8 @@ HEADERS += \
     CPP/nomogramma.h \
     CPP/printermanager.h \
     CPP/printerserialport.h \
-    ../MGlobal/UDMImpl.h
+    ../MGlobal/UDMImpl.h \
+
 
 
 SOURCES += ../AnaUro/anauro.cpp \
@@ -81,8 +80,9 @@ INCLUDEPATH +=  CPP \
                 ../MGlobal \
                 ../SuperFlowBt \
                 ../DataFileManager \
-                CPP/TCP \
-                ../SupeFlowBT
+                ../SupeFlowBT \
+                CPP/TCP \                
+
 
 
 
@@ -134,11 +134,14 @@ else:win32:CONFIG(debug, debug|release): LIBS += -L$$PWD/../Build/DataBuild/debu
 INCLUDEPATH += $$PWD/../Build/DataBuild/release
 DEPENDPATH += $$PWD/../Build/DataBuild/release
 }
+unix{
+DEFINES += TAR
+}
+#unix:!macx: LIBS += -L$$PWD/../Build/DataFileManager/ -lDatafileManager
 
-unix:!macx: LIBS += -L$$PWD/../Build/DataFileManager/ -lDatafileManager
+#INCLUDEPATH += $$PWD/../Build/DataFileManager
+#DEPENDPATH += $$PWD/../Build/DataFileManager
 
-INCLUDEPATH += $$PWD/../Build/DataFileManager
-DEPENDPATH += $$PWD/../Build/DataFileManager
 
 
 #tastiera virutuale
@@ -150,6 +153,28 @@ CONFIG += link_pkgconfig
 #    deployment.path = /vktest
 #    INSTALLS += target deployment
 #} else {
-    target.path = $$[QT_INSTALL_PLUGINS]/virtualkeyboard
-    INSTALLS += target
+    #target.path = $$[QT_INSTALL_PLUGINS]/virtualkeyboard
+    #INSTALLS += target
 #}
+
+PICOFLOW{
+DEFINES += PICOFLOW
+DEFINES += TAR
+TARGET = PicoAcq
+RESOURCES += modules_picoflow.qrc
+unix:!macx: LIBS += -L$$PWD/../Build-IMX6/DatafileManager/ -lDatafileManager
+
+INCLUDEPATH += $$PWD/../Build-IMX6/DatafileManager
+DEPENDPATH += $$PWD/../Build-IMX6/DatafileManager
+
+# Additional import path used to resolve QML modules in Qt Creator's code model
+QML_IMPORT_PATH +=  Modules/PicoFlow
+}
+
+
+
+
+
+
+
+

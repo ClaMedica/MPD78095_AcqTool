@@ -5,6 +5,7 @@ import QtQuick.Controls.Styles 1.2
 import MPlotModule 1.0
 import Managers 1.0
 import QtQml 2.0
+
 //import Resources 1.0
 import "qrc:/Components"
 MForm{
