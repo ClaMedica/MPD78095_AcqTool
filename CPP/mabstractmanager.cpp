@@ -248,8 +248,7 @@ QVariantList MAbstractManager::commandsInfo()
     //analisi
     list<<"$GridElement";
     list<<"descr"<<tr("analysis");
-    QString rootURL="file:///"+m_applicationPath+"/Icone/";
-    list<<"img"<<rootURL+"analisi";
+    list<<"img"<<":/Images/analisi";
     list<<"key"<<111;
     list<<"visible"<<true;
     list<<"&GridElement";
@@ -257,8 +256,7 @@ QVariantList MAbstractManager::commandsInfo()
     //salva e chiudi
     list<<"$GridElement";
     list<<"descr"<<tr("save&exit");
-    rootURL="file:///"+m_applicationPath+"/Icone/";
-    list<<"img"<<rootURL+"salvaChiudi";
+    list<<"img"<<":/Images/salvaChiudi";
     list<<"key"<<112;
     list<<"visible"<<true;
     list<<"&GridElement";
@@ -266,8 +264,7 @@ QVariantList MAbstractManager::commandsInfo()
     //zoom in
     list<<"$GridElement";
     list<<"descr"<<tr("zoom in");
-    rootURL="file:///"+m_applicationPath+"/Icone/";
-    list<<"img"<<rootURL+"zoom";
+    list<<"img"<<":/Images/zoom";
     list<<"key"<<113;
     list<<"visible"<<true;
     list<<"&GridElement";
@@ -275,8 +272,7 @@ QVariantList MAbstractManager::commandsInfo()
     //zoom out
     list<<"$GridElement";
     list<<"descr"<<tr("zoom out");
-    rootURL="file:///"+m_applicationPath+"/Icone/";
-    list<<"img"<<rootURL+"zoom_out";
+    list<<"img"<<":/Images/zoom_out";
     list<<"key"<<114;
     list<<"visible"<<true;
     list<<"&GridElement";
@@ -284,8 +280,7 @@ QVariantList MAbstractManager::commandsInfo()
     //zoom none
     list<<"$GridElement";
     list<<"descr"<<tr("zoom none");
-    rootURL="file:///"+m_applicationPath+"/Icone/";
-    list<<"img"<<rootURL+"zoom_none";
+    list<<"img"<<":/Images/zoom_none";
     list<<"key"<<115;
     list<<"visible"<<true;
     list<<"&GridElement";
@@ -299,8 +294,7 @@ QVariantList MAbstractManager::acqInfo()
     //salva e chiudi
     list<<"$GridElement";
     list<<"descr"<<tr("save&exit");
-    QString rootURL="file:///"+m_applicationPath+"/Icone/";
-    list<<"img"<<rootURL+"salvaChiudi";
+    list<<"img"<<":/Images/salvaChiudi";
     list<<"key"<<112;
     list<<"visible"<<true;
     list<<"&GridElement";
@@ -312,7 +306,11 @@ bool MAbstractManager::load()
     if(!m_configLocale.loadFromXML(":/Config/Config_Locale.xml"))
         qCritical()<<"Error on locale configuration file";
 
-    if(!m_configUser.loadFromXML(":/Config/Config_User.xml"))
+    QString configUser=g_P7SettingsManager.userSettings();
+    if(!QFile::exists(configUser))
+        configUser=":/Config/Config_User.xml";
+
+    if(!m_configUser.loadFromXML(configUser))
         qCritical()<<"Error on user configuration file";
 
     if(!m_configMarkers.loadFromXML(":/Config/markers.xml"))

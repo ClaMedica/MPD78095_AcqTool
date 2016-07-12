@@ -1,8 +1,6 @@
 #include "macqmanager.h"
 int dataCount=0;
 
-
-
 MAcqManager::MAcqManager(QObject *parent)
 {
 
@@ -90,7 +88,7 @@ bool MAcqManager::newAcquisition(QString __dataFile)
             qCritical()<<"Error on acq configuration file";
 
         //e infine carico il file degli allarmi con la lingua giusta
-        QString lang=m_configLocale.getChild(XML_LOCALE)->getAttribute("value");
+        QString lang=m_configLocale.getChild(XML_LOCALE)->getSafeAttribute("value");
         if(!m_alarmMng.load(m_applicationPath+"/Config_Alarms_"+lang+".xml"))
             qCritical()<<"Error on alarm configuration file";
 
@@ -191,20 +189,19 @@ void MAcqManager::startSupe(QString __mode)
 #endif
 #ifdef PICOFLOW
     QString path = g_P7SettingsManager.progPath();
-    QString exeFile="/PicoFlowSupe";
+    QString program="run_PicoTarget.sh";
 
-    if(!QFile::exists(path+exeFile))
-        qCritical()<<"No path for"<<path;
-    qDebug()<<"Lancio l'applicativo"<<path+exeFile;
-    QStringList arguments;arguments<<__mode;
-
-    arguments<<"--platform eglfs"<<"-plugin tslib:/dev/input/event0";
+    if(!QFile::exists(path+"/"+program))
+        qCritical()<<"No path for"<<path+"/"+program;
+    qDebug()<<"Lancio l'applicativo"<<path+"/"+program;
+    QStringList arguments;arguments<<"PicoFlowSupe"<<__mode;
 
     QString command="cd ";
-    command+=path+" && ."+exeFile+" "+arguments.join(" ");
-    qDebug()<<"Running command "<<command;
-    executeCommand(command);
+    command+=path+" && ./"+program+" "+arguments.join(" ");
+    //arguments<<"--platform eglfs"<<"-plugin tslib:/dev/input/event0";
 
+    qDebug()<<"Running process "<<command;
+    qDebug()<<"Process returned:"<<executeDetached(command);
 #endif
 }
 
@@ -227,7 +224,7 @@ void MAcqManager::endAcquisition(QString __exit)
     {//se siamo in acq facciamo un commit
         qDebug()<<"Commit Values?"<<m_mng->CommitValues();
     }
-    qDebug()<<"File closed?"<<m_mng->Close();
+    //#BUG non va la close qDebug()<<"File closed?"<<m_mng->Close();
 
     //mando il comando al gestore archivio paziente
     QByteArray mex=__exit.toLatin1();
@@ -246,7 +243,14 @@ void MAcqManager::endAcquisition(QString __exit)
     m_superProcess->close();
 
     m_mng=NULL;
-    exit(1);
+    //exit(1);
+}
+
+void MAcqManager::sendIAmReady()
+{
+    QByteArray mex="READY";
+    qDebug()<<"Sono pronto database!!"<<mex;
+    m_tcpChannels["MNG"]->sendData(&mex);
 }
 
 void MAcqManager::addMarker(QVariant __key)
@@ -366,8 +370,7 @@ void MAcqManager::handleTCP(SimpleTCPClient *__client, QByteArray __block)
 
             //qDebug()<<"Supervisoore connesso";
         }
-
-        if(who=="VAL")
+        else if(who=="VAL")
         {
             //riempo i buffer
             fillBuffers(__block);
@@ -376,7 +379,7 @@ void MAcqManager::handleTCP(SimpleTCPClient *__client, QByteArray __block)
             //faccio le mie operazioni e rimuovo i primi campioni
             while(buffersReady())
             {
-                qDebug()<<"BUFFER ready";
+                //qDebug()<<"BUFFER ready";
                 applyOperations();
                 foreach(QString hwc,m_totalHWChan)
                     m_bufferMap[hwc]->remove(0,m_frameMap[hwc]);
@@ -419,12 +422,14 @@ bool MAcqManager::loadConnectivityInfo(Ancestry *__info)
     foreach (Ancestry *child, tcp->getChildren()) {
         QString name=child->name();
 
-        QString address=child->getAttribute(ATT_ADDRESS);
-        int port=child->getAttribute(ATT_PORT).toInt();
-        if(child->getAttribute(ATT_TYPE)=="client")
+        QString address=child->getSafeAttribute(ATT_ADDRESS);
+        int port=child->getSafeAttribute(ATT_PORT).toInt();
+        if(child->getSafeAttribute(ATT_TYPE)=="client")
             m_tcpClients[name]=new SimpleTCPClient(QHostAddress(address),port,this);
-        else if(child->getAttribute(ATT_TYPE)=="server")
+        else if(child->getSafeAttribute(ATT_TYPE)=="server")
             m_tcpChannels[name]=new SimpleTCPChannel(QHostAddress(address),port,this);
+        else
+            qDebug()<<"Skip"<<name<<address<<port;
         qDebug()<<name<<address<<port;
     }
 
@@ -437,11 +442,11 @@ void MAcqManager::analyzeStatus(flowBT_status_t __status)
 {
     m_alarmMng.stopTimeoutAlarm(ALA_TIMEOUT_STATUS);
     if(__status.currState!=m_oldState)
-        qDebug()<<"Stato "<<__status.currState;
+        qDebug()<<"Stato "<<__status.currState<<m_oldState;
 
     switch(__status.currState)
     {
-    case ESTATE_IDLE_NOT_CONNECTED:
+    case ESTATE_IDLE_NOT_CONNECTED:        
         if(m_oldState==ESTATE_IDLE_CONNECTED)
             m_alarmMng.addAlarm(ALA_NOT_CONNECTED);
         else
@@ -484,8 +489,8 @@ void MAcqManager::checkAutomaticStartStop(QString __which)
     Ancestry *contitions=m_configUser.getSafeChild("Auto"+__which+"s");
     foreach (Ancestry *condition, contitions->getChildren()) {//scorro le condizioni di autostart anche se ce ne è solo una
         //pesco su quale canale è fatta
-        QString chanType=condition->getAttribute(ATT_CHANTYPE);
-        int num=condition->getAttribute(ATT_NUM).toInt()-1;//il meno 1 è per ovviare al fatto che si parte da 1
+        QString chanType=condition->getSafeChild(ATT_CHANTYPE)->getSafeAttribute(ATT_VALUE);
+        int num=condition->getSafeChild(ATT_NUM)->getSafeAttribute(ATT_VALUE).toInt()-1;//il meno 1 è per ovviare al fatto che si parte da 1
         //e in base a come si chiama vedo che farci
 
         //qDebug()<<condition->name();
@@ -493,16 +498,16 @@ void MAcqManager::checkAutomaticStartStop(QString __which)
         if(condition->name()==XML_STEP)
         {
 
-            qDebug()<<"condizione a gradino";
+            //qDebug()<<"condizione a gradino";
 
             Ancestry *childDur=condition->getSafeChild(XML_DURATION);
             Ancestry *childAmp=condition->getSafeChild(XML_AMPLITUDE);
             //per prima cosa controlliamo quanti campioni è
-             int min=childDur->getSafeChild(ATT_MIN)->getAttribute(ATT_VALUE).toUInt();
+             int min=childDur->getSafeChild(ATT_MIN)->getSafeAttribute(ATT_VALUE).toUInt();
 
-            qreal ampMin=childAmp->getSafeChild(ATT_MIN)->getAttribute(ATT_VALUE).toInt();
+            qreal ampMin=childAmp->getSafeChild(ATT_MIN)->getSafeAttribute(ATT_VALUE).toInt();
 
-            qreal ampMax=childAmp->getSafeChild(ATT_MAX)->getAttribute(ATT_VALUE).toInt();
+            qreal ampMax=childAmp->getSafeChild(ATT_MAX)->getSafeAttribute(ATT_VALUE).toInt();
 
             //qDebug()<<"Buffer"<<chanType<<num<<"="<<*(m_channelMap[chanType].at(num));
 
@@ -534,7 +539,7 @@ void MAcqManager::checkAutomaticStartStop(QString __which)
             else
             {
 
-                qDebug()<<"Non ho trovato nulla";
+                //qDebug()<<"Non ho trovato nulla";
 
             }
         }
@@ -545,10 +550,10 @@ void MAcqManager::checkAutomaticStartStop(QString __which)
             Ancestry *childVal=condition->getSafeChild(XML_VALUE);
 
             //per prima cosa controlliamo quanti campioni è
-            int min=childDur->getSafeChild(ATT_MIN)->getAttribute(ATT_VALUE).toUInt();
+            int min=childDur->getSafeChild(ATT_MIN)->getSafeAttribute(ATT_VALUE).toUInt();
 
-            qreal valMin=childVal->getSafeChild(ATT_MIN)->getAttribute(ATT_VALUE).toDouble();
-            qreal valMax=childVal->getSafeChild(ATT_MAX)->getAttribute(ATT_VALUE).toDouble();
+            qreal valMin=childVal->getSafeChild(ATT_MIN)->getSafeAttribute(ATT_VALUE).toDouble();
+            qreal valMax=childVal->getSafeChild(ATT_MAX)->getSafeAttribute(ATT_VALUE).toDouble();
             //qDebug()<<"Buffer"<<chanType<<num<<"="<<*(m_channelMap[chanType].at(num));
 
             m_stopBuffer<<*m_channelMap[chanType].at(num);
@@ -624,7 +629,9 @@ void MAcqManager::sendBuffersToPlot()
         QList<MSignal> channels;
 
         foreach(QString chanName,m_chanInPlots[plotName]){
+            //qDebug()<<chanName;
             int size=chanName.size();
+
             QString type,number;
             for(int i=0;i<size;i++)
             {
@@ -635,7 +642,7 @@ void MAcqManager::sendBuffersToPlot()
             }
 
             if(!m_channelMap.contains(type) || number.toInt()<1 || number.isEmpty())
-                qCritical()<<type<<number<<"Not recognized";
+                qCritical()<<m_channelMap.keys()<<type<<number<<"Not recognized";
             int index=number.toInt()-1;
             MSignal copy=*(m_channelMap[type].at(index));
             channels<<copy;
@@ -781,7 +788,7 @@ void MAcqManager::fillBuffers(QByteArray __block)
     block=__block;
 
     //e poi lo spacchettiamo
-    qDebug()<<"block "<<block.toHex().data();
+    //qDebug()<<"block "<<block.toHex().data();
     qint32 numChan = 0;
     qint32 numBytes = 0;
     qint32 currChan = 0;
@@ -848,7 +855,7 @@ bool MAcqManager::readConfigurationFile()
     foreach(Ancestry *channel,channels->getChildren()){
         //scorriamo tutti i canali per acquisire le info
         //che supervisore serve?
-        QString card=channel->getAttribute("card");
+        QString card=channel->getSafeAttribute("card");
         if(card=="")qCritical()<<"File corrupted";
         //se non c'è gi�  questo supe lo aggiungo alla lista di quelli da far partire
         if(!m_superList.contains(card))

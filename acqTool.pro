@@ -38,6 +38,7 @@ SOURCES += main.cpp \
     CPP/printermanager.cpp \
     CPP/printerserialport.cpp \
     ../MGlobal/UdMImpl.cpp \
+    ../MGlobal/appbridge.cpp
 
 HEADERS += \
     CPP/parametermanager.h \
@@ -62,6 +63,7 @@ HEADERS += \
     CPP/printermanager.h \
     CPP/printerserialport.h \
     ../MGlobal/UDMImpl.h \
+    ../MGlobal/appbridge.h
 
 
 

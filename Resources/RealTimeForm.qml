@@ -72,19 +72,7 @@ MForm{
         }
     }
 
-    MAlarmBox{
-        //@@@@@@@@@@    Properties      @@@@@@@@@@
-        id:alarmBox
-        alarmHeight: 50
-        anchors.topMargin: 30
-        anchors.top:parent.top
-        anchors.left:parent.left
-        anchors.right:grid.left
-        alarms: mngAcq.alarms
 
-        //@@@@@@@@@@    Events          @@@@@@@@@@
-        onResetAlarms: mngAcq.resetAlarms()
-    }
 
     MPlot2DRealStack {
         //@@@@@@@@@@    Properties      @@@@@@@@@@
@@ -234,6 +222,18 @@ MForm{
 
         //@@@@@@@@@@    Events          @@@@@@@@@@
         onTriggered: Qt.quit()
+    }
+    MAlarmBox{
+        //@@@@@@@@@@    Properties      @@@@@@@@@@
+        id:alarmBox
+        alarmHeight: 50
+        anchors.top:parent.top
+        anchors.left:parent.left
+        anchors.right:grid.left
+        alarms: mngAcq.alarms
+
+        //@@@@@@@@@@    Events          @@@@@@@@@@
+        onResetAlarms: mngAcq.resetAlarms()
     }
 
 

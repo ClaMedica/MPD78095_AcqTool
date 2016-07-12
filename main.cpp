@@ -20,6 +20,7 @@
 #include <QObject>
 #include <p7settingsmanager.h>
 #include <MyMessageOutput.h>
+#include <appbridge.h>
 #include <QApplication>
 #ifdef ANDROID
 #include <QAndroidJniObject>
@@ -36,6 +37,7 @@ int main(int argc, char *argv[])
     Q_INIT_RESOURCE(qml);
 
     QGuiApplication app(argc, argv);
+
     //carico i settaggi
     g_P7SettingsManager.loadSettings();
 #ifdef ANDROID
@@ -49,11 +51,17 @@ int main(int argc, char *argv[])
 #endif
 
     //dirotto il debug log
-    MyMessageOutput outmsg;
-    outmsg.init(gPath_log);
+    MyMessageOutput::init(gPath_log);
     qDebug()<<"Partiamo";
+    QStringList arguments;
+    //leggiamo gli argomenti
+    for(int i=0;i<argc;i++)
+        arguments<<QString(argv[i]);
+    qDebug()<<"Argomenti"<<arguments;
     //qDebug()<<fibonacci(5);
+    AcqBridge bridge(AppBridge::Server);
 
+    bridge.setConnection(QStringList()<<argv[1]<<argv[2]);
 
     qmlRegisterType<ParameterManager>("Managers",1,0,"ParameterManager");
     qmlRegisterType<ModelManager>("Managers",1,0,"ModelManager");
@@ -85,6 +93,7 @@ int main(int argc, char *argv[])
     engine.rootContext()->setContextProperty(QLatin1String("platform"),"win");
 #endif
     engine.rootContext()->setContextProperty("settings",&g_P7SettingsManager);
+    engine.rootContext()->setContextProperty("bridge",&bridge);
 
     qDebug()<<engine.importPathList();
     engine.load(QUrl(QStringLiteral("qrc:/main.qml")));

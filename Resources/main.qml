@@ -19,67 +19,59 @@ ApplicationWindow {
     //@@@@@@@@@@    Properties      @@@@@@@@@@
     id: root
     flags: Qt.FramelessWindowHint
-    visible: true
+    visible: false
 
     //width:platform==="android"?640:Screen.width//*0.94
     // height:platform==="android"?480:Screen.height//*0.94
 
 
-       width:640
-       height:480
+    width:640
+    height:480
     color:"steelblue"
 
-    function launch(arguments)
+    function launch(mode,dataFile)
     {
 
-        if(arguments.length>1)
+        if(mode==="acq")
         {
-            console.log("arguments founded",arguments,arguments.length)
-            //gli argomenti sono acq/ana dataFile lingua
-
-
-            if(arguments[1]==="acq")
-            {
-                mngAcq.load()
-                mngAcq.startSupe(arguments[3])
-                mngAcq.newAcquisition(arguments[2]);
-                console.log("Start configuring screen")
-                forReal.setMarkersInfo(mngAcq.markersInfo("type",[1,6]))
-                forReal.configurationFile=mngAcq.plotConfigFileName()
-                forReal.displayMessage("Wait for inizialization...",-1)
-                forHome.whoIsVisilbe=forReal.name
-                forReal.setAcqInfo(mngData.acqInfo())
-
-            }
-            else if(arguments[1]==="vis")
-            {
-                forAna.initialize()
-                mngData.load()
-                if(platform!=="android")
-                    mngData.loadFile(arguments[2]);
-                else
-                    mngData.loadFile("/mnt/sdcard/Medica/pv000461A.pic")
-                forAna.setMarkersInfo(mngData.markersInfo("type",[1,6]))
-                forAna.setDefinersInfo(mngData.definersInfo())
-                forAna.setCommandsInfo(mngData.commandsInfo())
-            }
+            mngAcq.load()
+            mngAcq.newAcquisition(dataFile)
+            console.log("Start configuring screen")
+            forReal.setMarkersInfo(mngAcq.markersInfo("type",[1,6]))
+            forReal.configurationFile=mngAcq.plotConfigFileName()
+            forReal.displayMessage("Wait for inizialization...",-1)
+            forHome.whoIsVisilbe=forReal.name
+            forReal.setAcqInfo(mngData.acqInfo())
         }
-        else
+        else if(mode==="vis")
         {
-            console.log("No arguments founded")
             forAna.initialize()
             mngData.load()
-            if(platform==="android")
+            if(platform!=="android")
+                mngData.loadFile(dataFile);
+            else
                 mngData.loadFile("/mnt/sdcard/Medica/pv000461A.pic")
+            forAna.setMarkersInfo(mngData.markersInfo("type",[1,6]))
+            forAna.setDefinersInfo(mngData.definersInfo())
+            forAna.setCommandsInfo(mngData.commandsInfo())
         }
+        bridge.sendReady();
+        root.show()
         console.log("Application Ready!")
     }
 
     //@@@@@@@@@@    Events          @@@@@@@@@@
-    Component.onCompleted:launch(Qt.application.arguments)
+
 
 
     //@@@@@@@@@@    Objects         @@@@@@@@@@
+    Connections{
+        id:connMainApp
+        target:bridge
+        ignoreUnknownSignals:true
+        onNewAcquisition:launch("acq",datafile)
+        onNewVisualization:launch("vis",datafile)
+    }
 
 
     MAcqManager{
@@ -88,7 +80,11 @@ ApplicationWindow {
 
         //@@@@@@@@@@    Events          @@@@@@@@@@
         Component.onCompleted: console.log("MAcqManager Ready!")
-        onSystemInAcqStatus:forReal.displayMessage("Go go go!",2000)
+        onSystemInAcqStatus:
+        {
+            console.log("Go Go Go");
+            forReal.displayMessage("Go go go!",2000)
+        }
     }
 
     MDataManager{
@@ -176,7 +172,7 @@ ApplicationWindow {
         id: exit
         visible: false
     }
-/*
+    /*
     //per la tastiera virtuale
     InputPanelNumeric {
         id: inputPanelNumeric

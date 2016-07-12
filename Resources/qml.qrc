@@ -52,6 +52,9 @@
         <file alias="resetOn">resetOn.jpg</file>
         <file alias="setting">setting.png</file>
         <file alias="Supervisor">Supervisor.jpg</file>
+        <file>salvaChiudi.png</file>
+        <file>salvaChiudi_CLICK.png</file>
+        <file>salvaChiudi_off.png</file>
     </qresource>
     <qresource prefix="/Config">
         <file>Config_Alarms_it.xml</file>
