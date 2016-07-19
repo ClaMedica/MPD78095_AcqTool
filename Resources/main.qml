@@ -55,9 +55,8 @@ ApplicationWindow {
             forAna.setDefinersInfo(mngData.definersInfo())
             forAna.setCommandsInfo(mngData.commandsInfo())
         }
-        bridge.sendReady();
-        root.show()
         console.log("Application Ready!")
+        bridgeMain.sendSwitch()
     }
 
     //@@@@@@@@@@    Events          @@@@@@@@@@
@@ -67,7 +66,7 @@ ApplicationWindow {
     //@@@@@@@@@@    Objects         @@@@@@@@@@
     Connections{
         id:connMainApp
-        target:bridge
+        target:bridgeMain
         ignoreUnknownSignals:true
         onNewAcquisition:launch("acq",datafile)
         onNewVisualization:launch("vis",datafile)

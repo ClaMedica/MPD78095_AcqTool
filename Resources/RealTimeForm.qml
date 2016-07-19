@@ -207,7 +207,7 @@ MForm{
                 if (value === "112") {
                     mngAcq.sendStopAcq()
                     plot.stopAll()
-                    mngAcq.endAcquisition("TEST_SAVE")
+                    mngAcq.endAcquisitionSave()
                     timClose.start(1000);
                 }
 
@@ -221,7 +221,7 @@ MForm{
         id:timClose
 
         //@@@@@@@@@@    Events          @@@@@@@@@@
-        onTriggered: Qt.quit()
+        //onTriggered: Qt.quit()
     }
     MAlarmBox{
         //@@@@@@@@@@    Properties      @@@@@@@@@@
@@ -262,19 +262,19 @@ MForm{
 //            if (itemClicked === qsTr("Exit without saving")) {
 //                mngAcq.sendStopAcq()
 //                plot.stopAll()
-//                mngAcq.endAcquisition("TEST_DISCARD")
+//                mngAcq.endAcquisitionDiscard()
 //                timClose.start(1000);
 //            }
 //            if (itemClicked === qsTr("Exit and save")) {
 //                mngAcq.sendStopAcq()
 //                plot.stopAll()
-//                mngAcq.endAcquisition("TEST_SAVE")
+//                mngAcq.endAcquisitionSave()
 //                timClose.start(1000);
 //            }
 //            if (itemClicked === qsTr("Exit, save and review")) {
 //                mngAcq.sendStopAcq()
 //                plot.stopAll()
-//                mngAcq.endAcquisition("TEST_SAVE")
+//                mngAcq.endAcquisitionSave()
 //                var arg=[]
 //                arg[0]=Qt.application.arguments[0]
 //                arg[1]="vis"

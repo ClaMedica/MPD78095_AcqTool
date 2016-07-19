@@ -18,6 +18,7 @@ public:
 
     static void dataOnTCP(QObject *__pParent=NULL, SimpleTCPClient *__pTCP=NULL, QByteArray __block=QByteArray());
 
+
 signals:
     void alarmsChanged();
     void acqMarkersChanged();
@@ -29,14 +30,16 @@ public slots:
     bool newAcquisition(QString __dataFile="");
     void connectToServers();
     void startSupe(QString __mode);
-    void endAcquisition(QString __exit);
-    void sendIAmReady();
+    void endAcquisition();
+    void endAcquisitionSave();
+    void endAcquisitionDiscard();
     void addMarker(QVariant __key);
     void addDefiner(bool __startEnd,QVariantList __info);
     bool sendStartAcq(void);
     bool sendStopAcq (void);
     void resetAlarms();
     void setAlarms(QVariantList __list);
+
 
 private slots:
     bool sendCommand(tcp_flow_bt_cmd_t __command);
@@ -53,6 +56,7 @@ private:
     m_serverReady,
     m_sendingToPlot,
     m_saving,
+    m_acqFinished,  //mi dice se ho finito di acquisire
     m_autoStartStop;//mi dice se il controllo è abilitato o meno
 
     QByteArray m_sendingPack;

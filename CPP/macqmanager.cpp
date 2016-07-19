@@ -1,6 +1,7 @@
 #include "macqmanager.h"
+#include "appbridge.h"
 int dataCount=0;
-
+extern AcqBridge *g_mainAppBridge;
 MAcqManager::MAcqManager(QObject *parent)
 {
 
@@ -45,7 +46,7 @@ MAcqManager::~MAcqManager()
         }
     }
 
-    if(m_tcpChannels.values().size()>0)
+    if(m_tcpChannels.size()>0)
     {
         foreach (SimpleTCPChannel * cur, m_tcpChannels.values()) {
             delete cur;
@@ -92,7 +93,7 @@ bool MAcqManager::newAcquisition(QString __dataFile)
         if(!m_alarmMng.load(m_applicationPath+"/Config_Alarms_"+lang+".xml"))
             qCritical()<<"Error on alarm configuration file";
 
-        //carico info di connettivit� 
+        //carico info di connettivit�
         loadConnectivityInfo(m_configAcq.getSafeChild(XML_CONNECTIONS));
 
 
@@ -112,7 +113,7 @@ bool MAcqManager::newAcquisition(QString __dataFile)
         m_mng=new DatafileManager;
 
         m_mng->SetFileName(__dataFile);
-        m_mng->SetFileType(7);
+        m_mng->SetFileType(5);
 
         qDebug()<<"Opening file ... "<<m_mng->Open();
         qDebug()<<"Loading parameters ... "<<m_mng->GetParameters();
@@ -205,7 +206,19 @@ void MAcqManager::startSupe(QString __mode)
 #endif
 }
 
-void MAcqManager::endAcquisition(QString __exit)
+void MAcqManager::endAcquisitionSave()
+{
+    endAcquisition();
+    g_mainAppBridge->sendSave();
+}
+
+void MAcqManager::endAcquisitionDiscard()
+{
+    endAcquisition();
+    g_mainAppBridge->sendDiscard();
+}
+
+void MAcqManager::endAcquisition()
 {
     //disabilito gli allarmi
     m_alarmMng.disableAll();
@@ -224,33 +237,16 @@ void MAcqManager::endAcquisition(QString __exit)
     {//se siamo in acq facciamo un commit
         qDebug()<<"Commit Values?"<<m_mng->CommitValues();
     }
-    //#BUG non va la close qDebug()<<"File closed?"<<m_mng->Close();
+    qDebug()<<"File closed?"<<m_mng->Close();
 
-    //mando il comando al gestore archivio paziente
-    QByteArray mex=__exit.toLatin1();
-    m_tcpChannels["MNG"]->sendData(&mex);
-    qDebug()<<__exit;
+    //    foreach (SimpleTCPChannel *channel, m_tcpChannels) {
+    //        //mi disconnetto dal resto
 
-    foreach (SimpleTCPChannel *channel, m_tcpChannels) {
-        //mi disconnetto dal resto
-
-        if(channel->disconnect())
-            qDebug()<<"disconnect "
-                   <<channel->serverAddress().toString().toLatin1()
-                  <<channel->serverPort();
-    }
-
-    m_superProcess->close();
-
-    m_mng=NULL;
-    //exit(1);
-}
-
-void MAcqManager::sendIAmReady()
-{
-    QByteArray mex="READY";
-    qDebug()<<"Sono pronto database!!"<<mex;
-    m_tcpChannels["MNG"]->sendData(&mex);
+    //        if(channel->disconnect())
+    //            qDebug()<<"disconnect "
+    //                   <<channel->serverAddress().toString().toLatin1()
+    //                  <<channel->serverPort();
+    //    }
 }
 
 void MAcqManager::addMarker(QVariant __key)
@@ -398,8 +394,11 @@ void MAcqManager::handleTCP(SimpleTCPClient *__client, QByteArray __block)
             {
                 if(m_autoStartStop)
                     checkAutomaticStartStop("Stop");
-                sendBuffersToPlot();
-                saveBuffersToFile();
+                if(!m_acqFinished)
+                {
+                    sendBuffersToPlot();
+                    saveBuffersToFile();
+                }
             }
         }
     }
@@ -446,7 +445,7 @@ void MAcqManager::analyzeStatus(flowBT_status_t __status)
 
     switch(__status.currState)
     {
-    case ESTATE_IDLE_NOT_CONNECTED:        
+    case ESTATE_IDLE_NOT_CONNECTED:
         if(m_oldState==ESTATE_IDLE_CONNECTED)
             m_alarmMng.addAlarm(ALA_NOT_CONNECTED);
         else
@@ -503,7 +502,7 @@ void MAcqManager::checkAutomaticStartStop(QString __which)
             Ancestry *childDur=condition->getSafeChild(XML_DURATION);
             Ancestry *childAmp=condition->getSafeChild(XML_AMPLITUDE);
             //per prima cosa controlliamo quanti campioni è
-             int min=childDur->getSafeChild(ATT_MIN)->getSafeAttribute(ATT_VALUE).toUInt();
+            int min=childDur->getSafeChild(ATT_MIN)->getSafeAttribute(ATT_VALUE).toUInt();
 
             qreal ampMin=childAmp->getSafeChild(ATT_MIN)->getSafeAttribute(ATT_VALUE).toInt();
 
@@ -534,6 +533,7 @@ void MAcqManager::checkAutomaticStartStop(QString __which)
                 m_saving=true;//posso iniziare a salvare i dati
                 emit acquisitionStarted();
                 qDebug()<<"Start acquiring";
+                m_acqFinished=false;
                 return;
             }
             else
@@ -566,11 +566,12 @@ void MAcqManager::checkAutomaticStartStop(QString __which)
 
             qreal smin=m_stopBuffer.minimum();
             qreal smax=m_stopBuffer.maximum();
-            qDebug()<<smin<<valMin<<smax<<valMax;
+            //qDebug()<<smin<<valMin<<smax<<valMax;
             if(smin>valMin && smax<valMax)
             {
                 qDebug()<<"Stop acquiring";
-                endAcquisition("TEST_SAVE");
+                endAcquisitionSave();
+                m_acqFinished=true;
                 return;
             }
             else
@@ -715,8 +716,8 @@ void MAcqManager::applyOperations()
     foreach (QString type, m_operationMap.keys()) {//per ogni tipo di canale
         foreach(QString op,m_operationMap[type]){//sono tranquillo di avere le operazioni in ordine
             QStringList opData=op.split("@");
-            //opData.at(0) è il nome dell'operazione
-            //opData.at(1) è la buffersize
+            //opData.at(0) e' il nome dell'operazione
+            //opData.at(1) e' la buffersize
             //siamo sicuri che ci sono in quanto il controllo sulle dimensioni lo facciamo in readconfiguration
             QString name=opData.at(0);
             int bufferSize=opData.at(1).toInt();
@@ -915,7 +916,7 @@ bool MAcqManager::readConfigurationFile()
                 m_HWChansMap[name]<<hwc;
                 if(m_sampleFreqMap.keys().contains(hwc))
                     if(m_sampleFreqMap[hwc]!=sampleFreq)//controllo che questo canale abbia una sola frequenza di campionamento
-                    qCritical()<<"File corrupted";
+                        qCritical()<<"File corrupted";
                 m_sampleFreqMap[hwc]=sampleFreq;
                 if(m_bufSizeMap[hwc]<bufMax)
                     m_bufSizeMap[hwc]=bufMax;
@@ -926,14 +927,13 @@ bool MAcqManager::readConfigurationFile()
 
         foreach(QString c,hwchans.split("#"))
             if(!m_totalHWChan.contains(c))
+            {//inizializzo i buffer hardware;
                 m_totalHWChan<<c;
+                m_bufferMap[c]=new MSignal();
+                m_bufferMap[c]->setSamplingFrequency(sampleFreq);
+                m_frameMap[c]=m_sampleFreqMap[c]/gcd(m_sampleFreqMap.values());
+            }
     }
-    //inizializzo i buffer hardware;
-    foreach (QString c,m_totalHWChan) {
-        m_bufferMap[c]=new MSignal();
-        m_frameMap[c]=m_sampleFreqMap[c]/gcd(m_sampleFreqMap.values());
-    }
-
     //sono a posto così
     qDebug()<<"Configuration file read succesfully!";
     return true;

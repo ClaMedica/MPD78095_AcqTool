@@ -813,6 +813,7 @@ bool MDataManager::saveDataAndUpdate(QString __family, QString __name, VarMapVec
 
 void MDataManager::exitFromReview()
 {
+    qDebug()<<"Exit";
     if (getToSave() == "ret")
         exit(0); // dovrà tornare al modulo database
 

@@ -22,12 +22,13 @@
 #include <MyMessageOutput.h>
 #include <appbridge.h>
 #include <QApplication>
+#include <QQuickWindow>
 #ifdef ANDROID
 #include <QAndroidJniObject>
 #include <QtAndroid>
 #include <androidmanager.h>
 #endif
-
+AcqBridge *g_mainAppBridge;
 
 int main(int argc, char *argv[])
 {
@@ -59,9 +60,7 @@ int main(int argc, char *argv[])
         arguments<<QString(argv[i]);
     qDebug()<<"Argomenti"<<arguments;
     //qDebug()<<fibonacci(5);
-    AcqBridge bridge(AppBridge::Server);
-
-    bridge.setConnection(QStringList()<<argv[1]<<argv[2]);
+    g_mainAppBridge=new AcqBridge(QStringList()<<argv[1]<<argv[2]);//definisco un bridge tra app di topo server
 
     qmlRegisterType<ParameterManager>("Managers",1,0,"ParameterManager");
     qmlRegisterType<ModelManager>("Managers",1,0,"ModelManager");
@@ -93,13 +92,14 @@ int main(int argc, char *argv[])
     engine.rootContext()->setContextProperty(QLatin1String("platform"),"win");
 #endif
     engine.rootContext()->setContextProperty("settings",&g_P7SettingsManager);
-    engine.rootContext()->setContextProperty("bridge",&bridge);
+    engine.rootContext()->setContextProperty("bridgeMain",g_mainAppBridge);
+
 
     qDebug()<<engine.importPathList();
     engine.load(QUrl(QStringLiteral("qrc:/main.qml")));
     qDebug()<<"engine caricato";
-
-
+    g_mainAppBridge->setRootObjects(engine.rootObjects());
     int ret=app.exec();
+    qDebug()<<"Exiting with code"<<ret;
     return ret;
 }
