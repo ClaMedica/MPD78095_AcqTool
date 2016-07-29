@@ -1,0 +1,28 @@
+<RCC>
+    <qresource prefix="/">
+        <file>Cough.png</file>
+        <file>Cough_click.png</file>
+        <file>Cough_off.png</file>
+        <file>salvaChiudi.png</file>
+        <file>salvaChiudi_click.png</file>
+        <file>salvaChiudi_off.png</file>
+        <file>Spoken.png</file>
+        <file>Spoken_click.png</file>
+        <file>Spoken_off.png</file>
+        <file>analisi.png</file>
+        <file>analisi_click.png</file>
+        <file>analisi_off.png</file>
+        <file>zoom_in.jpg</file>
+        <file>zoom_in_click.jpg</file>
+        <file>zoom_in_off.jpg</file>
+        <file>zoom_none.jpg</file>
+        <file>zoom_none_click.jpg</file>
+        <file>zoom_none_off.jpg</file>
+        <file>zoom_out.jpg</file>
+        <file>zoom_out_click.jpg</file>
+        <file>zoom_out_off.jpg</file>
+        <file>cmDefFlo.jpg</file>
+        <file>cmDefFlo_click.jpg</file>
+        <file>cmDefFlo_off.jpg</file>
+    </qresource>
+</RCC>

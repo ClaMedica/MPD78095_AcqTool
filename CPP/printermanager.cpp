@@ -1,7 +1,7 @@
 #include "printermanager.h"
 
 
-printermanager::printermanager(QString __namefile, QObject *parent) : QObject(parent)
+PrinterManager::PrinterManager(QString __namefile, QObject *parent) : QObject(parent)
 {
     m_namefile = __namefile;
 
@@ -34,7 +34,7 @@ printermanager::printermanager(QString __namefile, QObject *parent) : QObject(pa
 /**
 Stampa automatica alla fine dell'esame: al momento della pressione dello stop, i dati sono analizzati, salvati e poi mandati in stampa.
 */
-void printermanager::print()
+void PrinterManager::print()
 {
     //dati paziente e esame
     m_dfm->Open();
@@ -98,8 +98,8 @@ void printermanager::print()
     m_dfm->Close();
 
 
-//    printerserialport *port;
-     m_port = new printerserialport(this);
+//    PrinterSerialPort *port;
+     m_port = new PrinterSerialPort(this);
      m_port->init_printer();
 
     pri_rep_review();	// qui va subito in stampa
@@ -108,7 +108,7 @@ void printermanager::print()
     return ;
 }
 
-void printermanager::pri_rep_review()
+void PrinterManager::pri_rep_review()
 {
     int max_volume = 0;
 
@@ -178,7 +178,7 @@ Alla fine ogni valore del buffer è il valore mediano di una finestra di 5 campio
 In questo modo il primo significativo è il 3, così al primo è assegnato un valore pari ad 1/4 del valore del terzo, e al secondo un valore pari a 1/2 del terzo
 Al penultimo un valore pari a 1/2 del terzultimo, all'ultimo un valore pari ad 1/4 del terzultimo
 */
-void printermanager::smooting_PRINT_flow()
+void PrinterManager::smooting_PRINT_flow()
 {
     short media;
     short somma;
@@ -216,7 +216,7 @@ la stampa è prevista cmunque sempre dopo il review, si avvale dei dati di review
 gli stessi comandi sia che ci si trovi a fine esame, sia che sia un review di esamei in MMC. Allora al posto della struttura Patient_Data, ci metiamo DatiPaziente.
 questa funzione gestisce tutta la stampa del report, sia in modalita portrait che landscape
 */
-void printermanager::Pri_Rep()//byte numCurve, char* num_file_to_print, bool print_mode)
+void PrinterManager::Pri_Rep()//byte numCurve, char* num_file_to_print, bool print_mode)
 {	/*	Stampa il Report	*/
 
     m_port->Pri_Speed(0);
@@ -347,7 +347,7 @@ void printermanager::Pri_Rep()//byte numCurve, char* num_file_to_print, bool pri
 /**
 E' stampata l'intestazione del report, con intestazione clinica, logo and so on
 */
-void printermanager::Intest()
+void PrinterManager::Intest()
 {
     m_port->Pri_Str(3,(char*)LINE"\x1",0);  			// scrive una riga vuota
     m_port->Pri_justif(F_center);				// scrittura al centro
@@ -377,7 +377,7 @@ void printermanager::Intest()
 /**
 Sono stampati i dati del report paziente, nome, cognome, data di nascita, sesso, data esame, ....
 */
-void printermanager::Report_data()
+void PrinterManager::Report_data()
 {
     char str[60];
 
@@ -473,7 +473,7 @@ void printermanager::Report_data()
 /**
 stampa del grafico di flusso/volume nella versione a grafici in portrait mode
 */
-void printermanager::Report_flw()
+void PrinterManager::Report_flw()
 {
 
     Calc_Max();	// calcolo FC curva di flusso (max_y) e FC curva di volume (max_x) così da individuare il giusto fondoscala
@@ -502,7 +502,7 @@ void printermanager::Report_flw()
 /**
 Calcola "i_max_x" , "max_x" e "max_y"
 */
-void printermanager::Calc_Max()
+void PrinterManager::Calc_Max()
 {
     m_max_x = m_durata;
 
@@ -651,7 +651,7 @@ GRAFICI IN PORTRAIT MODE - modo tradizionale
 funzione chiamata ciclicamente per stampare le 10 righe in cui è suddiviso il grafico del flusso/volume
 a seconda del parametro num_rig si stampano o meno i label degli assi di flusso e volume
 */
-void printermanager::Pri_Rep_Gra(int __num_riga)
+void PrinterManager::Pri_Rep_Gra(int __num_riga)
 {
     static bool label = false;
     unsigned short uw8;
@@ -908,7 +908,7 @@ void printermanager::Pri_Rep_Gra(int __num_riga)
     m_port->Pri_Str( (LCMD + CLS*24 + m_uw3 + CLD*24), (char *)m_str_gr, 0);
 }
 
-void printermanager::Pri_Rep_Gra_Ini_Grid(int __n_riga)
+void PrinterManager::Pri_Rep_Gra_Ini_Grid(int __n_riga)
 {
     m_uw3 = 24*94;	// dimensioni in byte della riga n-esima dell'area grafico
 
@@ -949,7 +949,7 @@ void printermanager::Pri_Rep_Gra_Ini_Grid(int __n_riga)
 
 
 
-byte printermanager::Int_Pun(int __i4){
+byte PrinterManager::Int_Pun(int __i4){
     /*
         Interpola i Punti ("x1","_y1") e ("x2","y2") rispetto alla Banda
       di Ordinate "i4" e "i4"+48.
@@ -1016,7 +1016,7 @@ byte printermanager::Int_Pun(int __i4){
     return(1);
 }
 
-void printermanager::Gra_Line(){
+void PrinterManager::Gra_Line(){
     /*
       Disegna il Segmento definito da ["x1","_y1"] - ["x2","y2"]
    */
@@ -1069,7 +1069,7 @@ void printermanager::Gra_Line(){
 }
 
 // crea la trasposta della stringa str_gr, ottenendo una matrice scritta per righe
-void printermanager::Str_Trasposta(byte __type, unsigned short __sx_byte, unsigned short __dx_byte)
+void PrinterManager::Str_Trasposta(byte __type, unsigned short __sx_byte, unsigned short __dx_byte)
 {
     static short num_byte, num_col, num_rig;
     static int j;
@@ -1098,7 +1098,7 @@ void printermanager::Str_Trasposta(byte __type, unsigned short __sx_byte, unsign
 /**
 stampa del grafico di EMG nella versione a grafici in portrait mode
 */
-void printermanager::Report_emg()
+void PrinterManager::Report_emg()
 {
     Calc_Max_EMG();
 
@@ -1120,7 +1120,7 @@ void printermanager::Report_emg()
 }
 
 
-void printermanager::Calc_Max_EMG()
+void PrinterManager::Calc_Max_EMG()
 {
     while (1){
         if (m_max_emg <= 50L){
@@ -1232,7 +1232,7 @@ void printermanager::Calc_Max_EMG()
 }
 
 
-void printermanager::Pri_Rep_Gra_EMG(byte __num_riga)
+void PrinterManager::Pri_Rep_Gra_EMG(byte __num_riga)
 {
     static bool label = false;
     static short int max_emg;
@@ -1444,7 +1444,7 @@ void printermanager::Pri_Rep_Gra_EMG(byte __num_riga)
 /**
 Nella stampa del report tipo reale, individuo il fondoscala del flusso, parametro che serve per adattare i valori degli array dati volume e emg (e anche flusso)
 */
-long printermanager::Calc_Max_Flw()
+long PrinterManager::Calc_Max_Flw()
 {
     long flw_max = 0;
     flw_max = (long)m_flu_max;
@@ -1468,7 +1468,7 @@ dal valore di FS del flusso, dovrò adattare, dal caso minore di 5 sample ogni 8p
 Il paramentro num_sample è il valore assoluto di dati reali acqusiti, e dividendo per 10 questo valore ho i secondi effettivi di acquisizione.
 ritorna il numero di punti da stampare, ricavati dall'adattamento del num_sample a seconda della risoluzione dell'asse tempo richiesta
 */
-short printermanager::adatta_buffer_dati(int __num_sample, long __fs_flw)
+short PrinterManager::adatta_buffer_dati(int __num_sample, long __fs_flw)
 {
     unsigned short j, k;		// valore massimo = 20min*60sec*10sample/sec = 12000
     unsigned short num_max_sample = __num_sample;
@@ -1634,7 +1634,7 @@ short printermanager::adatta_buffer_dati(int __num_sample, long __fs_flw)
 /**
 Nella stampa del report tipo reale, qui si cercano i massimi dei vari array per settare i fondoscala dei grafici
 */
-void printermanager::Calc_Max_RealReport_rel2(short __num_sample)
+void PrinterManager::Calc_Max_RealReport_rel2(short __num_sample)
 {
     short vol_max = 0;
     short emg_max = 0;
@@ -1689,7 +1689,7 @@ con 3 valori intermedi (1/4 FS, 1/2 FS, 3/4 FS).
 poi viene costruito il grafico a pezzi di 5secondi ciascuno (40righe)
 infine è cotruito l'asse delle ordinate destro, dove appare l'udm del volume e ik suo fs
 */
-void printermanager::Report_Real_Time(short __num_sample)
+void PrinterManager::Report_Real_Time(short __num_sample)
 {
     int num_righe;
     m_init_time_to_print = 0;
@@ -1746,7 +1746,7 @@ void printermanager::Report_Real_Time(short __num_sample)
 STAMPO in corrispondenza dell'asse ascisse grafico flusso, i label del flusso, dove lo zero sarà posto in corrispondenza della prima linea del grafico
 si tratta di un'immagine grafica composta da una matrice di punti larga 808dots e alta (8char*8puntiperchar)=64righe, quindi 808*64=12800punti = 1600caratteri
 */
-void printermanager::Pri_Rep_Label()
+void PrinterManager::Pri_Rep_Label()
 {
     //bool decimal = false;
     short int num_char_to_print, max_y;
@@ -1900,7 +1900,7 @@ funzioncina dedicata alla stampa dei caratteri dell'asse a sinistra nel caso del
 oppure emg, volume e flusso
 le unità di misura sono invece inserite nella funzione principale
 */
-void printermanager::print_char_left_label(short __value, int __pos_in_string, short int __num_char, bool __pri_decim, short int __pre_char)
+void PrinterManager::print_char_left_label(short __value, int __pos_in_string, short int __num_char, bool __pri_decim, short int __pre_char)
 {
     int init_pos_in_string;
     short int first_char, second_char, third_char, fourth_char;
@@ -1980,7 +1980,7 @@ void printermanager::print_char_left_label(short __value, int __pos_in_string, s
 /**
 Inserisce nella stringona le udm delle curve che possono essere: ml/s, ml, uV
 */
-void printermanager::print_udm_label(int ch_type, short __pos_in_string, short int __pre_char)
+void PrinterManager::print_udm_label(int ch_type, short __pos_in_string, short int __pre_char)
 {
     short init_pos_in_string;
     short int orriz_pos = _NUM_CHAR_X_LABEL_rel2 - __pre_char + 1; // con il "+1" ho già messo lo spazio vuoto fra numero e label
@@ -2035,7 +2035,7 @@ l'area sottesa al grafico del flussso, deve essere proporzionale al valore di fl
 funzione chiamata ciclicamente per stampare le righe in cui è suddiviso il grafico del flusso/volume
 a seconda del parametro num_rig si stampano o meno i label degli assi di flusso e volume
 */
-void printermanager::Pri_Rep_Gra_Landscape(short __num_cample)
+void PrinterManager::Pri_Rep_Gra_Landscape(short __num_cample)
 {
     bool stamp_x_label = false;
     //word i, z, j;
@@ -2524,7 +2524,7 @@ void printermanager::Pri_Rep_Gra_Landscape(short __num_cample)
 a seconda del massimo del flusso, si sceglie un fondo scala verticale e il conseguente asse dei tempi. A seconda dei sample fin qui stampati,
 si risale al tempo per comandare la stampa del label (in secondi) o meno
 */
-bool printermanager::check_stamp_label()
+bool PrinterManager::check_stamp_label()
 {
     int num_sec;
 
@@ -2571,7 +2571,7 @@ bool printermanager::check_stamp_label()
 /**
 Deve stampare l'asse che chiude il grafico e sopra stmpare l label del volume
 */
-void printermanager::Pri_Rep_asse_dx()
+void PrinterManager::Pri_Rep_asse_dx()
 {
     // riempio la stringa di zeri
     for(int i = 0; i < dim_string_solo_ax; i++ )
@@ -2621,7 +2621,7 @@ void printermanager::Pri_Rep_asse_dx()
 /**
 Stampa dei grafici di Syroki, sono 2 uno fianco l'altro
 */
-void printermanager::Report_siroky()
+void PrinterManager::Report_siroky()
 {
     m_port->Pri_Font(1);
     m_port->Pri_mode(0x10);
@@ -2692,7 +2692,7 @@ void printermanager::Report_siroky()
 /**
 disegna i diagrammi di Siriolokky
 */
-void  printermanager::Pri_Rep_Gra_Siroky (byte __num_riga, byte __grap)
+void  PrinterManager::Pri_Rep_Gra_Siroky (byte __num_riga, byte __grap)
 {
     byte z = 0;
 
@@ -2876,7 +2876,7 @@ void  printermanager::Pri_Rep_Gra_Siroky (byte __num_riga, byte __grap)
 
 
 
-void printermanager::Pri_Rep_Gra_Ini_Grid_Sir(byte __num_rig, byte __curve )
+void PrinterManager::Pri_Rep_Gra_Ini_Grid_Sir(byte __num_rig, byte __curve )
 {
     static unsigned short pos_gra_corr;
 
@@ -2918,7 +2918,7 @@ void printermanager::Pri_Rep_Gra_Ini_Grid_Sir(byte __num_rig, byte __curve )
 }	// fine funzione Pri_Rep_Gra_Ini_Grid_Sir
 
 
-void printermanager::Plot_StdCurve_Siroky(byte __num_rig, byte __curve )
+void PrinterManager::Plot_StdCurve_Siroky(byte __num_rig, byte __curve )
 {
     static unsigned short pos_gra_corr;
 
@@ -2989,7 +2989,7 @@ void printermanager::Plot_StdCurve_Siroky(byte __num_rig, byte __curve )
 /**
 Verifica se deve inserire e dove, il punto syroki con il suo tratteggio
 */
-void printermanager::Plot_Point_Siroky(byte __num_rig, byte __curve, unsigned short __flu )
+void PrinterManager::Plot_Point_Siroky(byte __num_rig, byte __curve, unsigned short __flu )
 {
     static unsigned short pos_gra_corr;
 
@@ -3048,7 +3048,7 @@ void printermanager::Plot_Point_Siroky(byte __num_rig, byte __curve, unsigned sh
 }
 
 
-void printermanager::Plot_Quadro_Siroky(byte __ubstrt, byte __ubend, unsigned short __new_pos, int __vol_pt, unsigned char __uw4)
+void PrinterManager::Plot_Quadro_Siroky(byte __ubstrt, byte __ubend, unsigned short __new_pos, int __vol_pt, unsigned char __uw4)
 {
     unsigned char ub2 = 0x80 >> (byte)( __vol_pt % 8);             /*byt=x(mod)8   u=x_st*24+y_st*/
     unsigned short uw6 = (unsigned short)( ub2 * 256);
@@ -3073,7 +3073,7 @@ void printermanager::Plot_Quadro_Siroky(byte __ubstrt, byte __ubend, unsigned sh
 /**
 stampa l'elenco dei dati di analidi delle curve
 */
-void printermanager::Report_result()
+void PrinterManager::Report_result()
 {
     m_port->Pri_Font(1);
     m_port->Pri_mode(0x10);
@@ -3126,7 +3126,7 @@ void printermanager::Report_result()
          -   "str_udm"  =  Stringa Unita' di Misura
          -   "flag_lf"  =  Flag LF Finale
 */
-void printermanager::Pri_Rep_Lin(char *__str_des, int __rep_dat, byte __num_dec, char *__str_udm, byte __flag_lf)
+void PrinterManager::Pri_Rep_Lin(char *__str_des, int __rep_dat, byte __num_dec, char *__str_udm, byte __flag_lf)
 {
     static short d_strlen;
     char str2[40];

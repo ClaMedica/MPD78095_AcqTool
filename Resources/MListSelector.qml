@@ -1,6 +1,7 @@
 import QtQuick 2.0
  
 import "qrc:/Components"
+import MComponents 1.0
 Rectangle{
     //@@@@@@@@@@    Definitions     @@@@@@@@@@
     property string title:"Lista"

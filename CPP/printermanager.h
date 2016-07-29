@@ -3,7 +3,7 @@
 
 #include <QObject>
 #include "datafilemanager.h"
-#include "printerserialport.h"
+#include "PrinterSerialPort.h"
 
 #define     NUMOF_X_PRINT_DOTS 752 // (96 mm - 2mm dovuti agli assi) * 8 bit al mm = 94 * 8 = 752
 #define 	NUMOFMAX_LEGHT_PORTRAIT_REP 3000	// 10 sample/sec x 5min = 3000
@@ -232,11 +232,11 @@ typedef struct{
 
 //extern bool Pri_Str(int num_car, char *str_pri, byte flag_lf);
 
-class printermanager : public QObject
+class PrinterManager : public QObject
 {
     Q_OBJECT
 public:
-    explicit printermanager(QString __namefile, QObject *parent = 0);
+    explicit PrinterManager(QString __namefile, QObject *parent = 0);
 
     void print();
 
@@ -261,7 +261,7 @@ signals:
 public slots:
 
 private:
-    printerserialport *m_port;
+    PrinterSerialPort *m_port;
 
     QString m_namefile;
     DatafileManager *m_dfm;
@@ -377,4 +377,4 @@ private:
 
 };
 
-#endif // PRINTERMANAGER_H
+#endif // PrinterManager_H

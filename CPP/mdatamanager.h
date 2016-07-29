@@ -5,7 +5,7 @@
 #include "mstorage.h"
 #include "modelmanager.h"
 #include "mflowdatas.h"
-#include "printermanager.h"
+#include "PrinterManager.h"
 
 
 typedef struct {

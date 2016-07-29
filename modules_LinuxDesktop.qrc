@@ -1,0 +1,6 @@
+<RCC>
+    <qresource prefix="/">
+        <file>Modules</file>
+        <file>Modules/MComponents</file>        
+    </qresource>
+</RCC>

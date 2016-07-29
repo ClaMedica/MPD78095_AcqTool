@@ -1,7 +1,7 @@
 import QtQuick 2.3
 import QtQuick.Controls 1.3
 import QtQuick.Dialogs 1.2
- 
+import MComponents 1.0
 import "qrc:/Components"
 import QtQuick.Controls.Styles 1.2
 import MPlotModule 1.0
@@ -16,9 +16,8 @@ MForm{
     signal back
 
     //@@@@@@@@@@    Properties      @@@@@@@@@@
-    id : rootRealTime
-    background:"qrc:/Images/Real"
-    visible:whoIsVisilbe===name?true:false
+    id : rootRealTime    
+
     clip:true
 
     //@@@@@@@@@@    Functions       @@@@@@@@@@
@@ -168,8 +167,6 @@ MForm{
         itemsInRow:2
         delegate: MMarkerButton{}
         visible:false
-
-
         //@@@@@@@@@@    Events          @@@@@@@@@@
         onClicked:
         {

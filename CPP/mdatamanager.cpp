@@ -118,7 +118,7 @@ void MDataManager::loadFile(QString __fileName)
         qDebug()<<"File Caricato?"<<m_mng->GetParameters();
 
         //m_mng->SetAnalysis(QString::number(FLW_AVD_STUDY));//temporaneo
-       // m_mng->CommitParameters();
+        // m_mng->CommitParameters();
 
         qDebug()<<"Building configuration file ...";
         if(!buildConfigurationFile())
@@ -227,7 +227,7 @@ void MDataManager::loadFile(QString __fileName)
         if(!defVec->isEmpty())
         {
             QString family="Definers";
-           // QString name="Operative";
+            // QString name="Operative";
             saveDataAndUpdate(family,descr,defVec);
         }
 
@@ -305,7 +305,7 @@ void MDataManager::loadFile(QString __fileName)
         //                saveDataAndUpdate(m_mng->GetChanName(nc),"Analytical Markers",subVec);
         //        }
 
-        //mi memorizzo le analisi associate a questo esame e l'associazione con i definitori
+        qDebug()<<"mi memorizzo le analisi associate a questo esame e l'associazione con i definitori";
         for (int i=0; i<m_mng->GetAnalysiNum();i++)
         {
             int anal = m_mng->GetAnalysis(i).toInt();
@@ -813,9 +813,11 @@ bool MDataManager::saveDataAndUpdate(QString __family, QString __name, VarMapVec
 
 void MDataManager::exitFromReview()
 {
-    qDebug()<<"Exit";
-    if (getToSave() == "ret")
-        exit(0); // dovrà tornare al modulo database
+    qDebug()<<"Exit"<<getToSave();
+    if (getToSave() == "ret"){
+        g_mainAppBridge->sendSwitch();
+        return;
+    }
 
     if (getToSave() == "")
         emit sg_exitFromReview();
@@ -835,33 +837,34 @@ void MDataManager::exitFromReview()
         else //"yes"
             //cancello il file copy
             qDebug()<<"cancellata copia all'exit"<<QFile::remove(copyName);
-        exit(0); //poi dovrà tornare al modulo database
+        g_mainAppBridge->sendSwitch(); //poi dovrà tornare al modulo database
     }
 
-//    if (getToSave() == "")
-//        emit sg_exitFromReview();
-//    else
-//    {
-//        QString copyName=m_fileName;
-//        copyName.insert(copyName.length()-4,"_copy");
-//        if (getToSave() == "yes")
-//        {        //copio il file copy nell'originale
-//            if (QFile::exists(copyName))
-//            {
-//                qDebug()<<"cancello vecchio file"<<QFile::remove(m_fileName);
-//                qDebug()<<"copio le modifiche"<<QFile::copy(copyName,m_fileName);
-//                qDebug()<<"cancellata copia all'exit"<<QFile::remove(copyName);
-//            }
-//        }
-//        else //"no"
-//            //cancello il file copy
-//            qDebug()<<"cancellata copia all'exit"<<QFile::remove(copyName);
-//        exit(0); //poi dovrà tornare al modulo database
-//    }
+    //    if (getToSave() == "")
+    //        emit sg_exitFromReview();
+    //    else
+    //    {
+    //        QString copyName=m_fileName;
+    //        copyName.insert(copyName.length()-4,"_copy");
+    //        if (getToSave() == "yes")
+    //        {        //copio il file copy nell'originale
+    //            if (QFile::exists(copyName))
+    //            {
+    //                qDebug()<<"cancello vecchio file"<<QFile::remove(m_fileName);
+    //                qDebug()<<"copio le modifiche"<<QFile::copy(copyName,m_fileName);
+    //                qDebug()<<"cancellata copia all'exit"<<QFile::remove(copyName);
+    //            }
+    //        }
+    //        else //"no"
+    //            //cancello il file copy
+    //            qDebug()<<"cancellata copia all'exit"<<QFile::remove(copyName);
+    //        exit(0); //poi dovrà tornare al modulo database
+    //    }
 }
 
 bool MDataManager::checkForVolRes()
 {
+    qDebug()<<"INIZIO";
     if (getValVolRes() != -999)
         return false;
 
@@ -873,7 +876,7 @@ bool MDataManager::checkForVolRes()
     qDebug()<<"File Caricato?"<<m_mng->GetParameters();
 
     //per ora salvo io su file pic l'analisi flussimetria ...
-  // m_mng->SetAnalysis("Flussimetria");
+    // m_mng->SetAnalysis("Flussimetria");
 
     m_numAna = m_mng->GetAnalysiNum();
 
@@ -898,6 +901,7 @@ bool MDataManager::checkForVolRes()
     }
 
     m_mng->Close();
+    qDebug()<<"FINE"<<volRes;
     return volRes;
 }
 
@@ -914,7 +918,7 @@ void MDataManager::analysis()
     //                Detrusor Overactivity
     //                Biofeedback
     //                Compliance
-
+qDebug()<<"INIZIO";
 
     if (checkForVolRes())
         return;
@@ -1126,21 +1130,22 @@ void MDataManager::analysis()
     }
 
 
-    m_mng->Close();
+    qDebug()<<"File chiuso"<<m_mng->Close();
+
 
     //printer PROVA
-    printermanager *prova = new printermanager(m_fileName);
-    prova->setTempoAttesa(m_aflwdatas.at(0)->getWaitingTime());
-    prova->setFlussoMax(m_aflwdatas.at(0)->getQMax());
-    prova->setFlussoMedio(m_aflwdatas.at(0)->getQAve());
-    prova->setTempoMax(m_aflwdatas.at(0)->getTimeAtQmax());
-    prova->setTempo595(m_aflwdatas.at(0)->getTime90());
-    prova->setTempoFlusso(m_aflwdatas.at(0)->getFlowTime());
-    prova->setTempoDisc(m_aflwdatas.at(0)->getDescTime());
-    prova->setTempoSvuot(m_aflwdatas.at(0)->getVoidingTime());
-    prova->setVolFlussoMax(m_aflwdatas.at(0)->getVolAtQqmax());
-    prova->setVolVuotato(m_aflwdatas.at(0)->getVoidedVolume());
-    prova->setAccelerazione(m_aflwdatas.at(0)->getAcceleration());
+//    PrinterManager *prova = new PrinterManager(m_fileName);
+//    prova->setTempoAttesa(m_aflwdatas.at(0)->getWaitingTime());
+//    prova->setFlussoMax(m_aflwdatas.at(0)->getQMax());
+//    prova->setFlussoMedio(m_aflwdatas.at(0)->getQAve());
+//    prova->setTempoMax(m_aflwdatas.at(0)->getTimeAtQmax());
+//    prova->setTempo595(m_aflwdatas.at(0)->getTime90());
+//    prova->setTempoFlusso(m_aflwdatas.at(0)->getFlowTime());
+//    prova->setTempoDisc(m_aflwdatas.at(0)->getDescTime());
+//    prova->setTempoSvuot(m_aflwdatas.at(0)->getVoidingTime());
+//    prova->setVolFlussoMax(m_aflwdatas.at(0)->getVolAtQqmax());
+//    prova->setVolVuotato(m_aflwdatas.at(0)->getVoidedVolume());
+//    prova->setAccelerazione(m_aflwdatas.at(0)->getAcceleration());
 
     //letto dai setting
     //mi dice se la flussimetria automatica o manuale
@@ -1149,6 +1154,7 @@ void MDataManager::analysis()
     //prova->print();
 
     //qml
+    qDebug()<<"FINE";
     emit sg_loadResult();
 
 }
@@ -1308,7 +1314,7 @@ void MDataManager::InitPageGraphs(int __anaType)
                 saveDataAndUpdate(family,name,mrkAnVec);
             }
 
-           // saveChanges();//(?)
+            // saveChanges();//(?)
             updateInfoList();
             emit reloadingCompleted();
 
@@ -1329,7 +1335,7 @@ bool MDataManager::InitArraysFLW(int __start,
     double widthTth = 0;
 
     Ancestry *config_ana = new Ancestry;
-    config_ana->loadFromXML(":/Config/ParAna.xml");
+    qDebug()<<"File Par Ana caricato correttamente?"<<config_ana->loadFromXML(":/Config/ParAna.xml");
 
     QString value;
     foreach (Ancestry *child,config_ana->getChildren())
@@ -1338,13 +1344,14 @@ bool MDataManager::InitArraysFLW(int __start,
         {
             foreach (Ancestry *def,child->getChildren())
             {
-                value=def->getAttribute("Type");
+                value=def->getSafeAttribute("Type");
                 if (value.toInt() == MK_FLOWMETRY)
                 {
-                    Ancestry *flusso = def->getChild("Q");
-                    startTh = flusso->getChild("StartTh")->getTextOfChild("value").toDouble();
-                    heightTh = flusso->getChild("AmpTh")->getTextOfChild("value").toDouble();
-                    widthTth = flusso->getChild("DurTh")->getTextOfChild("value").toDouble();
+                    qDebug()<<"Trovato MK_FLOWMETRY";
+                    Ancestry *flusso = def->getSafeChild("Q");
+                    startTh = flusso->getSafeChild("StartTh")->getTextOfChild("value").toDouble();
+                    heightTh = flusso->getSafeChild("AmpTh")->getTextOfChild("value").toDouble();
+                    widthTth = flusso->getSafeChild("DurTh")->getTextOfChild("value").toDouble();
                 }
             }
         }
@@ -1355,17 +1362,17 @@ bool MDataManager::InitArraysFLW(int __start,
     if (res < 0)
         return false;
 
-    //Legge i risultati
+    qDebug()<<"Legge i risultati";
     int numEv = 1;
     res = ReadResult(numEv);
     if (res < 0)
         return false;
 
 
-    //costruisco i segnali da disegnare nel plot per i nomogrammi
+    qDebug()<<"costruisco i segnali da disegnare nel plot per i nomogrammi";
     for (int i=0;i<numEv;i++)
     {
-        //nomogramma LiverpoolQMax
+        qDebug()<<"nomogramma LiverpoolQMax";
         MSignal *sig0=new MSignal;
         MSignal *sig1=new MSignal;
         MSignal *sig2=new MSignal;
@@ -1401,7 +1408,7 @@ bool MDataManager::InitArraysFLW(int __start,
         m_aflwdatas.at(i+1)->getLiverpoolMax()->setColors(colori);
         m_aflwdatas.at(i+1)->getLiverpoolMax()->setTracce(tracce);
 
-        //nomogramma LiverpoolQAve
+        qDebug()<<"nomogramma LiverpoolQAve";
         MSignal *sig0Ave=new MSignal;
         MSignal *sig1Ave=new MSignal;
         MSignal *sig2Ave=new MSignal;
@@ -1437,7 +1444,7 @@ bool MDataManager::InitArraysFLW(int __start,
         m_aflwdatas.at(i+1)->getLiverpoolAve()->setColors(colori);
         m_aflwdatas.at(i+1)->getLiverpoolAve()->setTracce(tracce);
 
-        //nomogramma Siroky Max
+        qDebug()<<"nomogramma Siroky Max";
         if (!m_sexPatient)
         {
             MSignal *sig0SirMax=new MSignal;
@@ -1502,6 +1509,7 @@ bool MDataManager::InitArraysFLW(int __start,
             m_aflwdatas.at(i+1)->getSirokyAve()->setLinea(linee);
         }
     }
+    qDebug()<<"Fine";
     return true;
 }
 

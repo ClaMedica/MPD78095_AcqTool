@@ -1,9 +1,8 @@
 import QtQuick 2.0
 import QtQuick.Controls 1.0
-import Managers 1.0
- 
+import Managers 1.0 
+import MComponents 1.0
 import "qrc:/Components"
-
 
 MForm{
     //@@@@@@@@@@ Definitions @@@@@@@@@@
@@ -11,7 +10,7 @@ MForm{
 
     //@@@@@@@@@@    Properties      @@@@@@@@@@
     id : rootHom
-    visible:whoIsVisilbe===name?true:false
+
 
     MButton{
         //@@@@@@@@@@    Properties      @@@@@@@@@@
@@ -21,7 +20,7 @@ MForm{
         anchors.top:parent.top
         width:rootHom.width/2
         height: rootHom.height/2
-        background:"qrc:/Images/Real"
+        image:"qrc:/Images/Real"
         enabled:configSelector.visible?false:true
 
         //@@@@@@@@@@    Events          @@@@@@@@@@
@@ -38,7 +37,7 @@ MForm{
         anchors.top:parent.top
         width:rootHom.width/2
         height: rootHom.height/2
-        background:"qrc:/Images/Analysis"
+        image:"qrc:/Images/Analysis"
         enabled:configSelector.visible?false:true
         onClicked:{            
             configSelector.visible=true
@@ -54,7 +53,7 @@ MForm{
         anchors.bottom:parent.bottom
         width:rootHom.width/2
         height: rootHom.height/2
-        background:"qrc:/Images/Supervisor"
+        image:"qrc:/Images/Supervisor"
         onClicked: mngAcq.startSupe("hide")
         enabled:configSelector.visible?false:true
     }
@@ -66,7 +65,7 @@ MForm{
         anchors.bottom:parent.bottom
         width:rootHom.width/2
         height: rootHom.height/2
-        background:"qrc:/Images/Options"
+        image:"qrc:/Images/Options"
         enabled:configSelector.visible?false:true
     }
 
@@ -90,8 +89,7 @@ MForm{
                 configFile=configFolder+"/cur.xml"
 
 
-            whoIsVisilbe=owner
-
+            whoIsVisible=owner
             configSelector.visible=false
 
         }

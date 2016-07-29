@@ -1,7 +1,6 @@
 <RCC>
     <qresource prefix="/">
-        <file>Modules/PicoFlow</file>
-        <file>Modules/PicoFlow/MComponents</file>
-        <file>Modules/PicoFlow/MPlotModule</file>
+        <file>Modules</file>
+        <file>Modules/MComponents</file>
     </qresource>    
 </RCC>

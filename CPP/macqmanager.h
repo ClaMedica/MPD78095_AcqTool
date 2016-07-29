@@ -47,6 +47,7 @@ private slots:
 
 private:
     QStringList m_serversNames,
+                m_channelNames,//lista dei nomi dei canali
                 m_totalHWChan,//lista dei canali hw che ci sono
                 m_superList;    //lista dei supervisori che dovrò avviare
 

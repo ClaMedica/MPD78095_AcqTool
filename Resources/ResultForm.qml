@@ -3,13 +3,14 @@ import QtQuick.Controls 1.0
 import QtQuick.Dialogs 1.2
 import QtQuick.Controls.Styles 1.2
 import MPlotModule 1.0
+import MComponents 1.0
 import QtQuick.Layouts 1.1
 import QtQml 2.0
 
 import "qrc:/Forms"
 import "qrc:/Components"
 
-Rectangle {
+MForm {
 
     //@@@@@@@@@@    Properties      @@@@@@@@@@
     property var pagesLocal:[]
@@ -39,7 +40,6 @@ Rectangle {
                 pagesLocal[i].visible = false;
         }
         pagesLocal[btnId].visible = true;
-
     }
 
     function loadPageAnalysis()
@@ -76,7 +76,7 @@ Rectangle {
                 var btnLeftMargin = 20
                 if (mngData.getNumAnaFlwAdv() !== 2)
                 {
-                    var buttonfn = Qt.createQmlObject('import "qrc:/Components"; MAnaButton {}', rectf)
+                    var buttonfn = Qt.createQmlObject('import "qrc:/Components"; MButton {}', rectf)
                     buttonfn.buttonId = pagesSameAna.length
                     buttonfn.anchors.right = rectf.right
                     buttonfn.anchors.top = rectf.top
@@ -109,7 +109,7 @@ Rectangle {
                 tablefn.populate()
                 tablefn.visible = true
 
-                var buttonT = Qt.createQmlObject('import "qrc:/Components"; MAnaButton {}', rectdata)
+                var buttonT = Qt.createQmlObject('import "qrc:/Components"; MButton {}', rectdata)
                 buttonT.buttonId = pagesLocal.length
                 buttonT.anchors.bottom = rectdata.bottom
                 buttonT.anchors.left = rectdata.left
@@ -119,7 +119,7 @@ Rectangle {
                 buttonT.clicked.connect(clickButton)
                 resultForm.buttonTable = buttonT.buttonId
                 // btnLeftMargin += 110
-                pagesLocal[pagesLocal.length] = tablefn
+                pagesLocal.push(tablefn)
 
                 //nomogrammi flussimetria
                 //liverpool Qmax
@@ -147,7 +147,7 @@ Rectangle {
                 LQM.visible = false
 
                 //button
-                var buttonLQM = Qt.createQmlObject('import "qrc:/Components"; MAnaButton {}', rectdata)
+                var buttonLQM = Qt.createQmlObject('import "qrc:/Components"; MButton {}', rectdata)
                 buttonLQM.buttonId = pagesLocal.length
                 buttonLQM.anchors.bottom = rectdata.bottom
                 buttonLQM.anchors.left = rectdata.left
@@ -156,7 +156,7 @@ Rectangle {
                 buttonLQM.myText = nameNomo
                 buttonLQM.clicked.connect(clickButton)
                 btnLeftMargin += 110
-                pagesLocal[pagesLocal.length] = LQM
+                pagesLocal.push(LQM)
 
                 //liverpool QAve
                 nameNomo = mngData.getFlowDatas(1).getLiverpoolAve().getTitle()
@@ -183,7 +183,7 @@ Rectangle {
                 LQA.visible = false
 
                 //button
-                var buttonLQA = Qt.createQmlObject('import "qrc:/Components"; MAnaButton {}', rectdata)
+                var buttonLQA = Qt.createQmlObject('import "qrc:/Components"; MButton {}', rectdata)
                 buttonLQA.buttonId = pagesLocal.length
                 buttonLQA.anchors.bottom = rectdata.bottom
                 buttonLQA.anchors.left = rectdata.left
@@ -192,7 +192,7 @@ Rectangle {
                 buttonLQA.myText = nameNomo
                 buttonLQA.clicked.connect(clickButton)
                 btnLeftMargin += 110
-                pagesLocal[pagesLocal.length] = LQA
+                pagesLocal.push(LQA)
 
                 //siroky QMax
                 nameNomo = mngData.getFlowDatas(1).getSirokyMax().getTitle()
@@ -226,7 +226,7 @@ Rectangle {
                     SQM.visible = false
 
                     //button
-                    var buttonSQM = Qt.createQmlObject('import "qrc:/Components"; MAnaButton {}', rectdata)
+                    var buttonSQM = Qt.createQmlObject('import "qrc:/Components"; MButton {}', rectdata)
                     buttonSQM.buttonId = pagesLocal.length
                     buttonSQM.anchors.bottom = rectdata.bottom
                     buttonSQM.anchors.left = rectdata.left
@@ -235,7 +235,7 @@ Rectangle {
                     buttonSQM.myText = nameNomo
                     buttonSQM.clicked.connect(clickButton)
                     btnLeftMargin += 110
-                    pagesLocal[pagesLocal.length] = SQM
+                    pagesLocal.push(SQM)
 
                     //siroky QAve
                     nameNomo = mngData.getFlowDatas(i).getSirokyAve().getTitle()
@@ -267,7 +267,7 @@ Rectangle {
                     SQA.visible = false
 
                     //button
-                    var buttonSQA = Qt.createQmlObject('import "qrc:/Components"; MAnaButton {}', rectdata)
+                    var buttonSQA = Qt.createQmlObject('import "qrc:/Components"; MButton {}', rectdata)
                     buttonSQA.buttonId = pagesLocal.length
                     buttonSQA.anchors.bottom = rectdata.bottom
                     buttonSQA.anchors.left = rectdata.left
@@ -276,7 +276,7 @@ Rectangle {
                     buttonSQA.myText = nameNomo
                     buttonSQA.clicked.connect(clickButton)
                     //btnLeftMargin += 110
-                    pagesLocal[pagesLocal.length] = SQA
+                    pagesLocal.push(SQA)
                 }
 
             }
@@ -287,7 +287,7 @@ Rectangle {
     }
 
     //@@@@@@@@@@    Graphics      @@@@@@@@@@
-    Button {
+    MButton {
         id:btnBack
         text: qsTr("back to graphs")
         width: 100

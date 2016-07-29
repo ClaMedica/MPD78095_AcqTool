@@ -137,7 +137,7 @@
                 value="#FFFFFF"
                 />
         </Supervisor>
-        <channelsProp>
+        <ChannelsProp>
             <VBT>
                 <width
                    label="width track"
@@ -178,5 +178,25 @@
                     value="red"
                 />
             </QBT>
+            <EMG>
+                <width
+                   label="width track"
+                   type="TextField"
+                   unit=""
+                   value="1"
+                />
+                <thick
+                    label="thick"
+                    type="TextField"
+                    unit=""
+                    value="3"
+                />
+                <color
+                    label="color track"
+                    type="MColorBox"
+                    unit=""
+                    value="red"
+                />
+            </EMG>
         </channesProp>
 </Configuration>

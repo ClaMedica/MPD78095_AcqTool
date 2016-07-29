@@ -4,6 +4,7 @@ QT += qml quick widgets sql network multimedia xml core serialport
 
 RESOURCES += Resources/qml.qrc
 
+
 # Additional import path used to resolve QML modules in Qt Creator's code model
 QML_IMPORT_PATH +=  Modules/MPlotModule
 
@@ -35,10 +36,11 @@ SOURCES += main.cpp \
     ../MGlobal/MyMessageOutput.cpp \
     CPP/manatablemodel.cpp \
     CPP/nomogramma.cpp \
-    CPP/printermanager.cpp \
-    CPP/printerserialport.cpp \
+    CPP/PrinterManager.cpp \
+    CPP/PrinterSerialPort.cpp \
     ../MGlobal/UdMImpl.cpp \
-    ../MGlobal/appbridge.cpp
+    ../MGlobal/appbridge.cpp \
+    ../MGlobal/layoutmanager.cpp
 
 HEADERS += \
     CPP/parametermanager.h \
@@ -60,10 +62,11 @@ HEADERS += \
     CPP/mflowdatas.h \
     CPP/manatablemodel.h \
     CPP/nomogramma.h \
-    CPP/printermanager.h \
-    CPP/printerserialport.h \
+    CPP/PrinterManager.h \
+    CPP/PrinterSerialPort.h \
     ../MGlobal/UDMImpl.h \
-    ../MGlobal/appbridge.h
+    ../MGlobal/appbridge.h \
+    ../MGlobal/layoutmanager.h
 
 
 
@@ -161,16 +164,21 @@ CONFIG += link_pkgconfig
 
 PICOFLOW{
 DEFINES += PICOFLOW
-DEFINES += TAR
 TARGET = PicoAcq
 RESOURCES += modules_picoflow.qrc
+RESOURCES += Resources/Icone/icons.qrc
+
+
 unix:!macx: LIBS += -L$$PWD/../Build-IMX6/DatafileManager/ -lDatafileManager
 
 INCLUDEPATH += $$PWD/../Build-IMX6/DatafileManager
 DEPENDPATH += $$PWD/../Build-IMX6/DatafileManager
 
 # Additional import path used to resolve QML modules in Qt Creator's code model
-QML_IMPORT_PATH +=  Modules/PicoFlow
+QML_IMPORT_PATH = ../MGlobal \
+                  ../Build-IMX6/CommonPlugin
+DISTFILES += ../MGlobal/MComponents/* \
+             ../MGlobal/MComponents/Images/*
 }
 
 

@@ -4,6 +4,7 @@ import QtQuick.Dialogs 1.0
  
 import QtQuick.Controls.Styles 1.2
 import "qrc:/Components"
+import MComponents 1.0
 
 Rectangle{
     //@@@@@@@@@@    Definitions     @@@@@@@@@@

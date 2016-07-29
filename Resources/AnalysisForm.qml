@@ -6,7 +6,7 @@ import MPlotModule 1.0
 import Managers 1.0
 import QtQml 2.0
 
-//import Resources 1.0
+import MComponents 1.0
 import "qrc:/Components"
 MForm{
     //@@@@@@@@@@    Definitions     @@@@@@@@@@
@@ -16,9 +16,7 @@ MForm{
 
     //@@@@@@@@@@    Properties      @@@@@@@@@@
     id : rootAna
-    anchors.fill: parent.fill
-    //background:"qrc:/Images/Analysis"
-    visible:whoIsVisilbe===name?true:false
+    anchors.fill: parent.fill   
 
     //@@@@@@@@@@    Functions       @@@@@@@@@@
     function populate()

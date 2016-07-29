@@ -1,7 +1,7 @@
 import QtQuick 2.3
 import QtQuick.Controls 1.2
 import QtQuick.Dialogs 1.2
-
+import MComponents 1.0
 Rectangle {
     id:volResDlg
     color: "lightgrey"
@@ -12,7 +12,7 @@ Rectangle {
     anchors.centerIn: parent
 
     property string titleDlg: ""
-    property string volResVal: "0"
+    property int volResVal: 0
 
     Keys.onReturnPressed: {
         volResDlg.visible = false
@@ -33,48 +33,35 @@ Rectangle {
 
     }
 
-
-    Row{
-        spacing:20
-        anchors.centerIn: parent
-        focus: true
-
-        Text{
-            id: textVol
-            text:qsTr("Insert Residual Volume")
-        }
-
-        Rectangle {
-            color: "whitesmoke"
-            height: textVol.height +5
-            width: 50
-            anchors.bottom: textVol.bottom
-            focus: true
-
-            TextField {
-                id: textField
-                text: volResVal
-                validator: IntValidator { bottom:0; top: 1000}
-                anchors.bottom: parent.bottom
-                focus: true
-
-                inputMethodHints: Qt.ImhFormattedNumbersOnly
-                onActiveFocusChanged: volResVal = ""
-
-            }
+    MParameterEdit{
+        id:parVolResVal
+        anchors.verticalCenter: parent.verticalCenter
+        height:parent.height*0.2
+        anchors.left: parent.left
+        anchors.right:parent.right
+        anchors.margins: layout.value("Margin")
+        type:typTextField
+        model:[0,validator]
+        beginInfo:"0"
+        role:qsTr("Insert Residual Volume")
+        IntValidator {
+            id:validator
+            bottom:0
+            top:1000
         }
     }
 
-    Button {
+    MButton {
         id:btnOK
         text: "Ok"
-
         anchors.right: parent.right
         anchors.bottom: parent.bottom
         anchors.bottomMargin: 10
         anchors.rightMargin: 10
+        width:parent.width*0.4
+        height:parent.height*0.2
         onClicked: {
-            volResVal = textField.text
+            volResVal = parVolResVal.info
             volResDlg.visible = false
             Qt.inputMethod.hide()
             mngData.valVolRes = volResVal

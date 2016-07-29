@@ -7,7 +7,6 @@ import MPlotModule 1.0
 import Managers 1.0
 
 Rectangle {
-    property string whoIsVisilbe:""
-    property string name:"Form"
+
     signal back
 }

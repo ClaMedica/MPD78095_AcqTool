@@ -1,0 +1,48 @@
+import QtQuick 2.4
+import QtQuick.Controls 1.2
+import QtQuick.Dialogs 1.2
+import "qrc:/GeneralData.js" as DataEngine
+import Settings 1.0
+import "qrc:/"
+import "qrc:/Forms"
+import MComponents 1.0 //import MComponents 1.0 //import "qrc:/Components"
+Rectangle{
+    id:rootTree
+    property real labelSize:4
+    color:"transparent"
+    clip:true
+    function loadFile(f){
+        console.log("editSettings",f)
+        if(anctree.ancestry!==undefined)
+            anctree.ancestry.destroy()
+        var a=Qt.createQmlObject('import Settings 1.0; Ancestry{}',this)
+        if(a.loadFromXML(f)){
+            anctree.ancestry=a
+            //flick.contentItem=anctree
+
+
+        }
+    }
+    function saveFile(f){
+        anctree.save()
+        anctree.ancestry.saveToXML(f)
+    }
+
+    Flickable{
+        id:flick
+        anchors.fill:parent
+        contentHeight: anctree.height
+        contentWidth: anctree.width
+//        verticalScrollBarPolicy :Qt.ScrollBarAlwaysOff
+//        horizontalScrollBarPolicy :Qt.ScrollBarAlwaysOff
+//        contentItem: anctree
+
+    MAncestry {
+        id:anctree
+        width:rootTree.width
+        labelSize: rootTree.labelSize
+        itemHeight: rootTree.height/10
+    }
+    }
+
+}

@@ -3,6 +3,7 @@ import QtQuick.Controls 1.1
 import QtQuick.Dialogs 1.1
  
 import "qrc:/Components"
+import MComponents 1.0
 Rectangle {
     //@@@@@@@@@@    Definitions     @@@@@@@@@@
     property var plotList:[]

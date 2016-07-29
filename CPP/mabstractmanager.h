@@ -16,6 +16,9 @@
 #include "QtGlobal"
 //classe per unità di misura
 #include "UDMimpl.h"
+#include "appbridge.h"
+
+extern AcqBridge *g_mainAppBridge;
 
 class MAbstractManager : public QObject
 {

@@ -3,6 +3,7 @@ import Managers 1.0
 import QtQuick.Controls 1.0
  
 import MPlotModule 1.0
+import MComponents 1.0
 import "qrc:/Components"
 Rectangle{
     //@@@@@@@@@@    Definitions     @@@@@@@@@@
@@ -126,7 +127,6 @@ Rectangle{
             anchors.left:parent.left
             anchors.right:parent.right
             text:">>>"
-            showImage: false
 
             //@@@@@@@@@@    Events          @@@@@@@@@@
             onClicked: {

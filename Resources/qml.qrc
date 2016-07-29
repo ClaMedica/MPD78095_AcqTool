@@ -12,23 +12,16 @@
     <qresource prefix="/Components">
         <file>MAlarm.qml</file>
         <file>MAlarmBox.qml</file>
-        <file>MButton.qml</file>
         <file>MDialog.qml</file>
-        <file>MForm.qml</file>
         <file>MGridView.qml</file>
         <file>MListSelector.qml</file>
         <file>MMarkerButton.qml</file>
-        <file>MMenu.qml</file>
-        <file>MMenuBar.qml</file>
-        <file>MMenuButton.qml</file>
-        <file>MMessageYesNo.qml</file>
         <file>MNewName.qml</file>
         <file>MPopUp.qml</file>
         <file>Parameter.qml</file>
         <file>ParameterBox.qml</file>
         <file>Player.qml</file>
         <file>MAnaTableView.qml</file>
-        <file>MAnaButton.qml</file>
         <file>MNomogramma.qml</file>
         <file>MScroolBar.qml</file>
     </qresource>
@@ -52,9 +45,6 @@
         <file alias="resetOn">resetOn.jpg</file>
         <file alias="setting">setting.png</file>
         <file alias="Supervisor">Supervisor.jpg</file>
-        <file>salvaChiudi.png</file>
-        <file>salvaChiudi_CLICK.png</file>
-        <file>salvaChiudi_off.png</file>
     </qresource>
     <qresource prefix="/Config">
         <file>Config_Alarms_it.xml</file>

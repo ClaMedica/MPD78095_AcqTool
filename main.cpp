@@ -23,6 +23,8 @@
 #include <appbridge.h>
 #include <QApplication>
 #include <QQuickWindow>
+#include "layoutmanager.h"
+#include <QSplashScreen>
 #ifdef ANDROID
 #include <QAndroidJniObject>
 #include <QtAndroid>
@@ -73,12 +75,15 @@ int main(int argc, char *argv[])
     qmlRegisterUncreatableType<Nomogramma>("Managers",1,0,"nomogramma","error on Nomogramma creation");
 
     QQmlApplicationEngine engine;
+    //Carico il layout di default del programma
+    LayoutManager mngLayout;
 
-    engine.addPluginPath("qrc:/");
-    engine.addPluginPath("qrc:/Modules/PicoFlow/MComponents");
-    engine.addPluginPath("qrc:/Modules/PicoFlow/MPlotModule");
     engine.addPluginPath("qrc:/Modules/PicoFlow");
-#ifdef PICOFLOW
+    engine.addImportPath("qrc:/Modules");
+#ifdef PICOFLOW//metto questo altrimenti su target non carica il plugin cpp
+    engine.rootContext()->setContextProperty("screenH",480);
+    engine.rootContext()->setContextProperty("screenW",640);
+    engine.rootContext()->setContextProperty("isTouch",true);
     engine.addPluginPath("../PicoFlow");
 #endif
 #ifdef ANDROID
@@ -86,13 +91,15 @@ int main(int argc, char *argv[])
 
     AndroidManager *androidmanager = new AndroidManager(&engine);
     engine.rootContext()->setContextProperty(QLatin1String("androidmanager"),
-                                                         androidmanager);
+                                             androidmanager);
     engine.rootContext()->setContextProperty(QLatin1String("platform"),"android");
 #else
     engine.rootContext()->setContextProperty(QLatin1String("platform"),"win");
 #endif
+    engine.rootContext()->setContextProperty("layout",&mngLayout);
     engine.rootContext()->setContextProperty("settings",&g_P7SettingsManager);
     engine.rootContext()->setContextProperty("bridgeMain",g_mainAppBridge);
+
 
 
     qDebug()<<engine.importPathList();
@@ -100,6 +107,6 @@ int main(int argc, char *argv[])
     qDebug()<<"engine caricato";
     g_mainAppBridge->setRootObjects(engine.rootObjects());
     int ret=app.exec();
-    qDebug()<<"Exiting with code"<<ret;
+    qDebug()<<"Uscito"<<ret;
     return ret;
 }

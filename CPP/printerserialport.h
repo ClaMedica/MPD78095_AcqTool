@@ -1,5 +1,5 @@
-#ifndef PRINTERSERIALPORT_H
-#define PRINTERSERIALPORT_H
+#ifndef PrinterSerialPort_H
+#define PrinterSerialPort_H
 
 #include <QtCore/qglobal.h>
 #include <QObject>
@@ -13,11 +13,11 @@
 #define ESC               0x1B            /* Escape                         */
 #define GS				  0x1D			  /* SET impostazione				*/
 
-class printerserialport : public QObject
+class PrinterSerialPort : public QObject
 {
     Q_OBJECT
 public:
-    explicit printerserialport(QObject *parent = 0);
+    explicit PrinterSerialPort(QObject *parent = 0);
     void closeSerialPort();
 
     void init_printer();
@@ -45,4 +45,4 @@ private:
 
 };
 
-#endif // PRINTERSERIALPORT_H
+#endif // PrinterSerialPort_H

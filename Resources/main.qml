@@ -4,18 +4,18 @@ import QtQuick.Dialogs 1.2
 //import Resources 1.0
 import "qrc:/Forms"
 import "qrc:/Dialog"
-import MPlotModule 1.0
+import MComponents 1.0
 import Managers 1.0
 import QtQuick.Window 2.2
 
 //import QtQuick.VirtualKeyboard 1.0
 
-
-
 ApplicationWindow {
     //@@@@@@@@@@ Definitions @@@@@@@@@@
+    property var keyboard:appKey
     property string examFolder:settings.datafilePath
     property string configFolder:settings.appPath()
+
     //@@@@@@@@@@    Properties      @@@@@@@@@@
     id: root
     flags: Qt.FramelessWindowHint
@@ -34,17 +34,18 @@ ApplicationWindow {
 
         if(mode==="acq")
         {
+            console.log("Start new acq")
             mngAcq.load()
-            mngAcq.newAcquisition(dataFile)
-            console.log("Start configuring screen")
+            mngAcq.newAcquisition(dataFile)            
             forReal.setMarkersInfo(mngAcq.markersInfo("type",[1,6]))
             forReal.configurationFile=mngAcq.plotConfigFileName()
             forReal.displayMessage("Wait for inizialization...",-1)
-            forHome.whoIsVisilbe=forReal.name
+            forHome.whoIsVisible=forReal.name
             forReal.setAcqInfo(mngData.acqInfo())
         }
         else if(mode==="vis")
         {
+            console.log("Start new vis")
             forAna.initialize()
             mngData.load()
             if(platform!=="android")
@@ -94,7 +95,7 @@ ApplicationWindow {
         onLoadingCompleted:{
             forAna.configurationFile=mngData.plotConfigFileName()
             forAna.populate()
-            forHome.whoIsVisilbe=forAna.name
+            forHome.whoIsVisible=forAna.name
         }
 
         onReloadingCompleted: forAna.populate()
@@ -127,7 +128,7 @@ ApplicationWindow {
         id: forHome
         anchors.fill: parent
         name:"HomeForm"
-        whoIsVisilbe: "HomeForm"
+        whoIsVisible: "HomeForm"
     }
 
 
@@ -136,10 +137,10 @@ ApplicationWindow {
         id: forAna
         anchors.fill: parent
         name:"AnalysisForm"
-        whoIsVisilbe:forHome.whoIsVisilbe
+        whoIsVisible:forHome.whoIsVisible
 
         //@@@@@@@@@@    Events          @@@@@@@@@@
-        onBack: forHome.whoIsVisilbe=forHome.name
+        onBack: forHome.whoIsVisible=forHome.name
     }
 
 
@@ -148,10 +149,10 @@ ApplicationWindow {
         id: forReal
         anchors.fill: parent
         name:"RealTimeForm"
-        whoIsVisilbe: forHome.whoIsVisilbe
+        whoIsVisible: forHome.whoIsVisible
 
         //@@@@@@@@@@    Events          @@@@@@@@@@
-        onBack: forHome.whoIsVisilbe=forHome.name
+        onBack: forHome.whoIsVisible=forHome.name
     }
 
 
@@ -201,4 +202,9 @@ ApplicationWindow {
             }
         }
     }*/
+    MKeyboard{
+        id:appKey
+        visible:false
+        z:300
+    }
 }

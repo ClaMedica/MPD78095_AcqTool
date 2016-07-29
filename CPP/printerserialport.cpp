@@ -2,7 +2,7 @@
 #include <QDebug>
 #include <QThread>
 
-printerserialport::printerserialport(QObject *parent) : QObject(parent)
+PrinterSerialPort::PrinterSerialPort(QObject *parent) : QObject(parent)
 {
     m_serialPortInfo = new QSerialPortInfo;
     QList<QSerialPortInfo> list;
@@ -28,20 +28,20 @@ printerserialport::printerserialport(QObject *parent) : QObject(parent)
 
 }
 
-void printerserialport::init_printer()
+void PrinterSerialPort::init_printer()
 {
     Pri_Reset();
     Pri_Default();
 }
 
-void printerserialport::closeSerialPort()
+void PrinterSerialPort::closeSerialPort()
 {
     if (m_serialPort.isOpen())
         m_serialPort.close();
 }
 
 
-bool printerserialport::Pri_Str(int m_num_car, char *m_str_pri, unsigned char m_flag_lf)
+bool PrinterSerialPort::Pri_Str(int m_num_car, char *m_str_pri, unsigned char m_flag_lf)
 {
    /*
       Invia alla Stampante "num_car" caratteri della stringa "str_pri"
@@ -62,7 +62,7 @@ bool printerserialport::Pri_Str(int m_num_car, char *m_str_pri, unsigned char m_
 }
 
 
-void printerserialport::Pri_justif(char m_mode)
+void PrinterSerialPort::Pri_justif(char m_mode)
 {/* setta la giustificazione del testo*/
 // 0 centered; 1 right justified; 2 left justified
     char pri_str[3];
@@ -73,7 +73,7 @@ void printerserialport::Pri_justif(char m_mode)
 
 }
 
-void printerserialport::Pri_mode(char m_mode)
+void PrinterSerialPort::Pri_mode(char m_mode)
 {	/* imposta la modalità: default, double, quadruple, underlined */
     // mode = 0x00 = 00000000 : default
     // mode = 0xYY = X0XX0XX0 : <underlined> <0> <double w.> <double h.> <0> <quadruple w.> <quadruple h.> <0> */
@@ -84,7 +84,7 @@ void printerserialport::Pri_mode(char m_mode)
     Pri_Str(3,pri_str,0);
 }
 
-void printerserialport::Pri_forward(char m_dotlines)
+void PrinterSerialPort::Pri_forward(char m_dotlines)
 {/* fa avanzare di "dotlines" righe la carta*/
     char pri_str[3];
     pri_str[0]=ESC;
@@ -93,7 +93,7 @@ void printerserialport::Pri_forward(char m_dotlines)
     Pri_Str(3,pri_str,0);
 }
 
-void printerserialport::Pri_Reset()
+void PrinterSerialPort::Pri_Reset()
 {
    /*    resetta la stampante e la sua RAM, equivale ad un reset HW   */
    unsigned char pri_tip;
@@ -104,7 +104,7 @@ void printerserialport::Pri_Reset()
    Pri_Str(3,pri_str,0);
 }
 
-void printerserialport::Pri_Font(char m_font)
+void PrinterSerialPort::Pri_Font(char m_font)
 { /*Imposta il font desideratp della Printer   */
     /*    0 - 8x16  1 - 12x20 2 - 7x16  */
    char pri_str[3];
@@ -114,7 +114,7 @@ void printerserialport::Pri_Font(char m_font)
    Pri_Str(3,pri_str,0);
 }
 
-void printerserialport::Pri_Intensity(char m_intens)
+void PrinterSerialPort::Pri_Intensity(char m_intens)
 {
 /* intens = 0x80 default	0x00 < intens < 0xFF
    intens < 0x80 lighter print
@@ -128,7 +128,7 @@ void printerserialport::Pri_Intensity(char m_intens)
 }
 
 
-void printerserialport::Pri_Default()
+void PrinterSerialPort::Pri_Default()
 {
     unsigned char pri_tip;
     char pri_str[3];
@@ -143,7 +143,7 @@ void printerserialport::Pri_Default()
     dato il consumo in ampere desiderato Ca, la velocità massima si ha per n = ((Ca-0,3)*Rdot/(V*8) -1
     Ca = 1.4A @5V --> n =
 */    // default n = 5
-void printerserialport::Pri_Speed(char m_speed )
+void PrinterSerialPort::Pri_Speed(char m_speed )
 {
     char pri_str[3];
     pri_str[0]=GS;
@@ -157,7 +157,7 @@ void printerserialport::Pri_Speed(char m_speed )
     2080 < T < 25000 [us]
     vel[mm/sec] = 1/(8*T)   5 < vel < 60 [mm/sec]
  */
-void printerserialport::Pri_Max_Speed(char m_n1, char m_n2)
+void PrinterSerialPort::Pri_Max_Speed(char m_n1, char m_n2)
 {
     char pri_str[4];
     pri_str[0]=GS;
@@ -167,7 +167,7 @@ void printerserialport::Pri_Max_Speed(char m_n1, char m_n2)
     Pri_Str(4,pri_str,0);
 }
 
-void printerserialport::waiting()
+void PrinterSerialPort::waiting()
 {
     QThread::currentThread()->msleep(50);
 }

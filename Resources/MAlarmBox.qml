@@ -1,6 +1,7 @@
 import QtQuick 2.0
  
 import "qrc:/Components"
+import MComponents 1.0
 Rectangle{
     //@@@@@@@@@@    Definitions     @@@@@@@@@@
     property var alarms:[]
@@ -82,15 +83,13 @@ Rectangle{
     MButton{
         //@@@@@@@@@@    Properties      @@@@@@@@@@
         id:btnReset
-        background: "qrc:/Images/resetOff"
-        pressedBackground: "qrc:/Images/resetOn"
+        image: "qrc:/Images/resetOff"
         anchors.top: parent.top
         anchors.left: parent.left
         anchors.bottom: parent.bottom
         anchors.margins: 2
         width:alarmHeight
-        hoverEnable: false
-        imageFill: Image.PreserveAspectFit
+
 
         //@@@@@@@@@@    Events          @@@@@@@@@@
         onClicked: resetAlarms()

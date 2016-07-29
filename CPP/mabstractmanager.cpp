@@ -248,7 +248,7 @@ QVariantList MAbstractManager::commandsInfo()
     //analisi
     list<<"$GridElement";
     list<<"descr"<<tr("analysis");
-    list<<"img"<<":/Images/analisi";
+    list<<"img"<<"qrc:/analisi";
     list<<"key"<<111;
     list<<"visible"<<true;
     list<<"&GridElement";
@@ -256,7 +256,7 @@ QVariantList MAbstractManager::commandsInfo()
     //salva e chiudi
     list<<"$GridElement";
     list<<"descr"<<tr("save&exit");
-    list<<"img"<<":/Images/salvaChiudi";
+    list<<"img"<<"qrc:/salvaChiudi";
     list<<"key"<<112;
     list<<"visible"<<true;
     list<<"&GridElement";
@@ -264,7 +264,7 @@ QVariantList MAbstractManager::commandsInfo()
     //zoom in
     list<<"$GridElement";
     list<<"descr"<<tr("zoom in");
-    list<<"img"<<":/Images/zoom";
+    list<<"img"<<"qrc:/zoom_in";
     list<<"key"<<113;
     list<<"visible"<<true;
     list<<"&GridElement";
@@ -272,7 +272,7 @@ QVariantList MAbstractManager::commandsInfo()
     //zoom out
     list<<"$GridElement";
     list<<"descr"<<tr("zoom out");
-    list<<"img"<<":/Images/zoom_out";
+    list<<"img"<<"qrc:/zoom_out";
     list<<"key"<<114;
     list<<"visible"<<true;
     list<<"&GridElement";
@@ -280,7 +280,7 @@ QVariantList MAbstractManager::commandsInfo()
     //zoom none
     list<<"$GridElement";
     list<<"descr"<<tr("zoom none");
-    list<<"img"<<":/Images/zoom_none";
+    list<<"img"<<"qrc:/zoom_none";
     list<<"key"<<115;
     list<<"visible"<<true;
     list<<"&GridElement";
@@ -294,7 +294,7 @@ QVariantList MAbstractManager::acqInfo()
     //salva e chiudi
     list<<"$GridElement";
     list<<"descr"<<tr("save&exit");
-    list<<"img"<<":/Images/salvaChiudi";
+    list<<"img"<<"qrc:/salvaChiudi";
     list<<"key"<<112;
     list<<"visible"<<true;
     list<<"&GridElement";
@@ -303,6 +303,7 @@ QVariantList MAbstractManager::acqInfo()
 }
 bool MAbstractManager::load()
 {//in questa funzione inizializzo tutto caricando i file di configurazione fissi
+    m_configLocale.erase();
     if(!m_configLocale.loadFromXML(":/Config/Config_Locale.xml"))
         qCritical()<<"Error on locale configuration file";
 
@@ -310,9 +311,11 @@ bool MAbstractManager::load()
     if(!QFile::exists(configUser))
         configUser=":/Config/Config_User.xml";
 
+    m_configUser.erase();
     if(!m_configUser.loadFromXML(configUser))
         qCritical()<<"Error on user configuration file";
 
+    m_configMarkers.erase();
     if(!m_configMarkers.loadFromXML(":/Config/markers.xml"))
         qCritical()<<"Error on user configuration file";
 
@@ -334,7 +337,7 @@ bool MAbstractManager::buildConfigurationFile()
 {
     //carico i dati necessari
     int32_t chanlNum=m_mng->GetChanNum();
-    qDebug()<<"NÂ° Canali: "<<chanlNum;
+    qDebug()<<"N° Canali: "<<chanlNum;
     if(chanlNum==0)
         qCritical()<<"No channels in file";
     for(int32_t nc=0;nc<chanlNum;nc++)
@@ -348,6 +351,7 @@ bool MAbstractManager::buildConfigurationFile()
         m_chanInPlots[graphName]<<chanName;
         //aggiungo il canale su cui comunicherÃ  questo plot
         m_tcpChannels[graphName]=new SimpleTCPChannel(QHostAddress("127.0.0.1"),9000+m_mng->GetGraph(nc)-1,this);
+        qDebug()<<nc<<chanName<<"inviato su"<<graphName<<9000+m_mng->GetGraph(nc)-1;
         //per il datafile invece no
         m_dataChanNameMap[chanName]=nc;
 
@@ -398,37 +402,35 @@ bool MAbstractManager::buildConfigurationFile()
         axis->setAttribute("yAUOM",udm);
         axis->setAttribute("yAbsoluteMax",QString::number(m_mng->GetSupLim(nc)));
         axis->setAttribute("yAbsoluteMin",QString::number(m_mng->GetInfLim(nc)));
+
         time->setAttribute("samplingFrq",QString::number(m_mng->GetNAS(nc)));
         time->setAttribute("pageTime",QString::number(m_mng->GetPageTime()));
-        network->setAttribute(ATT_PORT,QString::number(9000+nc));
+        network->setAttribute(ATT_PORT,QString::number(9000+m_mng->GetGraph(nc)-1));
         network->setAttribute(ATT_ADDRESS,"127.0.0.1");
 
         //devo leggere le informazioni sulle dimensioni delle tracce e il loro colore
         //all'interno del file config_user
+        Ancestry * chProps=m_configUser.getSafeChild(XML_CHANNELSPROP);
+        QStringList chNames=chProps->childrenNames();
         foreach (QString chanName, m_chanInPlots[graphName])
         {//qui scrivo le proprietÃ  delle tracce
             Ancestry * trkN=tracks->addChild(chanName);
-            if (chanName.startsWith("Q"))
-            {
-                Ancestry* ch = m_configUser.getChild(ATT_CHANQBT);
-                if (ch != NULL)
-                {
-                    trkN->setAttribute(ATT_THICK,ch->getChild(ATT_THICK)->getAttribute("value"));
-                    trkN->setAttribute(ATT_COLOR,ch->getChild(ATT_COLOR)->getAttribute("value"));
-                    trkN->setAttribute(ATT_WIDTH,ch->getChild(ATT_WIDTH)->getAttribute("value"));
-                }
+            Ancestry* ch=NULL;
+            foreach (QString chNamePart, chNames) {
+                if(chanName.contains(chNamePart))
+                    ch = m_configUser.getSafeChild(chNamePart);
             }
-            if (chanName.startsWith("V"))
+
+            if(ch!=NULL)
             {
-                Ancestry* ch = m_configUser.getChild(ATT_CHANVBT);
-                if (ch != NULL)
-                {
-                    trkN->setAttribute(ATT_THICK,ch->getChild(ATT_THICK)->getAttribute("value"));
-                    trkN->setAttribute(ATT_COLOR,ch->getChild(ATT_COLOR)->getAttribute("value"));
-                    trkN->setAttribute(ATT_WIDTH,ch->getChild(ATT_WIDTH)->getAttribute("value"));
-                }
+            trkN->setAttribute(ATT_THICK,     ch->getSafeChild(ATT_THICK)->getSafeAttribute(ATT_VALUE));
+            trkN->setAttribute(ATT_COLOR,     ch->getSafeChild(ATT_COLOR)->getSafeAttribute(ATT_VALUE));
+            trkN->setAttribute(ATT_WIDTH,     ch->getSafeChild(ATT_WIDTH)->getSafeAttribute(ATT_VALUE));
+            axis->setAttribute(ATT_YAUTOSCALE,ch->getSafeChild(ATT_YAUTOSCALE)->getSafeAttribute(ATT_VALUE));
             }
-        }
+            else
+                qWarning()<<"Canale"<<chanName<<"senza proprietà grafiche. Uso le default";
+      }
     }
     //ora salvo il file di configurazione come cur.xml
 #ifdef ANDROID
@@ -443,11 +445,12 @@ bool MAbstractManager::buildConfigurationFile()
 
 bool MAbstractManager::buildMarkerInfoMap()
 {
+    m_markerMap.clear();
     foreach(Ancestry *marker,m_configMarkers.getChildren())
     {
         VarMap mark;
         QString img=marker->getAttribute(ATT_IMG);
-        QString rootURL="file:///"+m_applicationPath+"/Icone/";
+        QString rootURL="qrc:/";
         mark[ATT_IMG]=rootURL+img;
         mark[ATT_KEY]=marker->getAttribute(ATT_KEY);
         mark[ATT_CODE]=marker->getAttribute(ATT_CODE);
