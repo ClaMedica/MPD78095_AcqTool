@@ -314,6 +314,7 @@ MForm{
                 mngAcq.addMarker(value);
                 //console.log(mngAcq.acqMarkers)
                 plot.markers=mngAcq.acqMarkers;
+
                 break;
             }
         }
@@ -546,6 +547,8 @@ MForm{
 
 //        }
 //    }
+
+
 
 
 }

@@ -114,7 +114,7 @@ void mflowdatas::buildNomogrammi(bool __sex, int __age)
         if (!__sex)
         {
             if (__age < 50)
-                //Liverpool uomini etÃ  < 50
+                //Liverpool uomini etA  < 50
                 yValue.append(qPow((2.37 + 0.18 * qSqrt((i+1) * Step_Liverpool) - 0.014 * 35),2));
             else
                 //Liverpool uomini >= 50
@@ -222,7 +222,7 @@ void mflowdatas::buildNomogrammi(bool __sex, int __age)
         if (!__sex)
         {
             if (__age < 50)
-                //Liverpool uomini etÃ  < 50
+                //Liverpool uomini etA  < 50
                 yValue.append(qPow((1.8 + 0.14 * qSqrt((i+1) * Step_Liverpool) - 0.011 * 35),2));
             else
                 //Liverpool uomini >= 50
@@ -483,7 +483,7 @@ void mflowdatas::ReadLiverpoolParameter(bool __flowMax, bool __sex, int __age)
 
     if (__flowMax && !__sex && __age < 50)
     {
-        //Qmax, pazienti maschi etÃ  < 50
+        //Qmax, pazienti maschi etA  < 50
         //5th Centile
         m_arrLineX1.append(20);
         m_arrLineX1.append(60);
@@ -577,7 +577,7 @@ void mflowdatas::ReadLiverpoolParameter(bool __flowMax, bool __sex, int __age)
     }
     if (!__flowMax && !__sex && __age < 50)
     {
-        //Qave, pazienti maschi etÃ  < 50
+        //Qave, pazienti maschi etA  < 50
         //5th Centile
         m_arrLineX1.append(20);
         m_arrLineX1.append(50);
@@ -671,7 +671,7 @@ void mflowdatas::ReadLiverpoolParameter(bool __flowMax, bool __sex, int __age)
 
     if (__flowMax && !__sex && __age >= 50)
     {
-        //Qmax, pazienti maschi etÃ  >= 50
+        //Qmax, pazienti maschi etA  >= 50
         //5th Centile
         m_arrLineX1.append(20);
         m_arrLineX1.append(50);
@@ -766,7 +766,7 @@ void mflowdatas::ReadLiverpoolParameter(bool __flowMax, bool __sex, int __age)
     }
     if ( !__flowMax && !__sex && __age >= 50)
     {
-        //Qave, pazienti maschi etÃ  >= 50
+        //Qave, pazienti maschi etA  >= 50
         //5th Centile
         m_arrLineX1.append(20);
         m_arrLineX1.append(50);

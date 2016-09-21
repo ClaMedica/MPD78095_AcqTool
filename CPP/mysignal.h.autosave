@@ -17,7 +17,7 @@
 class MSignal
 {
 public:
-    //Proprietà generali del segnale generico
+    //ProprietA  generali del segnale generico
     MSignal();
     mysignal(int s);
     double t0;

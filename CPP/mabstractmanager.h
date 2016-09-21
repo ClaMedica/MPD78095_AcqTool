@@ -14,8 +14,8 @@
 #include "alarmmanager.h"
 #include "p7settingsmanager.h"
 #include "QtGlobal"
-//classe per unità di misura
-#include "UDMimpl.h"
+//classe per unita di misura
+#include "UdMImpl.h"
 #include "appbridge.h"
 
 extern AcqBridge *g_mainAppBridge;
@@ -40,10 +40,12 @@ signals:
 public slots:
     bool load(void);
     QString plotConfigFileName();
+    QString patientInfo(){return m_patientName;}
 
 
 protected:
-    QString m_applicationPath;
+    QString m_applicationPath,
+    m_patientName;//nome e altre info paziente
 
     DatafileManager *m_mng;
     Analyze *m_ana;
@@ -54,7 +56,7 @@ protected:
     QMap<QString,QStringList>   m_chanInPlots;//associa nome plot ad una mappa con cui ripescare il buffer
     QMap<QString,int32_t> m_dataChanNameMap;//associa il nome del canale al suo indice
     QMap<QString,SimpleTCPChannel *> m_tcpChannels;//canali di comunicazione verso l'esterno
-    Ancestry m_configLocale,    //Ã¨ la prima ad essere caricata e contiene la lingua
+    Ancestry m_configLocale,    //A? la prima ad essere caricata e contiene la lingua
     m_configMarkers,            //contiene le info per i marker
     m_configUser;               //contiene le info modificate dall'utente
 

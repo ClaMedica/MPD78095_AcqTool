@@ -49,20 +49,20 @@ private:
     QStringList m_serversNames,
                 m_channelNames,//lista dei nomi dei canali
                 m_totalHWChan,//lista dei canali hw che ci sono
-                m_superList;    //lista dei supervisori che dovrò avviare
+                m_superList;    //lista dei supervisori che dovrA? avviare
 
     int m_tcpAttempts;//contiene il numero di tentativi che ci metto per connettermi ai server
     bool    m_acqFileOpened,
-    m_supeConnected,    //mi indica quando il supervisore è connesso
+    m_supeConnected,    //mi indica quando il supervisore A? connesso
     m_serverReady,
     m_sendingToPlot,
     m_saving,
     m_acqFinished,  //mi dice se ho finito di acquisire
-    m_autoStartStop;//mi dice se il controllo è abilitato o meno
+    m_autoStartStop;//mi dice se il controllo A? abilitato o meno
 
     QByteArray m_sendingPack;
 
-    QVariantList m_alarmList,m_acqMarkerList;//#BUG aggiungere la definer list se servirà
+    QVariantList m_alarmList,m_acqMarkerList;//#BUG aggiungere la definer list se servirA 
 
     QMap<QString,SimpleTCPClient *> m_tcpClients;//elenco dei client attivi
     QMap<QString,int>   m_sampleFreqMap, //mi dice per ogni canale fisico la frequenza di campionamento

@@ -57,7 +57,7 @@ private:
 
     ///mappa delle info che devo andare a disegnare
     QMap<QString, QStringList> m_infoMap;
-    ///mappa locale di tutti gli elementi presenti: nome più puntatore al vettore dell'elemento
+    ///mappa locale di tutti gli elementi presenti: nome piA? puntatore al vettore dell'elemento
     QMap<QString, QMap<QString, VarMapVec*> > m_dataMap;
 
     ///contiene le role dei miei elementi

@@ -1,5 +1,6 @@
-﻿#include "parametermanager.h"
+#include "parametermanager.h"
 #include "QXmlStreamReader"
+
 ParameterManager::ParameterManager(QObject *parent) :
     QObject(parent)
 {

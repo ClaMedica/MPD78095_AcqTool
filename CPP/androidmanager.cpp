@@ -73,7 +73,7 @@ void AndroidManager::onPowerDisconnected()
 
 void AndroidManager::onAirplaneModeChanged()
 {
-    qDebug()<<"Cambio modalità aereo";
+    qDebug()<<"Cambio modalitA  aereo";
 }
 
 void AndroidManager::launchService(QString __serviceAction)
@@ -98,7 +98,7 @@ void AndroidManager::showToast(QString __s)
 
     QtAndroid::androidActivity().callMethod<void>(
                 "showToast",
-                convertSignature("jstring#void"),//sto metodo è sofisticato, vuole un const char*
+                convertSignature("jstring#void"),//sto metodo A? sofisticato, vuole un const char*
                 string.object<jstring>());
 
 #endif

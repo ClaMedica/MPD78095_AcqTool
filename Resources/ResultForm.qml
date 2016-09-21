@@ -76,7 +76,7 @@ MForm {
                 var btnLeftMargin = 20
                 if (mngData.getNumAnaFlwAdv() !== 2)
                 {
-                    var buttonfn = Qt.createQmlObject('import "qrc:/Components"; MButton {}', rectf)
+                    var buttonfn = Qt.createQmlObject('import "qrc:/Components"; MAnaButton {}', rectf)
                     buttonfn.buttonId = pagesSameAna.length
                     buttonfn.anchors.right = rectf.right
                     buttonfn.anchors.top = rectf.top
@@ -109,7 +109,7 @@ MForm {
                 tablefn.populate()
                 tablefn.visible = true
 
-                var buttonT = Qt.createQmlObject('import "qrc:/Components"; MButton {}', rectdata)
+                var buttonT = Qt.createQmlObject('import "qrc:/Components"; MAnaButton {}', rectdata)
                 buttonT.buttonId = pagesLocal.length
                 buttonT.anchors.bottom = rectdata.bottom
                 buttonT.anchors.left = rectdata.left
@@ -147,7 +147,7 @@ MForm {
                 LQM.visible = false
 
                 //button
-                var buttonLQM = Qt.createQmlObject('import "qrc:/Components"; MButton {}', rectdata)
+                var buttonLQM = Qt.createQmlObject('import "qrc:/Components"; MAnaButton {}', rectdata)
                 buttonLQM.buttonId = pagesLocal.length
                 buttonLQM.anchors.bottom = rectdata.bottom
                 buttonLQM.anchors.left = rectdata.left
@@ -183,7 +183,7 @@ MForm {
                 LQA.visible = false
 
                 //button
-                var buttonLQA = Qt.createQmlObject('import "qrc:/Components"; MButton {}', rectdata)
+                var buttonLQA = Qt.createQmlObject('import "qrc:/Components"; MAnaButton {}', rectdata)
                 buttonLQA.buttonId = pagesLocal.length
                 buttonLQA.anchors.bottom = rectdata.bottom
                 buttonLQA.anchors.left = rectdata.left
@@ -226,7 +226,7 @@ MForm {
                     SQM.visible = false
 
                     //button
-                    var buttonSQM = Qt.createQmlObject('import "qrc:/Components"; MButton {}', rectdata)
+                    var buttonSQM = Qt.createQmlObject('import "qrc:/Components"; MAnaButton {}', rectdata)
                     buttonSQM.buttonId = pagesLocal.length
                     buttonSQM.anchors.bottom = rectdata.bottom
                     buttonSQM.anchors.left = rectdata.left
@@ -267,7 +267,7 @@ MForm {
                     SQA.visible = false
 
                     //button
-                    var buttonSQA = Qt.createQmlObject('import "qrc:/Components"; MButton {}', rectdata)
+                    var buttonSQA = Qt.createQmlObject('import "qrc:/Components"; MAnaButton {}', rectdata)
                     buttonSQA.buttonId = pagesLocal.length
                     buttonSQA.anchors.bottom = rectdata.bottom
                     buttonSQA.anchors.left = rectdata.left
@@ -290,17 +290,19 @@ MForm {
     MButton {
         id:btnBack
         text: qsTr("back to graphs")
-        width: 100
 
-        anchors.right: resultForm.right
-        anchors.bottom: resultForm.bottom
+        anchors.right: parent.right
+        anchors.bottom: parent.bottom
         anchors.bottomMargin: 10
         anchors.rightMargin: 10
+        width:parent.width*0.4
+        height:parent.height*0.2
         onClicked: {
-            clickButton(resultForm.buttonTable)
             forAna.visible = true
             resultForm.visible = false            
         }
     }
+
+
 }
 

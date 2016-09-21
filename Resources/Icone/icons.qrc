@@ -22,7 +22,5 @@
         <file>zoom_out_click.jpg</file>
         <file>zoom_out_off.jpg</file>
         <file>cmDefFlo.jpg</file>
-        <file>cmDefFlo_click.jpg</file>
-        <file>cmDefFlo_off.jpg</file>
     </qresource>
 </RCC>

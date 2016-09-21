@@ -50,14 +50,14 @@ void ModelManager::updateModelList()
     m_drawList.clear();
 
     foreach(QString currentPlot,plotNames) {
-        //per ogni plot che ho controllo cosa devo disegnare e se c'è qualcosa del mio type
+        //per ogni plot che ho controllo cosa devo disegnare e se c'A? qualcosa del mio type
         QStringList objList=m_infoMap[currentPlot];
         m_drawList<<sGroup;
         m_drawList<<currentPlot;
 
         foreach(QString item,objList) {
             //sto scorrendo la lista delle cose da disegnare nel plot
-            //e controllo se c'è qualcosa del mio tipo
+            //e controllo se c'A? qualcosa del mio tipo
             QString family=item.section(":",0,0);
             QString name=item.section(":",1,1);
 

@@ -37,10 +37,11 @@ SOURCES += main.cpp \
     CPP/manatablemodel.cpp \
     CPP/nomogramma.cpp \
     CPP/PrinterManager.cpp \
-    CPP/PrinterSerialPort.cpp \
-    ../MGlobal/UdMImpl.cpp \
+    CPP/printerserialport.cpp \
+    ../MGlobal/UdMimpl.cpp \
     ../MGlobal/appbridge.cpp \
-    ../MGlobal/layoutmanager.cpp
+    ../MGlobal/layoutmanager.cpp \
+    ../MGlobal/systemmanager.cpp
 
 HEADERS += \
     CPP/parametermanager.h \
@@ -63,10 +64,11 @@ HEADERS += \
     CPP/manatablemodel.h \
     CPP/nomogramma.h \
     CPP/PrinterManager.h \
-    CPP/PrinterSerialPort.h \
-    ../MGlobal/UDMImpl.h \
+    CPP/PrinterSerialport.h \
+    ../MGlobal/UdMimpl.h \
     ../MGlobal/appbridge.h \
-    ../MGlobal/layoutmanager.h
+    ../MGlobal/layoutmanager.h \
+    ../MGlobal/systemmanager.h
 
 
 
@@ -111,7 +113,7 @@ QT += androidextras
 
 ANDROID_PACKAGE_SOURCE_DIR = $$PWD/android-sources
 
-unix:!macx: LIBS += -L$$PWD/../Build/Emulator/DataBuild/ -lDatafileManager
+unix:!macx: LIBS += -L$$PWD/../../build/DatafileManager/Debug/Desktop_Qt_5_5_1_GCC_64bit -lDatafileManager
 
 #INCLUDEPATH += $$PWD/../Build/Emulator/DataBuild
 #DEPENDPATH += $$PWD/../Build/Emulator/DataBuild
@@ -147,9 +149,10 @@ DEFINES += TAR
 #INCLUDEPATH += $$PWD/../Build/DataFileManager
 #DEPENDPATH += $$PWD/../Build/DataFileManager
 
+unix:!macx: LIBS += -L$$PWD/../Build-Linux/DatafileManager -lDatafileManager
 
 
-#tastiera virutuale
+#tastiera virtuale
 CONFIG += link_pkgconfig
 
 #linux-buildroot-g++ {
@@ -162,24 +165,45 @@ CONFIG += link_pkgconfig
     #INSTALLS += target
 #}
 
-PICOFLOW{
-DEFINES += PICOFLOW
-TARGET = PicoAcq
-RESOURCES += modules_picoflow.qrc
-RESOURCES += Resources/Icone/icons.qrc
+LINUXDESKTOP {
+        DEFINES += LINUXDESKTOP
+        TARGET = PicoAcq
+        RESOURCES += modules_LinuxDesktop.qrc
+	RESOURCES += Resources/Icone/icons.qrc
 
 
-unix:!macx: LIBS += -L$$PWD/../Build-IMX6/DatafileManager/ -lDatafileManager
+	#unix:!macx: LIBS += -L$$PWD/../Build-IMX6/DatafileManager/ -lDatafileManager
 
-INCLUDEPATH += $$PWD/../Build-IMX6/DatafileManager
-DEPENDPATH += $$PWD/../Build-IMX6/DatafileManager
+    #datafile manager
+    LIBS        += -L$$PWD/../Build-Linux/DatafileManager -lDatafileManager
+    INCLUDEPATH +=   $$PWD/../Build-Linux/DatafileManager
+    DEPENDPATH  +=   $$PWD/../Build-Linux/DatafileManager
 
-# Additional import path used to resolve QML modules in Qt Creator's code model
-QML_IMPORT_PATH = ../MGlobal \
-                  ../Build-IMX6/CommonPlugin
-DISTFILES += ../MGlobal/MComponents/* \
-             ../MGlobal/MComponents/Images/*
+	# Additional import path used to resolve QML modules in Qt Creator's code model
+	QML_IMPORT_PATH = ../MGlobal \
+		          ../Build-IMX6/CommonPlugin
+	DISTFILES += ../MGlobal/MComponents/* \
+		     ../MGlobal/MComponents/Images/*
 }
+
+#PICOFLOW {
+#	DEFINES += PICOFLOW
+#	TARGET = PicoAcq
+#	RESOURCES += modules_picoflow.qrc
+#	RESOURCES += Resources/Icone/icons.qrc
+
+
+#	#unix:!macx: LIBS += -L$$PWD/../Build-IMX6/DatafileManager/ -lDatafileManager
+
+#	INCLUDEPATH += $$PWD/../Build-IMX6/DatafileManager
+#	DEPENDPATH += $$PWD/../Build-IMX6/DatafileManager
+
+#	# Additional import path used to resolve QML modules in Qt Creator's code model
+#	QML_IMPORT_PATH = ../MGlobal \
+#		          ../Build-IMX6/CommonPlugin
+#	DISTFILES += ../MGlobal/MComponents/* \
+#		     ../MGlobal/MComponents/Images/*
+#}
 
 
 

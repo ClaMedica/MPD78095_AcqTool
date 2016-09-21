@@ -77,7 +77,7 @@ Rectangle{
             {
                 extCount++
                 if(extCount>=extModel.length)
-                    console.error("finite le estensioni")
+                    console.log("finite le estensioni")
                 source=imageName+extModel[extCount]
             }
         }

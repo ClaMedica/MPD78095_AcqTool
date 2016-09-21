@@ -24,6 +24,7 @@
         <file>MAnaTableView.qml</file>
         <file>MNomogramma.qml</file>
         <file>MScroolBar.qml</file>
+        <file>MAnaButton.qml</file>
     </qresource>
     <qresource prefix="/Scripts">
         <file>func.js</file>

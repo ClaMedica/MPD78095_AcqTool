@@ -36,7 +36,7 @@ QStringList MStorage::getNames(QStringList __families, QStringList __filterCateg
             foreach (QString name, m_storage[family].keys())
                 foreach (QString category, __filterCategory) {
                     VarMapVec *curVec=m_storage[family][name];
-                    if(curVec!=NULL)//così per sfizio
+                    if(curVec!=NULL)//cosA? per sfizio
                     {
                         VarMap *curMap=curVec->at(0);
                         if(curMap->value("category")==category)
@@ -57,7 +57,7 @@ QStringList MStorage::getNames(QStringList __families, QStringList __filterCateg
  */
 bool MStorage::archive(QString __family, QString __name, VarMapVec *__elements, bool __whatIfAlreadyPresent)
 {
-    //verifichiamo se c'è gi�  qualcosa con lo stesso nome all'interno della famiglia
+    //verifichiamo se c'A? giA  qualcosa con lo stesso nome all'interno della famiglia
     bool present=false;
     if(m_storage.keys().contains(__family))
         if(m_storage[__family].keys().contains(__name))

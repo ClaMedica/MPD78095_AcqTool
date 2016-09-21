@@ -1,19 +1,19 @@
 #include "mdatamanager.h"
-
+#include "systemmanager.h"
 
 MDataManager::MDataManager(QObject *parent)
 {
-    m_mng=NULL;
+    m_mng = NULL;
     m_ana = NULL;
-    m_copy=NULL;
-    m_currentSignalName="custom_signal";
-    m_pCurrentSignal=NULL;
-    m_updateWhenNews=false;
-    m_start=0;
-    m_end=3600;//fine esame di default a 1 ora
+    m_copy = NULL;
+    m_currentSignalName = "custom_signal";
+    m_pCurrentSignal = NULL;
+    m_updateWhenNews = false;
+    m_start = 0;
+    m_end = 3600;//fine esame di default a 1 ora
     //m_applicationPath=applicationDirPath();
-    m_configurationFileLoaded=false;//nessun file di configurazione caricato
-    m_changesToBeSaved=false;
+    m_configurationFileLoaded = false;//nessun file di configurazione caricato
+    m_changesToBeSaved = false;
 
     m_analized = false;
     m_autoPrint = false;
@@ -24,55 +24,50 @@ MDataManager::MDataManager(QObject *parent)
 
 MDataManager::~MDataManager()
 {
-    if(m_mng!=NULL)
-    {
+    if(m_mng!=NULL) {
         m_mng->Close();
         delete m_mng;
     }
-    if (m_ana != NULL)
-    {
-        m_ana = NULL;
+    if (m_ana != NULL) {
         delete m_ana;
+        m_ana = NULL;
     }
 }
 
 void MDataManager::setInfoList(QVariantList __list)
 {
-    if(__list!=m_infoList)
-    {
-        m_infoList=__list;
+    if(__list!=m_infoList) {
+        m_infoList = __list;
         emit infoListChanged();
     }
 }
 
 bool MDataManager::addSignal(MSignal *__pSignal)
 {
-
-    if(__pSignal==NULL)
-    {
+    if(__pSignal == NULL) {
         qDebug() << "The signal is empty in FunctionHandler::addSignal";
         return false;
     }
 
     foreach(MSignal *sig,m_signalVector)
-        if(sig->getName()==__pSignal->getName())
-        {
+        if(sig->getName() == __pSignal->getName()) {
             qDebug() << "File with the same name already exist in the vector";
             return false;
         }
+
     m_signalVector.append(__pSignal);
-    VarMapVec *vec=new VarMapVec;
-    VarMap *traccia=new VarMap;
-    QString family=__pSignal->getName();
-    QString name="Signal";
-    (*traccia)["descr"]=__pSignal->getName();
-    (*traccia)["category"]=CAT_TRACK;
-    (*traccia)["pointer"]=(qulonglong)__pSignal;
+    VarMapVec *vec = new VarMapVec;
+    VarMap *traccia = new VarMap;
+    QString family = __pSignal->getName();
+    QString name = "Signal";
+    (*traccia)["descr"] = __pSignal->getName();
+    (*traccia)["category"] = CAT_TRACK;
+    (*traccia)["pointer"] = (qulonglong) __pSignal;
     vec->append(traccia);
     saveDataAndUpdate(family,name,vec);
     emit availableTracksChanged();
-    return true;
 
+    return true;
 }
 
 
@@ -80,31 +75,32 @@ bool MDataManager::addSignal(MSignal *__pSignal)
 void MDataManager::loadFile(QString __fileName)
 {
     __fileName.remove("file:///");
-    qDebug()<<"Apro il file "<<__fileName;
-    if(!QFile::exists(__fileName))
-    {qCritical()<<__fileName<<MEX_FILE_NOT_EXISTS;return;}
+    qDebug() << "Apro il file " << __fileName;
+    if( ! QFile::exists(__fileName)) {
+        qCritical() << __fileName << MEX_FILE_NOT_EXISTS;
+        return;
+    }
     m_fileName=__fileName;
 
     int n;
 
-    VarMapVec *mrkOpVec=new VarMapVec;
-    VarMapVec *mrkAnVec=new VarMapVec;
-    VarMapVec *defVec=new VarMapVec;
+    VarMapVec *mrkOpVec = new VarMapVec;
+    VarMapVec *mrkAnVec = new VarMapVec;
+    VarMapVec *defVec = new VarMapVec;
     QMap<int,QVariantList > defEn;
 
-    double sigMin=INF,sigMax=-INF;
+    double sigMin = INF, sigMax = -INF;
     byte key;
     int32_t numCh;
-    int32_t numSamp[4];//4 byte per avere il numero del campione
+    int32_t numSamp[4]; //4 byte per avere il numero del campione
     int32_t numDef;
-    int32_t tStart[20],tEnd[20];
+    int32_t tStart[20], tEnd[20];
     QString descr;
     byte chEn[20];
 
     int i;
 
-    switch(fileType(__fileName))
-    {
+    switch(fileType(__fileName)) {
     case PIC:
     {
         if(m_mng!=NULL)
@@ -121,78 +117,77 @@ void MDataManager::loadFile(QString __fileName)
         // m_mng->CommitParameters();
 
         qDebug()<<"Building configuration file ...";
-        if(!buildConfigurationFile())
-        {qCritical()<<MEX_FILE_CORRUPTED;return;}
+        if(!buildConfigurationFile()) {
+            qCritical()<<MEX_FILE_CORRUPTED; return; }
 
-        QString patientName=m_mng->GetPatient().section(";",0,1);
-        patientName.replace(";","_");
+        m_patientName=m_mng->GetPatient();//.section(";",0,1);
+        m_patientName.replace(";","_");
         m_sexPatient = true;
         if (m_mng->GetPatient().section(";",12,12) == "F")
             m_sexPatient = true;
         else
             m_sexPatient = false;
-        n=m_mng->GetDuration();
-        m_end=n/1000;
+        n = m_mng->GetDuration();
+        m_end = n / 1000;
         qDebug()<<"Durata esame = "<<m_end;
-        qDebug()<<"NÂ° di canali = "<<m_mng->GetChanNum();
+        qDebug()<<"NA? di canali = "<<m_mng->GetChanNum();
 
         //------ Aggiungo i markers operativi, sono comuni a tutti i canali
 
         qDebug()<<"Marker Operativi = "<<m_mng->GetNumOperativeMarkers();
 
-        for(i=0;i<m_mng->GetNumOperativeMarkers();i++)
+        for(i = 0; i < m_mng->GetNumOperativeMarkers(); i++)
         {
-            VarMap *mrk=new VarMap;
-            m_mng->GetOpMarker(i,&key,numSamp,&descr);
+            VarMap *mrk = new VarMap;
+            m_mng->GetOpMarker(i, &key, numSamp, &descr);
             qDebug()<<numSamp[0];
             qDebug()<<numSamp[1];
             qDebug()<<numSamp[2];
             qDebug()<<numSamp[3];
-            double val=(double)numSamp[0]/m_mng->GetNAS(0);
+            double val = (double) numSamp[0] / m_mng->GetNAS(0);
             qDebug()<<"Marker"<<key<<val;
-            if(m_markerMap.keys().contains(key))
-            {//marker conosciuto le info ce le ho giÃ
-                (*mrk)=m_markerMap[key];
+
+            if(m_markerMap.keys().contains(key)) {   //marker conosciuto le info ce le ho giA
+                (*mrk) = m_markerMap[key];
             }
-            else
-            {//me lo costruisco
-                (*mrk)["code"]="USR";
-                (*mrk)["descr"]=descr;//sovrascrivo
-                (*mrk)["lock"]=false;
-                (*mrk)["key"]=key;
-                (*mrk)["color"]=COLOR_OPERATIVE;
-                (*mrk)["visible"]=true;
-                (*mrk)["category"]=CAT_MARKER;
+            else {  //me lo costruisco
+                (*mrk)["code"] = "USR";
+                (*mrk)["descr"] = descr;//sovrascrivo
+                (*mrk)["lock"] = false;
+                (*mrk)["key"] = key;
+                (*mrk)["color"] = COLOR_OPERATIVE;
+                (*mrk)["visible"] = true;
+                (*mrk)["category"] = CAT_MARKER;
             }
-            (*mrk)["val"]=val;
+            (*mrk)["val"] = val;
 
             mrkOpVec->append(mrk);
         }
-        if(!mrkOpVec->isEmpty())
-        {
-            QString family="Markers";
-            QString name="Operative";
-            saveDataAndUpdate(family,name,mrkOpVec);
+
+        if(!mrkOpVec->isEmpty()) {
+            QString family = "Markers";
+            QString name = "Operative";
+            saveDataAndUpdate(family, name, mrkOpVec);
         }
 
         //------Aggiungo i canali
 
-        for(int h=0;h<m_mng->GetChanNum();h++)
-        {
-            MSignal *sig=new MSignal;
+        for(int h = 0; h < m_mng->GetChanNum(); h++) {
+            MSignal *sig  =new MSignal;
             sig->resize(m_mng->GetSamplesNumber(h));
-            for(int i=0;i<m_mng->GetSamplesNumber(h);i++)
-                sig->replace(i,m_mng->GetValue(h,i));
+            for(int i = 0; i < m_mng->GetSamplesNumber(h); i++)
+                sig->replace(i, m_mng->GetValue(h, i));
 
             qDebug()<<sig;
             sig->setName(m_mng->GetChanName(h));
             sig->setSamplingFrequency(m_mng->GetNAS(h));
-            double M=sig->maximum();
-            double m=sig->minimum();
-            if(sigMax<M)
-                sigMax=M;
-            if(sigMin>m)
-                sigMin=m;
+
+            double M = sig->maximum();
+            double m = sig->minimum();
+            if(sigMax < M)
+                sigMax = M;
+            if(sigMin > m)
+                sigMin = m;
 
             //qDebug()<<(*sig);
             this->addSignal(sig);
@@ -201,49 +196,41 @@ void MDataManager::loadFile(QString __fileName)
         //------Aggiungo i definer
         qDebug()<<"Definer = "<<m_mng->GetNumDefiners();
 
-        for(i=0;i<m_mng->GetNumDefiners();i++)
-        {
+        for(i = 0; i < m_mng->GetNumDefiners(); i++) {
             VarMap *def=new VarMap;
-            m_mng->GetOpMarkerAn(i,&key,tStart,tEnd,chEn,&descr);
-            for(int nc=0;nc<m_mng->GetChanNum();nc++)
-                defEn[i]<<chEn[nc];
+            m_mng->GetOpMarkerAn(i, &key, tStart, tEnd, chEn, &descr);
+            for(int nc = 0; nc < m_mng->GetChanNum(); nc++)
+                defEn[i] << chEn[nc];
 
-            (*def)["key"]=key;
+            (*def)["key"] = key;
             (*def)["name"] = descr;
             (*def)["family"] = "Definers";
-            (*def)["xMin"]=(tStart[0]-1)/m_mng->GetNAS(0);
-            (*def)["xMax"]=(tEnd[0]-1)/m_mng->GetNAS(0);
-            (*def)["yMin"]=sigMin;
-            (*def)["yMax"]=sigMax;
+            (*def)["xMin"] = (tStart[0]-1)/m_mng->GetNAS(0);
+            (*def)["xMax"] = (tEnd[0]-1)/m_mng->GetNAS(0);
+            (*def)["yMin"] = sigMin;
+            (*def)["yMax"] = sigMax;
             (*def)["num"] = i;
-            (*def)["enCh"]=defEn[i];
-            (*def)["descr"]=descr;
-            (*def)["color"]="cyan";
-            (*def)["category"]=CAT_DEFINER;
-            (*def)["resizeable"]=1;
+            (*def)["enCh"] = defEn[i];
+            (*def)["descr"] = descr;
+            (*def)["color"] = "cyan";
+            (*def)["category"] = CAT_DEFINER;
+            (*def)["resizeable"] = 1;
             defVec->append(def);
-
         }
-        if(!defVec->isEmpty())
-        {
-            QString family="Definers";
+        if(!defVec->isEmpty()) {
+            QString family = "Definers";
             // QString name="Operative";
             saveDataAndUpdate(family,descr,defVec);
         }
 
-        for(int nc=0;nc<m_mng->GetChanNum();nc++)
-        {
-            VarMapVec *subVec=new VarMapVec;
-            for(i=0;i<m_mng->GetNumDefiners();i++)
+        for(int nc = 0;nc < m_mng->GetChanNum(); nc++) {
+            VarMapVec *subVec = new VarMapVec;
+            for(i = 0; i < m_mng->GetNumDefiners(); i++)
                 if(defEn[i].at(nc).toBool())
-                {
                     subVec->append(defVec->at(i));
-                }
             if(!subVec->isEmpty())
-                saveDataAndUpdate(m_mng->GetChanName(nc),"Definers",subVec);
+                saveDataAndUpdate(m_mng->GetChanName(nc), "Definers", subVec);
         }
-
-
 
         //------ Aggiungo i markers analitici, sono associati ad un definitore
         //m_mng->DeleteAllMarkers();
@@ -252,46 +239,43 @@ void MDataManager::loadFile(QString __fileName)
 
         mrkAnVec->clear();
         QVector<int32_t> numChVec;
-        for(int i=0;i<m_mng->GetNumAnalyticalMarkers();i++)
-        {
+        for(int i = 0; i < m_mng->GetNumAnalyticalMarkers(); i++) {
             VarMap *mrk=new VarMap;
-            m_mng->GetAnMarker(i,&key,&numCh,&numSamp[0],&numDef);
-            numChVec<<numCh;
+            m_mng->GetAnMarker(i, &key, &numCh, &numSamp[0], &numDef);
+            numChVec << numCh;
 
             QVariantList valuesY;
-            foreach(MSignal *sig,m_signalVector)
-                if(sig->getName()==m_mng->GetChanName(numCh))
-                    for (int i=0;i<sig->size();i++)
+            foreach(MSignal *sig, m_signalVector)
+                if(sig->getName() == m_mng->GetChanName(numCh))
+                    for (int i = 0; i < sig->size(); i++)
                         valuesY.append(sig->at(i));
 
-            double val=(double)numSamp[0]/m_mng->GetNAS(numCh);
-            (*mrk)["val"]=val;
-            (*mrk)["type"]=TYPE_ANALYTICAL;
-            (*mrk)["name"]="Analitical";
-            (*mrk)["family"]="Markers";
-            (*mrk)["nas"]= m_mng->GetNAS(numCh);
-            (*mrk)["valuesY"]=valuesY;
-            (*mrk)["code"]= "f" + QString::number(key);
-            (*mrk)["descr"]=descr;
-            (*mrk)["lock"]=false;
-            (*mrk)["channel"]=numCh;
-            (*mrk)["defCode"]=(qulonglong)defVec->value(numDef);
-            (*mrk)["key"]=key;
-            (*mrk)["color"]=COLOR_ANALYTICAL;
-            (*mrk)["visible"]=true;
-            (*mrk)["category"]=CAT_MARKER;
+            double val = (double) numSamp[0] / m_mng->GetNAS(numCh);
+            (*mrk)["val"] = val;
+            (*mrk)["type"] = TYPE_ANALYTICAL;
+            (*mrk)["name"] = "Analitical";
+            (*mrk)["family"] = "Markers";
+            (*mrk)["nas"] =  m_mng->GetNAS(numCh);
+            (*mrk)["valuesY"] = valuesY;
+            (*mrk)["code"] =  "f" + QString::number(key);
+            (*mrk)["descr"] = descr;
+            (*mrk)["lock"] = false;
+            (*mrk)["channel"] = numCh;
+            (*mrk)["defCode"] = (qulonglong)defVec->value(numDef);
+            (*mrk)["key"] = key;
+            (*mrk)["color"] = COLOR_ANALYTICAL;
+            (*mrk)["visible"] = true;
+            (*mrk)["category"] = CAT_MARKER;
             mrkAnVec->append(mrk);
             //lo associo al suo definitore
-            QList<QVariant> anM = defVec->value(numDef)->value("anMarkers").toList();
+            QList<QVariant> anM  =  defVec->value(numDef)->value("anMarkers").toList();
             anM.append((qulonglong)mrk);
-            (*defVec->value(numDef))["anMarkers"]=anM;
-
+            (*defVec->value(numDef))["anMarkers"] = anM;
         }
-        if(!mrkAnVec->isEmpty())
-        {
-            QString family="Markers";
-            QString name="Analitical";
-            saveDataAndUpdate(family,name,mrkAnVec);
+        if(!mrkAnVec->isEmpty()) {
+            QString family = "Markers";
+            QString name = "Analitical";
+            saveDataAndUpdate(family, name, mrkAnVec);
         }
 
         //        for(int32_t nc=0;nc<m_mng->GetChanNum();nc++)
@@ -306,7 +290,7 @@ void MDataManager::loadFile(QString __fileName)
         //        }
 
         qDebug()<<"mi memorizzo le analisi associate a questo esame e l'associazione con i definitori";
-        for (int i=0; i<m_mng->GetAnalysiNum();i++)
+        for (int i = 0; i < m_mng->GetAnalysiNum(); i++)
         {
             int anal = m_mng->GetAnalysis(i).toInt();
             switch (anal) {
@@ -343,7 +327,6 @@ void MDataManager::loadFile(QString __fileName)
             //m_analysisMap
         }
 
-
         qDebug()<<"Building infoList ...";
         if(!updateInfoList())
         {qCritical()<<"Error building infolist";return;}
@@ -352,13 +335,11 @@ void MDataManager::loadFile(QString __fileName)
         m_ana = new Analyze();
         m_mng->Close();
         break;
-
     }
     default:qDebug()<<"Should not be here!!!!!";break;
     }
 
     emit loadingCompleted();
-
 
     qDebug()<<"Load file operation completed succesfully!";
 }
@@ -547,7 +528,7 @@ bool MDataManager::updateInfoList()
         gName=graph;
         //riempo con gli elementi che mi servono
 
-        //tracce molto facile dato che ce le ho giÃ
+        //tracce molto facile dato che ce le ho giA
         foreach (QString chanName, m_chanInPlots[graph]) {
             elements<<chanName+":Signal";
         }
@@ -610,8 +591,8 @@ bool MDataManager::buildInfoList()
      * i marker di distanza per ogni grafico
      */
 
-    //allora dato che questa funzione Ã¨ chiamata dopo aver costruito i plotter
-    //so giÃ  quanti e come si chiamano i grafici
+    //allora dato che questa funzione A? chiamata dopo aver costruito i plotter
+    //so giA  quanti e come si chiamano i grafici
 
     QStringList graphs=m_chanInPlots.keys();
 
@@ -624,7 +605,7 @@ bool MDataManager::buildInfoList()
         gName=graph;
         //riempo con gli elementi che mi servono
 
-        //tracce molto facile dato che ce le ho giÃ
+        //tracce molto facile dato che ce le ho giA
         foreach (QString chanName, m_chanInPlots[graph]) {
             elements<<chanName+":Signal";
         }
@@ -744,7 +725,7 @@ bool MDataManager::changeObject(QVariantList __curObj)
         setToSave("");//necessario chiedere se salvare
 
         qulonglong whoAmI=__curObj.first().toULongLong();
-        //tolgo il whoami e lascio solo le proprietÃ
+        //tolgo il whoami e lascio solo le proprietA
         __curObj.removeFirst();
 
         qDebug()<<"Richiesta di modifica per "<<whoAmI;
@@ -794,7 +775,7 @@ bool MDataManager::saveDataAndUpdate(QString __family, QString __name, VarMapVec
     {qCritical()<<"No data in __elements";return false;}
 
     if(m_storage.archive(__family,__name,__elements,__whatIfAlreadyPresent))
-    {//se siamo qua dentro vuol dire che tutto Ã¨ andato liscio e possiamo visualizzare le info all'utente
+    {//se siamo qua dentro vuol dire che tutto A? andato liscio e possiamo visualizzare le info all'utente
         if(!m_data.keys().contains(__family))
         {
             m_data[__family].append(__name);
@@ -837,7 +818,7 @@ void MDataManager::exitFromReview()
         else //"yes"
             //cancello il file copy
             qDebug()<<"cancellata copia all'exit"<<QFile::remove(copyName);
-        g_mainAppBridge->sendSwitch(); //poi dovrà tornare al modulo database
+        g_mainAppBridge->sendSwitch(); //poi dovra tornare al modulo database
     }
 
     //    if (getToSave() == "")
@@ -858,7 +839,7 @@ void MDataManager::exitFromReview()
     //        else //"no"
     //            //cancello il file copy
     //            qDebug()<<"cancellata copia all'exit"<<QFile::remove(copyName);
-    //        exit(0); //poi dovrà tornare al modulo database
+    //        exit(0); //poi dovra tornare al modulo database
     //    }
 }
 
@@ -880,7 +861,7 @@ bool MDataManager::checkForVolRes()
 
     m_numAna = m_mng->GetAnalysiNum();
 
-    //ciclo per individuare se Ã¨ necessario aprire la dlg del volume residuo
+    //ciclo per individuare se A? necessario aprire la dlg del volume residuo
     bool volRes = false;
     for (int i=0; i<m_numAna; i++)
     {
@@ -892,7 +873,7 @@ bool MDataManager::checkForVolRes()
             else
             {
                 volRes = true;
-                setValVolRes(0);//in futuro sarÃ  letto da proprietÃ  xml
+                setValVolRes(0);//in futuro sarA  letto da proprietA  xml
                 emit sg_openVolResDlg("Flowmetry");
                 break;
             }
@@ -947,7 +928,7 @@ qDebug()<<"INIZIO";
         int anaType = m_mng->GetAnalysis(i).toInt();
         if (anaType == FLW_AVD_STUDY)
         {
-            //verifica se c'Ã¨ un definitore per questa analisi.
+            //verifica se c'A? un definitore per questa analisi.
             VarMap mkOpAnIn;
             bool found = false;
             VarMapVec* elements=m_storage.getAll(CAT_DEFINER);
@@ -979,7 +960,7 @@ qDebug()<<"INIZIO";
 
                 if (m_numAna == 1 || posQ > -1)
                 {
-                    //se non c'Ã¨ il defintore, ma questa Ã¨ l'unica analisi,
+                    //se non c'A? il defintore, ma questa A? l'unica analisi,
                     //viene inserito automaticamente sul canale del flusso.
                     for (int i=0;i<m_mng->GetChanNum();i++)
                         En << 0;
@@ -988,7 +969,7 @@ qDebug()<<"INIZIO";
                     if (posV > -1)
                         En[posV] = 1;
 
-                    //ho tralasciato la parte che gestisce l'iconizzazione che forse non c'è
+                    //ho tralasciato la parte che gestisce l'iconizzazione che forse non c'e
                     //provo a disegnare il definitore
                     QString family="Definers";
                     QString name="Flowmetry";
@@ -1023,8 +1004,8 @@ qDebug()<<"INIZIO";
                 }
                 //                else
                 //                {
-                //                    //cotrolliamo se c'Ã¨ il marker 'ff' free flow
-                //                    //nel qual caso, il definitore viene inserito da lÃ¬ fino a:
+                //                    //cotrolliamo se c'A? il marker 'ff' free flow
+                //                    //nel qual caso, il definitore viene inserito da lA? fino a:
                 //                    //fine esame o inizio FILL o inizio VOID
                 //                    VarMapVec* elements=m_storage.getAll(CAT_MARKER);
                 //                    foreach (VarMap *curMap, (*elements))
@@ -1043,7 +1024,7 @@ qDebug()<<"INIZIO";
                 //                                if (posV > -1)
                 //                                    En[posV] = 1;
 
-                //                                //ho tralasciato la parte che gestisce l'iconizzazione che forse non c'Ã¨
+                //                                //ho tralasciato la parte che gestisce l'iconizzazione che forse non c'A?
 
 
                 //                                VarMapVec* definers=m_storage.getAll(CAT_DEFINER);
@@ -1120,7 +1101,7 @@ qDebug()<<"INIZIO";
                 //                                            'Next k
                 //                                            'theGraphs.Reset_Zoom()
                 //                                            'TODO: implementare una gestione degli errori che mostri
-                //                                            'su DlgReport il messaggio d'errore anzichÃ¨ il risultato.
+                //                                            'su DlgReport il messaggio d'errore anzichA? il risultato.
                 //                                            'TODO: implementare un sistema per ottenere il numero di
                 //                                            'analisi dello stesso tipo effettuate.
                 //                                            'MarkerOpAn(mkOpAnIn).Warn = True
@@ -1130,33 +1111,39 @@ qDebug()<<"INIZIO";
     }
 
 
-    qDebug()<<"File chiuso"<<m_mng->Close();
+    qDebug() << "File chiuso" << m_mng->Close();
 
 
     //printer PROVA
-//    PrinterManager *prova = new PrinterManager(m_fileName);
-//    prova->setTempoAttesa(m_aflwdatas.at(0)->getWaitingTime());
-//    prova->setFlussoMax(m_aflwdatas.at(0)->getQMax());
-//    prova->setFlussoMedio(m_aflwdatas.at(0)->getQAve());
-//    prova->setTempoMax(m_aflwdatas.at(0)->getTimeAtQmax());
-//    prova->setTempo595(m_aflwdatas.at(0)->getTime90());
-//    prova->setTempoFlusso(m_aflwdatas.at(0)->getFlowTime());
-//    prova->setTempoDisc(m_aflwdatas.at(0)->getDescTime());
-//    prova->setTempoSvuot(m_aflwdatas.at(0)->getVoidingTime());
-//    prova->setVolFlussoMax(m_aflwdatas.at(0)->getVolAtQqmax());
-//    prova->setVolVuotato(m_aflwdatas.at(0)->getVoidedVolume());
-//    prova->setAccelerazione(m_aflwdatas.at(0)->getAcceleration());
+    PrinterManager *prova = new PrinterManager(m_fileName);
+    prova->setTempoAttesa(m_aflwdatas.at(0)->getWaitingTime());
+    prova->setFlussoMax(m_aflwdatas.at(0)->getQMax());
+    prova->setFlussoMedio(m_aflwdatas.at(0)->getQAve());
+    prova->setTempoMax(m_aflwdatas.at(0)->getTimeAtQmax());
+    prova->setTempo595(m_aflwdatas.at(0)->getTime90());
+    prova->setTempoFlusso(m_aflwdatas.at(0)->getFlowTime());
+    prova->setTempoDisc(m_aflwdatas.at(0)->getDescTime());
+    prova->setTempoSvuot(m_aflwdatas.at(0)->getVoidingTime());
+    prova->setVolFlussoMax(m_aflwdatas.at(0)->getVolAtQqmax());
+    prova->setVolVuotato(m_aflwdatas.at(0)->getVoidedVolume());
+    prova->setAccelerazione(m_aflwdatas.at(0)->getAcceleration());
 
     //letto dai setting
     //mi dice se la flussimetria automatica o manuale
     //prova->setMode();
     //if (m_autoPrint)
-    //prova->print();
+
+//    prova->print();
 
     //qml
-    qDebug()<<"FINE";
+    qDebug() << "FINE";
     emit sg_loadResult();
+}
 
+void MDataManager::print()
+{
+    qDebug() << "Stampooooo" << m_patientName;
+    SystemManager::executeDetached(QString() + "./PicoPrint immagine.bmp " + m_patientName);
 }
 
 
@@ -1212,7 +1199,7 @@ void MDataManager::InitPageGraphs(int __anaType)
                 evAuto = 1;
 
                 //ogni volta che si passano i definitori alla libreria di analisi dopo aver nascosto/rivisualizzato i canali
-                //Ã¨ necessario sistemare l'array dei canali abilitati considerando tutti i canali dell'analisi.
+                //A? necessario sistemare l'array dei canali abilitati considerando tutti i canali dell'analisi.
                 //Se un canale non era visibile al momento dell'analisi,
                 //consideriamo quel canale abilitato
                 //                            If objOpMAn.myEnabled.Length < myGraphPlot.totAnalisysChannel Then
@@ -1358,11 +1345,12 @@ bool MDataManager::InitArraysFLW(int __start,
 
     }
 
-    int res = m_ana->FLW_Adv_Analysis_Time(1,__chEn,__start,__end,__curDef,startTh,heightTh,widthTth,__auto,getValVolRes(), 0);
+//    int res = m_ana->FLW_Adv_Analysis_Time(1, __chEn, __start, __end, __curDef, startTh, heightTh, widthTth, __auto, getValVolRes(), 0);
+    int res = m_ana->FLW_Adv_Analysis(1, __chEn, __start, __end, __curDef, startTh, heightTh, widthTth, __auto, getValVolRes(), 0, true);
     if (res < 0)
         return false;
 
-    qDebug()<<"Legge i risultati";
+    qDebug() <<  "Legge i risultati";
     int numEv = 1;
     res = ReadResult(numEv);
     if (res < 0)
@@ -1513,8 +1501,6 @@ bool MDataManager::InitArraysFLW(int __start,
     return true;
 }
 
-
-
 int MDataManager::ReadResult(int __numEv)
 {
     int StructType = m_mng->GetAnaType();
@@ -1595,8 +1581,6 @@ int MDataManager::ReadResult(int __numEv)
         }
         m_aflwdatas.at(0)->buildTable();
         free(strTemp);
-
-
         break;
     }
     default:
@@ -1604,7 +1588,6 @@ int MDataManager::ReadResult(int __numEv)
     }
 
     return StructType;
-
 }
 
 mflowdatas *MDataManager::getFlowDatas(int __i)

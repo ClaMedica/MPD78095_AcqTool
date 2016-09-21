@@ -101,6 +101,7 @@ signals:
 
 public slots:
     void analysis(void);
+
     void exitFromReview();
     void loadFile(QString __fileName);
     float getStartTime(){return m_start;}
@@ -116,6 +117,7 @@ public slots:
     QStringList getLinks(QString __what, QStringList __filterFamily=QStringList(), QStringList __filterType=QStringList());
 
 
+    void print();
 private:
     QVector<MSignal *> m_signalVector;
 
@@ -130,7 +132,7 @@ private:
     m_fileName,
     m_configurationFileName;
 
-    Ancestry m_configLocale,    //è la prima ad essere caricata e contiene la lingua
+    Ancestry m_configLocale,    //A? la prima ad essere caricata e contiene la lingua
     m_configAcq,                //contiene le info fisse di acquisizione
     m_configUser;               //contiene le info modificate dall'utente
 

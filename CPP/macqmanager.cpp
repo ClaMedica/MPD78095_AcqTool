@@ -7,7 +7,7 @@ MAcqManager::MAcqManager(QObject *parent)
 
     m_mng=NULL;
     m_acqFileOpened=false;//nessuna acquisizione in atto
-    m_sendingToPlot=false;//nessuno sta spedendo qualcosa per cui ci si puÚ scrivere sopra
+    m_sendingToPlot=false;//nessuno sta spedendo qualcosa per cui ci si puo scrivere sopra
     m_serverReady=false;//i server non sono inizializzati quindi falso
     m_autoStartStop=false;
     m_superProcess=NULL;//nessun supervisore avviato
@@ -20,7 +20,7 @@ MAcqManager::MAcqManager(QObject *parent)
 
 #endif
 
-    //connetto il gestore degli allarmi alla propriet√  alarms
+    //connetto il gestore degli allarmi alla proprietA  alarms
     connect(&m_alarmMng,SIGNAL(alarmsUpdated(QVariantList)),this,SLOT(setAlarms(QVariantList)));
 }
 
@@ -79,7 +79,7 @@ bool MAcqManager::newAcquisition(QString __dataFile)
 {
     if(m_acqFileOpened)
     {
-        //sono gi√  in acquisizione e voglio farne partire un altra...strano ma
+        //sono giA  in acquisizione e voglio farne partire un altra...strano ma
     }
     else
     {
@@ -93,7 +93,7 @@ bool MAcqManager::newAcquisition(QString __dataFile)
         if(!m_alarmMng.load(m_applicationPath+"/Config_Alarms_"+lang+".xml"))
             qCritical()<<"Error on alarm configuration file";
 
-        //carico info di connettivit√
+        //carico info di connettivitA
         loadConnectivityInfo(m_configAcq.getSafeChild(XML_CONNECTIONS));
 
 
@@ -101,7 +101,7 @@ bool MAcqManager::newAcquisition(QString __dataFile)
          * oppure pescandole dal file di configurazione
         */
         if(m_mng!=NULL)
-        {//se c'√® qualcosa di vecchio lo chiudo
+        {//se c'A? qualcosa di vecchio lo chiudo
             delete m_mng;
         }
 
@@ -127,13 +127,13 @@ bool MAcqManager::newAcquisition(QString __dataFile)
         qDebug()<<"Reading configuration file";
         if(!readConfigurationFile())
             qCritical()<<"Error during reading of configuration file";
-        //bene nel file di configurazione c'Ë scritto tutto il massimo potenziale della scheda
-        //tuttavia non Ë detto che ci serva tutto per cui
+        //bene nel file di configurazione c'e scritto tutto il massimo potenziale della scheda
+        //tuttavia non e detto che ci serva tutto per cui
         qDebug()<<"Building configuration file for plots";
         if(!buildConfigurationFile())
             qCritical()<<"Error during building of configuration file";
 
-        //aggiorno il datafile con i dati relativi alla mia configurazione #BUG da togliere non appena il file verr√  scritto correttamente
+        //aggiorno il datafile con i dati relativi alla mia configurazione #BUG da togliere non appena il file verrA  scritto correttamente
         qDebug()<<"Updating datafile...";
         handleDataFile();
         //ripristino il file in acquisizione
@@ -255,7 +255,7 @@ void MAcqManager::endAcquisition()
     //    }
 
     m_acqFileOpened=false;//nessuna acquisizione in atto
-    m_sendingToPlot=false;//nessuno sta spedendo qualcosa per cui ci si puÚ scrivere sopra
+    m_sendingToPlot=false;//nessuno sta spedendo qualcosa per cui ci si puo scrivere sopra
     m_serverReady=false;//i server non sono inizializzati quindi falso
     m_autoStartStop=false;
     m_saving=false;//non sto salvando i dati
@@ -364,10 +364,10 @@ void MAcqManager::handleTCP(SimpleTCPClient *__client, QByteArray __block)
         QString who=m_tcpClients.key(__client);
         //qDebug()<<who<<__block;
         if(who=="STA")
-        {//allora √® uno stato
+        {//allora A? uno stato
             m_supeConnected=true;
             __block.remove(0,4);
-            //#BUG non Ë in gradi di interpretare lo stato del picoflow ma sono quello della cella
+            //#BUG non e in gradi di interpretare lo stato del picoflow ma sono quello della cella
             flowBT_status_t status;
             alarms_t alarms;
             uint i=0;
@@ -387,7 +387,7 @@ void MAcqManager::handleTCP(SimpleTCPClient *__client, QByteArray __block)
             //riempo i buffer
             fillBuffers(__block);
 
-            //finch√® i buffer hanno abbastanza campioni
+            //finchA? i buffer hanno abbastanza campioni
             //faccio le mie operazioni e rimuovo i primi campioni
             while(buffersReady())
             {
@@ -402,7 +402,7 @@ void MAcqManager::handleTCP(SimpleTCPClient *__client, QByteArray __block)
             if(!m_saving){
 
                 if(m_autoStartStop)
-                    checkAutomaticStartStop("Start");//finch√® non devo salvare riempo il buffer e controllo
+                    checkAutomaticStartStop("Start");//finchA? non devo salvare riempo il buffer e controllo
                 else
                     m_saving=true;
             }
@@ -432,7 +432,7 @@ void MAcqManager::initializeServers()
 bool MAcqManager::loadConnectivityInfo(Ancestry *__info)
 {
     qDebug()<<"Loading connectivity info";
-    //__info √® sicuro
+    //__info A? sicuro
     Ancestry *tcp=__info->getSafeChild(XML_TCP);
     foreach (Ancestry *child, tcp->getChildren()) {
         QString name=child->name();
@@ -496,16 +496,16 @@ void MAcqManager::analyzeAlarms(alarms_t __alarms)
 
 
 void MAcqManager::checkAutomaticStartStop(QString __which)
-{//ok controlliamo se c'√® qualche condizione automatica
+{//ok controlliamo se c'A? qualche condizione automatica
     //mi salvo il puntatore al livello acquisition
 
     //qDebug()<<"Start check"<<__which;
 
     Ancestry *contitions=m_configUser.getSafeChild("Auto"+__which+"s");
-    foreach (Ancestry *condition, contitions->getChildren()) {//scorro le condizioni di autostart anche se ce ne √® solo una
-        //pesco su quale canale √® fatta
+    foreach (Ancestry *condition, contitions->getChildren()) {//scorro le condizioni di autostart anche se ce ne A? solo una
+        //pesco su quale canale A? fatta
         QString chanType=condition->getSafeChild(ATT_CHANTYPE)->getSafeAttribute(ATT_VALUE);
-        int num=condition->getSafeChild(ATT_NUM)->getSafeAttribute(ATT_VALUE).toInt()-1;//il meno 1 √® per ovviare al fatto che si parte da 1
+        int num=condition->getSafeChild(ATT_NUM)->getSafeAttribute(ATT_VALUE).toInt()-1;//il meno 1 A? per ovviare al fatto che si parte da 1
         //e in base a come si chiama vedo che farci
 
         //qDebug()<<condition->name();
@@ -517,7 +517,7 @@ void MAcqManager::checkAutomaticStartStop(QString __which)
 
             Ancestry *childDur=condition->getSafeChild(XML_DURATION);
             Ancestry *childAmp=condition->getSafeChild(XML_AMPLITUDE);
-            //per prima cosa controlliamo quanti campioni √®
+            //per prima cosa controlliamo quanti campioni A?
             int min=childDur->getSafeChild(ATT_MIN)->getSafeAttribute(ATT_VALUE).toUInt();
 
             qreal ampMin=childAmp->getSafeChild(ATT_MIN)->getSafeAttribute(ATT_VALUE).toInt();
@@ -530,7 +530,7 @@ void MAcqManager::checkAutomaticStartStop(QString __which)
                 continue;//non ho ancora abbastanza campioni per decidere skip alla prossima condizione
             //ora quindi sono sicuro che arrivo qui solo quando ho abbastanza campioni
 
-            //controllo se c'√® un gradino
+            //controllo se c'A? un gradino
             qreal startVal=m_channelMap[chanType].at(num)->first();
             int count=0;
             foreach(qreal sample,(*m_channelMap[chanType].at(num))){
@@ -565,7 +565,7 @@ void MAcqManager::checkAutomaticStartStop(QString __which)
             Ancestry *childDur=condition->getSafeChild(XML_DURATION);
             Ancestry *childVal=condition->getSafeChild(XML_VALUE);
 
-            //per prima cosa controlliamo quanti campioni √®
+            //per prima cosa controlliamo quanti campioni A?
             int min=childDur->getSafeChild(ATT_MIN)->getSafeAttribute(ATT_VALUE).toUInt();
 
             qreal valMin=childVal->getSafeChild(ATT_MIN)->getSafeAttribute(ATT_VALUE).toDouble();
@@ -608,7 +608,7 @@ void MAcqManager::checkAutomaticStartStop(QString __which)
 }
 
 void MAcqManager::saveBuffersToFile()
-{//qui so che ho gi√  spedito i campioni al plot per cui salvo sul file ed elimino i campioni dal buffer per sempre
+{//qui so che ho giA  spedito i campioni al plot per cui salvo sul file ed elimino i campioni dal buffer per sempre
 
     foreach (QString chanName, m_dataChanNameMap.keys()) {
         int size=chanName.size();
@@ -697,7 +697,7 @@ bool MAcqManager::handleDataFile()
     Ancestry *channels=m_configAcq.getChild(XML_CHANNELS);
     if(channels==NULL)
         qCritical("Child not alive");
-    //ciclo per ogni canale del datafile alla ricerca di propriet√  da completare
+    //ciclo per ogni canale del datafile alla ricerca di proprietA  da completare
     int maxChan=m_mng->GetChanNum();
     for(int i=0;i<maxChan;i++)
     {
@@ -817,11 +817,11 @@ void MAcqManager::fillBuffers(QByteArray __block)
     qreal sample;
 
     in >> numBytes;
-    //qDebug()<<"N¬∞ bytes: "<<numBytes;
+    //qDebug()<<"NA? bytes: "<<numBytes;
 
     //Chan number
     in >> numChan;
-    //qDebug()<<"N¬∞ chan: "<<numChan;
+    //qDebug()<<"NA? chan: "<<numChan;
 
     if(numChan > maxNumChan)
     {
@@ -835,7 +835,7 @@ void MAcqManager::fillBuffers(QByteArray __block)
         in >> numChanData;
         //qDebug()<<currChan;
         if(currChan < maxNumChan && currChan >= 0)
-        {//se √® un canale con del senso
+        {//se A? un canale con del senso
 
             for(int i=0;i < numChanData;i++)
             {
@@ -851,7 +851,7 @@ void MAcqManager::fillBuffers(QByteArray __block)
         else
             qCritical()<< "currChan out of range"<<currChan;
     }
-    //rimuoviamo roba gi√  processata
+    //rimuoviamo roba giA  processata
 }
 
 bool MAcqManager::buffersReady()
@@ -886,7 +886,7 @@ bool MAcqManager::readConfigurationFile()
         bool skip=true;
         foreach (QString n, m_channelNames) {//QBT1,VBT1 ecc
             if(n.contains(name)){
-                skip=false;//questo tipo di canale Ë tra quelli del datafile per cui posso processarlo
+                skip=false;//questo tipo di canale e tra quelli del datafile per cui posso processarlo
                 break;
             }
         }
@@ -900,7 +900,7 @@ bool MAcqManager::readConfigurationFile()
         QString card=channel->getSafeAttribute("card");
         qDebug()<<"Card"<<card;
         if(card=="")qCritical()<<"File corrupted";
-        //se non c'√® gi√  questo supe lo aggiungo alla lista di quelli da far partire
+        //se non c'A? giA  questo supe lo aggiungo alla lista di quelli da far partire
         if(!m_superList.contains(card))
             m_superList<<card;
 
@@ -976,7 +976,7 @@ bool MAcqManager::readConfigurationFile()
 
 
     }
-    //lo faccio adesso perchË ho la mappa delle frequenze completata
+    //lo faccio adesso perche ho la mappa delle frequenze completata
     foreach(QString c,m_totalHWChan)
     {//inizializzo i buffer hardware;
         m_bufferMap[c]=new MSignal();
@@ -985,7 +985,7 @@ bool MAcqManager::readConfigurationFile()
         m_frameMap[c]=m_sampleFreqMap[c]/gcd(m_sampleFreqMap.values());
         qDebug()<<"Aggiungo canale buffer"<<c<<m_sampleFreqMap[c]<<"frame"<<m_frameMap[c];
     }
-    //sono a posto cos√¨
+    //sono a posto cosA?
     qDebug()<<"Configuration file read succesfully!";
     return true;
 

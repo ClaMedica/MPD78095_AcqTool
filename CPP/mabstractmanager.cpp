@@ -337,19 +337,19 @@ bool MAbstractManager::buildConfigurationFile()
 {
     //carico i dati necessari
     int32_t chanlNum=m_mng->GetChanNum();
-    qDebug()<<"N° Canali: "<<chanlNum;
+    qDebug()<<"N? Canali: "<<chanlNum;
     if(chanlNum==0)
         qCritical()<<"No channels in file";
     for(int32_t nc=0;nc<chanlNum;nc++)
     {//contiamo i grafici e popoliamo le mappe di associazione
         QString chanName=m_mng->GetChanName(nc);
 
-        //per i grafici devo appendere l'informazione perchÃ¨ posso avere piÃ¹ canali
+        //per i grafici devo appendere l'informazione perchA? posso avere piA? canali
         QString graphName="Graph_"+QString::number(m_mng->GetGraph(nc));
 
 
         m_chanInPlots[graphName]<<chanName;
-        //aggiungo il canale su cui comunicherÃ  questo plot
+        //aggiungo il canale su cui comunicherA  questo plot
         m_tcpChannels[graphName]=new SimpleTCPChannel(QHostAddress("127.0.0.1"),9000+m_mng->GetGraph(nc)-1,this);
         qDebug()<<nc<<chanName<<"inviato su"<<graphName<<9000+m_mng->GetGraph(nc)-1;
         //per il datafile invece no
@@ -357,7 +357,7 @@ bool MAbstractManager::buildConfigurationFile()
 
     }
 
-    //scriviamo un file di configurazione che poi l'utente potrà modificare a suo gusto
+    //scriviamo un file di configurazione che poi l'utente potra modificare a suo gusto
     Ancestry configPlot;
     //aggiungo il campo graphs
     Ancestry *graph=configPlot.addChild(XML_GRAPHS);
@@ -369,7 +369,7 @@ bool MAbstractManager::buildConfigurationFile()
         Ancestry *  prop=graphN->addChild(XML_PROPERTIES);
         Ancestry *  tracks=graphN->addChild(XML_TRACKS);
 
-        //ho la certezza che i canali su ogni grafico hanno tutti le stesse proprietÃ  grafiche per cui vado tranquillo
+        //ho la certezza che i canali su ogni grafico hanno tutti le stesse proprietA  grafiche per cui vado tranquillo
         QString chanName=m_chanInPlots[graphName].first();
         int32_t nc=m_dataChanNameMap[chanName];
         Ancestry *  axis=prop->addChild(XML_AXIS);
@@ -413,7 +413,7 @@ bool MAbstractManager::buildConfigurationFile()
         Ancestry * chProps=m_configUser.getSafeChild(XML_CHANNELSPROP);
         QStringList chNames=chProps->childrenNames();
         foreach (QString chanName, m_chanInPlots[graphName])
-        {//qui scrivo le proprietÃ  delle tracce
+        {//qui scrivo le proprietA  delle tracce
             Ancestry * trkN=tracks->addChild(chanName);
             Ancestry* ch=NULL;
             foreach (QString chNamePart, chNames) {
@@ -429,7 +429,7 @@ bool MAbstractManager::buildConfigurationFile()
             axis->setAttribute(ATT_YAUTOSCALE,ch->getSafeChild(ATT_YAUTOSCALE)->getSafeAttribute(ATT_VALUE));
             }
             else
-                qWarning()<<"Canale"<<chanName<<"senza proprietà grafiche. Uso le default";
+                qWarning()<<"Canale"<<chanName<<"senza proprieta grafiche. Uso le default";
       }
     }
     //ora salvo il file di configurazione come cur.xml

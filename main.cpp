@@ -62,7 +62,7 @@ int main(int argc, char *argv[])
         arguments<<QString(argv[i]);
     qDebug()<<"Argomenti"<<arguments;
     //qDebug()<<fibonacci(5);
-    g_mainAppBridge=new AcqBridge(QStringList()<<argv[1]<<argv[2]);//definisco un bridge tra app di topo server
+    g_mainAppBridge = new AcqBridge(QStringList() << argv[1] << argv[2]);//definisco un bridge tra app di tipo server
 
     qmlRegisterType<ParameterManager>("Managers",1,0,"ParameterManager");
     qmlRegisterType<ModelManager>("Managers",1,0,"ModelManager");
@@ -77,9 +77,9 @@ int main(int argc, char *argv[])
     QQmlApplicationEngine engine;
     //Carico il layout di default del programma
     LayoutManager mngLayout;
-
-    engine.addPluginPath("qrc:/Modules/PicoFlow");
-    engine.addImportPath("qrc:/Modules");
+    engine.addImportPath("qrc:/Modules/");
+    engine.addImportPath("../standalone/");
+    engine.addImportPath(QApplication::applicationDirPath());
 #ifdef PICOFLOW//metto questo altrimenti su target non carica il plugin cpp
     engine.rootContext()->setContextProperty("screenH",480);
     engine.rootContext()->setContextProperty("screenW",640);
@@ -94,7 +94,7 @@ int main(int argc, char *argv[])
                                              androidmanager);
     engine.rootContext()->setContextProperty(QLatin1String("platform"),"android");
 #else
-    engine.rootContext()->setContextProperty(QLatin1String("platform"),"win");
+    engine.rootContext()->setContextProperty(QLatin1String("platform"),"linux");
 #endif
     engine.rootContext()->setContextProperty("layout",&mngLayout);
     engine.rootContext()->setContextProperty("settings",&g_P7SettingsManager);
@@ -106,7 +106,7 @@ int main(int argc, char *argv[])
     engine.load(QUrl(QStringLiteral("qrc:/main.qml")));
     qDebug()<<"engine caricato";
     g_mainAppBridge->setRootObjects(engine.rootObjects());
-    int ret=app.exec();
-    qDebug()<<"Uscito"<<ret;
+    int ret = app.exec();
+    qDebug() << "Uscito" << ret;
     return ret;
 }
