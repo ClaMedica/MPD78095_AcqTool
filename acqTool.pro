@@ -4,14 +4,12 @@ QT += qml quick widgets sql network multimedia xml core serialport
 
 RESOURCES += Resources/qml.qrc
 
-
 # Additional import path used to resolve QML modules in Qt Creator's code model
 QML_IMPORT_PATH +=  Modules/MPlotModule
 
 DEFINES += QT_MESSAGELOGCONTEXT
 #debug campioni di acquisizione
 DEFINES += DEBUG_ACQ
-
 
 # The .cpp file which was generated for your project. Feel free to hack it.
 SOURCES += main.cpp \
@@ -70,8 +68,6 @@ HEADERS += \
     ../MGlobal/layoutmanager.h \
     ../MGlobal/systemmanager.h
 
-
-
 SOURCES += ../AnaUro/anauro.cpp \
     ../AnaUro/analysis.cpp \
     ../AnaUro/anautils.cpp \
@@ -90,13 +86,8 @@ INCLUDEPATH +=  CPP \
                 ../SupeFlowBT \
                 CPP/TCP \                
 
-
-
-
 # Default rules for deployment.
 include(deployment.pri)
-
-
 
 win32:CONFIG(release, debug|release): LIBS += -L$$PWD/../Build/AnaUro7Build/release/ -lAnaUro
 else:win32:CONFIG(debug, debug|release): LIBS += -L$$PWD/../Build/AnaUro7Build/debug/ -lAnaUro
@@ -167,6 +158,7 @@ CONFIG += link_pkgconfig
 
 LINUXDESKTOP {
         DEFINES += LINUXDESKTOP
+        DEFINES += LINUX
         TARGET = PicoAcq
         RESOURCES += modules_LinuxDesktop.qrc
 	RESOURCES += Resources/Icone/icons.qrc

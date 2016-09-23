@@ -28,58 +28,58 @@ mflowdatas::mflowdatas(QObject *parent) : QObject(parent)
     m_sirokyMax = new Nomogramma("flowmetry",G_SIROKY_MAX);
     m_sirokyAve = new Nomogramma("flowmetry",G_SIROKY_AVE);
 }
+
 mflowdatas::~mflowdatas()
 {
     //delete m_datasInfo;
     //delete m_liverpoolMax;
     //delete m_liverpoolAve;
-    int c= 0;
-
+//    int c = 0;
 }
 
 void mflowdatas::buildTable()
 {
     m_datasInfo->setData(0,"descr",tr("Waiting Time (sec)"));
-    m_datasInfo->setData(0,"value",QString::number(getWaitingTime(),'f',1));
+    m_datasInfo->setData(0,"value",QString::number(getWaitingTime(), 'f', 1));
 
     m_datasInfo->setData(1,"descr",tr("Maximum flow rate (ml/sec)"));
-    m_datasInfo->setData(1,"value",QString::number(getQMax(),'f',1));
+    m_datasInfo->setData(1,"value",QString::number(getQMax(), 'f', 1));
 
     m_datasInfo->setData(2,"descr",tr("Average flow rate (ml/sec)"));
-    m_datasInfo->setData(2,"value",QString::number(getQAve(),'f',1));
+    m_datasInfo->setData(2,"value",QString::number(getQAve(), 'f', 1));
 
     m_datasInfo->setData(3,"descr",tr("Time to maximun flow (sec)"));
-    m_datasInfo->setData(3,"value",QString::number(getTimeAtQmax(),'f',1));
+    m_datasInfo->setData(3,"value",QString::number(getTimeAtQmax(), 'f', 1));
 
     m_datasInfo->setData(4,"descr",tr("Time between 5% and 95% (sec)"));
-    m_datasInfo->setData(4,"value",QString::number(getTime90(),'f',1));
+    m_datasInfo->setData(4,"value",QString::number(getTime90(), 'f', 1));
 
     m_datasInfo->setData(5,"descr",tr("Flow time (sec)"));
-    m_datasInfo->setData(5,"value",QString::number(getFlowTime(),'f',1));
+    m_datasInfo->setData(5,"value",QString::number(getFlowTime(), 'f', 1));
 
     m_datasInfo->setData(6,"descr",tr("Descent time (sec"));
-    m_datasInfo->setData(6,"value",QString::number(getDescTime(),'f',1));
+    m_datasInfo->setData(6,"value",QString::number(getDescTime(), 'f', 1));
 
     m_datasInfo->setData(7,"descr",tr("Voiding time (sec)"));
-    m_datasInfo->setData(7,"value",QString::number(getVoidingTime(),'f',1));
+    m_datasInfo->setData(7,"value",QString::number(getVoidingTime(), 'f', 1));
 
     m_datasInfo->setData(8,"descr",tr("Volume to maxinum flow (ml)"));
-    m_datasInfo->setData(8,"value",QString::number(getVolAtQqmax(),'f',1));
+    m_datasInfo->setData(8,"value",QString::number(getVolAtQqmax(), 'f', 1));
 
     m_datasInfo->setData(9,"descr",tr("Voiding volume (ml)"));
-    m_datasInfo->setData(9,"value",QString::number(getVoidedVolume(),'f',1));
+    m_datasInfo->setData(9,"value",QString::number(getVoidedVolume(), 'f', 1));
 
     m_datasInfo->setData(10,"descr",tr("Corrected maximun flow (ml)"));
-    m_datasInfo->setData(10,"value",QString::number(getCQ(),'f',1));
+    m_datasInfo->setData(10,"value",QString::number(getCQ(), 'f', 1));
 
     m_datasInfo->setData(11,"descr",tr("Flow acceleration (ml/sec^2))"));
-    m_datasInfo->setData(11,"value",QString::number(getAcceleration(),'f',1));
+    m_datasInfo->setData(11,"value",QString::number(getAcceleration(), 'f', 1));
 
     m_datasInfo->setData(12,"descr",tr("Maximun contraction speed (mm/sec)"));
-    m_datasInfo->setData(12,"value",QString::number(getVDetMax(),'f',1));
+    m_datasInfo->setData(12,"value",QString::number(getVDetMax(), 'f', 1));
 
     m_datasInfo->setData(13,"descr",tr("Residual volume (ml)"));
-    m_datasInfo->setData(13,"value",QString::number(getResidualVolume(),'f',1));
+    m_datasInfo->setData(13,"value",QString::number(getResidualVolume(), 'f', 1));
 
 }
 
@@ -109,38 +109,32 @@ void mflowdatas::buildNomogrammi(bool __sex, int __age)
 
     QVector<double> yValue;
     yValue.append(0);
-    for (int i=0; i<N_LIVERPOOL; i++)
-    {
-        if (!__sex)
-        {
+    for (int i = 0; i < N_LIVERPOOL; i++) {
+        if (!__sex) {
             if (__age < 50)
                 //Liverpool uomini etA  < 50
-                yValue.append(qPow((2.37 + 0.18 * qSqrt((i+1) * Step_Liverpool) - 0.014 * 35),2));
+                yValue.append(qPow((2.37 + 0.18 * qSqrt((i+1) * Step_Liverpool) - 0.014 * 35), 2));
             else
                 //Liverpool uomini >= 50
-                yValue.append(qPow((2.37 + 0.18 * qSqrt((i+1) * Step_Liverpool) - 0.014 * 60),2));
+                yValue.append(qPow((2.37 + 0.18 * qSqrt((i+1) * Step_Liverpool) - 0.014 * 60), 2));
         }
         else
             //Liverpool donne
             yValue.append(qPow(2.718282,(0.511 + 0.505 * qLn((i+1) * Step_Liverpool))));
     }
 
-
     int pos = 0;
     double midValue = 0, valueToAdd = 0;
-    for (int i=0; i< m_liverpoolMax->getXmax(); i++)
-    {
-        if (i==(Step_Liverpool*pos))
-        {
-            m_liverpoolMax->addToLiney(0,yValue.at(pos));
-            midValue = (yValue.at(pos+1) - yValue.at(pos))/Step_Liverpool;
+    for (int i = 0; i < m_liverpoolMax->getXmax(); i++) {
+        if (i == (Step_Liverpool * pos)) {
+            m_liverpoolMax->addToLiney(0, yValue.at(pos));
+            midValue = (yValue.at(pos + 1) - yValue.at(pos)) / Step_Liverpool;
             valueToAdd = midValue;
             pos++;
         }
-        else
-        {
-            m_liverpoolMax->addToLiney(0,yValue.at(pos-1)+valueToAdd);
-            valueToAdd=valueToAdd+midValue;
+        else {
+            m_liverpoolMax->addToLiney(0, yValue.at(pos-1) + valueToAdd);
+            valueToAdd=valueToAdd + midValue;
         }
 
     }
@@ -158,9 +152,8 @@ void mflowdatas::buildNomogrammi(bool __sex, int __age)
     yVal[4].append(0);
     xVal[5].append(0);
     yVal[5].append(0);
-    ReadLiverpoolParameter(true,__sex,__age);
-    for (int i=0; i<=N_LIVERPOOL_CENT; i++)
-    {
+    ReadLiverpoolParameter(true, __sex, __age);
+    for (int i = 0; i <= N_LIVERPOOL_CENT; i++) {
         xVal[0].append(m_arrLineX1.at(i));
         yVal[0].append(m_arrLineY1.at(i));
 
@@ -180,27 +173,21 @@ void mflowdatas::buildNomogrammi(bool __sex, int __age)
         yVal[5].append(m_arrLineY6.at(i));
     }
 
-
-    for (int j=0; j<xVal.size(); j++)
-    {
+    for (int j = 0; j < xVal.size(); j++) {
         pos = 0;
         midValue = 0;
         valueToAdd = 0;
-        for (int i=0; i< m_liverpoolMax->getXmax(); i++)
-        {
-            if (i==xVal[j].at(pos))
-            {
+        for (int i = 0; i < m_liverpoolMax->getXmax(); i++) {
+            if (i == xVal[j].at(pos)) {
                 m_liverpoolMax->addToLiney(j+1,yVal[j].at(pos));
-                midValue = (yVal[j].at(pos+1) - yVal[j].at(pos))/(xVal[j].at(pos+1) - xVal[j].at(pos));
+                midValue = (yVal[j].at(pos+1) - yVal[j].at(pos)) / (xVal[j].at(pos+1) - xVal[j].at(pos));
                 valueToAdd = midValue;
                 pos++;
             }
-            else
-            {
+            else {
                 m_liverpoolMax->addToLiney(j+1,yVal[j].at(pos-1)+valueToAdd);
                 valueToAdd=valueToAdd+midValue;
             }
-
         }
     }
 
@@ -217,19 +204,16 @@ void mflowdatas::buildNomogrammi(bool __sex, int __age)
 
     yValue.clear();
     yValue.append(0);
-    for (int i=0; i<N_LIVERPOOL; i++)
-    {
-        if (!__sex)
-        {
+    for (int i = 0; i < N_LIVERPOOL; i++) {
+        if (!__sex) {
             if (__age < 50)
                 //Liverpool uomini etA  < 50
-                yValue.append(qPow((1.8 + 0.14 * qSqrt((i+1) * Step_Liverpool) - 0.011 * 35),2));
+                yValue.append(qPow((1.8 + 0.14 * qSqrt((i+1) * Step_Liverpool) - 0.011 * 35), 2));
             else
                 //Liverpool uomini >= 50
-                yValue.append(qPow((1.8 + 0.14 * qSqrt((i+1) * Step_Liverpool) - 0.011 * 60),2));
+                yValue.append(qPow((1.8 + 0.14 * qSqrt((i+1) * Step_Liverpool) - 0.011 * 60), 2));
         }
-        else
-        {
+        else {
             //Liverpool donne
             yValue.append( qPow((-0.921 + 0.869 * qLn((i+1) * Step_Liverpool)),2));
         }
@@ -238,21 +222,17 @@ void mflowdatas::buildNomogrammi(bool __sex, int __age)
     pos = 0;
     midValue = 0;
     valueToAdd = 0;
-    for (int i=0; i< m_liverpoolAve->getXmax(); i++)
-    {
-        if (i==(Step_Liverpool*pos))
-        {
-            m_liverpoolAve->addToLiney(0,yValue.at(pos));
-            midValue = (yValue.at(pos+1) - yValue.at(pos))/Step_Liverpool;
+    for (int i = 0; i < m_liverpoolAve->getXmax(); i++) {
+        if (i == (Step_Liverpool * pos)) {
+            m_liverpoolAve->addToLiney(0, yValue.at(pos));
+            midValue = (yValue.at(pos + 1) - yValue.at(pos)) / Step_Liverpool;
             valueToAdd = midValue;
             pos++;
         }
-        else
-        {
-            m_liverpoolAve->addToLiney(0,yValue.at(pos-1)+valueToAdd);
-            valueToAdd=valueToAdd+midValue;
+        else {
+            m_liverpoolAve->addToLiney(0, yValue.at(pos-1) + valueToAdd);
+            valueToAdd = valueToAdd + midValue;
         }
-
     }
 
     xVal.clear();
@@ -270,9 +250,8 @@ void mflowdatas::buildNomogrammi(bool __sex, int __age)
     xVal[5].append(0);
     yVal[5].append(0);
 
-    ReadLiverpoolParameter(false,__sex,__age);
-    for (int i=0; i<=N_LIVERPOOL_CENT; i++)
-    {
+    ReadLiverpoolParameter(false, __sex, __age);
+    for (int i = 0; i <= N_LIVERPOOL_CENT; i++) {
         xVal[0].append(m_arrLineX1.at(i));
         yVal[0].append(m_arrLineY1.at(i));
 
@@ -292,31 +271,26 @@ void mflowdatas::buildNomogrammi(bool __sex, int __age)
         yVal[5].append(m_arrLineY6.at(i));
     }
 
-    for (int j=0; j<xVal.size(); j++)
-    {
+    for (int j = 0; j < xVal.size(); j++) {
         pos = 0;
         midValue = 0;
         valueToAdd = 0;
-        for (int i=0; i< m_liverpoolAve->getXmax(); i++)
-        {
-            if (i==xVal[j].at(pos))
-            {
-                m_liverpoolAve->addToLiney(j+1,yVal[j].at(pos));
-                midValue = (yVal[j].at(pos+1) - yVal[j].at(pos))/(xVal[j].at(pos+1) - xVal[j].at(pos));
+        for (int i = 0; i < m_liverpoolAve->getXmax(); i++) {
+            if (i == xVal[j].at(pos)) {
+                m_liverpoolAve->addToLiney(j + 1, yVal[j].at(pos));
+                midValue = (yVal[j].at(pos + 1) - yVal[j].at(pos)) / (xVal[j].at(pos+1) - xVal[j].at(pos));
                 valueToAdd = midValue;
                 pos++;
             }
-            else
-            {
-                m_liverpoolAve->addToLiney(j+1,yVal[j].at(pos-1)+valueToAdd);
-                valueToAdd=valueToAdd+midValue;
+            else {
+                m_liverpoolAve->addToLiney(j + 1, yVal[j].at(pos-1) + valueToAdd);
+                valueToAdd = valueToAdd+midValue;
             }
         }
     }
 
     //siroky Max - Ave
-    if (!__sex)
-    {
+    if (!__sex) {
         //max
         m_sirokyMax->setTitle(tr("Siroky (Q Max)"));
         m_sirokyMax->setUnitx(tr("Q (ml/sec)"));
@@ -341,23 +315,19 @@ void mflowdatas::buildNomogrammi(bool __sex, int __age)
         yVal[3].append(0);
 
         ReadSirokyParameter(false);
-        for (int i=0; i<m_arrLineX1.length(); i++)
-        {
+        for (int i = 0; i <m_arrLineX1.length(); i++) {
             xVal[0].append(m_arrLineX1.at(i));
             yVal[0].append(m_arrLineY1.at(i));
         }
-        for (int i=0; i<m_arrLineX2.length(); i++)
-        {
+        for (int i = 0; i < m_arrLineX2.length(); i++) {
             xVal[1].append(m_arrLineX2.at(i));
             yVal[1].append(m_arrLineY2.at(i));
         }
-        for (int i=0; i<m_arrLineX3.length(); i++)
-        {
+        for (int i = 0; i < m_arrLineX3.length(); i++) {
             xVal[2].append(m_arrLineX3.at(i));
             yVal[2].append(m_arrLineY3.at(i));
         }
-        for (int i=0; i<m_arrLineX4.length(); i++)
-        {
+        for (int i = 0; i < m_arrLineX4.length(); i++) {
             xVal[3].append(m_arrLineX4.at(i));
             yVal[3].append(m_arrLineY4.at(i));
         }
@@ -366,28 +336,23 @@ void mflowdatas::buildNomogrammi(bool __sex, int __age)
         //            Value.append(m_arrMax.at(i));
         //        }
 
-        for (int j=0; j<xVal.size(); j++)
-        {
+        for (int j = 0; j < xVal.size(); j++) {
             pos = 0;
             midValue = 0;
             valueToAdd = 0;
-            for (int i=0; i<m_sirokyMax->getXmax(); i++)
-            {
-                if (i==xVal[j].at(pos) && pos!=xVal[j].length()-1)
-                {
-                    m_sirokyMax->addToLiney(j,yVal[j].at(pos));
-                    midValue = (yVal[j].at(pos+1) - yVal[j].at(pos))/(xVal[j].at(pos+1) - xVal[j].at(pos));
+            for (int i = 0; i < m_sirokyMax->getXmax(); i++) {
+                if ((i == xVal[j].at(pos)) && (pos != (xVal[j].length() - 1))) {
+                    m_sirokyMax->addToLiney(j, yVal[j].at(pos));
+                    midValue = (yVal[j].at(pos+1) - yVal[j].at(pos)) / (xVal[j].at(pos+1) - xVal[j].at(pos));
                     valueToAdd = midValue;
                     pos++;
                 }
-                else
-                {
-                    m_sirokyMax->addToLiney(j,yVal[j].at(pos-1)+valueToAdd);
-                    valueToAdd=valueToAdd+midValue;
+                else {
+                    m_sirokyMax->addToLiney(j, yVal[j].at(pos-1)+valueToAdd);
+                    valueToAdd=valueToAdd + midValue;
                 }
             }
         }
-
 
         //ave
         m_sirokyAve->setTitle(tr("Siroky (Q Ave)"));
@@ -415,54 +380,44 @@ void mflowdatas::buildNomogrammi(bool __sex, int __age)
         yVal[4].append(0);
 
         ReadSirokyParameter(true);
-        for (int i=0; i<m_arrLineX1.length(); i++)
-        {
+        for (int i = 0; i < m_arrLineX1.length(); i++) {
             xVal[0].append(m_arrLineX1.at(i));
             yVal[0].append(m_arrLineY1.at(i));
         }
-        for (int i=0; i<m_arrLineX2.length(); i++)
-        {
+        for (int i = 0; i < m_arrLineX2.length(); i++) {
             xVal[1].append(m_arrLineX2.at(i));
             yVal[1].append(m_arrLineY2.at(i));
         }
-        for (int i=0; i<m_arrLineX3.length(); i++)
-        {
+        for (int i = 0; i < m_arrLineX3.length(); i++) {
             xVal[2].append(m_arrLineX3.at(i));
             yVal[2].append(m_arrLineY3.at(i));
         }
-        for (int i=0; i<m_arrLineX4.length(); i++)
-        {
+        for (int i = 0; i < m_arrLineX4.length(); i++) {
             xVal[3].append(m_arrLineX4.at(i));
             yVal[3].append(m_arrLineY4.at(i));
         }
-        for (int i=0; i<m_arrLineX5.length(); i++)
-        {
+        for (int i = 0; i < m_arrLineX5.length(); i++) {
             xVal[4].append(m_arrLineX5.at(i));
             yVal[4].append(m_arrLineY5.at(i));
         }
-        for (int j=0; j<xVal.size(); j++)
-        {
+        for (int j = 0; j < xVal.size(); j++) {
             pos = 0;
             midValue = 0;
             valueToAdd = 0;
-            for (int i=0; i<m_sirokyAve->getXmax(); i++)
-            {
-                if (i==xVal[j].at(pos) && pos!=xVal[j].length()-1)
-                {
-                    m_sirokyAve->addToLiney(j,yVal[j].at(pos));
-                    midValue = (yVal[j].at(pos+1) - yVal[j].at(pos))/(xVal[j].at(pos+1) - xVal[j].at(pos));
+            for (int i = 0; i < m_sirokyAve->getXmax(); i++) {
+                if ((i == xVal[j].at(pos)) && (pos != (xVal[j].length() - 1))) {
+                    m_sirokyAve->addToLiney(j, yVal[j].at(pos));
+                    midValue = (yVal[j].at(pos + 1) - yVal[j].at(pos)) / (xVal[j].at(pos + 1) - xVal[j].at(pos));
                     valueToAdd = midValue;
                     pos++;
                 }
-                else
-                {
-                    m_sirokyAve->addToLiney(j,yVal[j].at(pos-1)+valueToAdd);
-                    valueToAdd=valueToAdd+midValue;
+                else {
+                    m_sirokyAve->addToLiney(j, yVal[j].at(pos-1) + valueToAdd);
+                    valueToAdd = valueToAdd + midValue;
                 }
             }
         }
     }
-
 }
 
 void mflowdatas::ReadLiverpoolParameter(bool __flowMax, bool __sex, int __age)
@@ -481,8 +436,7 @@ void mflowdatas::ReadLiverpoolParameter(bool __flowMax, bool __sex, int __age)
     m_arrLineY5.clear();
     m_arrLineY6.clear();
 
-    if (__flowMax && !__sex && __age < 50)
-    {
+    if (__flowMax && !__sex && (__age < 50)) {
         //Qmax, pazienti maschi etA  < 50
         //5th Centile
         m_arrLineX1.append(20);
@@ -575,8 +529,7 @@ void mflowdatas::ReadLiverpoolParameter(bool __flowMax, bool __sex, int __age)
         m_arrLineY6.append(58);
 
     }
-    if (!__flowMax && !__sex && __age < 50)
-    {
+    if (!__flowMax && !__sex && (__age < 50)) {
         //Qave, pazienti maschi etA  < 50
         //5th Centile
         m_arrLineX1.append(20);
@@ -669,8 +622,7 @@ void mflowdatas::ReadLiverpoolParameter(bool __flowMax, bool __sex, int __age)
         m_arrLineY6.append(33.2);
     }
 
-    if (__flowMax && !__sex && __age >= 50)
-    {
+    if (__flowMax && !__sex && (__age >= 50)) {
         //Qmax, pazienti maschi etA  >= 50
         //5th Centile
         m_arrLineX1.append(20);
@@ -762,10 +714,9 @@ void mflowdatas::ReadLiverpoolParameter(bool __flowMax, bool __sex, int __age)
         m_arrLineY6.append(28.8);
         m_arrLineY6.append(35.5);
         m_arrLineY6.append(52.5);
-
     }
-    if ( !__flowMax && !__sex && __age >= 50)
-    {
+
+    if ( !__flowMax && !__sex && (__age >= 50)) {
         //Qave, pazienti maschi etA  >= 50
         //5th Centile
         m_arrLineX1.append(20);
@@ -857,8 +808,8 @@ void mflowdatas::ReadLiverpoolParameter(bool __flowMax, bool __sex, int __age)
         m_arrLineY6.append(20);
         m_arrLineY6.append(30);
     }
-    if ( __flowMax && __sex)
-    {
+
+    if ( __flowMax && __sex) {
         //Qmax, pazienti femmine
         //5th Centile
         m_arrLineX1.append(20);
@@ -950,8 +901,8 @@ void mflowdatas::ReadLiverpoolParameter(bool __flowMax, bool __sex, int __age)
         m_arrLineY6.append(52);
         m_arrLineY6.append(75);
     }
-    if ( !__flowMax && __sex)
-    {
+
+    if ( !__flowMax && __sex) {
         //Qave, pazienti femmine
         //5th Centile
         m_arrLineX1.append(20);
@@ -1043,7 +994,6 @@ void mflowdatas::ReadLiverpoolParameter(bool __flowMax, bool __sex, int __age)
         m_arrLineY6.append(25.9);
         m_arrLineY6.append(32.3);
     }
-
 }
 
 void mflowdatas::ReadSirokyParameter(bool __flowAve)
@@ -1065,8 +1015,7 @@ void mflowdatas::ReadSirokyParameter(bool __flowAve)
     m_arrAve.clear();
     m_arrMax.clear();
 
-    if (__flowAve)
-    {
+    if (__flowAve) {
         m_arrLineX1.append(75);
         m_arrLineX1.append(100);
         m_arrLineX1.append(125);
@@ -1285,8 +1234,7 @@ void mflowdatas::ReadSirokyParameter(bool __flowAve)
         m_arrAve.append(23.2);
         m_arrAve.append(27.4);
     }
-    else
-    {
+    else {
         m_arrLineX1.append(50);
         m_arrLineX1.append(75);
         m_arrLineX1.append(100);
@@ -1435,23 +1383,4 @@ void mflowdatas::ReadSirokyParameter(bool __flowAve)
         m_arrMax.append(29.4);
     }
 }
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 

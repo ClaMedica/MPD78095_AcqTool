@@ -19,7 +19,7 @@ public:
 
     Q_INVOKABLE QVariantList modelInfo(const QString &__tabType);
     Q_INVOKABLE bool setData(const int __index,QString __field, const QVariant &__value);
-    Qt::ItemFlags flags(const QModelIndex &index) const;
+    Qt::ItemFlags flags(const QModelIndex &__index) const;
 
     Q_INVOKABLE void updateRowData(int __row){
         QModelIndex topLeft;

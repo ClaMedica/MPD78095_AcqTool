@@ -4,12 +4,11 @@
 
 MAbstractManager::MAbstractManager(QObject *parent) : QObject(parent)
 {
-    m_applicationPath=QApplication::applicationDirPath();
+    m_applicationPath = QApplication::applicationDirPath();
 }
 
 MAbstractManager::~MAbstractManager()
 {
-
 }
 
 QVariantList MAbstractManager::markersInfo(QString __filterType,
@@ -17,9 +16,8 @@ QVariantList MAbstractManager::markersInfo(QString __filterType,
 {
     //leggiamo il file di configurazione e riempiamo le info
     QVariantList list;
-    foreach(VarMap marker,m_markerMap.values())
-    {
-        if(__filterType!="")
+    foreach(VarMap marker, m_markerMap.values()) {
+        if(__filterType != "")
             if(!__filterValues.contains(marker.value(__filterType)))
                 continue;
 
@@ -27,137 +25,126 @@ QVariantList MAbstractManager::markersInfo(QString __filterType,
         switch (mrk)
         {
         case MK_INVITATION:
-            if (m_analysisMap.contains(PFS_STD_STUDY))
-            {
-                list<<"$GridElement";
-                foreach(QString key,marker.keys())
-                {
-                    list<<key;
-                    list<<marker.value(key);
+            if (m_analysisMap.contains(PFS_STD_STUDY)) {
+                list << "$GridElement";
+                foreach(QString key, marker.keys()) {
+                    list << key;
+                    list << marker.value(key);
                 }
-                list<<"&GridElement";
+                list << "&GridElement";
             }
             break;
+
         case MK_FIRSTDESIRE:
-            if (m_analysisMap.contains(CYS_STUDY))
-            {
-                list<<"$GridElement";
-                foreach(QString key,marker.keys())
-                {
-                    list<<key;
-                    list<<marker.value(key);
+            if (m_analysisMap.contains(CYS_STUDY)) {
+                list << "$GridElement";
+                foreach(QString key, marker.keys()) {
+                    list << key;
+                    list << marker.value(key);
                 }
-                list<<"&GridElement";
+                list << "&GridElement";
             }
             break;
+
         case MK_STRONGDESIRE:
-            if (m_analysisMap.contains(CYS_STUDY))
-            {
-                list<<"$GridElement";
-                foreach(QString key,marker.keys())
-                {
-                    list<<key;
-                    list<<marker.value(key);
+            if (m_analysisMap.contains(CYS_STUDY)) {
+                list << "$GridElement";
+                foreach(QString key, marker.keys()) {
+                    list << key;
+                    list << marker.value(key);
                 }
-                list<<"&GridElement";
+                list << "&GridElement";
             }
             break;
+
         case MK_MAXCYSCAPACITY:
-            if (m_analysisMap.contains(CYS_STUDY))
-            {
-                list<<"$GridElement";
-                foreach(QString key,marker.keys())
-                {
-                    list<<key;
-                    list<<marker.value(key);
+            if (m_analysisMap.contains(CYS_STUDY)) {
+                list << "$GridElement";
+                foreach(QString key, marker.keys()) {
+                    list << key;
+                    list << marker.value(key);
                 }
-                list<<"&GridElement";
+                list << "&GridElement";
             }
             break;
+
         case MK_COMP1:
-            if (m_analysisMap.contains(CYS_STUDY))
-            {
-                list<<"$GridElement";
-                foreach(QString key,marker.keys())
-                {
-                    list<<key;
-                    list<<marker.value(key);
+            if (m_analysisMap.contains(CYS_STUDY)) {
+                list << "$GridElement";
+                foreach(QString key, marker.keys()) {
+                    list << key;
+                    list << marker.value(key);
                 }
-                list<<"&GridElement";
+                list << "&GridElement";
             }
             break;
+
         case MK_VALSALVALEAK:
-            if (m_analysisMap.contains(LPP_STUDY))
-            {
-                list<<"$GridElement";
-                foreach(QString key,marker.keys())
-                {
-                    list<<key;
-                    list<<marker.value(key);
+            if (m_analysisMap.contains(LPP_STUDY)) {
+                list << "$GridElement";
+                foreach(QString key, marker.keys()) {
+                    list << key;
+                    list << marker.value(key);
                 }
-                list<<"&GridElement";
+                list << "&GridElement";
             }
             break;
+
         case MK_DETRUSORLEAK:
-            if (m_analysisMap.contains(LPP_STUDY))
-            {
-                list<<"$GridElement";
-                foreach(QString key,marker.keys())
-                {
-                    list<<key;
-                    list<<marker.value(key);
+            if (m_analysisMap.contains(LPP_STUDY)) {
+                list << "$GridElement";
+                foreach(QString key, marker.keys()) {
+                    list << key;
+                    list << marker.value(key);
                 }
                 list<<"&GridElement";
             }
             break;
+
         case MK_MIN_ABD_P:
-            if (m_analysisMap.contains(LPP_STUDY))
-            {
-                list<<"$GridElement";
-                foreach(QString key,marker.keys())
-                {
-                    list<<key;
-                    list<<marker.value(key);
+            if (m_analysisMap.contains(LPP_STUDY)) {
+                list << "$GridElement";
+                foreach(QString key, marker.keys()) {
+                    list << key;
+                    list << marker.value(key);
                 }
-                list<<"&GridElement";
+                list << "&GridElement";
             }
             break;
+
         case MK_COUGHT:
-            if (m_analysisMap.contains(LPP_STUDY))
-            {
-                list<<"$GridElement";
-                foreach(QString key,marker.keys())
-                {
-                    list<<key;
-                    list<<marker.value(key);
+            if (m_analysisMap.contains(LPP_STUDY)) {
+                list << "$GridElement";
+                foreach(QString key, marker.keys()) {
+                    list << key;
+                    list << marker.value(key);
                 }
-                list<<"&GridElement";
+                list << "&GridElement";
             }
             break;
+
         case MK_LPD:
-            if (m_analysisMap.contains(LPP_STUDY))
-            {
-                list<<"$GridElement";
-                foreach(QString key,marker.keys())
-                {
-                    list<<key;
-                    list<<marker.value(key);
+            if (m_analysisMap.contains(LPP_STUDY)) {
+                list << "$GridElement";
+                foreach(QString key, marker.keys()) {
+                    list << key;
+                    list << marker.value(key);
                 }
-                list<<"&GridElement";
+                list << "&GridElement";
             }
             break;
+
         case MK_INSTABILITY:
-            if (m_analysisMap.contains(DO_STUDY))
-            {
-                list<<"$GridElement";
-                foreach(QString key,marker.keys())
-                {
-                    list<<key;
-                    list<<marker.value(key);
+            if (m_analysisMap.contains(DO_STUDY)) {
+                list << "$GridElement";
+                foreach(QString key, marker.keys()) {
+                    list << key;
+                    list << marker.value(key);
                 }
-                list<<"&GridElement";
+                list << "&GridElement";
             }
             break;
+
             //TO DO: a quale esame associamo il marker operativo ff??
             //            case MK_FREEFLOW:
             //                    if (m_analysisMap.contains(PFS_STD_STUDY))
@@ -171,46 +158,42 @@ QVariantList MAbstractManager::markersInfo(QString __filterType,
             //                        list<<"&GridElement";
             //                    }
             //                break;
+
         case MK_STARTSP:
-            if (m_analysisMap.contains(UPP_STA_STUDY))
-            {
-                list<<"$GridElement";
-                foreach(QString key,marker.keys())
-                {
-                    list<<key;
-                    list<<marker.value(key);
+            if (m_analysisMap.contains(UPP_STA_STUDY)) {
+                list << "$GridElement";
+                foreach(QString key, marker.keys()) {
+                    list << key;
+                    list << marker.value(key);
                 }
-                list<<"&GridElement";
+                list << "&GridElement";
             }
             break;
+
         case MK_STARTDP:
-            if (m_analysisMap.contains(UPP_DYN_STUDY))
-            {
-                list<<"$GridElement";
-                foreach(QString key,marker.keys())
-                {
-                    list<<key;
-                    list<<marker.value(key);
+            if (m_analysisMap.contains(UPP_DYN_STUDY)) {
+                list << "$GridElement";
+                foreach(QString key, marker.keys()) {
+                    list << key;
+                    list << marker.value(key);
                 }
-                list<<"&GridElement";
+                list << "&GridElement";
             }
             break;
+
         default:
             break;
 
         }
 
-        if (marker.value(__filterType) == "6" )
-        {
-            list<<"$GridElement";
-            foreach(QString key,marker.keys())
-            {
-                list<<key;
-                list<<marker.value(key);
+        if (marker.value(__filterType) == "6") {
+            list << "$GridElement";
+            foreach(QString key, marker.keys()) {
+                list << key;
+                list << marker.value(key);
             }
-            list<<"&GridElement";
+            list << "&GridElement";
         }
-
     }
 
     return list;
@@ -220,21 +203,19 @@ QVariantList MAbstractManager::definersInfo()
 {
     //leggiamo il file di configurazione e riempiamo le info
     QVariantList list;
-    foreach(VarMap marker,m_markerMap.values())
-    {
+
+    foreach(VarMap marker, m_markerMap.values()) {
         if(marker.value(ATT_TYPE)!="5") //no definer
             continue;
 
-        foreach (int key, m_analysisMap.keys() )
-            if (marker.value(ATT_KEY) == m_analysisMap.value(key))
-            {
-                list<<"$GridElement";
-                foreach(QString key,marker.keys())
-                {
-                    list<<key;
-                    list<<marker.value(key);
+        foreach (int key, m_analysisMap.keys())
+            if (marker.value(ATT_KEY) == m_analysisMap.value(key)) {
+                list << "$GridElement";
+                foreach(QString key, marker.keys()) {
+                    list << key;
+                    list << marker.value(key);
                 }
-                list<<"&GridElement";
+                list << "&GridElement";
             }
     }
 
@@ -246,44 +227,44 @@ QVariantList MAbstractManager::commandsInfo()
     QVariantList list;
 
     //analisi
-    list<<"$GridElement";
-    list<<"descr"<<tr("analysis");
-    list<<"img"<<"qrc:/analisi";
-    list<<"key"<<111;
-    list<<"visible"<<true;
-    list<<"&GridElement";
+    list << "$GridElement";
+    list << "descr" << tr("analysis");
+    list << "img" << "qrc:/analisi";
+    list << "key" << 111;
+    list << "visible" << true;
+    list << "&GridElement";
 
     //salva e chiudi
-    list<<"$GridElement";
-    list<<"descr"<<tr("save&exit");
-    list<<"img"<<"qrc:/salvaChiudi";
-    list<<"key"<<112;
-    list<<"visible"<<true;
-    list<<"&GridElement";
+    list << "$GridElement";
+    list << "descr" << tr("save&exit");
+    list << "img" << "qrc:/salvaChiudi";
+    list << "key" << 112;
+    list << "visible" << true;
+    list << "&GridElement";
 
     //zoom in
-    list<<"$GridElement";
-    list<<"descr"<<tr("zoom in");
-    list<<"img"<<"qrc:/zoom_in";
-    list<<"key"<<113;
-    list<<"visible"<<true;
-    list<<"&GridElement";
+    list << "$GridElement";
+    list << "descr" << tr("zoom in");
+    list << "img" << "qrc:/zoom_in";
+    list << "key" << 113;
+    list << "visible" << true;
+    list << "&GridElement";
 
     //zoom out
-    list<<"$GridElement";
-    list<<"descr"<<tr("zoom out");
-    list<<"img"<<"qrc:/zoom_out";
-    list<<"key"<<114;
-    list<<"visible"<<true;
-    list<<"&GridElement";
+    list << "$GridElement";
+    list << "descr" << tr("zoom out");
+    list << "img" << "qrc:/zoom_out";
+    list << "key" << 114;
+    list << "visible" << true;
+    list << "&GridElement";
 
     //zoom none
-    list<<"$GridElement";
-    list<<"descr"<<tr("zoom none");
-    list<<"img"<<"qrc:/zoom_none";
-    list<<"key"<<115;
-    list<<"visible"<<true;
-    list<<"&GridElement";
+    list << "$GridElement";
+    list << "descr" << tr("zoom none");
+    list << "img" << "qrc:/zoom_none";
+    list << "key" << 115;
+    list << "visible" << true;
+    list << "&GridElement";
 
     return list;
 }
@@ -291,33 +272,36 @@ QVariantList MAbstractManager::commandsInfo()
 QVariantList MAbstractManager::acqInfo()
 {
     QVariantList list;
+
     //salva e chiudi
-    list<<"$GridElement";
-    list<<"descr"<<tr("save&exit");
-    list<<"img"<<"qrc:/salvaChiudi";
-    list<<"key"<<112;
-    list<<"visible"<<true;
-    list<<"&GridElement";
+    list << "$GridElement";
+    list << "descr" << tr("save&exit");
+    list << "img" << "qrc:/salvaChiudi";
+    list << "key" << 112;
+    list << "visible" << true;
+    list << "&GridElement";
 
     return list;
 }
+
 bool MAbstractManager::load()
-{//in questa funzione inizializzo tutto caricando i file di configurazione fissi
+{
+    //in questa funzione inizializzo tutto caricando i file di configurazione fissi
     m_configLocale.erase();
     if(!m_configLocale.loadFromXML(":/Config/Config_Locale.xml"))
-        qCritical()<<"Error on locale configuration file";
+        qCritical() << "Error on locale configuration file";
 
-    QString configUser=g_P7SettingsManager.userSettings();
+    QString configUser = g_P7SettingsManager.userSettings();
     if(!QFile::exists(configUser))
-        configUser=":/Config/Config_User.xml";
+        configUser = ":/Config/Config_User.xml";
 
     m_configUser.erase();
     if(!m_configUser.loadFromXML(configUser))
-        qCritical()<<"Error on user configuration file";
+        qCritical() << "Error on user configuration file";
 
     m_configMarkers.erase();
     if(!m_configMarkers.loadFromXML(":/Config/markers.xml"))
-        qCritical()<<"Error on user configuration file";
+        qCritical() << "Error on user configuration file";
 
     return buildMarkerInfoMap();
 }
@@ -327,111 +311,106 @@ QString MAbstractManager::plotConfigFileName()
 #ifdef ANDROID
     return "/mnt/sdcard/Medica/cur.xml";
 #else
-    return m_applicationPath+"/cur.xml";
+    return m_applicationPath + "/cur.xml";
 #endif
 }
-
-
 
 bool MAbstractManager::buildConfigurationFile()
 {
     //carico i dati necessari
-    int32_t chanlNum=m_mng->GetChanNum();
+    int32_t chanlNum = m_mng->GetChanNum();
     qDebug()<<"N? Canali: "<<chanlNum;
-    if(chanlNum==0)
-        qCritical()<<"No channels in file";
-    for(int32_t nc=0;nc<chanlNum;nc++)
-    {//contiamo i grafici e popoliamo le mappe di associazione
-        QString chanName=m_mng->GetChanName(nc);
+
+    if(chanlNum == 0)
+        qCritical() << "No channels in file";
+
+    for(int32_t nc = 0; nc < chanlNum; nc++) {  //contiamo i grafici e popoliamo le mappe di associazione
+        QString chanName = m_mng->GetChanName(nc);
 
         //per i grafici devo appendere l'informazione perchA? posso avere piA? canali
-        QString graphName="Graph_"+QString::number(m_mng->GetGraph(nc));
+        QString graphName = "Graph_" + QString::number(m_mng->GetGraph(nc));
+        m_chanInPlots[graphName] << chanName;
 
-
-        m_chanInPlots[graphName]<<chanName;
         //aggiungo il canale su cui comunicherA  questo plot
-        m_tcpChannels[graphName]=new SimpleTCPChannel(QHostAddress("127.0.0.1"),9000+m_mng->GetGraph(nc)-1,this);
-        qDebug()<<nc<<chanName<<"inviato su"<<graphName<<9000+m_mng->GetGraph(nc)-1;
-        //per il datafile invece no
-        m_dataChanNameMap[chanName]=nc;
+        m_tcpChannels[graphName] = new SimpleTCPChannel(QHostAddress("127.0.0.1"), 9000 + m_mng->GetGraph(nc) - 1, this);
+        qDebug() << nc << chanName << "inviato su" << graphName << 9000 + m_mng->GetGraph(nc) - 1;
 
+        //per il datafile invece no
+        m_dataChanNameMap[chanName] = nc;
     }
 
     //scriviamo un file di configurazione che poi l'utente potra modificare a suo gusto
     Ancestry configPlot;
-    //aggiungo il campo graphs
-    Ancestry *graph=configPlot.addChild(XML_GRAPHS);
-    if(graph==NULL)
-        qCritical()<<"Could not create child";
 
-    foreach (QString graphName, m_chanInPlots.keys()) {//scorro per ogni grafico
-        Ancestry *  graphN=graph->addChild(graphName);
-        Ancestry *  prop=graphN->addChild(XML_PROPERTIES);
-        Ancestry *  tracks=graphN->addChild(XML_TRACKS);
+    //aggiungo il campo graphs
+    Ancestry *graph = configPlot.addChild(XML_GRAPHS);
+    if(graph == NULL)
+        qCritical() << "Could not create child";
+
+    foreach (QString graphName, m_chanInPlots.keys()) { //scorro per ogni grafico
+        Ancestry *  graphN = graph->addChild(graphName);
+        Ancestry *  prop = graphN->addChild(XML_PROPERTIES);
+        Ancestry *  tracks = graphN->addChild(XML_TRACKS);
 
         //ho la certezza che i canali su ogni grafico hanno tutti le stesse proprietA  grafiche per cui vado tranquillo
-        QString chanName=m_chanInPlots[graphName].first();
-        int32_t nc=m_dataChanNameMap[chanName];
-        Ancestry *  axis=prop->addChild(XML_AXIS);
-        Ancestry *  time=prop->addChild(XML_TIME);
-        Ancestry *  network=prop->addChild(XML_NETWORK);
+        QString chanName = m_chanInPlots[graphName].first();
+        int32_t nc = m_dataChanNameMap[chanName];
+        Ancestry *  axis    = prop->addChild(XML_AXIS);
+        Ancestry *  time    = prop->addChild(XML_TIME);
+        Ancestry *  network = prop->addChild(XML_NETWORK);
 
         Ancestry m_configAcq;
-        if(!m_configAcq.loadFromXML(g_P7SettingsManager.progPath()+"/Config_Acq.xml"))
-            qCritical()<<"Error on acq configuration file";
+        if(!m_configAcq.loadFromXML(g_P7SettingsManager.progPath() + "/Config_Acq.xml"))
+            qCritical() << "Error on acq configuration file";
 
-
-        Ancestry *channels=m_configAcq.getChild(XML_CHANNELS);
-        if(channels==NULL)
+        Ancestry *channels = m_configAcq.getChild(XML_CHANNELS);
+        if(channels == NULL)
             qCritical("Child not alive");
 
         QString udm = "";
-        foreach (Ancestry *channel, channels->getChildren())
-        {
-            if(channel->getChild(XML_NAME)!=NULL)
-                if(chanName.contains(channel->getTextOfChild(XML_NAME).left(1)))
-                {
+        foreach (Ancestry *channel, channels->getChildren()) {
+            if(channel->getChild(XML_NAME) != NULL)
+                if(chanName.contains(channel->getTextOfChild(XML_NAME).left(1))) {
                     QString udmID = (channel->getChild(XML_UDM))->getAttribute("ID");
-                    UDMConst c=(UDMConst)udmID.toInt();
+                    UDMConst c = (UDMConst) udmID.toInt();
                     udm = UDMUtil.toString(c);
                     break;
                 }
         }
 
+        axis->setAttribute("yAUOM", udm);
+        axis->setAttribute("yAbsoluteMax", QString::number(m_mng->GetSupLim(nc)));
+        axis->setAttribute("yAbsoluteMin", QString::number(m_mng->GetInfLim(nc)));
 
-        axis->setAttribute("yAUOM",udm);
-        axis->setAttribute("yAbsoluteMax",QString::number(m_mng->GetSupLim(nc)));
-        axis->setAttribute("yAbsoluteMin",QString::number(m_mng->GetInfLim(nc)));
-
-        time->setAttribute("samplingFrq",QString::number(m_mng->GetNAS(nc)));
-        time->setAttribute("pageTime",QString::number(m_mng->GetPageTime()));
-        network->setAttribute(ATT_PORT,QString::number(9000+m_mng->GetGraph(nc)-1));
-        network->setAttribute(ATT_ADDRESS,"127.0.0.1");
+        time->setAttribute("samplingFrq", QString::number(m_mng->GetNAS(nc)));
+        time->setAttribute("pageTime", QString::number(m_mng->GetPageTime()));
+        network->setAttribute(ATT_PORT, QString::number(9000+m_mng->GetGraph(nc)-1));
+        network->setAttribute(ATT_ADDRESS, "127.0.0.1");
 
         //devo leggere le informazioni sulle dimensioni delle tracce e il loro colore
         //all'interno del file config_user
-        Ancestry * chProps=m_configUser.getSafeChild(XML_CHANNELSPROP);
-        QStringList chNames=chProps->childrenNames();
-        foreach (QString chanName, m_chanInPlots[graphName])
-        {//qui scrivo le proprietA  delle tracce
-            Ancestry * trkN=tracks->addChild(chanName);
-            Ancestry* ch=NULL;
+        Ancestry * chProps = m_configUser.getSafeChild(XML_CHANNELSPROP);
+        QStringList chNames = chProps->childrenNames();
+
+        foreach (QString chanName, m_chanInPlots[graphName]) {  //qui scrivo le proprietA  delle tracce
+            Ancestry * trkN = tracks->addChild(chanName);
+            Ancestry * ch = NULL;
             foreach (QString chNamePart, chNames) {
                 if(chanName.contains(chNamePart))
                     ch = m_configUser.getSafeChild(chNamePart);
             }
 
-            if(ch!=NULL)
-            {
-            trkN->setAttribute(ATT_THICK,     ch->getSafeChild(ATT_THICK)->getSafeAttribute(ATT_VALUE));
-            trkN->setAttribute(ATT_COLOR,     ch->getSafeChild(ATT_COLOR)->getSafeAttribute(ATT_VALUE));
-            trkN->setAttribute(ATT_WIDTH,     ch->getSafeChild(ATT_WIDTH)->getSafeAttribute(ATT_VALUE));
-            axis->setAttribute(ATT_YAUTOSCALE,ch->getSafeChild(ATT_YAUTOSCALE)->getSafeAttribute(ATT_VALUE));
+            if(ch != NULL) {
+                trkN->setAttribute(ATT_THICK,      ch->getSafeChild(ATT_THICK)->getSafeAttribute(ATT_VALUE));
+                trkN->setAttribute(ATT_COLOR,      ch->getSafeChild(ATT_COLOR)->getSafeAttribute(ATT_VALUE));
+                trkN->setAttribute(ATT_WIDTH,      ch->getSafeChild(ATT_WIDTH)->getSafeAttribute(ATT_VALUE));
+                axis->setAttribute(ATT_YAUTOSCALE, ch->getSafeChild(ATT_YAUTOSCALE)->getSafeAttribute(ATT_VALUE));
             }
             else
-                qWarning()<<"Canale"<<chanName<<"senza proprieta grafiche. Uso le default";
+                qWarning() << "Canale" << chanName << "senza proprieta grafiche. Uso le default";
       }
     }
+
     //ora salvo il file di configurazione come cur.xml
 #ifdef ANDROID
     configPlot.saveToXML("/mnt/sdcard/Medica/cur.xml");
@@ -439,29 +418,30 @@ bool MAbstractManager::buildConfigurationFile()
     configPlot.saveToXML(m_applicationPath+"/cur.xml");
 #endif
 
-    qDebug()<<"Configuration file builded succesfully";
+    qDebug() << "Configuration file builded succesfully";
     return true;
 }
 
 bool MAbstractManager::buildMarkerInfoMap()
 {
     m_markerMap.clear();
-    foreach(Ancestry *marker,m_configMarkers.getChildren())
-    {
+
+    foreach(Ancestry *marker, m_configMarkers.getChildren()) {
         VarMap mark;
-        QString img=marker->getAttribute(ATT_IMG);
-        QString rootURL="qrc:/";
-        mark[ATT_IMG]=rootURL+img;
-        mark[ATT_KEY]=marker->getAttribute(ATT_KEY);
-        mark[ATT_CODE]=marker->getAttribute(ATT_CODE);
-        mark[ATT_DESCR]=marker->getAttribute(ATT_DESCR);
-        mark[ATT_TYPE]=marker->getAttribute(ATT_TYPE);
-        mark["lock"]=true;
-        mark["color"]=COLOR_OPERATIVE;
-        mark["visible"]=true;
-        mark["category"]=CAT_MARKER;
-        m_markerMap[mark[ATT_KEY]]=mark;
+        QString img = marker->getAttribute(ATT_IMG);
+        QString rootURL = "qrc:/";
+        mark[ATT_IMG] = rootURL+img;
+        mark[ATT_KEY] = marker->getAttribute(ATT_KEY);
+        mark[ATT_CODE] = marker->getAttribute(ATT_CODE);
+        mark[ATT_DESCR] = marker->getAttribute(ATT_DESCR);
+        mark[ATT_TYPE] = marker->getAttribute(ATT_TYPE);
+        mark["lock"]     = true;
+        mark["color"]    = COLOR_OPERATIVE;
+        mark["visible"]  = true;
+        mark["category"] = CAT_MARKER;
+        m_markerMap[mark[ATT_KEY]] = mark;
     }
-    qDebug()<<m_markerMap.size()<<"markers loaded!";
+    qDebug() << m_markerMap.size() << "markers loaded!";
+
     return true;
 }

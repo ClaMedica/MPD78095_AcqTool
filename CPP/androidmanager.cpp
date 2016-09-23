@@ -33,10 +33,12 @@
 
 #include "androidmanager.h"
 #include <QDebug>
+
 #ifdef ANDROID
 #include <QtAndroidExtras/QAndroidJniObject>
 #include <QtAndroid>
 #endif
+
 AndroidManager::AndroidManager(QObject *parent)
     : QObject(parent)
 {
@@ -48,71 +50,81 @@ AndroidManager &AndroidManager::instance(QObject *parent)
     return androidManager;
 }
 
-void AndroidManager::showNotification(QString __title,QString __message)
+void AndroidManager::showNotification(QString __title, QString __message)
 {
+
 #ifdef ANDROID
-    QAndroidJniObject title=QAndroidJniObject::fromString(__title);
-    QAndroidJniObject message=QAndroidJniObject::fromString(__message);
-    QString signature="("+getSignature("jstring")+getSignature("jstring")+")V";
+    QAndroidJniObject title = QAndroidJniObject::fromString(__title);
+    QAndroidJniObject message = QAndroidJniObject::fromString(__message);
+    QString signature = "(" + getSignature("jstring") + getSignature("jstring") + ")V";
     QtAndroid::androidActivity().callMethod<void>(
                 "showNotification",
                 signature.toLatin1().data(),
-                title.object<jstring>(),message.object<jstring>());
+                title.object<jstring>(), message.object<jstring>());
+#else
+    (void) __title;
+    (void) __message;
 #endif
+
 }
 
 void AndroidManager::onPowerConnected()
 {
-    qDebug()<<"Power connected";
+    qDebug() << "Power connected";
 }
 
 void AndroidManager::onPowerDisconnected()
 {
-    qDebug()<<"Power disconnected";
+    qDebug() << "Power disconnected";
 }
 
 void AndroidManager::onAirplaneModeChanged()
 {
-    qDebug()<<"Cambio modalitA  aereo";
+    qDebug() << "Cambio modalitA  aereo";
 }
 
 void AndroidManager::launchService(QString __serviceAction)
 {
+
 #ifdef ANDROID
-    QAndroidJniObject string=QAndroidJniObject::fromString(__serviceAction);
+    QAndroidJniObject string = QAndroidJniObject::fromString(__serviceAction);
     QtAndroid::androidActivity().callMethod<void>(
                 "launchService",
                 convertSignature("jstring#void"),
                 string.object<jstring>());
-
-
+#else
+    (void) __serviceAction;
 #endif
+
 }
 
 void AndroidManager::showToast(QString __s)
 {
-#ifdef ANDROID
-    qDebug()<<"toast"<<__s;
-    QAndroidJniObject string=QAndroidJniObject::fromString(__s);
 
+#ifdef ANDROID
+    qDebug() << "toast" << __s;
+    QAndroidJniObject string = QAndroidJniObject::fromString(__s);
 
     QtAndroid::androidActivity().callMethod<void>(
                 "showToast",
-                convertSignature("jstring#void"),//sto metodo A? sofisticato, vuole un const char*
+                convertSignature("jstring#void"),   //sto metodo A? sofisticato, vuole un const char*
                 string.object<jstring>());
-
+#else
+    (void) __s;
 #endif
+
 }
 
 void AndroidManager::killService()
 {
+
 #ifdef ANDROID
     QtAndroid::androidActivity().callMethod<void>(
                 "killService",
                 "()V");
 #endif
-}
 
+}
 
 void AndroidManager::updateAndroidNotification()
 {
@@ -126,14 +138,16 @@ void AndroidManager::updateAndroidNotification()
 const char* AndroidManager::convertSignature(QString __original)
 {
     //la firma originale ha gli argomenti separati da @ e il return lo trovi dopo #
-    QStringList parameters=__original.split("#").at(0).split("@");
+    QStringList parameters = __original.split("#").at(0).split("@");
+
     QString ret;
     ret.append("(");
     foreach (QString p, parameters) {
         ret.append(getSignature(p));
     }
     ret.append(")");
-    if(getSignature(__original.split("#").at(1))=="")
+
+    if(getSignature(__original.split("#").at(1)) == "")
         ret.append("V");
     else
         ret.append(getSignature(__original.split("#").at(1)));
@@ -143,29 +157,28 @@ const char* AndroidManager::convertSignature(QString __original)
 
 QString AndroidManager::getSignature(QString __type)
 {
-
-         if(__type=="jboolean")      {return "Z";}
-    else if(__type=="jbyte")         {return "B";}
-    else if(__type=="jchar")         {return "C";}
-    else if(__type=="jshort")        {return "S";}
-    else if(__type=="jint")          {return "I";}
-    else if(__type=="jlong")         {return "J";}
-    else if(__type=="jfloat")        {return "F";}
-    else if(__type=="jdouble")       {return "D";}
-    else if(__type=="jobject")       {return "Ljava/lang/Object;";}
-    else if(__type=="jclass")        {return "Ljava/lang/Class;";}
-    else if(__type=="jstring")       {return "Ljava/lang/String;";}
-    else if(__type=="jthrowable")    {return "Ljava/lang/Throwable;";}
-    else if(__type=="jobjectArray")  {return "[Ljava/lang/Object;";}
-    //else if(__type=="jarray")        {return "[<type>";}
-    else if(__type=="jbooleanArray") {return "[Z";}
-    else if(__type=="jbyteArray")    {return "[B";}
-    else if(__type=="jcharArray")    {return "[C";}
-    else if(__type=="jshortArray")   {return "[S";}
-    else if(__type=="jintArray")     {return "[I";}
-    else if(__type=="jlongArray")    {return "[J";}
-    else if(__type=="jfloatArray")   {return "[F";}
-    else if(__type=="jdoubleArray")  {return "[D";}
+         if(__type == "jboolean")      { return "Z"; }
+    else if(__type == "jbyte")         { return "B"; }
+    else if(__type == "jchar")         { return "C"; }
+    else if(__type == "jshort")        { return "S"; }
+    else if(__type == "jint")          { return "I"; }
+    else if(__type == "jlong")         { return "J"; }
+    else if(__type == "jfloat")        { return "F"; }
+    else if(__type == "jdouble")       { return "D"; }
+    else if(__type == "jobject")       { return "Ljava/lang/Object;"; }
+    else if(__type == "jclass")        { return "Ljava/lang/Class;"; }
+    else if(__type == "jstring")       { return "Ljava/lang/String;"; }
+    else if(__type == "jthrowable")    { return "Ljava/lang/Throwable;"; }
+    else if(__type == "jobjectArray")  { return "[Ljava/lang/Object;"; }
+    //else if(__type == "jarray")        { return "[<type>"; }
+    else if(__type == "jbooleanArray") { return "[Z"; }
+    else if(__type == "jbyteArray")    { return "[B"; }
+    else if(__type == "jcharArray")    { return "[C"; }
+    else if(__type == "jshortArray")   { return "[S"; }
+    else if(__type == "jintArray")     { return "[I"; }
+    else if(__type == "jlongArray")    { return "[J"; }
+    else if(__type == "jfloatArray")   { return "[F"; }
+    else if(__type == "jdoubleArray")  { return "[D"; }
 
     return "";
 }
