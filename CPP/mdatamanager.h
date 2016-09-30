@@ -29,25 +29,6 @@ typedef struct {
 } FLWAdvRepStruct;
 
 
-enum {
-    WAITING_TIME = 0,
-    MAXIMUM_FLOW = 4,
-    AVERAGE_FLOW = 8,
-    TIME_AT_VOL3 = 12,
-    TIME_AT_VOL2 = 16,
-    TIME_AT_QMAX = 20,
-    TIME_5_95_VOIDED_VOL = 24,
-    FLOW_TIME  = 28,
-    TIME_QMAX_95_VOIDED_VOL = 32,
-    VOIDING_TIME = 36,
-    VOLUME_QMAX = 40,
-    VOIDED_VOLUME = 44,
-    ACCELERATION = 48,
-    RESIDUAL_USER = 52,
-    DETRUSOR = 56,
-    FLOW_CORR_FACTOR = 60
-}  ;
-
 class MDataManager : public MAbstractManager
 {
     Q_OBJECT
@@ -175,7 +156,7 @@ private:
 
     void InitPageGraphs(int __anaType);
     bool InitArraysFLW(int __start, int __end, QVector<unsigned char> __chEn, int __curDef, byte __auto);
-    int ReadResult(int __numEv = 1);
+    int ReadResult(int & __numEv);
     bool checkForVolRes();
 };
 

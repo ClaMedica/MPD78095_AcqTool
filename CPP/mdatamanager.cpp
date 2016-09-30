@@ -141,12 +141,9 @@ void MDataManager::loadFile(QString __fileName)
         for(int i = 0; i < m_mng->GetNumOperativeMarkers(); i++) {
             VarMap *mrk = new VarMap;
             m_mng->GetOpMarker(i, &key, numSamp, &descr);
-            qDebug() << numSamp[0];
-            qDebug() << numSamp[1];
-            qDebug() << numSamp[2];
-            qDebug() << numSamp[3];
+            qDebug() << "numSamp[]" << numSamp[0] << numSamp[1]  << numSamp[2] << numSamp[3];
             double val = (double) numSamp[0] / m_mng->GetNAS(0);
-            qDebug()<<"Marker"<<key<<val;
+            qDebug() << "Marker" << key << val;
 
             if(m_markerMap.keys().contains(key)) {   //marker conosciuto le info ce le ho giA
                 (*mrk) = m_markerMap[key];
@@ -179,7 +176,7 @@ void MDataManager::loadFile(QString __fileName)
             for(int i = 0; i < m_mng->GetSamplesNumber(h); i++)
                 sig->replace(i, m_mng->GetValue(h, i));
 
-            qDebug() << sig;
+            qDebug() << "sig:" << sig;
             sig->setName(m_mng->GetChanName(h));
             sig->setSamplingFrequency(m_mng->GetNAS(h));
 
@@ -248,9 +245,11 @@ void MDataManager::loadFile(QString __fileName)
 
             QVariantList valuesY;
             foreach(MSignal *sig, m_signalVector)
-                if(sig->getName() == m_mng->GetChanName(numCh))
+                if(sig->getName() == m_mng->GetChanName(numCh)) {
+                    qDebug("%s: %d", sig->getName().toLatin1().constData(), sig->size());
                     for (int i = 0; i < sig->size(); i++)
                         valuesY.append(sig->at(i));
+                }
 
             double val = (double) numSamp[0] / m_mng->GetNAS(numCh);
             (*mrk)["val"] = val;
@@ -859,7 +858,7 @@ bool MDataManager::checkForVolRes()
     qDebug() << "File Caricato?" << m_mng->GetParameters();
 
     //per ora salvo io su file pic l'analisi flussimetria ...
-    // m_mng->SetAnalysis("Flussimetria");
+    m_mng->SetAnalysis("2");
 
     m_numAna = m_mng->GetAnalysiNum();
 
@@ -914,7 +913,7 @@ qDebug() << "INIZIO";
     qDebug() << "File Caricato?" << m_mng->GetParameters();
 
     //per ora salvo io su file pic l'analisi flussimetria ...
-    //m_mng->SetAnalysis("Flussimetria");
+    m_mng->SetAnalysis("2");
 
     m_ana->SetData(m_mng);
 
@@ -923,6 +922,7 @@ qDebug() << "INIZIO";
 
     for (int i = 0; i < m_numAna; i++) {
         int anaType = m_mng->GetAnalysis(i).toInt();
+
         if (anaType == FLW_AVD_STUDY) {
             //verifica se c'A? un definitore per questa analisi.
             VarMap mkOpAnIn;
@@ -1119,7 +1119,7 @@ qDebug() << "INIZIO";
     //prova->setMode();
     //if (m_autoPrint)
 
-    prova->print();
+//    prova->print();
 
     //qml
     qDebug() << "FINE";
@@ -1326,7 +1326,7 @@ bool MDataManager::InitArraysFLW(int __start,
 
     qDebug() << "costruisco i segnali da disegnare nel plot per i nomogrammi";
     for (int i = 0; i < numEv; i++) {
-        qDebug()<<"nomogramma LiverpoolQMax";
+        qDebug() << "nomogramma LiverpoolQMax";
         MSignal *sig0 = new MSignal;
         MSignal *sig1 = new MSignal;
         MSignal *sig2 = new MSignal;
@@ -1482,14 +1482,14 @@ bool MDataManager::InitArraysFLW(int __start,
     return true;
 }
 
-int MDataManager::ReadResult(int __numEv)
+int MDataManager::ReadResult(int & __numEv)
 {
     int StructType = m_mng->GetAnaType();
     if (StructType <= 0)
         //error
         return -1;
 
-    __numEv = m_mng->readNumEv();
+   __numEv = m_mng->readNumEv();
 
     m_aflwdatas.clear();
 
@@ -1520,22 +1520,23 @@ int MDataManager::ReadResult(int __numEv)
         for (int i = 1; i <= __numEv; i++) {
             m_aflwdatas.append(new mflowdatas());
             m_mng->readResAna(sizeof(FLWAdvRepStruct),strTemp);
-            m_aflwdatas.last()->setWaitingTime(*((float*)(strTemp + WAITING_TIME)));
-            m_aflwdatas.last()->setQMax(*((float*)(strTemp + MAXIMUM_FLOW)));
-            m_aflwdatas.last()->setQAve(*((float*)(strTemp + AVERAGE_FLOW)));
-            m_aflwdatas.last()->setTimeAtV3(*((float*)(strTemp + TIME_AT_VOL3)));
-            m_aflwdatas.last()->setTimeAtV2(*((float*)(strTemp + TIME_AT_VOL2)));
-            m_aflwdatas.last()->setTimeAtQmax(*((float*)(strTemp + TIME_AT_QMAX)));
-            m_aflwdatas.last()->setTime90(*((float*)(strTemp + TIME_5_95_VOIDED_VOL)));
-            m_aflwdatas.last()->setFlowTime(*((float*)(strTemp + FLOW_TIME)));
-            m_aflwdatas.last()->setDescTime(*((float*)(strTemp + TIME_QMAX_95_VOIDED_VOL)));
-            m_aflwdatas.last()->setVoidingTime(*((float*)(strTemp + VOIDING_TIME)));
-            m_aflwdatas.last()->setVolAtQqmax(*((float*)(strTemp + VOLUME_QMAX)));
-            m_aflwdatas.last()->setVoidedVolume(*((int*)(strTemp + VOIDED_VOLUME)));
-            m_aflwdatas.last()->setAcceleration(*((float*)(strTemp + ACCELERATION)));
-            m_aflwdatas.last()->setResidualVolume(*((int*)(strTemp + RESIDUAL_USER)));
-            m_aflwdatas.last()->setVDetMax(*((float*)(strTemp + DETRUSOR)));
-            m_aflwdatas.last()->setCQ(*((float*)(strTemp +FLOW_CORR_FACTOR)));
+            FLWAdvRepStruct* structureFlow = (FLWAdvRepStruct*)strTemp;
+            m_aflwdatas.last()->setWaitingTime(structureFlow->waiting_time);
+            m_aflwdatas.last()->setQMax(structureFlow->q_max);
+            m_aflwdatas.last()->setQAve(structureFlow->q_ave);
+            m_aflwdatas.last()->setTimeAtV3(structureFlow->time_at_v3);
+            m_aflwdatas.last()->setTimeAtV2(structureFlow->time_at_v2 );
+            m_aflwdatas.last()->setTimeAtQmax(structureFlow->time_at_qmax);
+            m_aflwdatas.last()->setTime90(structureFlow->time_90);
+            m_aflwdatas.last()->setFlowTime(structureFlow->flow_time);
+            m_aflwdatas.last()->setDescTime(structureFlow->desc_time);
+            m_aflwdatas.last()->setVoidingTime(structureFlow->voiding_time);
+            m_aflwdatas.last()->setVolAtQqmax(structureFlow->vol_at_qmax);
+            m_aflwdatas.last()->setVoidedVolume(structureFlow->voided_volume);
+            m_aflwdatas.last()->setAcceleration(structureFlow->acceleration);
+            m_aflwdatas.last()->setResidualVolume(structureFlow->residual_volume);
+            m_aflwdatas.last()->setVDetMax(structureFlow->v_det_max);
+            m_aflwdatas.last()->setCQ(structureFlow->cQ);
             m_aflwdatas.last()->buildTable();
             m_aflwdatas.last()->buildNomogrammi(m_sexPatient, 45);
         }
@@ -1572,6 +1573,6 @@ int MDataManager::ReadResult(int __numEv)
 
 mflowdatas *MDataManager::getFlowDatas(int __i)
 {
-    return m_aflwdatas.at(__i);\
+    return m_aflwdatas.at(__i);
 }
 
