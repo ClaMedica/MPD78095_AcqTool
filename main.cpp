@@ -34,8 +34,15 @@
 
 AcqBridge *g_mainAppBridge;
 
+void porcata(QString arg)
+{
+    emit g_mainAppBridge->newVisualization(arg);
+}
+
 int main(int argc, char *argv[])
 {
+    bool inDebug = false;
+
     // Load virtualkeyboard input context plugin
     //qputenv("QT_IM_MODULE", QByteArray("qtvirtualkeyboard"));
 
@@ -57,13 +64,18 @@ int main(int argc, char *argv[])
 
     //dirotto il debug log
     MyMessageOutput::init(gPath_log);
-    qDebug()<<"Partiamo";
+    qDebug() << "Partiamo";
 
     QStringList arguments;
     //leggiamo gli argomenti
     for(int i = 0; i < argc; i++)
         arguments << QString(argv[i]);
-    qDebug()<<"Argomenti"<<arguments;
+    qDebug() << "Argomenti"<<arguments;
+
+    if(argc > 3 && strcmp(argv[3], "debug") == 0) {
+        inDebug = true;
+        qDebug() << "========== inDebug ===========";
+    }
 
     g_mainAppBridge = new AcqBridge(QStringList() << argv[1] << argv[2]);   //definisco un bridge tra app di tipo server
 
@@ -101,16 +113,21 @@ int main(int argc, char *argv[])
     engine.rootContext()->setContextProperty(QLatin1String("platform"), "linux");
 #endif
 
-    engine.rootContext()->setContextProperty("layout",&mngLayout);
-    engine.rootContext()->setContextProperty("settings",&g_P7SettingsManager);
-    engine.rootContext()->setContextProperty("bridgeMain",g_mainAppBridge);
+    engine.rootContext()->setContextProperty("layout", &mngLayout);
+    engine.rootContext()->setContextProperty("settings", &g_P7SettingsManager);
+    engine.rootContext()->setContextProperty("bridgeMain", g_mainAppBridge);
 
     qDebug()<<engine.importPathList();
     engine.load(QUrl(QStringLiteral("qrc:/main.qml")));
     qDebug()<<"engine caricato";
 
     g_mainAppBridge->setRootObjects(engine.rootObjects());
+
+//    if(inDebug)
+//        QTimer::singleShot(1000, &app, SLOT(porcata(QString(argv[2]))));
+
     int ret = app.exec();
+
     qDebug() << "Uscito" << ret;
     return ret;
 }

@@ -175,7 +175,7 @@ private:
 
     void InitPageGraphs(int __anaType);
     bool InitArraysFLW(int __start, int __end, QVector<unsigned char> __chEn, int __curDef, byte __auto);
-    int ReadResult(int __numEv = 1);
+    int ReadResult(int & __numEv);
     bool checkForVolRes();
 };
 

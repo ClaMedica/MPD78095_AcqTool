@@ -11,80 +11,78 @@ DEFINES += QT_MESSAGELOGCONTEXT
 #debug campioni di acquisizione
 DEFINES += DEBUG_ACQ
 
-# The .cpp file which was generated for your project. Feel free to hack it.
-SOURCES += main.cpp \
-    CPP/parametermanager.cpp \
-    ../MGlobal/msignal.cpp \
-    ../MGlobal/global.cpp \
+SOURCES += \
+    main.cpp \
+    CPP/alarmmanager.cpp \
+    CPP/androidmanager.cpp \
+    CPP/mabstractmanager.cpp \
+    CPP/macqmanager.cpp \
+    CPP/manatablemodel.cpp \
+    CPP/mdatamanager.cpp \
+    CPP/mflowdatas.cpp \
     CPP/modelmanager.cpp \
+    CPP/mstorage.cpp \
+    CPP/native.cpp \
+    CPP/nomogramma.cpp \
+    CPP/parametermanager.cpp \
+    CPP/PrinterManager.cpp \
+    CPP/printerserialport.cpp \
     CPP/TCP/SimpleTCPChannel.cpp \
     CPP/TCP/SimpleTCPClient.cpp \
     CPP/TCP/TcpServers.cpp \
     CPP/TCP/TcpSettingFile.cpp \
     ../MGlobal/ancestry.cpp \
-    CPP/macqmanager.cpp \
-    CPP/mdatamanager.cpp \
-    CPP/mstorage.cpp \
-    CPP/alarmmanager.cpp \
-    ../MGlobal/p7settingsmanager.cpp \
-    CPP/mabstractmanager.cpp \
-    CPP/native.cpp \
-    CPP/androidmanager.cpp \
-    CPP/mflowdatas.cpp \
-    ../MGlobal/MyMessageOutput.cpp \
-    CPP/manatablemodel.cpp \
-    CPP/nomogramma.cpp \
-    CPP/PrinterManager.cpp \
-    CPP/printerserialport.cpp \
-    ../MGlobal/UdMimpl.cpp \
     ../MGlobal/appbridge.cpp \
+    ../MGlobal/global.cpp \
     ../MGlobal/layoutmanager.cpp \
-    ../MGlobal/systemmanager.cpp
+    ../MGlobal/msignal.cpp \
+    ../MGlobal/MyMessageOutput.cpp \
+    ../MGlobal/p7settingsmanager.cpp \
+    ../MGlobal/systemmanager.cpp \
+    ../MGlobal/UdmImpl.cpp \
+    ../AnaUro/anauro.cpp \
+    ../AnaUro/analysis.cpp \
+    ../AnaUro/anautils.cpp 
 
 HEADERS += \
-    CPP/parametermanager.h \
-    ../MGlobal/global.h \
-    ../MGlobal/msignal.h \
+    CPP/alarmmanager.h \
+    CPP/androidmanager.h \
+    CPP/mabstractmanager.h \
+    CPP/macqmanager.h \
+    CPP/manatablemodel.h \
+    CPP/mdatamanager.h \
+    CPP/mflowdatas.h \
     CPP/modelmanager.h \
+    CPP/mstorage.h \
+    CPP/nomogramma.h \
+    CPP/parametermanager.h \
+    CPP/PrinterManager.h \
+    CPP/PrinterSerialport.h \
     CPP/TCP/SimpleTCPChannel.h \
     CPP/TCP/SimpleTCPClient.h \
     CPP/TCP/TcpServers.h \
     CPP/TCP/TcpSettingFile.h \
-    ../MGlobal/ancestry.h \
-    CPP/macqmanager.h \
-    CPP/mdatamanager.h \
-    CPP/mstorage.h \
-    CPP/alarmmanager.h \
-    ../MGlobal/p7settingsmanager.h \
-    CPP/mabstractmanager.h \
-    CPP/androidmanager.h \
-    CPP/mflowdatas.h \
-    CPP/manatablemodel.h \
-    CPP/nomogramma.h \
-    CPP/PrinterManager.h \
-    CPP/PrinterSerialport.h \
-    ../MGlobal/UdMimpl.h \
-    ../MGlobal/appbridge.h \
-    ../MGlobal/layoutmanager.h \
-    ../MGlobal/systemmanager.h
-
-SOURCES += ../AnaUro/anauro.cpp \
-    ../AnaUro/analysis.cpp \
-    ../AnaUro/anautils.cpp \
-
-HEADERS += ../AnaUro/anauro.h\
-        ../AnaUro/anauro_global.h \
+    ../AnaUro/anauro.h\
+    ../AnaUro/anauro_global.h \
     ../AnaUro/analysis.h \
     ../AnaUro/Anaerrorcodes.h \
     ../AnaUro/anautils.h \
+    ../MGlobal/ancestry.h \
+    ../MGlobal/appbridge.h \
+    ../MGlobal/global.h \
+    ../MGlobal/layoutmanager.h \
+    ../MGlobal/msignal.h \
+    ../MGlobal/p7settingsmanager.h \
+    ../MGlobal/systemmanager.h \
+    ../MGlobal/UdmImpl.h
 
 INCLUDEPATH +=  CPP \
+                CPP/TCP \                
                 ../AnaUro \
                 ../MGlobal \
                 ../SuperFlowBt \
                 ../DataFileManager \
                 ../SupeFlowBT \
-                CPP/TCP \                
 
 # Default rules for deployment.
 include(deployment.pri)
@@ -173,7 +171,7 @@ LINUXDESKTOP {
 
 	# Additional import path used to resolve QML modules in Qt Creator's code model
 	QML_IMPORT_PATH = ../MGlobal \
-		          ../Build-IMX6/CommonPlugin
+                          ../Build-Linux/CommonPlugin
 	DISTFILES += ../MGlobal/MComponents/* \
 		     ../MGlobal/MComponents/Images/*
 }

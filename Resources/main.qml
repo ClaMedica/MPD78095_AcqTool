@@ -30,28 +30,29 @@ ApplicationWindow {
 
     function launch(mode,dataFile)
     {
+        console.log("launch(mode,dataFile)")
 
-        if(mode==="acq")
+        if(mode === "acq")
         {
             console.log("Start new acq")
             mngAcq.load()
             mngAcq.newAcquisition(dataFile)            
-            forReal.setMarkersInfo(mngAcq.markersInfo("type",[1,6]))
-            forReal.configurationFile=mngAcq.plotConfigFileName()
-            forReal.displayMessage("Wait for inizialization...",-1)
-            forHome.whoIsVisible=forReal.name
+            forReal.setMarkersInfo(mngAcq.markersInfo("type", [1, 6]))
+            forReal.configurationFile = mngAcq.plotConfigFileName()
+            forReal.displayMessage("Wait for inizialization...", -1)
+            forHome.whoIsVisible = forReal.name
             forReal.setAcqInfo(mngData.acqInfo())
         }
-        else if(mode==="vis")
+        else if(mode === "vis")
         {
             console.log("Start new vis")
             forAna.initialize()
             mngData.load()
-            if(platform!=="android")
+            if(platform !== "android")
                 mngData.loadFile(dataFile);
             else
                 mngData.loadFile("/mnt/sdcard/Medica/pv000461A.pic")
-            forAna.setMarkersInfo(mngData.markersInfo("type",[1,6]))
+            forAna.setMarkersInfo(mngData.markersInfo("type", [1, 6]))
             forAna.setDefinersInfo(mngData.definersInfo())
             forAna.setCommandsInfo(mngData.commandsInfo())
         }

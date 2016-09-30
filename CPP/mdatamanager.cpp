@@ -141,12 +141,9 @@ void MDataManager::loadFile(QString __fileName)
         for(int i = 0; i < m_mng->GetNumOperativeMarkers(); i++) {
             VarMap *mrk = new VarMap;
             m_mng->GetOpMarker(i, &key, numSamp, &descr);
-            qDebug() << numSamp[0];
-            qDebug() << numSamp[1];
-            qDebug() << numSamp[2];
-            qDebug() << numSamp[3];
+            qDebug() << "numSamp[]" << numSamp[0] << numSamp[1]  << numSamp[2] << numSamp[3];
             double val = (double) numSamp[0] / m_mng->GetNAS(0);
-            qDebug()<<"Marker"<<key<<val;
+            qDebug() << "Marker" << key << val;
 
             if(m_markerMap.keys().contains(key)) {   //marker conosciuto le info ce le ho giA
                 (*mrk) = m_markerMap[key];
@@ -179,7 +176,7 @@ void MDataManager::loadFile(QString __fileName)
             for(int i = 0; i < m_mng->GetSamplesNumber(h); i++)
                 sig->replace(i, m_mng->GetValue(h, i));
 
-            qDebug() << sig;
+            qDebug() << "sig:" << sig;
             sig->setName(m_mng->GetChanName(h));
             sig->setSamplingFrequency(m_mng->GetNAS(h));
 
@@ -248,9 +245,11 @@ void MDataManager::loadFile(QString __fileName)
 
             QVariantList valuesY;
             foreach(MSignal *sig, m_signalVector)
-                if(sig->getName() == m_mng->GetChanName(numCh))
+                if(sig->getName() == m_mng->GetChanName(numCh)) {
+                    qDebug("%s: %d", sig->getName().toLatin1().constData(), sig->size());
                     for (int i = 0; i < sig->size(); i++)
                         valuesY.append(sig->at(i));
+                }
 
             double val = (double) numSamp[0] / m_mng->GetNAS(numCh);
             (*mrk)["val"] = val;
@@ -914,7 +913,7 @@ qDebug() << "INIZIO";
     qDebug() << "File Caricato?" << m_mng->GetParameters();
 
     //per ora salvo io su file pic l'analisi flussimetria ...
-    //m_mng->SetAnalysis("Flussimetria");
+//    m_mng->SetAnalysis(2);
 
     m_ana->SetData(m_mng);
 
@@ -923,6 +922,7 @@ qDebug() << "INIZIO";
 
     for (int i = 0; i < m_numAna; i++) {
         int anaType = m_mng->GetAnalysis(i).toInt();
+        anaType = FLW_AVD_STUDY;    // !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
         if (anaType == FLW_AVD_STUDY) {
             //verifica se c'A? un definitore per questa analisi.
             VarMap mkOpAnIn;
@@ -1119,7 +1119,7 @@ qDebug() << "INIZIO";
     //prova->setMode();
     //if (m_autoPrint)
 
-    prova->print();
+//    prova->print();
 
     //qml
     qDebug() << "FINE";
@@ -1326,7 +1326,7 @@ bool MDataManager::InitArraysFLW(int __start,
 
     qDebug() << "costruisco i segnali da disegnare nel plot per i nomogrammi";
     for (int i = 0; i < numEv; i++) {
-        qDebug()<<"nomogramma LiverpoolQMax";
+        qDebug() << "nomogramma LiverpoolQMax";
         MSignal *sig0 = new MSignal;
         MSignal *sig1 = new MSignal;
         MSignal *sig2 = new MSignal;
@@ -1482,14 +1482,15 @@ bool MDataManager::InitArraysFLW(int __start,
     return true;
 }
 
-int MDataManager::ReadResult(int __numEv)
+int MDataManager::ReadResult(int & __numEv)
 {
     int StructType = m_mng->GetAnaType();
     if (StructType <= 0)
         //error
         return -1;
 
-    __numEv = m_mng->readNumEv();
+    __numEv = 1;    // m_mng->readNumEv(); !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+    qDebug("ReadResult __numEv:%d ############# CORREGGERE CORREZIONE !!!!!!!!!!!!!!!!!!!!!!!", __numEv);
 
     m_aflwdatas.clear();
 
@@ -1572,6 +1573,6 @@ int MDataManager::ReadResult(int __numEv)
 
 mflowdatas *MDataManager::getFlowDatas(int __i)
 {
-    return m_aflwdatas.at(__i);\
+    return m_aflwdatas.at(__i);
 }
 

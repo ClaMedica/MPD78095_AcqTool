@@ -15,7 +15,7 @@
 #include "p7settingsmanager.h"
 #include "QtGlobal"
 //classe per unita di misura
-#include "UdMImpl.h"
+#include "UdmImpl.h"
 #include "appbridge.h"
 
 extern AcqBridge *g_mainAppBridge;
