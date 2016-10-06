@@ -803,7 +803,11 @@ void MDataManager::exitFromReview()
 {
     qDebug() << "Exit" << getToSave();
     if (getToSave() == "ret") {
+#ifndef DEBUGACQTOOL
         g_mainAppBridge->sendSwitch();
+#else
+        exit(0);
+#endif
         return;
     }
 
@@ -822,7 +826,12 @@ void MDataManager::exitFromReview()
         else //"yes"
             //cancello il file copy
             qDebug() << "cancellata copia all'exit" << QFile::remove(copyName);
+#ifndef DEBUGACQTOOL
         g_mainAppBridge->sendSwitch(); //poi dovra tornare al modulo database
+#else
+        exit(0);
+#endif
+
     }
 
     //    if (getToSave() == "")
@@ -1502,7 +1511,7 @@ int MDataManager::ReadResult(int & __numEv)
         //dati analisi
         m_aflwdatas.append(new mflowdatas());
         byte * strTemp = (byte *) malloc (sizeof(FLWAdvRepStruct));
-
+        m_aflwdatas.at(0)->setParent(this);
         m_aflwdatas.at(0)->setWaitingTime(0);
         m_aflwdatas.at(0)->setQMax(0);
         m_aflwdatas.at(0)->setQAve(0);
@@ -1524,6 +1533,7 @@ int MDataManager::ReadResult(int & __numEv)
             m_aflwdatas.append(new mflowdatas());
             m_mng->readResAna(sizeof(FLWAdvRepStruct),strTemp);
             FLWAdvRepStruct* structureFlow = (FLWAdvRepStruct*)strTemp;
+            m_aflwdatas.last()->setParent(this);
             m_aflwdatas.last()->setWaitingTime(structureFlow->waiting_time);
             m_aflwdatas.last()->setQMax(structureFlow->q_max);
             m_aflwdatas.last()->setQAve(structureFlow->q_ave);

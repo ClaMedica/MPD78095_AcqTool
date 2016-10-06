@@ -4,6 +4,7 @@ import QtQuick.Dialogs 1.2
 //import Resources 1.0
 import "qrc:/Forms"
 import "qrc:/Dialog"
+
 import MComponents 1.0
 import Managers 1.0
 import QtQuick.Window 2.2
@@ -28,9 +29,49 @@ ApplicationWindow {
     height:480
     color:"steelblue"
 
+    function launchDEBUG(mode,dataFile)
+     {
+         console.log("launch(mode,dataFile)", mode, dataFile)
+
+         if(mode === "acq")
+         {
+             console.log("Start new acq")
+             mngAcq.load()
+             mngAcq.newAcquisition(dataFile)
+             forReal.setMarkersInfo(mngAcq.markersInfo("type", [1, 6]))
+             forReal.configurationFile = mngAcq.plotConfigFileName()
+             forReal.displayMessage("Wait for inizialization...", -1)
+             forHome.whoIsVisible = forReal.name
+             forReal.setAcqInfo(mngData.acqInfo())
+         }
+         else if(mode === "vis")
+         {
+             console.log("Start new vis")
+             forAna.initialize()
+             mngData.load()
+             if(platform !== "android")
+                 mngData.loadFile(dataFile);
+             else
+                 mngData.loadFile("/mnt/sdcard/Medica/pv000461A.pic")
+             forAna.setMarkersInfo(mngData.markersInfo("type", [1, 6]))
+             forAna.setDefinersInfo(mngData.definersInfo())
+             forAna.setCommandsInfo(mngData.commandsInfo())
+         }
+         console.log("Application Ready!")
+     }
+
+    //@@@@@@@@@@    Events          @@@@@@@@@@
+     Component.onCompleted:{
+         console.log("debug??? ", Qt.application.arguments[3])
+         if (Qt.application.arguments[3] === "debug"){
+             root.visible = true
+             launchDEBUG(Qt.application.arguments[1],Qt.application.arguments[2])
+         }
+     }
+
     function launch(mode,dataFile)
     {
-        console.log("launch(mode,dataFile)")
+        console.log("launch(mode,dataFile)", mode, dataFile)
 
         if(mode === "acq")
         {
@@ -59,10 +100,6 @@ ApplicationWindow {
         console.log("Application Ready!")
         bridgeMain.sendSwitch()
     }
-
-    //@@@@@@@@@@    Events          @@@@@@@@@@
-
-
 
     //@@@@@@@@@@    Objects         @@@@@@@@@@
     Connections{

@@ -34,18 +34,8 @@
 
 AcqBridge *g_mainAppBridge;
 
-void porcata(QString arg)
-{
-    emit g_mainAppBridge->newVisualization(arg);
-}
-
 int main(int argc, char *argv[])
 {
-    bool inDebug = false;
-
-    // Load virtualkeyboard input context plugin
-    //qputenv("QT_IM_MODULE", QByteArray("qtvirtualkeyboard"));
-
     Q_INIT_RESOURCE(qml);
 
     QGuiApplication app(argc, argv);
@@ -72,12 +62,9 @@ int main(int argc, char *argv[])
         arguments << QString(argv[i]);
     qDebug() << "Argomenti"<<arguments;
 
-    if(argc > 3 && strcmp(argv[3], "debug") == 0) {
-        inDebug = true;
-        qDebug() << "========== inDebug ===========";
-    }
-
+#ifndef DEBUGACQTOOL
     g_mainAppBridge = new AcqBridge(QStringList() << argv[1] << argv[2]);   //definisco un bridge tra app di tipo server
+#endif
 
     qmlRegisterType<ParameterManager>("Managers", 1, 0, "ParameterManager");
     qmlRegisterType<ModelManager>("Managers", 1, 0, "ModelManager");
@@ -90,11 +77,17 @@ int main(int argc, char *argv[])
     qmlRegisterUncreatableType<Nomogramma>("Managers", 1, 0, "nomogramma", "error on Nomogramma creation");
 
     QQmlApplicationEngine engine;
+
     //Carico il layout di default del programma
     LayoutManager mngLayout;
+
     engine.addImportPath("qrc:/Modules/");
     engine.addImportPath("../standalone/");
     engine.addImportPath(QApplication::applicationDirPath());
+
+#ifdef DEBUGACQTOOL
+    engine.addImportPath(QApplication::applicationDirPath()+"/Modules");
+#endif
 
 #ifdef PICOFLOW//metto questo altrimenti su target non carica il plugin cpp
     engine.rootContext()->setContextProperty("screenH", 480);
@@ -109,8 +102,13 @@ int main(int argc, char *argv[])
     engine.rootContext()->setContextProperty(QLatin1String("androidmanager"),
                                              androidmanager);
     engine.rootContext()->setContextProperty(QLatin1String("platform"), "android");
-#else
+#endif
+
+#ifdef LINUXDESKTOP
     engine.rootContext()->setContextProperty(QLatin1String("platform"), "linux");
+    engine.rootContext()->setContextProperty("screenH", 480);
+    engine.rootContext()->setContextProperty("screenW", 640);
+    engine.rootContext()->setContextProperty("isTouch", false);
 #endif
 
     engine.rootContext()->setContextProperty("layout", &mngLayout);
@@ -121,10 +119,9 @@ int main(int argc, char *argv[])
     engine.load(QUrl(QStringLiteral("qrc:/main.qml")));
     qDebug()<<"engine caricato";
 
+#ifndef DEBUGACQTOOL
     g_mainAppBridge->setRootObjects(engine.rootObjects());
-
-//    if(inDebug)
-//        QTimer::singleShot(1000, &app, SLOT(porcata(QString(argv[2]))));
+#endif
 
     int ret = app.exec();
 

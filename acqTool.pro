@@ -4,8 +4,6 @@ QT += qml quick widgets sql network multimedia xml core serialport
 
 RESOURCES += Resources/qml.qrc
 
-# Additional import path used to resolve QML modules in Qt Creator's code model
-QML_IMPORT_PATH +=  Modules/MPlotModule
 
 DEFINES += QT_MESSAGELOGCONTEXT
 #debug campioni di acquisizione
@@ -114,7 +112,7 @@ unix:!macx: LIBS += -L$$PWD/../../build/DatafileManager/Debug/Desktop_Qt_5_5_1_G
 #percorso acer luca
 #rootPath = C:\Users\Mez
 #percorso claudia
-rootPath = E:\Piattaforma_70
+rootPath = E:\Piattaforma70
 
 win32{
     #creo la cartella da copiare in giro
@@ -161,9 +159,6 @@ LINUXDESKTOP {
         RESOURCES += modules_LinuxDesktop.qrc
 	RESOURCES += Resources/Icone/icons.qrc
 
-
-	#unix:!macx: LIBS += -L$$PWD/../Build-IMX6/DatafileManager/ -lDatafileManager
-
     #datafile manager
     LIBS        += -L$$PWD/../Build-Linux/DatafileManager -lDatafileManager
     INCLUDEPATH +=   $$PWD/../Build-Linux/DatafileManager
@@ -171,9 +166,10 @@ LINUXDESKTOP {
 
 	# Additional import path used to resolve QML modules in Qt Creator's code model
 	QML_IMPORT_PATH = ../MGlobal \
-                          ../Build-Linux/CommonPlugin
-	DISTFILES += ../MGlobal/MComponents/* \
-		     ../MGlobal/MComponents/Images/*
+        QML_IMPORT_PATH +=  Modules
+
+        DISTFILES += ../MGlobal/MComponents/* \
+                     ../MGlobal/MComponents/Images/* \
 }
 
 #PICOFLOW {
@@ -195,6 +191,8 @@ LINUXDESKTOP {
 #		     ../MGlobal/MComponents/Images/*
 #}
 
+#per debugare solo acqtool
+DEFINES += DEBUGACQTOOL
 
 
 
