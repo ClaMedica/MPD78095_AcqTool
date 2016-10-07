@@ -1502,6 +1502,7 @@ int MDataManager::ReadResult(int & __numEv)
         //dati analisi
         m_aflwdatas.append(new mflowdatas());
         byte * strTemp = (byte *) malloc (sizeof(FLWAdvRepStruct));
+        m_aflwdatas.at(0)->setParent(this);
 
         m_aflwdatas.at(0)->setWaitingTime(0);
         m_aflwdatas.at(0)->setQMax(0);
@@ -1522,6 +1523,7 @@ int MDataManager::ReadResult(int & __numEv)
 
         for (int i = 1; i <= __numEv; i++) {
             m_aflwdatas.append(new mflowdatas());
+            m_aflwdatas.last()->setParent(this);
             m_mng->readResAna(sizeof(FLWAdvRepStruct),strTemp);
             FLWAdvRepStruct* structureFlow = (FLWAdvRepStruct*)strTemp;
             m_aflwdatas.last()->setWaitingTime(structureFlow->waiting_time);

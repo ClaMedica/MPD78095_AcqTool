@@ -41,7 +41,8 @@ void porcata(QString arg)
 
 int main(int argc, char *argv[])
 {
-    bool inDebug = false;
+//    bool bool_true = true;
+    bool bool_false = false;
 
     // Load virtualkeyboard input context plugin
     //qputenv("QT_IM_MODULE", QByteArray("qtvirtualkeyboard"));
@@ -70,12 +71,7 @@ int main(int argc, char *argv[])
     //leggiamo gli argomenti
     for(int i = 0; i < argc; i++)
         arguments << QString(argv[i]);
-    qDebug() << "Argomenti"<<arguments;
-
-    if(argc > 3 && strcmp(argv[3], "debug") == 0) {
-        inDebug = true;
-        qDebug() << "========== inDebug ===========";
-    }
+    qDebug() << "Argomenti" << arguments;
 
     g_mainAppBridge = new AcqBridge(QStringList() << argv[1] << argv[2]);   //definisco un bridge tra app di tipo server
 
@@ -99,7 +95,7 @@ int main(int argc, char *argv[])
 #ifdef PICOFLOW//metto questo altrimenti su target non carica il plugin cpp
     engine.rootContext()->setContextProperty("screenH", 480);
     engine.rootContext()->setContextProperty("screenW", 640);
-    engine.rootContext()->setContextProperty("isTouch", true);
+    engine.rootContext()->setContextProperty("isTouch", bool_true);
     engine.addPluginPath("../PicoFlow");
 #endif
 
@@ -111,20 +107,23 @@ int main(int argc, char *argv[])
     engine.rootContext()->setContextProperty(QLatin1String("platform"), "android");
 #else
     engine.rootContext()->setContextProperty(QLatin1String("platform"), "linux");
+    engine.rootContext()->setContextProperty("isTouch", bool_false);
 #endif
 
     engine.rootContext()->setContextProperty("layout", &mngLayout);
     engine.rootContext()->setContextProperty("settings", &g_P7SettingsManager);
     engine.rootContext()->setContextProperty("bridgeMain", g_mainAppBridge);
 
-    qDebug()<<engine.importPathList();
+    qDebug() << engine.importPathList();
     engine.load(QUrl(QStringLiteral("qrc:/main.qml")));
-    qDebug()<<"engine caricato";
+    qDebug() << "engine caricato";
 
     g_mainAppBridge->setRootObjects(engine.rootObjects());
 
-//    if(inDebug)
-//        QTimer::singleShot(1000, &app, SLOT(porcata(QString(argv[2]))));
+//    if(strcmp(argv[2], "9876") == 0) {  // debug
+//        g_mainAppBridge->m_program = "PicoAcq";
+//        g_mainAppBridge->m_arguments << argv[3] << argv[4];
+//    }
 
     int ret = app.exec();
 

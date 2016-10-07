@@ -20,9 +20,9 @@ typedef struct {
     float desc_time;				// time between Q max and 95% of the voided volume
     float voiding_time;			// voiding time
     float vol_at_qmax;			// volume at Q max
-    int voided_volume;          // voided volume
+    int32_t voided_volume;          // voided volume
     float acceleration;           // Q max / T qmax
-    int residual_volume;		// residual volume inserted by the user
+    int32_t residual_volume;		// residual volume inserted by the user
     float v_det_max;              // detrusor contraction maximum speed
     float cQ;						// Flow corrective factor
 
