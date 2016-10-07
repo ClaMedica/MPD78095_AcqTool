@@ -399,14 +399,14 @@ void MDataManager::saveChanges()
         qDebug() << "Salvo l'oggetto: " << curMap;
 
         qDebug() << "Inizio salvataggio";
-        int32_t *numCamp = new int32_t[m_copy->GetChanNum()];
-        qDebug() << curMap->value("val").toFloat();
 
+        QVector<int32_t> numCamp;
+        numCamp.resize(m_copy->GetChanNum());
         for(int i = 0; i < m_copy->GetChanNum(); i++)
-            numCamp[i] = curMap->value("val").toFloat() * m_copy->GetNAS(i);
+            numCamp[i] = curMap->value("val").toFloat() * m_copy->GetNAS(i) + 0.5;
 
         if(curMap->value("color").toString() == COLOR_OPERATIVE) {
-            m_copy->AddOpMarker(numCamp, curMap->value("key").toInt(), curMap->value("descr").toString());
+            m_copy->AddOpMarker(numCamp.data(), curMap->value("key").toInt(), curMap->value("descr").toString());
         }
         if((curMap->value("color").toString() == COLOR_ANALYTICAL) && (curMap->value("visible").toBool() == true)) {
             m_copy->AddAnMarker(curMap->value("channel").toInt(),
@@ -816,7 +816,8 @@ void MDataManager::exitFromReview()
     else {
         QString copyName = m_fileName;
         copyName.insert(copyName.length() - 4, "_origin");
-        if (getToSave() == "no") {        //copio il file copy nell'originale
+        if (getToSave() == "no")        //copio il file copy nell'originale
+         {
             if (QFile::exists(copyName)) {
                 qDebug() << "cancello vecchio file" << QFile::remove(m_fileName);
                 qDebug() << "copio le modifiche" << QFile::copy(copyName,m_fileName);
@@ -824,8 +825,12 @@ void MDataManager::exitFromReview()
             }
         }
         else //"yes"
+        {
+            //salvo
+            saveChanges();
             //cancello il file copy
             qDebug() << "cancellata copia all'exit" << QFile::remove(copyName);
+        }
 #ifndef DEBUGACQTOOL
         g_mainAppBridge->sendSwitch(); //poi dovra tornare al modulo database
 #else
@@ -1113,18 +1118,18 @@ qDebug() << "INIZIO";
     qDebug() << "File chiuso" << m_mng->Close();
 
     //printer PROVA
-    PrinterManager *prova = new PrinterManager(m_fileName);
-    prova->setTempoAttesa(m_aflwdatas.at(0)->getWaitingTime());
-    prova->setFlussoMax(m_aflwdatas.at(0)->getQMax());
-    prova->setFlussoMedio(m_aflwdatas.at(0)->getQAve());
-    prova->setTempoMax(m_aflwdatas.at(0)->getTimeAtQmax());
-    prova->setTempo595(m_aflwdatas.at(0)->getTime90());
-    prova->setTempoFlusso(m_aflwdatas.at(0)->getFlowTime());
-    prova->setTempoDisc(m_aflwdatas.at(0)->getDescTime());
-    prova->setTempoSvuot(m_aflwdatas.at(0)->getVoidingTime());
-    prova->setVolFlussoMax(m_aflwdatas.at(0)->getVolAtQqmax());
-    prova->setVolVuotato(m_aflwdatas.at(0)->getVoidedVolume());
-    prova->setAccelerazione(m_aflwdatas.at(0)->getAcceleration());
+    //PrinterManager *prova = new PrinterManager(m_fileName);
+//    prova->setTempoAttesa(m_aflwdatas.at(0)->getWaitingTime());
+//    prova->setFlussoMax(m_aflwdatas.at(0)->getQMax());
+//    prova->setFlussoMedio(m_aflwdatas.at(0)->getQAve());
+//    prova->setTempoMax(m_aflwdatas.at(0)->getTimeAtQmax());
+//    prova->setTempo595(m_aflwdatas.at(0)->getTime90());
+//    prova->setTempoFlusso(m_aflwdatas.at(0)->getFlowTime());
+//    prova->setTempoDisc(m_aflwdatas.at(0)->getDescTime());
+//    prova->setTempoSvuot(m_aflwdatas.at(0)->getVoidingTime());
+//    prova->setVolFlussoMax(m_aflwdatas.at(0)->getVolAtQqmax());
+//    prova->setVolVuotato(m_aflwdatas.at(0)->getVoidedVolume());
+//    prova->setAccelerazione(m_aflwdatas.at(0)->getAcceleration());
 
     //letto dai setting
     //mi dice se la flussimetria automatica o manuale

@@ -11,11 +11,24 @@ TableView{
     property var roles:[]
     property string type:"default"
     height:300
-    width:300
+    width:500
     frameVisible: false
     clip:true
     selectionMode:SelectionMode.ExtendedSelection
     horizontalScrollBarPolicy: Qt.ScrollBarAlwaysOff
+
+    itemDelegate: Item {
+        anchors.leftMargin: 100
+        Text {
+            anchors.verticalCenter: parent.verticalCenter
+            color: styleData.textColor
+            elide: styleData.elideMode
+            text: styleData.value
+            font.family: "Courier 8 Pitch"
+            font.bold: false
+            font.pixelSize: 12
+        }
+    }
 
     function populate(){//al caricamento della tabella popolo con le colonne
         if(model===undefined)

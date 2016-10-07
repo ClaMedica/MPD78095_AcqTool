@@ -101,7 +101,7 @@ Rectangle{
         color:"black"
         font.family: "Courier 8 Pitch"
         font.bold: false
-        font.pixelSize: 8
+        font.pixelSize: 12
         anchors.top:img.top
 
         //        anchors.bottom: parent.bottom
