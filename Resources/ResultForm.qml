@@ -2,7 +2,6 @@ import QtQuick 2.3
 import QtQuick.Controls 1.0
 import QtQuick.Dialogs 1.2
 import QtQuick.Controls.Styles 1.2
-import MPlotModule 1.0
 import MComponents 1.0
 import QtQuick.Layouts 1.1
 import QtQml 2.0
@@ -100,7 +99,7 @@ MForm {
                 pagesSameAna[pagesSameAna.length] = rectdata
 
                 var tablefn =  Qt.createQmlObject('import "qrc:/Components"; MAnaTableView {}', rectdata)
-                tablefn.width = 300
+                tablefn.width = 350
                 tablefn.anchors.left = rectdata.left
                 tablefn.anchors.top = rectdata.top
                 tablefn.anchors.topMargin = 20
@@ -113,7 +112,7 @@ MForm {
                 buttonT.buttonId = pagesLocal.length
                 buttonT.anchors.bottom = rectdata.bottom
                 buttonT.anchors.left = rectdata.left
-                buttonT.anchors.bottomMargin = 60
+                buttonT.anchors.bottomMargin = 100
                 buttonT.anchors.leftMargin = btnLeftMargin
                 buttonT.myText = qsTr("Table")
                 buttonT.clicked.connect(clickButton)
@@ -151,11 +150,11 @@ MForm {
                 buttonLQM.buttonId = pagesLocal.length
                 buttonLQM.anchors.bottom = rectdata.bottom
                 buttonLQM.anchors.left = rectdata.left
-                buttonLQM.anchors.bottomMargin = 20
+                buttonLQM.anchors.bottomMargin = 60
                 buttonLQM.anchors.leftMargin = btnLeftMargin
                 buttonLQM.myText = nameNomo
                 buttonLQM.clicked.connect(clickButton)
-                btnLeftMargin += 110
+                btnLeftMargin += buttonLQM.width + 5
                 pagesLocal.push(LQM)
 
                 //liverpool QAve
@@ -187,11 +186,11 @@ MForm {
                 buttonLQA.buttonId = pagesLocal.length
                 buttonLQA.anchors.bottom = rectdata.bottom
                 buttonLQA.anchors.left = rectdata.left
-                buttonLQA.anchors.bottomMargin = 20
+                buttonLQA.anchors.bottomMargin = 60
                 buttonLQA.anchors.leftMargin = btnLeftMargin
                 buttonLQA.myText = nameNomo
                 buttonLQA.clicked.connect(clickButton)
-                btnLeftMargin += 110
+                btnLeftMargin += buttonLQA.width + 5
                 pagesLocal.push(LQA)
 
                 //siroky QMax
@@ -230,11 +229,11 @@ MForm {
                     buttonSQM.buttonId = pagesLocal.length
                     buttonSQM.anchors.bottom = rectdata.bottom
                     buttonSQM.anchors.left = rectdata.left
-                    buttonSQM.anchors.bottomMargin = 20
+                    buttonSQM.anchors.bottomMargin = 60
                     buttonSQM.anchors.leftMargin = btnLeftMargin
                     buttonSQM.myText = nameNomo
                     buttonSQM.clicked.connect(clickButton)
-                    btnLeftMargin += 110
+                    btnLeftMargin += buttonSQM.width + 5
                     pagesLocal.push(SQM)
 
                     //siroky QAve
@@ -271,7 +270,7 @@ MForm {
                     buttonSQA.buttonId = pagesLocal.length
                     buttonSQA.anchors.bottom = rectdata.bottom
                     buttonSQA.anchors.left = rectdata.left
-                    buttonSQA.anchors.bottomMargin = 20
+                    buttonSQA.anchors.bottomMargin = 60
                     buttonSQA.anchors.leftMargin = btnLeftMargin
                     buttonSQA.myText = nameNomo
                     buttonSQA.clicked.connect(clickButton)
@@ -295,8 +294,8 @@ MForm {
         anchors.bottom: parent.bottom
         anchors.bottomMargin: 10
         anchors.rightMargin: 10
-        width:parent.width*0.4
-        height:parent.height*0.2
+        width:parent.width*0.2
+        height:parent.height*0.08
         onClicked: {
             forAna.visible = true
             resultForm.visible = false            

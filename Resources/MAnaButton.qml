@@ -1,8 +1,9 @@
-import QtQuick 2.0
+import QtQuick 2.5
+import QtQuick.Window 2.0
 
 Rectangle {
     id: anaBtn
-    width: 100
+    width: 120
     height: 30
     color:"whitesmoke"
     border.color: "gray"
@@ -19,6 +20,9 @@ Rectangle {
     Text {
         id: textBtn
         text: myText
+        font.family: "Courier 8 Pitch"
+        font.bold: false
+        font.pixelSize: anaBtn.height*0.4
         anchors.horizontalCenter: parent.horizontalCenter
         anchors.verticalCenter: parent.verticalCenter
     }

@@ -382,7 +382,6 @@ MForm{
                     mngData.analysis();
 
                 if (value === "112") {
-                    mngData.saveChanges()
                     mngData.exitFromReview()
                 }
                 if (value === "113"){
