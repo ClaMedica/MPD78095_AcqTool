@@ -1,6 +1,9 @@
 #include "mdatamanager.h"
 #include "systemmanager.h"
 
+extern bool DebugAcqTool;
+
+
 MDataManager::MDataManager(QObject *parent)
 {
     (void) parent;
@@ -111,8 +114,10 @@ void MDataManager::loadFile(QString __fileName)
         m_mng = new DatafileManager;
         m_mng->SetFileName(__fileName);
         m_mng->SetFileType(7);
-        qDebug() << "File Aperto?" << m_mng->Open();
-        qDebug() << "File Caricato?" << m_mng->GetParameters();
+        bool res = m_mng->Open();
+        qDebug() << "File Aperto?" << res;
+        res = m_mng->GetParameters();
+        qDebug() << "File Caricato?" << res;
 
         //m_mng->SetAnalysis(QString::number(FLW_AVD_STUDY));//temporaneo
         // m_mng->CommitParameters();
@@ -803,11 +808,14 @@ void MDataManager::exitFromReview()
 {
     qDebug() << "Exit" << getToSave();
     if (getToSave() == "ret") {
-#ifndef DEBUGACQTOOL
-        g_mainAppBridge->sendSwitch();
-#else
-        exit(0);
-#endif
+//#ifndef DEBUGACQTOOL
+//#else
+//#endif
+        if(DebugAcqTool == false)
+            g_mainAppBridge->sendSwitch();  //send(MEX_SHOW);
+        else
+            exit(0);
+
         return;
     }
 
@@ -817,7 +825,7 @@ void MDataManager::exitFromReview()
         QString copyName = m_fileName;
         copyName.insert(copyName.length() - 4, "_origin");
         if (getToSave() == "no")        //copio il file copy nell'originale
-         {
+        {
             if (QFile::exists(copyName)) {
                 qDebug() << "cancello vecchio file" << QFile::remove(m_fileName);
                 qDebug() << "copio le modifiche" << QFile::copy(copyName,m_fileName);
@@ -831,11 +839,13 @@ void MDataManager::exitFromReview()
             //cancello il file copy
             qDebug() << "cancellata copia all'exit" << QFile::remove(copyName);
         }
-#ifndef DEBUGACQTOOL
-        g_mainAppBridge->sendSwitch(); //poi dovra tornare al modulo database
-#else
-        exit(0);
-#endif
+//#ifndef DEBUGACQTOOL
+//#else
+//#endif
+        if(DebugAcqTool == false)
+            g_mainAppBridge->sendSwitch(); //poi dovra tornare al modulo database
+        else
+            exit(0);
 
     }
 
@@ -1184,7 +1194,7 @@ void MDataManager::InitPageGraphs(int __anaType)
         int evStart;
         int evEnd;
         VarMap *evMarkOpIn;
-        byte evAuto;
+        byte evAuto = 0;
         QVector<unsigned char> enCh;
 
         VarMapVec* elements = m_storage.getAll(CAT_DEFINER);

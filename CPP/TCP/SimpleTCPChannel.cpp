@@ -25,7 +25,8 @@ SimpleTCPChannel::SimpleTCPChannel(QHostAddress __address, int __currentPort, QO
     connect(m_channelTcpServer, SIGNAL(newConnection()), this, SLOT(manageIncomingConnection()), Qt::DirectConnection);
 }
 
-SimpleTCPChannel::~SimpleTCPChannel(){
+SimpleTCPChannel::~SimpleTCPChannel()
+{
 
     //Closing TCP socket to client, only if it has been opened and it's not
     // already in UnconnectedState
@@ -39,16 +40,14 @@ SimpleTCPChannel::~SimpleTCPChannel(){
 
 void SimpleTCPChannel::listen()
 {
-    if(this->m_channelInUse)
-    {
+    if(this->m_channelInUse) {
         qDebug("SimpleTCPChannel: Channel in use can not perform listen operation");
         return;
     }
-    if(m_channelTcpServer->listen(m_address , m_port))
-    {
+    if(m_channelTcpServer->listen(m_address , m_port)) {
         qDebug("SimpleTCPChannel: Server listening on address: %s and port: %d",m_address.toString().toUtf8().data(),m_port);
-    }else
-    {
+    }
+    else {
         qDebug("SimpleTCPChannel: Problems on listen operation. address: %s and port: %d",m_address.toString().toUtf8().data(),m_port);
     }
 }
@@ -67,7 +66,8 @@ void  SimpleTCPChannel::close()
  * It sends given message. Dimension of msg is put at the head of stream, in a
  * quint32 variable.
  */
-bool SimpleTCPChannel::sendData(char* __msg, quint32 __len){
+bool SimpleTCPChannel::sendData(char* __msg, quint32 __len)
+{
     QByteArray block;
     QDataStream out(&block, QIODevice::WriteOnly);
 
@@ -80,12 +80,12 @@ bool SimpleTCPChannel::sendData(char* __msg, quint32 __len){
     // with byte order QDataStream::BigEndian neither). By the way all non-Qt clients must
     // be aware that data sent are in network byte order.
     //////////
-    out<<__len;
-    for(quint32 i = 0;i<__len;i++){
+    out << __len;
+    for(quint32 i = 0; i < __len; i++) {
         block.append(__msg[i]);
     }
 
-    if(this->m_channelInUse){
+    if(this->m_channelInUse) {
         m_channelTcpSocket->write(block);
         m_channelTcpSocket->flush();
         return true;
@@ -94,7 +94,8 @@ bool SimpleTCPChannel::sendData(char* __msg, quint32 __len){
         return false;
 }
 
-void SimpleTCPChannel::sendData(QByteArray *__pData){
+void SimpleTCPChannel::sendData(QByteArray *__pData)
+{
     //writing size, and content 'char by char'
 
     //////////
@@ -106,18 +107,20 @@ void SimpleTCPChannel::sendData(QByteArray *__pData){
     //////////
     //quint32 len = __pData->length();
     //__pData->insert(0, QByteArray((char*)&len, sizeof(quint32)));
-    if(this->m_channelInUse){
+    if(this->m_channelInUse) {
         m_channelTcpSocket->write(*__pData);
         m_channelTcpSocket->flush();
     }
 }
 
-QTcpServer* SimpleTCPChannel::getQTcpServer(){
+QTcpServer* SimpleTCPChannel::getQTcpServer()
+{
     return this->m_channelTcpServer;
 }
 
 
-QTcpSocket* SimpleTCPChannel::getQTcpSocket(){
+QTcpSocket* SimpleTCPChannel::getQTcpSocket()
+{
     return this->m_channelTcpSocket;
 }
 
@@ -138,14 +141,15 @@ void SimpleTCPChannel::setServerPort(int __port)
 
 // slots
 
-void SimpleTCPChannel::manageIncomingConnection(){
+void SimpleTCPChannel::manageIncomingConnection()
+{
     QTcpSocket *clientConnection = m_channelTcpServer->nextPendingConnection();
     connect(clientConnection, SIGNAL(disconnected()), clientConnection, SLOT(deleteLater()));
 
     qDebug("SimpleTCPChannel: Incoming connection to manage. Address: %s - port: %d",
            m_channelTcpServer->serverAddress().toString().toUtf8().data(),m_channelTcpServer->serverPort());
     fflush(stdout);
-    if(!m_channelInUse){
+    if(!m_channelInUse) {
         //establishing new connection
         m_channelTcpSocket = clientConnection;
         connect(m_channelTcpSocket, SIGNAL(disconnected()), this, SLOT(managechannelOneDisconnection()));
@@ -155,7 +159,8 @@ void SimpleTCPChannel::manageIncomingConnection(){
         fflush(stdout);
 
         emit signal_clientConnected();
-    }else{
+    }
+    else {
         //connection for current channel is already established.
         // further request are just ignored.
         clientConnection->disconnectFromHost();
@@ -164,8 +169,9 @@ void SimpleTCPChannel::manageIncomingConnection(){
     }
 }
 
-void SimpleTCPChannel::managechannelOneDisconnection(){
-    if(this->m_channelInUse){
+void SimpleTCPChannel::managechannelOneDisconnection()
+{
+    if(this->m_channelInUse) {
         this->m_channelInUse=false;
         disconnect(m_channelTcpSocket, SIGNAL(readyRead()), this, SLOT(onDataReady()));
         m_channelTcpSocket = NULL;
@@ -175,8 +181,7 @@ void SimpleTCPChannel::managechannelOneDisconnection(){
 
 void SimpleTCPChannel::onDataReady()
 {
-    if(m_pFDataReadyCallBack != NULL)
-    {
+    if(m_pFDataReadyCallBack != NULL) {
         QByteArray block;
         block = m_channelTcpSocket->readAll();
         m_pFDataReadyCallBack(m_pParent, this, block);

@@ -61,17 +61,17 @@ Rectangle{
         curEle.visible=true
     }
 
-    MLabel{
-        id:curEle
+    MLabel {
+        id: curEle
         anchors.right: parent.right
         anchors.left: parent.left
         anchors.verticalCenter: parent.verticalCenter
         anchors.leftMargin: rootComboBox.border.width
         height: oriH
         labelSize: rootComboBox.labelSize
-        font.family: text!=""?text:layout.value("FFamily")
-        text:"Courier"
-        horizontalAlignment: text.length>5?Text.AlignLeft:Text.AlignHCenter
+        font.family: (text != "") ? text : layout.value("FFamily")
+        text: "Courier"
+        horizontalAlignment: (text.length > 5) ? Text.AlignLeft : Text.AlignHCenter
     }
 
     ListView{

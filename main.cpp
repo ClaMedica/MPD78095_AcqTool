@@ -32,11 +32,15 @@
 #include <androidmanager.h>
 #endif
 
+bool DebugAcqTool = false;
+
 AcqBridge *g_mainAppBridge;
 
 int main(int argc, char *argv[])
 {
-    bool bool_false = false;
+    bool bool_false = false; (void) bool_false;
+    bool bool_true  = true;  (void) bool_true;
+
     Q_INIT_RESOURCE(qml);
 
     QGuiApplication app(argc, argv);
@@ -46,16 +50,17 @@ int main(int argc, char *argv[])
 #ifdef ANDROID
     QtAndroid::androidActivity().callMethod<void>("registerBroadcastReceiver", "()V");
 #endif
-    QString logFile = "acqTool_log.htm";
+    QString logFile = "acqTool_log_" + QDateTime::currentDateTime().toString("yyyyMMdd_hhmmss")+".htm";
 #ifdef ANDROID
     gPath_log = "/mnt/sdcard/" + logFile;
 #else
-    gPath_log = QApplication::applicationDirPath() + "/" + logFile;
+    gPath_log = /*QApplication::applicationDirPath()*/ + "/tmp/" + logFile;
 #endif
 
+    qDebug() << "Start. log:" << gPath_log;
     //dirotto il debug log
     MyMessageOutput::init(gPath_log);
-    qDebug() << "Partiamo";
+    qDebug() << "Start. log:" << gPath_log;
 
     QStringList arguments;
     //leggiamo gli argomenti
@@ -63,9 +68,12 @@ int main(int argc, char *argv[])
         arguments << QString(argv[i]);
     qDebug() << "Argomenti" << arguments;
 
-#ifndef DEBUGACQTOOL
-    g_mainAppBridge = new AcqBridge(QStringList() << argv[1] << argv[2]);   //definisco un bridge tra app di tipo server
-#endif
+//#ifndef DEBUGACQTOOL
+    if((argc > 1) && (strcmp(argv[argc - 1], (const char *)"debug") == 0))
+        DebugAcqTool = true;
+    if(DebugAcqTool == false)
+        g_mainAppBridge = new AcqBridge(QStringList() << argv[1] << argv[2]);   //definisco un bridge tra app di tipo server
+//#endif
 
     qmlRegisterType<ParameterManager>("Managers", 1, 0, "ParameterManager");
     qmlRegisterType<ModelManager>("Managers", 1, 0, "ModelManager");
@@ -83,14 +91,16 @@ int main(int argc, char *argv[])
     LayoutManager mngLayout;
 
     engine.addImportPath("qrc:/Modules/");
-    engine.addImportPath("../standalone/");
+    //engine.addImportPath("../standalone");
     engine.addImportPath(QApplication::applicationDirPath());
 
-#ifdef DEBUGACQTOOL
-    engine.addImportPath(QApplication::applicationDirPath()+"/Modules");
-#endif
+//#ifdef DEBUGACQTOOL
+    if(DebugAcqTool)
+        engine.addImportPath(QApplication::applicationDirPath() + "/Modules");
+//#endif
 
 #ifdef PICOFLOW//metto questo altrimenti su target non carica il plugin cpp
+    engine.rootContext()->setContextProperty(QLatin1String("platform"), "linux");
     engine.rootContext()->setContextProperty("screenH", 480);
     engine.rootContext()->setContextProperty("screenW", 640);
     engine.rootContext()->setContextProperty("isTouch", bool_true);
@@ -107,9 +117,9 @@ int main(int argc, char *argv[])
 
 #ifdef LINUXDESKTOP
     engine.rootContext()->setContextProperty(QLatin1String("platform"), "linux");
-    engine.rootContext()->setContextProperty("isTouch", bool_false);
     engine.rootContext()->setContextProperty("screenH", 480);
     engine.rootContext()->setContextProperty("screenW", 640);
+    engine.rootContext()->setContextProperty("isTouch", bool_false);
 #endif
 
     engine.rootContext()->setContextProperty("layout", &mngLayout);
@@ -120,9 +130,10 @@ int main(int argc, char *argv[])
     engine.load(QUrl(QStringLiteral("qrc:/main.qml")));
     qDebug() << "engine caricato";
 
-#ifndef DEBUGACQTOOL
-    g_mainAppBridge->setRootObjects(engine.rootObjects());
-#endif
+//#ifndef DEBUGACQTOOL
+    if(DebugAcqTool == false)
+        g_mainAppBridge->setRootObjects(engine.rootObjects());
+//#endif
 //        g_mainAppBridge->m_arguments << argv[3] << argv[4];
 //    }
 

@@ -27,14 +27,14 @@ signals:
 
 public slots:
 
-    bool newAcquisition(QString __dataFile="");
+    bool newAcquisition(QString __dataFile = "");
     void connectToServers();
     void startSupe(QString __mode);
     void endAcquisition();
     void endAcquisitionSave();
     void endAcquisitionDiscard();
     void addMarker(QVariant __key);
-    void addDefiner(bool __startEnd,QVariantList __info);
+    void addDefiner(bool __startEnd, QVariantList __info);
     bool sendStartAcq(void);
     bool sendStopAcq (void);
     void resetAlarms();
@@ -43,7 +43,7 @@ public slots:
 
 private slots:
     bool sendCommand(tcp_flow_bt_cmd_t __command);
-    bool sendCommand(int __command){return sendCommand((tcp_flow_bt_cmd_t)__command);}
+    bool sendCommand(int __command) { return sendCommand((tcp_flow_bt_cmd_t) __command); }
 
 private:
     QStringList m_serversNames,

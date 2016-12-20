@@ -1,6 +1,5 @@
 <RCC>
     <qresource prefix="/">
-        <file>Modules/MComponents</file>
-        <file>Modules/MPlotModule</file>
+        <file>Modules/MComponents</file>        
     </qresource>
 </RCC>

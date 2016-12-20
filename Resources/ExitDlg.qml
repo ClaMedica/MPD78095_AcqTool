@@ -3,11 +3,11 @@ import QtQuick.Controls 1.2
 import QtQuick.Dialogs 1.2
 
 Rectangle {
-    id:exitDlg
+    id: exitDlg
     color: "lightgrey"
-    implicitWidth: 300
+    implicitWidth: 350
     implicitHeight: 150
-    visible:false
+    visible: false
 
     anchors.centerIn: parent
 
@@ -15,40 +15,36 @@ Rectangle {
         volResDlg.visible = false
     }
 
-    Rectangle{
-        color:"dodgerblue"
-        implicitWidth: 300
+    Rectangle {
+        color: "dodgerblue"
+        implicitWidth: 350
         implicitHeight: 25
         Text{
             anchors.horizontalCenter: parent.horizontalCenter
             anchors.verticalCenter: parent.verticalCenter
             text:qsTr("close")
         }
-
         anchors.top: parent.top
-
     }
 
-    Row{
+    Row {
         spacing:20
         anchors.centerIn: parent
         focus: true
-
         Text{
             id: text
             text:qsTr("Do you want save changes?")
         }
-
     }
 
     Button {
         id:btnYes
         text: qsTr("Yes")
-        anchors.right: parent.right
+        anchors.left: parent.left
         anchors.bottom: parent.bottom
         anchors.bottomMargin: 10
-        anchors.rightMargin: 2*width + 30
-
+        anchors.leftMargin: 10
+        width: (parent.width - 4*10) / 3
         onClicked: {
             exitDlg.visible = false
             mngData.toSave = "yes"
@@ -59,11 +55,10 @@ Rectangle {
     Button {
         id:btnNo
         text: qsTr("No")
-        anchors.right: parent.right
+        anchors.horizontalCenter: parent.horizontalCenter
         anchors.bottom: parent.bottom
         anchors.bottomMargin: 10
-        anchors.rightMargin: width + 20
-
+        width: (parent.width - 4*10) / 3
         onClicked: {
             exitDlg.visible = false
             mngData.toSave = "no"
@@ -78,12 +73,10 @@ Rectangle {
         anchors.bottom: parent.bottom
         anchors.bottomMargin: 10
         anchors.rightMargin: 10
-
+        width: (parent.width - 4*10) / 3
         onClicked: {
             exitDlg.visible = false
             mngData.toSave = ""
         }
     }
-
 }
-

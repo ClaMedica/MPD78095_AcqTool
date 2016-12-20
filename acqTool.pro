@@ -1,9 +1,9 @@
 TEMPLATE = app
-TARGET = acqTool
+#TARGET = acqTool
+TARGET = PicoAcq
 QT += qml quick widgets sql network multimedia xml core serialport
 
 RESOURCES += Resources/qml.qrc
-
 
 DEFINES += QT_MESSAGELOGCONTEXT
 #debug campioni di acquisizione
@@ -80,7 +80,7 @@ INCLUDEPATH +=  CPP \
                 ../MGlobal \
                 ../SuperFlowBt \
                 ../DataFileManager \
-                ../SupeFlowBT \
+                ../SupeFlowBT
 
 # Default rules for deployment.
 include(deployment.pri)
@@ -92,19 +92,18 @@ else:win32:CONFIG(debug, debug|release): LIBS += -L$$PWD/../Build/AnaUro7Build/d
 #DEPENDPATH += $$PWD/../Build/DataBuild/release
 
 contains(ANDROID_TARGET_ARCH,armeabi-v7a) {
-DEFINES += ANDROID
-QT += androidextras
-    ANDROID_EXTRA_LIBS = \
-        $$PWD/../Build/Emulator/DataBuild/libDatafileManager.so \
-        $$PWD/../Build/Emulator/MPlotModule/libQmlPlotter.so
+    DEFINES += ANDROID
+    QT += androidextras
+        ANDROID_EXTRA_LIBS = \
+            $$PWD/../Build/Emulator/DataBuild/libDatafileManager.so \
+            $$PWD/../Build/Emulator/MPlotModule/libQmlPlotter.so
 
-ANDROID_PACKAGE_SOURCE_DIR = $$PWD/android-sources
+    ANDROID_PACKAGE_SOURCE_DIR = $$PWD/android-sources
 
-unix:!macx: LIBS += -L$$PWD/../../build/DatafileManager/Debug/Desktop_Qt_5_5_1_GCC_64bit -lDatafileManager
+    unix:!macx: LIBS += -L$$PWD/../../build/DatafileManager/Debug/Desktop_Qt_5_5_1_GCC_64bit -lDatafileManager
 
-#INCLUDEPATH += $$PWD/../Build/Emulator/DataBuild
-#DEPENDPATH += $$PWD/../Build/Emulator/DataBuild
-
+    #INCLUDEPATH += $$PWD/../Build/Emulator/DataBuild
+    #DEPENDPATH += $$PWD/../Build/Emulator/DataBuild
 }
 
 #percorso tecnoideal
@@ -112,9 +111,9 @@ unix:!macx: LIBS += -L$$PWD/../../build/DatafileManager/Debug/Desktop_Qt_5_5_1_G
 #percorso acer luca
 #rootPath = C:\Users\Mez
 #percorso claudia
-rootPath = E:\Piattaforma70
 
-win32{
+win32 {
+    rootPath = E:\Piattaforma70
     #creo la cartella da copiare in giro
     #plugin.path = $${rootPath}\Lavoro\Software\Build\StandAlone
     #claudia
@@ -122,22 +121,22 @@ win32{
     plugin.files += $$shell_path($$OUT_PWD)\release\acqTool.exe
     INSTALLS += plugin
 
-win32:CONFIG(release, debug|release): LIBS += -L$$PWD/../Build/DataBuild/release/ -lDatafileManager
-else:win32:CONFIG(debug, debug|release): LIBS += -L$$PWD/../Build/DataBuild/debug/ -lDatafileManager
+    win32:CONFIG(release, debug|release): LIBS += -L$$PWD/../Build/DataBuild/release/ -lDatafileManager
+    else:win32:CONFIG(debug, debug|release): LIBS += -L$$PWD/../Build/DataBuild/debug/ -lDatafileManager
 
-INCLUDEPATH += $$PWD/../Build/DataBuild/release
-DEPENDPATH += $$PWD/../Build/DataBuild/release
+    INCLUDEPATH += $$PWD/../Build/DataBuild/release
+    DEPENDPATH += $$PWD/../Build/DataBuild/release
 }
-unix{
-DEFINES += TAR
+
+unix {
+    DEFINES += TAR
 }
 #unix:!macx: LIBS += -L$$PWD/../Build/DataFileManager/ -lDatafileManager
 
 #INCLUDEPATH += $$PWD/../Build/DataFileManager
 #DEPENDPATH += $$PWD/../Build/DataFileManager
 
-unix:!macx: LIBS += -L$$PWD/../Build-Linux/DatafileManager -lDatafileManager
-
+#unix:!macx: LIBS += -L$$PWD/../Build-Linux/DatafileManager -lDatafileManager
 
 #tastiera virtuale
 CONFIG += link_pkgconfig
@@ -153,46 +152,44 @@ CONFIG += link_pkgconfig
 #}
 
 LINUXDESKTOP {
-        DEFINES += LINUXDESKTOP
-        DEFINES += LINUX
-        TARGET = PicoAcq
-        RESOURCES += modules_LinuxDesktop.qrc
-	RESOURCES += Resources/Icone/icons.qrc
+    DEFINES += LINUXDESKTOP
+    DEFINES += LINUX
+    TARGET = PicoAcq
+    RESOURCES += modules_LinuxDesktop.qrc
+    RESOURCES += Resources/Icone/icons.qrc
 
     #datafile manager
     LIBS        += -L$$PWD/../Build-Linux/DatafileManager -lDatafileManager
     INCLUDEPATH +=   $$PWD/../Build-Linux/DatafileManager
     DEPENDPATH  +=   $$PWD/../Build-Linux/DatafileManager
 
-	# Additional import path used to resolve QML modules in Qt Creator's code model
-	QML_IMPORT_PATH = ../MGlobal \
-        QML_IMPORT_PATH +=  Modules
+    # Additional import path used to resolve QML modules in Qt Creator's code model
+    QML_IMPORT_PATH = ../MGlobal \
+    QML_IMPORT_PATH +=  Modules
 
-        DISTFILES += ../MGlobal/MComponents/* \
-                     ../MGlobal/MComponents/Images/* \
+    DISTFILES += ../MGlobal/MComponents/* \
+                 ../MGlobal/MComponents/Images/* \
 }
 
-#PICOFLOW {
-#	DEFINES += PICOFLOW
-#	TARGET = PicoAcq
-#	RESOURCES += modules_picoflow.qrc
-#	RESOURCES += Resources/Icone/icons.qrc
+PICOFLOW {
+    DEFINES += PICOFLOW
+    TARGET = PicoAcq
+    RESOURCES += modules_picoflow.qrc
+    RESOURCES += Resources/Icone/icons.qrc
 
+    LIBS        += -L$$PWD/../Build-IMX6/DatafileManager/ -lDatafileManager
+    INCLUDEPATH +=   $$PWD/../Build-IMX6/DatafileManager
+    DEPENDPATH  +=   $$PWD/../Build-IMX6/DatafileManager
 
-#	#unix:!macx: LIBS += -L$$PWD/../Build-IMX6/DatafileManager/ -lDatafileManager
-
-#	INCLUDEPATH += $$PWD/../Build-IMX6/DatafileManager
-#	DEPENDPATH += $$PWD/../Build-IMX6/DatafileManager
-
-#	# Additional import path used to resolve QML modules in Qt Creator's code model
-#	QML_IMPORT_PATH = ../MGlobal \
-#		          ../Build-IMX6/CommonPlugin
-#	DISTFILES += ../MGlobal/MComponents/* \
-#		     ../MGlobal/MComponents/Images/*
-#}
+    # Additional import path used to resolve QML modules in Qt Creator's code model
+    QML_IMPORT_PATH = ../MGlobal \
+                      ../Build-IMX6/CommonPlugin
+    DISTFILES += ../MGlobal/MComponents/* \
+                 ../MGlobal/MComponents/Images/*
+}
 
 #per debugare solo acqtool
-DEFINES += DEBUGACQTOOL
+#DEFINES += DEBUGACQTOOL
 
 
 

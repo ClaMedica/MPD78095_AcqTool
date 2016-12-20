@@ -10,14 +10,16 @@
 #include <QtMessageHandler>
 #include <QtNetwork>
 
-class SimpleTCPChannel : public QObject{
+class SimpleTCPChannel : public QObject {
     Q_OBJECT
 
 public:
     /**
      * Basic constructor. It sets TCP server to be listening on currentPort.
      */
-    explicit SimpleTCPChannel(QHostAddress __address = QHostAddress::LocalHost, int __currentPort = 2000, QObject *__pParent = 0);
+    explicit SimpleTCPChannel(QHostAddress __address = QHostAddress::LocalHost,
+                              int __currentPort = 2000,
+                              QObject *__pParent = 0);
 
     ~SimpleTCPChannel();
 
@@ -40,8 +42,8 @@ public:
      */
     QTcpSocket* getQTcpSocket();
 
-    QHostAddress serverAddress(){return m_address;}
-    int serverPort(){return m_port;}
+    QHostAddress serverAddress() { return m_address; }
+    int serverPort() { return m_port; }
 
     void setServerAddress(QHostAddress __address);
     void setServerAddress(QString __address);

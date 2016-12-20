@@ -24,17 +24,16 @@ MForm {
 
 
     //@@@@@@@@@@    Functions      @@@@@@@@@@
-    function clickButtonSameAna(btnId){
-        for (var i=0; i<pagesSameAna.length; i++){
+    function clickButtonSameAna(btnId) {
+        for (var i = 0; i < pagesSameAna.length; i++) {
             if (pagesSameAna[i].visible)
                 pagesSameAna[i].visible = false;
         }
         pagesSameAna[btnId].visible = true;
-
     }
 
     function clickButton(btnId){
-        for (var i=0; i<pagesLocal.length; i++){
+        for (var i = 0; i < pagesLocal.length; i++) {
             if (pagesLocal[i].visible)
                 pagesLocal[i].visible = false;
         }
@@ -65,7 +64,7 @@ MForm {
             var firstPageSameAna = pagesSameAna.length
 
             //salto la 0 perchè è la media
-            for (var i=1; i<mngData.getNumAnaFlwAdv(); i++)
+            for (var i = 1; i < mngData.getNumAnaFlwAdv(); i++)
             {
                 if (mngData.getNumAnaFlwAdv() === 2)
                     namePage = "Flow"
@@ -277,11 +276,9 @@ MForm {
                     //btnLeftMargin += 110
                     pagesLocal.push(SQA)
                 }
-
             }
 
             pagesSameAna[firstPageSameAna].visible = true
-
         }
     }
 
@@ -296,12 +293,14 @@ MForm {
         anchors.rightMargin: 10
         width:parent.width*0.2
         height:parent.height*0.08
-        onClicked: {
+        onClicked: {            
+            for (var i = 0; i < pagesLocal.length; i++) {
+                if (pagesLocal[i].visible)
+                    pagesLocal[i].visible = false;
+            }
             forAna.visible = true
-            resultForm.visible = false            
+            resultForm.visible = false
         }
     }
-
-
 }
 

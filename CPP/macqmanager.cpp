@@ -77,7 +77,7 @@ void MAcqManager::dataOnTCP(QObject *__pParent, SimpleTCPClient *__pTCP, QByteAr
 bool MAcqManager::newAcquisition(QString __dataFile)
 {
     if(m_acqFileOpened) {
-        ;   //sono giA  in acquisizione e voglio farne partire un altra...strano ma
+        ;   //sono gia' in acquisizione e voglio farne partire un altra
     }
     else {
         qDebug() << "carico la configurazione per l'acquisizione";
@@ -92,7 +92,6 @@ bool MAcqManager::newAcquisition(QString __dataFile)
 
         //carico info di connettivitA
         loadConnectivityInfo(m_configAcq.getSafeChild(XML_CONNECTIONS));
-
 
         /* non sono in acquisizione e quindi posso lanciarne una nuova aprendo il file e leggendo le info
          * oppure pescandole dal file di configurazione
@@ -117,7 +116,12 @@ bool MAcqManager::newAcquisition(QString __dataFile)
 
         m_acqFileOpened = true;     //mi segno che ho aperto il file
 
+        m_acqFinished = false;
+
         //popoliamo la lista dei canali prenotati
+
+        m_channelNames.clear(); // #################################################
+
         for(int i = 0; i < m_mng->GetChanNum(); i++)
             m_channelNames.append(m_mng->GetChanName(i));
 
@@ -137,7 +141,8 @@ bool MAcqManager::newAcquisition(QString __dataFile)
         handleDataFile();
 
         //ripristino il file in acquisizione
-        qDebug() << "Continue ..." << m_mng->Continue();
+        bool res = m_mng->Continue();
+        qDebug() << "Continue ..." << res;
 
         //inizializzo i server di comunicazione con i plotter
         initializeServers();
@@ -147,8 +152,6 @@ bool MAcqManager::newAcquisition(QString __dataFile)
 
         //mi connetto ai server del supe e del programma di gestione archivi
         connectToServers();
-
-
     }
     //faccio partire il timer per l'allarme di stato
     //m_alarmMng.startTimeoutAlarm();
@@ -172,7 +175,7 @@ void MAcqManager::connectToServers()
         qDebug() << "Retrying to connect in 2 seconds...";
 
     if(m_tcpAttempts >= 10) {
-        qDebug()<<"Restarting supervisor...";
+        qDebug() << "Restarting supervisor...";
 
         if(m_superProcess != NULL) {
             m_superProcess->close();
@@ -188,8 +191,6 @@ void MAcqManager::connectToServers()
 
     m_tcpAttempts++;
 }
-
-
 
 void MAcqManager::startSupe(QString __mode)
 {
@@ -268,13 +269,16 @@ void MAcqManager::endAcquisition()
                      << client->hostPort();
     }
 
-    qDebug() << "statoooooo " << m_mng->GetState();
+    qDebug() << "stato:" << m_mng->GetState();
 
     if(m_acqFileOpened) {   //se siamo in acq facciamo un commit
-        qDebug() << "Commit Values?" << m_mng->CommitValues();
+        qDebug() << m_mng->GetFileName() << m_mng->GetFileType() << m_mng->GetChanNum() ;
+        bool cvres = m_mng->CommitValues();
+        qDebug() << "Commit Values?" << cvres;
     }
 
-    qDebug() << "File closed?" << m_mng->Close();
+    bool ret = m_mng->Close();
+    qDebug() << "File closed?" << ret;
 
     //    foreach (SimpleTCPChannel *channel, m_tcpChannels) {
     //        //mi disconnetto dal resto
@@ -366,7 +370,6 @@ void MAcqManager::updateAcqData()
     QString eType = "&" + type;
 
     foreach(QString currentPlot, plotNames) {
-
         m_acqMarkerList << sGroup;
         m_acqMarkerList << currentPlot;
 
@@ -386,7 +389,6 @@ void MAcqManager::updateAcqData()
 
 void MAcqManager::handleTCP(SimpleTCPClient *__client, QByteArray __block)
 {
-
     if(m_tcpClients.values().contains(__client)) {
         QString who = m_tcpClients.key(__client);
         //qDebug()<<who<<__block;
@@ -422,6 +424,7 @@ void MAcqManager::handleTCP(SimpleTCPClient *__client, QByteArray __block)
                     m_bufferMap[hwc]->remove(0, m_frameMap[hwc]);
             }
 
+            qDebug() << "m_saving:" << m_saving << "m_autoStartStop:" << m_autoStartStop;
             if(!m_saving) {
                 if(m_autoStartStop)
                     checkAutomaticStartStop("Start");   //finche' non devo salvare riempo il buffer e controllo
@@ -472,8 +475,8 @@ bool MAcqManager::loadConnectivityInfo(Ancestry *__info)
         qDebug() << name << address << port;
     }
 
-    qDebug()<<"Loaded clients:"<<m_tcpClients.keys();
-    qDebug()<<"Loaded channels:"<<m_tcpChannels.keys();
+    qDebug() << "Loaded clients:" << m_tcpClients.keys();
+    qDebug() << "Loaded channels:" << m_tcpChannels.keys();
     return true;
 }
 
@@ -586,7 +589,7 @@ void MAcqManager::checkAutomaticStartStop(QString __which)
             Ancestry *childDur = condition->getSafeChild(XML_DURATION);
             Ancestry *childVal = condition->getSafeChild(XML_VALUE);
 
-            //per prima cosa controlliamo quanti campioni A?
+            //per prima cosa controlliamo quanti campioni ha
             int min = childDur->getSafeChild(ATT_MIN)->getSafeAttribute(ATT_VALUE).toUInt();
 
             qreal valMin = childVal->getSafeChild(ATT_MIN)->getSafeAttribute(ATT_VALUE).toDouble();
@@ -625,8 +628,10 @@ void MAcqManager::checkAutomaticStartStop(QString __which)
 }
 
 void MAcqManager::saveBuffersToFile()
-{//qui so che ho giA  spedito i campioni al plot per cui salvo sul file ed elimino i campioni dal buffer per sempre
+{
+    //qui so che ho gia'  spedito i campioni al plot per cui salvo sul file ed elimino i campioni dal buffer per sempre
 
+    qDebug() << "saveBuffersToFile() m_dataChanNameMap:" << m_dataChanNameMap;
     foreach (QString chanName, m_dataChanNameMap.keys()) {
         int size = chanName.size();
         QString type,number;
@@ -639,7 +644,7 @@ void MAcqManager::saveBuffersToFile()
         }
 
         if(!m_channelMap.contains(type) || (number.toInt() < 1) || number.isEmpty())
-            qCritical() << type<<number << "Not recognized";
+            qCritical() << type << number << "Not recognized";
 
         int index = number.toInt() - 1;
         int32_t chanNum = m_dataChanNameMap[chanName];
@@ -649,6 +654,7 @@ void MAcqManager::saveBuffersToFile()
         while(m_channelMap[type].at(index)->size() > 0) {
             float v = m_channelMap[type].at(index)->takeFirst();
             m_mng->AppendValue(&chanNum, &v, 1);
+            qDebug("AppendValue(chanNum:%d v:%f),chanNum,v)",chanNum,v);
         }
     }
     //qDebug()<<"Salvooo"<<m_mng->GetDuration();
@@ -696,8 +702,9 @@ void MAcqManager::sendBuffersToPlot()
                 out << channels[i].takeFirst();
             }
         }
+        qDebug() << "block[" << block.size() << "]:" << block;
         if(m_tcpChannels.keys().contains(plotName))
-            m_tcpChannels[plotName]->sendData(block.data(),block.size());
+            m_tcpChannels[plotName]->sendData(block.data(), block.size());
         else
             qCritical() << "No server of name" << plotName;
     }
@@ -719,7 +726,7 @@ bool MAcqManager::handleDataFile()
     int maxChan = m_mng->GetChanNum();
     for(int i = 0; i < maxChan; i++) {
         QString chanName = m_mng->GetChanName(i);
-        //qDebug()<<chanName;
+        qDebug() << "handleDataFile(): chanName:" << chanName;
         foreach (Ancestry *channel, channels->getChildren()) {
             if(channel->getChild(XML_NAME) != NULL)
                 if(chanName.contains(channel->getTextOfChild(XML_NAME))) {
@@ -734,14 +741,14 @@ bool MAcqManager::handleDataFile()
         //mi fido del software archivio pazienti
         if(m_mng->GetLoc(i) == "a")
             m_autoStartStop = true;
-        //qDebug()<<m_mng->GetGain(i)<<m_mng->GetOffset(i);
+        qDebug() << "handleDataFile(): GetGain,GetOffset:" << m_mng->GetGain(i) << m_mng->GetOffset(i);
     }
 
-    //qDebug()<<"stato"<<m_mng->GetState();
-    qDebug() << "Commit Parameters?" << m_mng->CommitParameters();
-    qDebug() << "Close?" << m_mng->Close();
-    qDebug() << "Open?" << m_mng->Open();
-    qDebug() << "Get Parameters?" << m_mng->GetParameters();
+//    //qDebug()<<"stato"<<m_mng->GetState();
+//    qDebug() << "Commit Parameters?" << m_mng->CommitParameters();
+//    qDebug() << "Close?" << m_mng->Close();
+//    qDebug() << "Open?" << m_mng->Open();
+//    qDebug() << "Get Parameters?" << m_mng->GetParameters();
     return true;
 }
 
@@ -850,13 +857,14 @@ void MAcqManager::fillBuffers(QByteArray __block)
         //qDebug()<<currChan;
 
         if((currChan < maxNumChan) && (currChan >= 0)) {    //se e' un canale con del senso
-            for(int i = 0; i < numChanData; i++) {
-                in >> sample;
-                if(m_bufferMap.keys().contains(QString::number(currChan)))
+            if(m_bufferMap.keys().contains(QString::number(currChan)))
+                for(int i = 0; i < numChanData; i++) {
+                    in >> sample;
                     m_bufferMap[QString::number(currChan)]->append(sample);
-                else
-                    qCritical() << "Channel non recognized" << m_bufferMap.keys() << currChan;
-            }
+                    qDebug("samples(ch:%d, nd:%d):%f",currChan,numChanData,sample);
+                }
+            else
+                qCritical() << "Channel non recognized" << m_bufferMap.keys() << currChan;
             qDebug() << currChan << m_bufferMap[QString::number(currChan)]->size();
         }
         else
@@ -869,9 +877,9 @@ bool MAcqManager::buffersReady()
 {
     // questa funzione controlla se i miei buffer sono pronti
     // controllo se hanno abbastanza campioni per fare le operazioni e
-    // contrmporaneamente restituire un frame
+    // contemporaneamente restituire un frame
 
-    foreach(QString hwchan, m_totalHWChan){
+    foreach(QString hwchan, m_totalHWChan) {
         if(m_bufferMap[hwchan]->size() < (m_bufSizeMap[hwchan] + m_frameMap[hwchan])) {
             qDebug() << hwchan << "buffer non pronto con" << m_bufferMap[hwchan]->size() << "<" << m_bufSizeMap[hwchan] + m_frameMap[hwchan];
             return false;
@@ -889,7 +897,7 @@ bool MAcqManager::readConfigurationFile()
     //in questa funzione leggo il file di configurazione e mi annoto le info che mi servono
     qDebug() << "Inizio a leggere il file di configurazione";
 
-    int fmin = INF;
+    int fmin = 0x7fffffff;  // INF;
     Ancestry *channels = m_configAcq.getSafeChild(XML_CHANNELS);
     qDebug() << "Trovati" << channels->getChildren().size() << "canali";
 

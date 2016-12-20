@@ -303,7 +303,8 @@ bool MAbstractManager::load()
     if(!m_configMarkers.loadFromXML(":/Config/markers.xml"))
         qCritical() << "Error on user configuration file";
 
-    return buildMarkerInfoMap();
+    bool res = buildMarkerInfoMap();
+    return res;
 }
 
 QString MAbstractManager::plotConfigFileName()

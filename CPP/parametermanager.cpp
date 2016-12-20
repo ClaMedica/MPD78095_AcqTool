@@ -98,7 +98,7 @@ void ParameterManager::setCurAnalysis(QString __cur)
     if(m_curAnalysis != __cur) {
         m_curAnalysis = __cur;
         if(!m_parameterMap.contains(__cur)) {
-            qDebug() << "ParameterManager::setType curAnalysis not recognized";
+            qDebug() << "setType curAnalysis not recognized";
             return;
         }
         m_current = m_parameterMap[__cur];

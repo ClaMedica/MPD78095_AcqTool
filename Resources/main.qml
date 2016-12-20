@@ -31,7 +31,7 @@ ApplicationWindow {
 
     function launchDEBUG(mode,dataFile)
      {
-         console.log("launch(mode,dataFile)", mode, dataFile)
+         console.log("launchDEBUG(mode,dataFile)", mode, dataFile)
 
          if(mode === "acq")
          {
@@ -61,9 +61,9 @@ ApplicationWindow {
      }
 
     //@@@@@@@@@@    Events          @@@@@@@@@@
-     Component.onCompleted:{
+     Component.onCompleted: {
          console.log("debug??? ", Qt.application.arguments[3])
-         if (Qt.application.arguments[3] === "debug"){
+         if (Qt.application.arguments[3] === "debug") {
              root.visible = true
              launchDEBUG(Qt.application.arguments[1],Qt.application.arguments[2])
          }
@@ -77,10 +77,10 @@ ApplicationWindow {
         {
             console.log("Start new acq")
             mngAcq.load()
-            mngAcq.newAcquisition(dataFile)            
+            mngAcq.newAcquisition(dataFile)
             forReal.setMarkersInfo(mngAcq.markersInfo("type", [1, 6]))
             forReal.configurationFile = mngAcq.plotConfigFileName()
-            forReal.displayMessage("Wait for inizialization...", -1)
+            forReal.displayMessage("Aspetta e spera", -1)    //"Wait for initialization..."
             forHome.whoIsVisible = forReal.name
             forReal.setAcqInfo(mngData.acqInfo())
         }
@@ -102,12 +102,16 @@ ApplicationWindow {
     }
 
     //@@@@@@@@@@    Objects         @@@@@@@@@@
-    Connections{
-        id:connMainApp
-        target:bridgeMain
-        ignoreUnknownSignals:true
-        onNewAcquisition:launch("acq",datafile)
-        onNewVisualization:launch("vis",datafile)
+    Connections {
+        id: connMainApp
+        target: bridgeMain
+        ignoreUnknownSignals: true
+        onNewAcquisition: launch("acq",datafile)
+        onNewVisualization:
+        {
+            console.log(datafile);
+            launch("vis",datafile)
+        }
     }
 
 
@@ -129,10 +133,10 @@ ApplicationWindow {
         id:mngData
 
         //@@@@@@@@@@    Events          @@@@@@@@@@
-        onLoadingCompleted:{
-            forAna.configurationFile=mngData.plotConfigFileName()
+        onLoadingCompleted: {
+            forAna.configurationFile = mngData.plotConfigFileName()
             forAna.populate()
-            forHome.whoIsVisible=forAna.name
+            forHome.whoIsVisible = forAna.name
         }
 
         onReloadingCompleted: forAna.populate()
@@ -156,7 +160,6 @@ ApplicationWindow {
             exit.visible = true;
         }
 
-
         Component.onCompleted: console.log("MDataManager Ready!")
     }
 
@@ -169,7 +172,7 @@ ApplicationWindow {
     }
 
 
-    AnalysisForm{
+    AnalysisForm {
         //@@@@@@@@@@    Properties      @@@@@@@@@@
         id: forAna
         anchors.fill: parent
@@ -177,7 +180,7 @@ ApplicationWindow {
         whoIsVisible:forHome.whoIsVisible
 
         //@@@@@@@@@@    Events          @@@@@@@@@@
-        onBack: forHome.whoIsVisible=forHome.name
+        onBack: forHome.whoIsVisible = forHome.name
     }
 
 

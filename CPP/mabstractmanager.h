@@ -24,13 +24,12 @@ class MAbstractManager : public QObject
 {
     Q_OBJECT
 
-
 public:
     explicit MAbstractManager(QObject *parent = 0);
     ~MAbstractManager();
 
-    Q_INVOKABLE QVariantList markersInfo(QString __filterType="",
-                                         QVariantList __filterValues=QVariantList());
+    Q_INVOKABLE QVariantList markersInfo(QString __filterType = "",
+                                         QVariantList __filterValues = QVariantList());
     Q_INVOKABLE QVariantList commandsInfo();
     Q_INVOKABLE QVariantList definersInfo();
     Q_INVOKABLE QVariantList acqInfo();
@@ -40,23 +39,23 @@ signals:
 public slots:
     bool load(void);
     QString plotConfigFileName();
-    QString patientInfo(){return m_patientName;}
+    QString patientInfo() { return m_patientName; }
 
 
 protected:
     QString m_applicationPath,
-    m_patientName;//nome e altre info paziente
+    m_patientName;                      //nome e altre info paziente
 
     DatafileManager *m_mng;
     Analyze *m_ana;
 
-    QMap<QVariant,VarMap> m_markerMap;//mappa di tutti i possibili marker ordinati per key
-    QMap<int,int> m_analysisMap;//mappa le analisi associate all'esame con i definitori
+    QMap<QVariant,VarMap> m_markerMap;  //mappa di tutti i possibili marker ordinati per key
+    QMap<int,int> m_analysisMap;        //mappa le analisi associate all'esame con i definitori
 
-    QMap<QString,QStringList>   m_chanInPlots;//associa nome plot ad una mappa con cui ripescare il buffer
-    QMap<QString,int32_t> m_dataChanNameMap;//associa il nome del canale al suo indice
-    QMap<QString,SimpleTCPChannel *> m_tcpChannels;//canali di comunicazione verso l'esterno
-    Ancestry m_configLocale,    //A? la prima ad essere caricata e contiene la lingua
+    QMap<QString, QStringList>   m_chanInPlots;  //associa nome plot ad una mappa con cui ripescare il buffer
+    QMap<QString, int32_t> m_dataChanNameMap;    //associa il nome del canale al suo indice
+    QMap<QString, SimpleTCPChannel *> m_tcpChannels;    //canali di comunicazione verso l'esterno
+    Ancestry m_configLocale,    //e' la prima ad essere caricata e contiene la lingua
     m_configMarkers,            //contiene le info per i marker
     m_configUser;               //contiene le info modificate dall'utente
 
@@ -66,8 +65,6 @@ protected:
 
     bool buildConfigurationFile();
     bool buildMarkerInfoMap();
-
-
 };
 
 #endif // MABSTRACTMANAGER_H
