@@ -273,6 +273,14 @@ QVariantList MAbstractManager::acqInfo()
 {
     QVariantList list;
 
+    //esci senza salvare
+    list << "$GridElement";
+    list << "descr" << tr("discard");
+    list << "img" << "qrc:/discard";
+    list << "key" << 116;
+    list << "visible" << true;
+    list << "&GridElement";
+
     //salva e chiudi
     list << "$GridElement";
     list << "descr" << tr("save&exit");

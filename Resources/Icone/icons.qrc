@@ -22,5 +22,8 @@
         <file>zoom_out_click.jpg</file>
         <file>zoom_out_off.jpg</file>
         <file>cmDefFlo.jpg</file>
+        <file>discard.png</file>
+        <file>discard_click.png</file>
+        <file>discard_off.png</file>
     </qresource>
 </RCC>

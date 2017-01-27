@@ -207,6 +207,12 @@ MForm{
                     mngAcq.endAcquisitionSave()
                     timClose.start(1000);
                 }
+                if (value === "116") {
+                    mngAcq.sendStopAcq()
+                    plot.stopAll()
+                    mngAcq.endAcquisitionDiscard()
+                    timClose.start(1000);
+                }
 
                 break;
             }
