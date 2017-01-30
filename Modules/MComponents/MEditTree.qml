@@ -33,9 +33,6 @@ Rectangle{
         anchors.fill:parent
         contentHeight: anctree.height
         contentWidth: anctree.width
-//        verticalScrollBarPolicy :Qt.ScrollBarAlwaysOff
-//        horizontalScrollBarPolicy :Qt.ScrollBarAlwaysOff
-//        contentItem: anctree
 
     MAncestry {
         id:anctree

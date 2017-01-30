@@ -4,10 +4,11 @@ import QtQuick.Controls 1.2
 import MComponents 1.0
 Rectangle {
     id: rootDialogYesNo
-    height:screenH*0.5
-    width:screenW*0.5
+    height:screenH*0.4
+    width:screenW*0.4
     anchors.centerIn: parent
     visible: false
+    color : layout.value("BackgroundColor")
     property string message: "Message"
     property string yesText:"Yes"
     property string noText:"No"
@@ -29,9 +30,9 @@ Rectangle {
         anchors.right:parent.right
         height:parent.height*0.7
         text: message
-        horizontalAlignment: Text.AlignLeft        
-        labelSize: 4
-        verticalAlignment: Text.AlignTop
+        horizontalAlignment: Text.AlignHCenter
+        labelSize: layout.value("F4")
+        verticalAlignment: Text.AlignVCenter
         wrapMode: Text.WordWrap
     }
 
@@ -43,7 +44,7 @@ Rectangle {
         width: parent.width/2.1
         anchors.margins: parent.height*0.01
         text: qsTr("Yes")
-        labelSize: 3
+        labelSize: layout.value("F4")
         onClicked:accepted()
     }
 
@@ -55,7 +56,7 @@ Rectangle {
         width: parent.width/2.1
         anchors.margins: parent.height*0.01
         text: qsTr("No")
-        labelSize: 3
+        labelSize: layout.value("F4")
         onClicked:rejected()
     }
 }

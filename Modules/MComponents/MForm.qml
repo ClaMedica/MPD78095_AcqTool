@@ -6,12 +6,15 @@ import QtQuick.Window 2.2
 import QtQuick.Controls.Styles 1.3
 import MComponents 1.0
 
+import QtQuick.VirtualKeyboard 1.0
+
 Rectangle{
     id:rootForm
     property string title:"title"
     property string name:"name"
     property string whoIsVisible:"none"
     property var keyboard:appKey
+    property var keyboardNum:appKeyNum
     property var brothersVis:[]
     signal closing
     signal shown
@@ -53,6 +56,44 @@ Rectangle{
 
     MKeyboard{
         id:appKey
-        visible:false
+        y: parent.height
+        anchors.left: parent.left
+        anchors.right: parent.right
+        visible: false
     }
+
+    MKeyboardNum {
+        id: appKeyNum
+        visible: false
+    }
+
+    //per la tastiera virtuale
+ //   InputPanel {
+//        id: inputPanel
+//        z: 99
+//        y: parent.height
+//        anchors.left: parent.left
+//        anchors.right: parent.right
+//       // visible: false
+//        states: State {
+//            name: "visible"
+//            when: Qt.inputMethod.visible
+//            PropertyChanges {
+//                target: inputPanel
+//                y: parent.height - inputPanel.height
+//            }
+//        }
+//        transitions: Transition {
+//            from: ""
+//            to: "visible"
+//            reversible: true
+//            ParallelAnimation {
+//                NumberAnimation {
+//                    properties: "y"
+//                    duration: 150
+//                    easing.type: Easing.InOutQuad
+//                }
+//            }
+//        }
+//    }
 }

@@ -38,7 +38,7 @@ Rectangle{
 
         color: "white"
         text: itemData.value
-        labelSize: layout.value("F3")
+        labelSize: layout.value("F4")
         horizontalAlignment: Text.AlignLeft
     }
 

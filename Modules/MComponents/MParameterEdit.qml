@@ -13,12 +13,13 @@ Rectangle {
     property var model //contiene un modello per il componente
     property real viewPerc:0.6 //indica quanto spazio occupa la label
     property bool labelFirst:true
-    property int labelSize:2//punti percentuali dello schermo
+    property int labelSize:5//punti percentuali dello schermo
     property string unit:""
     property bool created:false
     property bool editable:true
     property color labelColor:"black"//colore della role
     property var beginInfo:undefined//è il valore che ha la info la prima volta
+    property bool keyboardAlfaNum: true
     readonly property int currentIndex:type===typComboBox && component!=undefined?component.currentIndex:-1
     readonly property string typTextField:"TextField"
     readonly property string typComboBox: "ComboBox"
@@ -34,6 +35,10 @@ Rectangle {
     onTypeChanged: reload()
     height:100
     width:300
+
+    signal openKeyboard
+
+
     onComponentChanged: if(component!==undefined)connection.target=component
 
     function reload()
@@ -46,34 +51,38 @@ Rectangle {
 
     Connections{
         id:connection
-        //target:rootParEdit.component
+        //target: viene assegnato dal rootParEdit in onComponentChanged
         ignoreUnknownSignals: true
         onInfoChanged:{
-            if(component===undefined)
+            if(target===undefined)
                 return
             rootParEdit.info=connection.target.info
         }
+
+
         onFocusChanged:
         {
-            //console.log("cambio di ",target.focus,isTouch)
+          //console.log("cambio di ",target.focus,isTouch)
             if(target.focus && isTouch)
             {
                 var c
-                if(keyboard===undefined){
-                    console.log("creiamo questa tasteira")
-                    c=Qt.createQmlObject('import MComponents 1.0;
-                                      MKeyboard {}',rootApp);
-                    c.destroyWhenOK=true
-                }
+                if (keyboardAlfaNum)
+                    c = keyboard
                 else
-                    c=keyboard
+                    c = keyboardNum
 
-                c.target=component
-                DataEngine.putItemOnTop(c)
-                c.show()
+                if (c !== undefined)
+                {
+                    c.target = connection.target
+                    DataEngine.putItemOnTop(c)
+                    if (rootParEdit.type === typTextField)
+                        c.testo = connection.target.text
+                    c.show()
+                }
             }
         }
     }
+
 
     onModelChanged: if(created)loadModel(model)
 
@@ -81,7 +90,7 @@ Rectangle {
         if(__info!==undefined)
         {
             if(created){
-                //console.log(__info)
+                //console.log("NUOVE INFO",__info)
                 switch(type){
                 case typTextField:component.text        =__info.toString();break;
                 case typComboBox :component.currentIndex=component.find(__info.toString());break;
@@ -119,6 +128,7 @@ Rectangle {
             return
 
         //console.log(role,"carico il modello",__model)
+
         switch(rootParEdit.type){
         case typTextField:
             component.placeholderText = model[0]
@@ -129,7 +139,7 @@ Rectangle {
             break;
         case typComboBox:
             component.model=model
-            component.currentIndex=0
+            component.currentIndex=1
             component.labelSize=labelSize
             rootParEdit.info=component.currentText
             setInfo(model[0])
@@ -157,7 +167,6 @@ Rectangle {
         default:break;
         }
 
-        //console.log(rootParEdit.type,rootParEdit.role,component.model)
     }
 
     MLabel{
@@ -225,9 +234,7 @@ Rectangle {
                                                     MComboFont {property var info:currentText}',container);break;
             default:console.error("erroreeeee",rootParEdit.type)
             }
-            //c.anchors.centerIn=container
-            //c.height=container.height
-            //c.width=container.width
+
             if(type!==typComboBox && type!==typComboFont)
                 c.anchors.fill=container
             else
@@ -237,14 +244,14 @@ Rectangle {
                 c.anchors.left=container.left
                 c.anchors.right=container.right
             }
-            if(c.labelSize!=undefined)
+            if(c.labelSize !== undefined)
                 c.labelSize=rootParEdit.labelSize
+
             component=c
             created=true
             loadModel(rootParEdit.model)
             if(beginInfo!==undefined)
                 setInfo(beginInfo)
-            //console.log(c,c.checked,type,"Parametro completo",info,beginInfo)
         }
     }
 

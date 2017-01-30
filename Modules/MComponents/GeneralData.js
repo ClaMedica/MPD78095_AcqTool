@@ -22,6 +22,10 @@ var c_btn_enabled ="#99CCFF"
 var c_btn_checked ="#3399FF"
 var c_btn_pressed ="#0066CC"
 
+var c_btn_orange_hovered ="#F4BC69"
+var c_btn_orange_enabled ="#FFA41C"
+var c_btn_orange_checked ="#F46400"
+var c_btn_orange_pressed ="#F45000"
 
 var MARGIN = 5
 var CategoryWinWidth = 600
@@ -72,7 +76,7 @@ function putItemOnTop(item)
 function riseItem(item)
 {
     item.z=1
-    //console.log("nuovo",item,item.z)//diciamo chi siamo
+    //console.log("nuovo",item)//diciamo chi siamo
     if(item.children !== undefined && item.children !== null){//e poi iteriamo ricorsivamente
         for(var i=0;i<item.children.length;i++)//per ogni cinno
             riseItem(item.children[i])
@@ -82,10 +86,8 @@ function riseItem(item)
 
 }
 
-function findContentItem(item)
+function findContentItem(item,newZ)
 {
-
-
     //console.log(item.parent)
     if(item.parent !== undefined && item.parent !== null)
         return findContentItem(item.parent,newZ)

@@ -16,18 +16,14 @@ Rectangle {
     property var btnLetters:[]
     property var target:undefined
     property bool destroyWhenOK:false
-
-
-    //onBtnLettersChanged: console.log(btnLetters)
-
-    //Component.onCompleted: show()
+    property string testo: ""
 
     anchors.fill: parent
 
     onShiftChanged:
     {
         for(var i=0;i<btnLetters.length;i++)
-            if(btnLetters[i].text.length==1)
+            if(btnLetters[i].text.length===1)
             {
                 var t=btnLetters[i].text
                 if(shift)
@@ -40,10 +36,10 @@ Rectangle {
 
     function show()
     {
-
         visible=true
-    }
+        txtField.text = testo
 
+    }
 
     Rectangle{
         id:recPreview
@@ -57,7 +53,7 @@ Rectangle {
             selectByMouse:false
             anchors.fill: parent            
             labelSize: rootKeyboard.labelSize
-            onTextChanged: if(target!=undefined)target.text=txtField.text
+            onTextChanged: if(target!=undefined) target.text=txtField.text
             validator: target!=undefined?target.validator:null
         }
     }
@@ -68,10 +64,9 @@ Rectangle {
         anchors.left: parent.left
         anchors.right:parent.right
         anchors.bottom: parent.bottom
-        //spacing:height*0.01
         Repeater{
             id:repRow
-            model:[
+            model: [
                 [100,["1","2","3","4","5","6","7","8","9","0"],["!",'"',"£","$","%","&","/","(",")","="]],
 
                 [100,["q","w","e","r","t","y","u","i","o","p"],["'","?","^","@","#","°","*","+","[","]"]],
@@ -89,7 +84,6 @@ Rectangle {
                 anchors.horizontalCenter: parent.horizontalCenter
                 width:modelData[0]*parent.width/100
                 height: parent.height/5
-                //spacing:width*0.01
                 Repeater{
                     id:repKey
                     model:modelData[special?2:1]
@@ -123,11 +117,6 @@ Rectangle {
                                 if(image=="backspace.png"){
                                     var pos=txtField.cursorPosition
                                     txtField.remove(pos,pos-1)
-//                                    var first=txtField.text.substring(0,txtField.cursorPosition-1)
-//                                    var sec=txtField.text.substring(txtField.cursorPosition)
-//                                    var res=first.concat(sec)
-//                                    txtField.text=res
-//                                    txtField.cursorPosition=pos-1
                                 }
                                 break;
                             case "1@#":
@@ -161,9 +150,6 @@ Rectangle {
                 }
             }
         }
-
-
-
     }
 }
 

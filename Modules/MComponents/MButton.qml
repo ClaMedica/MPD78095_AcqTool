@@ -13,6 +13,7 @@ Rectangle {
     property string text
     property bool switchEnabled:false
     property bool checked:control.checked
+    property bool orange: false
 
     signal clicked(var id)
     signal pressed(var id)
@@ -28,18 +29,32 @@ Rectangle {
     border.color: DataEngine.TASKBAR_COLOR
     radius: height*0.1
     color:{
-        if(!control.enabled)
+        if (!control.enabled)
             return DataEngine.c_btn_idle
-        if(control.pressed)
-            return DataEngine.c_btn_pressed
-        if(control.checked)
-            return DataEngine.c_btn_checked
-        if(control.hovered)
-            return DataEngine.c_btn_hovered
-        if(control.enabled)
-            return DataEngine.c_btn_enabled
-
+        if (rootBtn.orange)
+        {
+            if (control.pressed)
+                return DataEngine.c_btn_orange_pressed
+            if (control.checked)
+                return DataEngine.c_btn_orange_checked
+            if (control.hovered)
+                return DataEngine.c_btn_orange_hovered
+            if (control.enabled)
+                return DataEngine.c_btn_orange_enabled
+        }
+        else
+        {
+            if (control.pressed)
+                return DataEngine.c_btn_pressed
+            if (control.checked)
+                return DataEngine.c_btn_checked
+            if (control.hovered)
+                return DataEngine.c_btn_hovered
+            if (control.enabled)
+                return DataEngine.c_btn_enabled
+        }
     }
+
     Behavior on color {
         ColorAnimation {
             duration: 200

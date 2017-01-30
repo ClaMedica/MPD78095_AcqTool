@@ -34,7 +34,7 @@ Rectangle{
         color: DataEngine.TASKBAR_COLOR
         elide: itemData.elideMode
         text: itemData.value===undefined?"none":itemData.value
-        labelSize:layout.value("F2")
+        labelSize:layout.value("F4")
         horizontalAlignment: Text.AlignHCenter        
     }
 

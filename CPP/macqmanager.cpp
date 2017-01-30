@@ -248,11 +248,11 @@ void MAcqManager::endAcquisitionSave()
 
 void MAcqManager::endAcquisitionDiscard()
 {
-    endAcquisition();
+    endAcquisition(true);
     g_mainAppBridge->sendDiscard();
 }
 
-void MAcqManager::endAcquisition()
+void MAcqManager::endAcquisition(bool discard)
 {
     //disabilito gli allarmi
     m_alarmMng.disableAll();
@@ -271,7 +271,8 @@ void MAcqManager::endAcquisition()
 
     qDebug() << "stato:" << m_mng->GetState();
 
-    if(m_acqFileOpened) {   //se siamo in acq facciamo un commit
+    if(m_acqFileOpened)    //se siamo in acq facciamo un commit
+    {
         qDebug() << m_mng->GetFileName() << m_mng->GetFileType() << m_mng->GetChanNum() ;
         bool cvres = m_mng->CommitValues();
         qDebug() << "Commit Values?" << cvres;
@@ -280,14 +281,9 @@ void MAcqManager::endAcquisition()
     bool ret = m_mng->Close();
     qDebug() << "File closed?" << ret;
 
-    //    foreach (SimpleTCPChannel *channel, m_tcpChannels) {
-    //        //mi disconnetto dal resto
+    if (discard)  //devo cancellare il file
+        qDebug() << QFile::remove(m_mng->GetFileName());
 
-    //        if(channel->disconnect())
-    //            qDebug()<<"disconnect "
-    //                   <<channel->serverAddress().toString().toLatin1()
-    //                  <<channel->serverPort();
-    //    }
 
     m_acqFileOpened = false;    //nessuna acquisizione in atto
     m_sendingToPlot = false;    //nessuno sta spedendo qualcosa per cui ci si puo scrivere sopra

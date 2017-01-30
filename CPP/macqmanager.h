@@ -30,7 +30,7 @@ public slots:
     bool newAcquisition(QString __dataFile = "");
     void connectToServers();
     void startSupe(QString __mode);
-    void endAcquisition();
+    void endAcquisition(bool discard = false);
     void endAcquisitionSave();
     void endAcquisitionDiscard();
     void addMarker(QVariant __key);

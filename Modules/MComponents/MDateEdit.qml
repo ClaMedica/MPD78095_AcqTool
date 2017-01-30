@@ -110,44 +110,33 @@ Rectangle {
             onCurrentIndexChanged: uppa(currentIndex)
             labelSize: rootDateEdit.labelSize
         }
-        TextField{
+        MTextField{
             id:edYear
             anchors.verticalCenter: parent.verticalCenter
             height: parent.height
             width:parent.width*0.38
             maximumLength:4
-            validator: RegExpValidator {
-                regExp: /[0-9]+/
-            }
-            text:cbMonth.currentText
+            text:""
             verticalAlignment: Text.AlignVCenter
             horizontalAlignment: Text.AlignHCenter
-            font.bold: true
-            font.pixelSize: Screen.height*0.01*labelSize
+            labelSize:rootDateEdit.labelSize
             onTextChanged: date=new Date(edYear.text,cbMonth.currentIndex,cbDay.currentIndex)
+
             onFocusChanged:
             {
                 if(focus && isTouch)
                 {
-                    var c
-                    if(keyboard===undefined){
-                        console.log("creiamo questa tasteira")
-                        c=Qt.createQmlObject('import MComponents 1.0;
-                                          MKeyboard {}',rootApp);
-                        c.destroyWhenOK=true
+                    if (keyboardNum !== undefined)
+                    {
+                        keyboardNum.testo = edYear.text
+                        keyboardNum.target = edYear
+                        DataEngine.putItemOnTop(keyboardNum)
+                        keyboardNum.show()
                     }
-                    else
-                        c=keyboard
-
-                    c.target=edYear
-                    DataEngine.putItemOnTop(c)
-                    c.show()
                 }
             }
         }
     }
-
-
 
     MButton{
         id:btnDialog
@@ -158,27 +147,77 @@ Rectangle {
         anchors.margins: parent.height*0.01*marginPerc
         labelSize: rootDateEdit.labelSize
         text:"..."
-        onClicked: dialog.open()
+        onClicked: {
+            dialog.open()
+        }
     }
 
-    Dialog {
+    Rectangle {
         id: dialog
         visible: false
-        title: "Choose a date"
-        standardButtons: StandardButton.Save | StandardButton.Cancel
-        height:calendar.height+20
-        width:calendar.width+20
-        onAccepted:{
-            var date=new Date(calendar.selectedDate)
-            console.log(date.getDate(),date.getMonth(),date.getFullYear())
-            cbMonth.currentIndex=date.getMonth()
-            cbDay.currentIndex=date.getDate()
-            edYear.text=date.getFullYear()
+        height:calendar.height+50
+        width:calendar.width+10
+        anchors.centerIn: parent
+        anchors.verticalCenterOffset: 50
+        anchors.horizontalCenterOffset: -50
+
+        signal accepted
+        signal rejected
+
+        function open()
+        {
+            calendar.selectedDate = new Date(edYear.text*1,cbMonth.currentIndex,cbDay.currentIndex+1)
+            DataEngine.putItemOnTop(this)
+            btnSaveDialog.enabled = false
+            visible=true
+        }
+
+        onAccepted: visible=false
+        onRejected: visible=false
+
+        MouseArea {
+            width: parent.width
+            height: parent.height
+        }
+
+        MButton
+        {
+            id:btnCancDialog
+            width: parent.width/2.1
+            anchors.right:calendar.right
+            anchors.top:calendar.bottom
+            anchors.bottom:parent.bottom
+            anchors.margins: 3
+            labelSize: layout.value("F4")
+            text:qsTr("Cancel")
+            onClicked:dialog.rejected()
+        }
+        MButton
+        {
+            id:btnSaveDialog
+            width: parent.width/2.1
+            anchors.left:calendar.left
+            anchors.top:calendar.bottom
+            anchors.bottom:parent.bottom
+            anchors.right: btnCancDialog.left
+            anchors.margins: 3
+            enabled: false
+            labelSize: layout.value("F4")
+            text:qsTr("Save")
+            onClicked: {
+                var date=new Date(calendar.selectedDate)
+                console.log(date.getDate(),date.getMonth(),date.getFullYear())
+                cbMonth.currentIndex=date.getMonth()
+                cbDay.currentIndex=date.getDate()-1//cbDay parte da 0
+                edYear.text=date.getFullYear()
+                dialog.accepted()
+            }
         }
 
         Calendar {
             id: calendar
-            onDoubleClicked: dialog.click(StandardButton.Save)
+            width: 440
+            onSelectedDateChanged: btnSaveDialog.enabled = true
         }
     }
 }
