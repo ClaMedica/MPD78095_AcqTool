@@ -96,6 +96,7 @@ private:
     bool newAcqFromConfigFile();
     bool newAcqFromPIC();
     void checkAutomaticStartStop(QString __which);
+    bool checkAutomaticFlow();
     void saveBuffersToFile();
     void sendBuffersToPlot();
     void removeLastFrame();
