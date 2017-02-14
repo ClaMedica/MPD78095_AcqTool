@@ -23,7 +23,6 @@ SOURCES += \
     CPP/native.cpp \
     CPP/nomogramma.cpp \
     CPP/parametermanager.cpp \
-    CPP/PrinterManager.cpp \
     CPP/printerserialport.cpp \
     CPP/TCP/SimpleTCPChannel.cpp \
     CPP/TCP/SimpleTCPClient.cpp \
@@ -40,7 +39,8 @@ SOURCES += \
     ../MGlobal/UdmImpl.cpp \
     ../AnaUro/anauro.cpp \
     ../AnaUro/analysis.cpp \
-    ../AnaUro/anautils.cpp 
+    ../AnaUro/anautils.cpp \ 
+    CPP/printermanager.cpp
 
 HEADERS += \
     CPP/alarmmanager.h \
@@ -54,8 +54,7 @@ HEADERS += \
     CPP/mstorage.h \
     CPP/nomogramma.h \
     CPP/parametermanager.h \
-    CPP/PrinterManager.h \
-    CPP/PrinterSerialport.h \
+    CPP/printermanager.h \
     CPP/TCP/SimpleTCPChannel.h \
     CPP/TCP/SimpleTCPClient.h \
     CPP/TCP/TcpServers.h \
@@ -72,7 +71,9 @@ HEADERS += \
     ../MGlobal/msignal.h \
     ../MGlobal/p7settingsmanager.h \
     ../MGlobal/systemmanager.h \
-    ../MGlobal/UdmImpl.h
+    ../MGlobal/UdmImpl.h \
+    CPP/printermanager.h \
+    CPP/printerserialport.h
 
 INCLUDEPATH +=  CPP \
                 CPP/TCP \                

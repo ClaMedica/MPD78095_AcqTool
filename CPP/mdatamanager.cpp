@@ -969,9 +969,9 @@ qDebug() << "INIZIO";
                 int i = 0;
                 foreach(MSignal *sig, m_signalVector) {
                     QString name = sig->getName();
-                    if ((name == "Q") || (name == "QBT1"))
+                    if ((name == "Q") || (name == "QBT1") || (name == "Q1"))
                         posQ = i;
-                    if ((name == "VLMv") || (name == "VBT1"))
+                    if ((name == "VLMv") || (name == "VBT1") || (name == "VV1"))
                         posV = i;
                     i++;
                 }
@@ -1128,25 +1128,25 @@ qDebug() << "INIZIO";
     qDebug() << "File chiuso" << m_mng->Close();
 
     //printer PROVA
-    //PrinterManager *prova = new PrinterManager(m_fileName);
-//    prova->setTempoAttesa(m_aflwdatas.at(0)->getWaitingTime());
-//    prova->setFlussoMax(m_aflwdatas.at(0)->getQMax());
-//    prova->setFlussoMedio(m_aflwdatas.at(0)->getQAve());
-//    prova->setTempoMax(m_aflwdatas.at(0)->getTimeAtQmax());
-//    prova->setTempo595(m_aflwdatas.at(0)->getTime90());
-//    prova->setTempoFlusso(m_aflwdatas.at(0)->getFlowTime());
-//    prova->setTempoDisc(m_aflwdatas.at(0)->getDescTime());
-//    prova->setTempoSvuot(m_aflwdatas.at(0)->getVoidingTime());
-//    prova->setVolFlussoMax(m_aflwdatas.at(0)->getVolAtQqmax());
-//    prova->setVolVuotato(m_aflwdatas.at(0)->getVoidedVolume());
-//    prova->setAccelerazione(m_aflwdatas.at(0)->getAcceleration());
+    printermanager *prova = new printermanager(m_fileName);
+    prova->setTempoAttesa(m_aflwdatas.at(0)->getWaitingTime());
+    prova->setFlussoMax(m_aflwdatas.at(0)->getQMax());
+    prova->setFlussoMedio(m_aflwdatas.at(0)->getQAve());
+    prova->setTempoMax(m_aflwdatas.at(0)->getTimeAtQmax());
+    prova->setTempo595(m_aflwdatas.at(0)->getTime90());
+    prova->setTempoFlusso(m_aflwdatas.at(0)->getFlowTime());
+    prova->setTempoDisc(m_aflwdatas.at(0)->getDescTime());
+    prova->setTempoSvuot(m_aflwdatas.at(0)->getVoidingTime());
+    prova->setVolFlussoMax(m_aflwdatas.at(0)->getVolAtQqmax());
+    prova->setVolVuotato(m_aflwdatas.at(0)->getVoidedVolume());
+    prova->setAccelerazione(m_aflwdatas.at(0)->getAcceleration());
 
     //letto dai setting
     //mi dice se la flussimetria automatica o manuale
     //prova->setMode();
     //if (m_autoPrint)
 
-//    prova->print();
+    prova->print();
 
     //qml
     qDebug() << "FINE";
@@ -1285,7 +1285,7 @@ void MDataManager::InitPageGraphs(int __anaType)
                 (*mrk)["code"] = "f" + QString::number(key);
                 (*mrk)["descr"] = descr;
                 (*mrk)["lock"] = false;
-                (*mrk)["channel"] = numCh;
+                (*mrk)["channel"] = numCh - 1;
                 (*mrk)["defCode"] = (qulonglong)evMarkOpIn->value("whoAmI").toInt();
                 (*mrk)["key"] = key;
                 (*mrk)["color"] = COLOR_ANALYTICAL;
