@@ -69,7 +69,7 @@ void mflowdatas::buildTable()
     m_datasInfo->setData(8,"descr",tr(" Volume to maxinum flow (ml)"));
     m_datasInfo->setData(8,"value",QString::number(getVolAtQqmax(), 'f', 1));
 
-    m_datasInfo->setData(9,"descr",tr(" Voiding volume (ml)"));
+    m_datasInfo->setData(9,"descr",tr(" Voided volume (ml)"));
     m_datasInfo->setData(9,"value",QString::number(getVoidedVolume(), 'f', 1));
 
     m_datasInfo->setData(10,"descr",tr(" Corrected maximun flow (ml)"));

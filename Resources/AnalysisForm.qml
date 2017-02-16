@@ -68,24 +68,16 @@ MForm{
         anchors.top: parent.top
         anchors.left: parent.left
         anchors.right: gridComand.left
-       // anchors.right: box.left
-      //  Behavior on width {NumberAnimation { duration: 1000 }}
         height: rootAna.height - 15
         plotProp:mngCon.plotSetting
 
         //@@@@@@@@@@    Events          @@@@@@@@@@
 
-        //onSaveMeChanged: mngTra.saveThis(saveMe)
-        //onTracksChanged:console.log("draw these",tracks)
         onCurObjChanged: {
             if(completed)
-            {
                 mngData.changeObject(curObj)
-//                plot.tracks=mngData.getData("Track")
-//                plot.markers=mngData.getData("Marker")
-//                plot.frames=mngData.getData("Definer")
-            }
         }
+
         onToZoomChanged:
         {
             var startTime = mngData.getStartTime()
@@ -138,134 +130,15 @@ MForm{
         }
     }
 
-    //@@@@@@@@@@--- Dialogs and Selectors@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@------
-
-//    MDialog{
-//        //@@@@@@@@@@    Properties      @@@@@@@@@@
-//        id:plotDial
-//        anchors.centerIn: plot
-//        width: plot.width*0.8
-//        height: plot.height*0.8
-//        dataList: mngData.availableData
-//        plotList: mngCon.plotList
-//        trackList: mngData.availableTracks
-
-//        //@@@@@@@@@@    Events          @@@@@@@@@@
-//        onReady:{mngData.infoList=news;populate()}
-//    }
-
-//    FileDialog{
-//        //@@@@@@@@@@    Definitions     @@@@@@@@@@
-//        property string owner:"none"
-
-//        //@@@@@@@@@@    Properties      @@@@@@@@@@
-//        id: fileDial
-
-//        //@@@@@@@@@@    Events          @@@@@@@@@@
-//        onAccepted:
-//        {
-//            switch(owner)
-//            {
-//            case "mngData":
-//                mngData.loadFile(fileUrl)
-//                plot.setAbsXmin(mngData.getStartTime())
-//                plot.setAbsXmax(mngData.getEndTime())
-//                break;
-
-//            case "mngCon":
-//                mngCon.fileName=fileUrl
-//                mngCon.read()
-//                break;
-//            default:console.log("Should Not Be Here!",owner);break;
-
-//            }
-//        }
-//    }
-
-//    MNewName{
-//        //@@@@@@@@@@    Properties      @@@@@@@@@@
-//        id:editName
-//        height: 100
-//        width:300
-//        anchors.centerIn: parent
-//        owner:""
-
-//        //@@@@@@@@@@    Events          @@@@@@@@@@
-//        onSelected: {
-//            //a seconda di chi lo sta usando decido cosa fare
-//            switch(owner)
-//            {
-//            case "NewObj": mngData.addCustomObj(selector.preSelectedElements,curText,type);plotDial.visible=true;break;
-//            default:break;
-//            }
-//            visible=false
-
-//        }
-//    }
-
-//    MListSelector{
-//        //@@@@@@@@@@    Properties      @@@@@@@@@@
-//        id:selector
-//        height: 300
-//        width:300
-//        anchors.centerIn: parent
-//        owner:""
-
-//        //@@@@@@@@@@    Events          @@@@@@@@@@
-//        onOwnerChanged:
-//        {
-//            //a seconda di chi lo controlla decido come riempirlo
-//            switch(owner)
-//            {
-//            case "audioPlayer": elements=audioPlayer.fileList();    break;
-//            case "dopAna":      elements=mngData.availableTracks;   break;
-//            case "family":      elements=mngData.getLinks("Families");
-//                enableNew=false;
-//                break;
-//            case "name":        enableNew=true;break;
-//            default:break;
-//            }
-//        }
-//        onSelected: {
-//            //a seconda di chi lo sta usando decido cosa fare
-//            switch(owner)
-//            {
-//            //case "dopAna":      dopAna.currentSignal=mngData.getSignal(curText);      owner="";break;
-//            case "family":
-//                title="Choose or create an element"
-//                elements=mngData.getLinks("Names",selectedElements,type);
-//                //mngData.addCustomObj(choices,type);
-//                //plotDial.visible=true;
-//                owner="name";break;
-//            default:break;
-//            }
-
-//        }
-//        onNuovo: {
-//            switch(owner)
-//            {
-//            case "name":
-//                editName.owner="NewObj"
-//                editName.type=type
-//                editName.setDefText("New Name")
-//                editName.visible=true
-//                owner="";
-//                break;
-//            }
-//        }
-
-//    }
 
     //Models
 
     MarkerModel{id:marMod}
     FrameModel{id:fraMod}
     TrackModel{id:traMod}
- //   ParameterModel{id:parMod}
 
     //Managers
 
-//
     ConfigManager{
         //@@@@@@@@@@    Properties      @@@@@@@@@@
         id:mngCon
@@ -274,23 +147,6 @@ MForm{
         onFileNameChanged: if(fileName!==""){plot.completed=true;read()}
     }
 
-    //@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@---------
-
-//    ParameterBox{
-//        //@@@@@@@@@@    Properties      @@@@@@@@@@
-//        id:box
-//        anchors.bottom: parent.bottom
-//        anchors.right: parent.right
-//        width:0
-//        height: root.height - 30
-//        Behavior on width {NumberAnimation { duration: 1000 }}
-
-//        //@@@@@@@@@@    Events          @@@@@@@@@@
-//        onUpdate: {
-//            plotDial.visible=true
-//        }
-
-//    }
 
     MGridView{
         //@@@@@@@@@@    Properties      @@@@@@@@@@

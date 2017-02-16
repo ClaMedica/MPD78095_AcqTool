@@ -22,8 +22,13 @@ MDataManager::MDataManager(QObject *parent)
 
     m_analized = false;
     m_autoPrint = false;
+    m_Siroky = true;
+    m_landscape = true;
+
     m_numAna = 0;
     m_toSave = "ret";
+
+    m_mngPrint = NULL;
 
     setValVolRes(-999);
 }
@@ -38,6 +43,11 @@ MDataManager::~MDataManager()
     if (m_ana != NULL) {
         delete m_ana;
         m_ana = NULL;
+    }
+
+    if (m_mngPrint != NULL) {
+        delete m_mngPrint;
+        m_mngPrint = NULL;
     }
 }
 
@@ -240,8 +250,6 @@ void MDataManager::loadFile(QString __fileName)
         }
 
         //------ Aggiungo i markers analitici, sono associati ad un definitore
-        //m_mng->DeleteAllMarkers();
-
         qDebug() << "Marker Analitici = " << m_mng->GetNumAnalyticalMarkers();
 
         mrkAnVec->clear();
@@ -352,8 +360,21 @@ void MDataManager::loadFile(QString __fileName)
             return;
         }
 
+        //carico le info necessarie dal file di config
+        Ancestry *autoflow = m_configUser.getSafeChild("AutomaticFlow");
+        m_autoFlow = (autoflow->getSafeChild("Auto")->getSafeAttribute(ATT_VALUE)=="1"?0:2);
+        Ancestry *autoprint = m_configUser.getSafeChild("AdvancedSettings");
+        m_autoPrint = (autoprint->getSafeChild("AutoPrint")->getSafeAttribute(ATT_VALUE)=="1"?true:false);
+        Ancestry *siroky = m_configUser.getSafeChild("AdvancedSettings");
+        m_Siroky = (siroky->getSafeChild("Siroky")->getSafeAttribute(ATT_VALUE)=="1"?true:false);
+        Ancestry *printmode = m_configUser.getSafeChild("AdvancedSettings");
+        m_landscape = (printmode->getSafeChild("PrinterMode")->getSafeAttribute(ATT_VALUE)=="1"?true:false);
+
         //libreria di analisi: creo oggetto.
         m_ana = new Analyze();
+        //creo oggetto per stampare
+        m_mngPrint = new printermanager(m_fileName);
+
         m_mng->Close();
         break;
     }
@@ -969,9 +990,9 @@ qDebug() << "INIZIO";
                 int i = 0;
                 foreach(MSignal *sig, m_signalVector) {
                     QString name = sig->getName();
-                    if ((name == "Q") || (name == "QBT1"))
+                    if ((name == "Q") || (name == "QBT1") || (name == "Q1"))
                         posQ = i;
-                    if ((name == "VLMv") || (name == "VBT1"))
+                    if ((name == "VLMv") || (name == "VBT1") || (name == "VV1"))
                         posV = i;
                     i++;
                 }
@@ -1127,26 +1148,26 @@ qDebug() << "INIZIO";
 
     qDebug() << "File chiuso" << m_mng->Close();
 
-    //printer PROVA
-    //PrinterManager *prova = new PrinterManager(m_fileName);
-//    prova->setTempoAttesa(m_aflwdatas.at(0)->getWaitingTime());
-//    prova->setFlussoMax(m_aflwdatas.at(0)->getQMax());
-//    prova->setFlussoMedio(m_aflwdatas.at(0)->getQAve());
-//    prova->setTempoMax(m_aflwdatas.at(0)->getTimeAtQmax());
-//    prova->setTempo595(m_aflwdatas.at(0)->getTime90());
-//    prova->setTempoFlusso(m_aflwdatas.at(0)->getFlowTime());
-//    prova->setTempoDisc(m_aflwdatas.at(0)->getDescTime());
-//    prova->setTempoSvuot(m_aflwdatas.at(0)->getVoidingTime());
-//    prova->setVolFlussoMax(m_aflwdatas.at(0)->getVolAtQqmax());
-//    prova->setVolVuotato(m_aflwdatas.at(0)->getVoidedVolume());
-//    prova->setAccelerazione(m_aflwdatas.at(0)->getAcceleration());
+
+    m_mngPrint->setTempoAttesa(m_aflwdatas.at(0)->getWaitingTime());
+    m_mngPrint->setFlussoMax(m_aflwdatas.at(0)->getQMax());
+    m_mngPrint->setFlussoMedio(m_aflwdatas.at(0)->getQAve());
+    m_mngPrint->setTempoMax(m_aflwdatas.at(0)->getTimeAtQmax());
+    m_mngPrint->setTempo595(m_aflwdatas.at(0)->getTime90());
+    m_mngPrint->setTempoFlusso(m_aflwdatas.at(0)->getFlowTime());
+    m_mngPrint->setTempoDisc(m_aflwdatas.at(0)->getDescTime());
+    m_mngPrint->setTempoSvuot(m_aflwdatas.at(0)->getVoidingTime());
+    m_mngPrint->setVolFlussoMax(m_aflwdatas.at(0)->getVolAtQqmax());
+    m_mngPrint->setVolVuotato(m_aflwdatas.at(0)->getVoidedVolume());
+    m_mngPrint->setAccelerazione(m_aflwdatas.at(0)->getAcceleration());
 
     //letto dai setting
     //mi dice se la flussimetria automatica o manuale
-    //prova->setMode();
-    //if (m_autoPrint)
-
-//    prova->print();
+    m_mngPrint->setMode(m_autoFlow);
+    m_mngPrint->setPrintSiroky(m_Siroky);
+    m_mngPrint->setPrintModeUser(m_landscape);
+    if (m_autoPrint)
+        m_mngPrint->print();
 
     //qml
     qDebug() << "FINE";

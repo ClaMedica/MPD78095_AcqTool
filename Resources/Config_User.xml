@@ -1,4 +1,11 @@
 <Configuration>
+        <AutomaticFlow>
+        <Auto
+            label="Automatic flow"
+            type="CheckBox"
+            unit=""
+            value="1"
+        />
         <AutoStarts>
                 <Step>
                         <chanType
@@ -54,7 +61,7 @@
                                 />
                         </Duration>
                         <Width
-                           label="width trak"
+                           label="width track"
                            type="TextField"
                            unit=""
                            value="1"
@@ -67,7 +74,7 @@
                         />
                         <Color
                             label="color track"
-                            type="TextField"
+                            type="ColorBox"
                             unit=""
                             value="black"
                         />
@@ -123,6 +130,7 @@
                         </Duration>
                        </Stationary>
         </AutoStops>
+        </AutomaticFlow>
         <Supervisor>
                 <Visible
                 label="Visible"
@@ -132,11 +140,33 @@
                 />
                 <Colore
                 label="Colore mio"
-                type="MColorBox"
+                type="ColorBox"
                 unit=""
                 value="#FFFFFF"
                 />
         </Supervisor>
+        <Flow>
+            <Emg
+                label="EMG"
+                type="CheckBox"
+                unit=""
+                value="0"
+            />
+            <Type>
+                <FlowC
+                    label="flow via cavo"
+                    type="CheckBox"
+                    unit=""
+                    value="1"
+                />
+                <FlowBT
+                    label="flow BT"
+                    type="CheckBox"
+                    unit=""
+                    value="0"
+                />
+             </Type>
+         </Flow>
         <ChannelsProp>
             <VBT>
                 <width
@@ -153,9 +183,31 @@
                 />
                 <color
                     label="color track"
-                    type="TextField"
+                    type="ColorBox"
                     unit=""
                     value="black"
+                />
+                <yAutoScale
+                    label="Y Auto Scale"
+                    type="CheckBox"
+                    unit=""
+                    value="1"
+                />
+                <Range
+                    label="Range"
+                    type="SpinBox"
+                    dt="real"
+                    unit="ml"
+                    model="500#50#5#0#"
+                    value="150"
+                />
+                <Zero
+                    label="Zero"
+                    type="SpinBox"
+                    dt="real"
+                    unit="%"
+                    model="100#0#10#0#"
+                    value="0"
                 />
             </VBT>
             <QBT>
@@ -173,9 +225,31 @@
                 />
                 <color
                     label="color track"
-                    type="MColorBox"
+                    type="ColorBox"
                     unit=""
                     value="red"
+                />
+                <yAutoScale
+                    label="Y Auto Scale"
+                    type="CheckBox"
+                    unit=""
+                    value="1"
+                />
+                <Range
+                    label="Range"
+                    type="SpinBox"
+                    dt="real"
+                    unit="ml/sec"
+                    model="50#0#0.5#1#"
+                    value="20"
+                />
+                <Zero
+                    label="Zero"
+                    type="SpinBox"
+                    dt="real"
+                    unit="%"
+                    model="100#0#10#0#"
+                    value="0"
                 />
             </QBT>
             <EMG>
@@ -193,10 +267,54 @@
                 />
                 <color
                     label="color track"
-                    type="MColorBox"
+                    type="ColorBox"
                     unit=""
                     value="red"
                 />
+                <yAutoScale
+                    label="Y Auto Scale"
+                    type="CheckBox"
+                    unit=""
+                    value="1"
+                />
+                <Range
+                    label="Range"
+                    type="SpinBox"
+                    dt="real"
+                    unit="uV"
+                    model="50#0#0.5#1#"
+                    value="20"
+                />
+                <Zero
+                    label="Zero"
+                    type="SpinBox"
+                    dt="real"
+                    unit="%"
+                    model="100#0#10#0#"
+                    value="0"
+                />
             </EMG>
-        </channesProp>
+        </ChannelsProp>
+
+        <AdvancedSettings>
+        <AutoPrint
+            label="Automatic Print"
+            type="CheckBox"
+            unit=""
+            value="1"
+        />
+        <Siroky
+            label="Siroky"
+            type="CheckBox"
+            unit=""
+            value="1"
+        />
+        <PrinterMode
+            label="Print Landascape Mode"
+            type="CheckBox"
+            unit=""
+            value="0"
+        />
+        </AdvancedSettings>
+
 </Configuration>

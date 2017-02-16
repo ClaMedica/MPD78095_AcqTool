@@ -1,14 +1,11 @@
-#include "PrinterSerialport.h"
+#include "printerserialport.h"
 #include <QDebug>
 #include <QThread>
 
-PrinterSerialPort::PrinterSerialPort(QObject *parent) : QObject(parent)
+printerserialport::printerserialport(QObject *parent) : QObject(parent)
 {
-//    m_serialPortInfo = new QSerialPortInfo;
-//    QList<QSerialPortInfo> list;
-//    list = m_serialPortInfo->availablePorts();
-
-    m_serialPort.setPortName("/dev/ttyS0");
+    m_serialPort.setPortName("/dev/ttyUSB0");
+    //m_serialPort.setPortName("/dev/ttyS0");
     m_serialPort.setBaudRate(115200);
     m_serialPort.setFlowControl(QSerialPort::HardwareControl);
     m_serialPort.setParity(QSerialPort::NoParity);
@@ -17,21 +14,17 @@ PrinterSerialPort::PrinterSerialPort(QObject *parent) : QObject(parent)
 
     if ( ! m_serialPort.open(QIODevice::ReadWrite))
         qCritical() << "Unable to open serial port";
-//    else {
-//        char pri_str[1] = { LF };
-//        (void) m_serialPort.write(pri_str);
-//        m_serialPort.flush();
-//    }
+
 
 }
 
-void PrinterSerialPort::init_printer()
+void printerserialport::init_printer()
 {
     Pri_Reset();
 //    Pri_Default();
 }
 
-void PrinterSerialPort::closeSerialPort()
+void printerserialport::closeSerialPort()
 {
     if (m_serialPort.isOpen())
         m_serialPort.close();
@@ -67,7 +60,7 @@ int hdump(FILE *fp, char *p, int n)
    Invia alla Stampante "num_car" caratteri della stringa "str_pri"
    Se "flag_lf" invia il carattere LF alla fine
 */
-bool PrinterSerialPort::Pri_Str(int m_num_car, char *m_str_pri, unsigned char m_flag_lf)
+bool printerserialport::Pri_Str(int m_num_car, char *m_str_pri, unsigned char m_flag_lf)
 {
 #ifdef  _PRISTR_SPLIT_
     static bool recurse = false;
@@ -168,7 +161,7 @@ bool PrinterSerialPort::Pri_Str(int m_num_car, char *m_str_pri, unsigned char m_
 }
 
 
-void PrinterSerialPort::Pri_justif(char m_mode)
+void printerserialport::Pri_justif(char m_mode)
 {
     /* setta la giustificazione del testo*/
     // 0 centered; 1 right justified; 2 left justified
@@ -177,7 +170,7 @@ void PrinterSerialPort::Pri_justif(char m_mode)
     Pri_Str(sizeof(pri_str), pri_str, 0);
 }
 
-void PrinterSerialPort::Pri_mode(char m_mode)
+void printerserialport::Pri_mode(char m_mode)
 {
     /* imposta la modalita: default, double, quadruple, underlined */
     // mode = 0x00 = 00000000 : default
@@ -187,7 +180,7 @@ void PrinterSerialPort::Pri_mode(char m_mode)
     Pri_Str(sizeof(pri_str), pri_str, 0);
 }
 
-void PrinterSerialPort::Pri_forward(char m_dotlines)
+void printerserialport::Pri_forward(char m_dotlines)
 {
     /* fa avanzare di "dotlines" righe la carta*/
 
@@ -195,7 +188,7 @@ void PrinterSerialPort::Pri_forward(char m_dotlines)
     Pri_Str(sizeof(pri_str), pri_str, 0);
 }
 
-void PrinterSerialPort::Pri_Reset()
+void printerserialport::Pri_Reset()
 {
     /*    resetta la stampante e la sua RAM, equivale ad un reset HW   */
 
@@ -206,7 +199,7 @@ void PrinterSerialPort::Pri_Reset()
 //    m_serialPort.setFlowControl(QSerialPort::HardwareControl);
 }
 
-void PrinterSerialPort::Pri_Font(char m_font)
+void printerserialport::Pri_Font(char m_font)
 {
     /*Imposta il font desideratp della Printer   */
     /*    0 - 8x16  1 - 12x20 2 - 7x16  */
@@ -215,7 +208,7 @@ void PrinterSerialPort::Pri_Font(char m_font)
     Pri_Str(sizeof(pri_str), pri_str, 0);
 }
 
-void PrinterSerialPort::Pri_Intensity(char m_intens)
+void printerserialport::Pri_Intensity(char m_intens)
 {
 //   intens = 0x80 default	0x00 < intens < 0xFF
 //   intens < 0x80 lighter print
@@ -226,7 +219,7 @@ void PrinterSerialPort::Pri_Intensity(char m_intens)
 }
 
 
-void PrinterSerialPort::Pri_Default()
+void printerserialport::Pri_Default()
 {
 //    char pri_str[] = { ESC, 'd' };
 //    Pri_Str(sizeof(pri_str), pri_str, 0);
@@ -237,7 +230,7 @@ void PrinterSerialPort::Pri_Default()
     dato il consumo in ampere desiderato Ca, la velocita massima si ha per n = ((Ca-0,3)*Rdot/(V*8) -1
     Ca = 1.4A @5V --> n =
 */    // default n = 5
-void PrinterSerialPort::Pri_Speed(char m_speed )
+void printerserialport::Pri_Speed(char m_speed )
 {
     char pri_str[] = { GS, '/', m_speed };     // 1 <= speed <= 32, 0 max speed
     Pri_Str(sizeof(pri_str), pri_str, 0);
@@ -248,13 +241,13 @@ void PrinterSerialPort::Pri_Speed(char m_speed )
     2080 < T < 25000 [us]
     vel[mm/sec] = 1/(8*T)   5 < vel < 60 [mm/sec]
  */
-void PrinterSerialPort::Pri_Max_Speed(char m_n1, char m_n2)
+void printerserialport::Pri_Max_Speed(char m_n1, char m_n2)
 {
     char pri_str[] = { GS, 's', m_n1, m_n2 };
     Pri_Str(sizeof(pri_str), pri_str, 0);
 }
 
-void PrinterSerialPort::waiting()
+void printerserialport::waiting()
 {
     QThread::currentThread()->msleep(50);
 }

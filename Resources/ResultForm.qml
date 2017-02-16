@@ -283,7 +283,7 @@ MForm {
     }
 
     //@@@@@@@@@@    Graphics      @@@@@@@@@@
-    MButton {
+    Button {
         id:btnBack
         text: qsTr("back to graphs")
 

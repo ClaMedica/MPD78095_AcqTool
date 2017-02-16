@@ -9,15 +9,15 @@
 /*
    Codici Ascii
 */
-#define LF                0x0A            /* Line Feed                      */
-#define ESC               0x1B            /* Escape                         */
-#define GS				  0x1D			  /* SET impostazione				*/
+#define LF                0x0A            /* Line Feed        */
+#define ESC               0x1B            /* Escape           */
+#define GS				  0x1D			  /* SET impostazione */
 
-class PrinterSerialPort : public QObject
+class printerserialport : public QObject
 {
     Q_OBJECT
 public:
-    explicit PrinterSerialPort(QObject *parent = 0);
+    explicit printerserialport(QObject *parent = 0);
     void closeSerialPort();
 
     void init_printer();

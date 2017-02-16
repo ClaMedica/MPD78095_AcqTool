@@ -221,21 +221,25 @@ void MAcqManager::startSupe(QString __mode)
 #endif
 
 #ifdef LINUXDESKTOP
+    m_superProcess = new QProcess();
+    qDebug() << "Supervisor starting...";
     QString path = g_P7SettingsManager.progPath();
-    QString program = "run_PicoTarget.sh";
+    m_superProcess->start(path + "/FlowBtSupe.exe", QStringList() << __mode);
+//    QString path = g_P7SettingsManager.progPath();
+//    QString program = "run_PicoTarget.sh";
 
-    if(!QFile::exists(path + "/" + program))
-        qCritical() << "No path for" << path + "/" + program;
-    qDebug() << "Lancio l'applicativo" << path + "/" + program;
-    QStringList arguments;
-    arguments << "PicoFlowSupe" << __mode;
+//    if(!QFile::exists(path + "/" + program))
+//        qCritical() << "No path for" << path + "/" + program;
+//    qDebug() << "Lancio l'applicativo" << path + "/" + program;
+//    QStringList arguments;
+//    arguments << "PicoFlowSupe" << __mode;
 
-    QString command = "cd ";
-    command += path + " && ./" + program + " " + arguments.join(" ");
-    //arguments<<"--platform eglfs"<<"-plugin tslib:/dev/input/event0";
+//    QString command = "cd ";
+//    command += path + " && ./" + program + " " + arguments.join(" ");
+//    //arguments<<"--platform eglfs"<<"-plugin tslib:/dev/input/event0";
 
-    qDebug() << "Running process " << command;
-    qDebug() << "Process returned:" << executeDetached(command);
+//    qDebug() << "Running process " << command;
+//    qDebug() << "Process returned:" << executeDetached(command);
 #endif
 
 }
@@ -520,6 +524,16 @@ void MAcqManager::analyzeAlarms(alarms_t __alarms)
 }
 
 
+bool MAcqManager::checkAutomaticFlow()
+{
+    //ok controlliamo se c'e' flusso automatico attivo
+
+    Ancestry *autoflow = m_configUser.getSafeChild("AutomaticFlow");
+    QString value = autoflow->getSafeChild("Auto")->getSafeAttribute(ATT_VALUE);
+
+    return (value=="true"?true:false);
+}
+
 
 void MAcqManager::checkAutomaticStartStop(QString __which)
 {
@@ -732,11 +746,14 @@ bool MAcqManager::handleDataFile()
                         m_mng->SetOffset(i, channel->getTextOfChild(XML_OFFSET).toFloat());
                 }
         }
-
+#if defined(PICOFLOW) || defined(LINUXDESKTOP)
+        m_autoStartStop = checkAutomaticFlow();
+#else
         //controllo se questo canale ha i requisiti per fare l'acq automatica
         //mi fido del software archivio pazienti
         if(m_mng->GetLoc(i) == "a")
-            m_autoStartStop = true;
+            m_autoStartStop = true;        
+#endif
         qDebug() << "handleDataFile(): GetGain,GetOffset:" << m_mng->GetGain(i) << m_mng->GetOffset(i);
     }
 

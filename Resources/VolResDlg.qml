@@ -33,17 +33,34 @@ Rectangle {
 
     }
 
+    Row {
+        id: label
+        spacing:20
+        //anchors.centerIn: parent
+        anchors.verticalCenter: parent.verticalCenter
+        height:parent.height*0.1
+        anchors.left: parent.left
+        //anchors.right:parent.right
+        anchors.margins: layout.value("Margin")
+        focus: true
+        Text{
+            id: text
+            text:qsTr("Insert Residual Volume")
+        }
+    }
+
     MParameterEdit{
         id:parVolResVal
         anchors.verticalCenter: parent.verticalCenter
         height:parent.height*0.2
-        anchors.left: parent.left
+        anchors.left: label.right
         anchors.right:parent.right
         anchors.margins: layout.value("Margin")
         type:typTextField
         model:[0,validator]
         beginInfo:"0"
-        role:qsTr("Insert Residual Volume")
+        labelSize: 3
+        viewPerc:0
         IntValidator {
             id:validator
             bottom:0
@@ -51,7 +68,7 @@ Rectangle {
         }
     }
 
-    MButton {
+    Button {
         id:btnOK
         text: "Ok"
         anchors.right: parent.right

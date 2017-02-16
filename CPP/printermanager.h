@@ -1,9 +1,9 @@
-#ifndef PRINTERMANAGER_H
-#define PRINTERMANAGER_H
+#ifndef printermanager_H
+#define printermanager_H
 
 #include <QObject>
 #include "datafilemanager.h"
-#include "PrinterSerialPort.h"
+#include "printerserialport.h"
 
 #define     NUMOF_X_PRINT_DOTS 752 // (96 mm - 2mm dovuti agli assi) * 8 bit al mm = 94 * 8 = 752
 #define 	NUMOFMAX_LEGHT_PORTRAIT_REP 3000	// 10 sample/sec x 5min = 3000
@@ -20,7 +20,7 @@
 
 #define WIN			5
 
-// un pò di costanti per la stampa dei label di flw, emg e vol
+// un po di costanti per la stampa dei label di flw, emg e vol
 #define _NUM_CHAR_X_LABEL	4
 #define _NUM_CHAR_X_LABEL_rel2 8
 #define _NUM_CHAR_X_LABEL_VOL 5
@@ -41,12 +41,12 @@
 #define _POS_FS_only_VOL_rel2 24
 #define _POS_UDM_VOL	(_POS_FS_VOL - 2)
 #define _WIDTH_LABEL_FLW 0x32	// larghezza in esadecimale dei byte dell'immagine grafica che stampa i label asse ordinate: 50 byte
-#define _NUM_LABEL		5	// 5 valori di label, tutti i fondoscala sono divisibili per 5, così ho sempre valori interi
+#define _NUM_LABEL		5	// 5 valori di label, tutti i fondoscala sono divisibili per 5, cosi ho sempre valori interi
 #define _NUM_LABEL_only_FLW 10
 #define _NUM_LABEL_VOL_EMG	3	// ci sono 3 grafici, quindi solo 2 laberl + lo zero per il volume
 #define _NUM_LABEL_EMG			2	// ci sono 3 grafici, solo il label di mezza scala per l'emg + lo zero
 
-// caratteristiche del font dei caratteri usati per i label (ruotati di 90°)
+// caratteristiche del font dei caratteri usati per i label (ruotati di 90?)
 #define _HEIGHT_CHAR_LABEL 8
 #define _WEIGHT_CHAR_LABEL 8
 #define negativo  0
@@ -55,7 +55,7 @@
 #define _NUM_BYTE_CMD 8 // numero di char del comando di stampa grafica previsto dal protocollo APS
 #define LCMD 8 //char per comando
 #define CLS 4		// 4 caratteri anche per il label sinistro
-#define CLD 4		// 0 caratteri per label destro, che nel grafico ruotato ora non c'è, ma che potrebbe essere l'intestazione del grafico
+#define CLD 4		// 0 caratteri per label destro, che nel grafico ruotato ora non c'e, ma che potrebbe essere l'intestazione del grafico
 #define w_flw	94	// report normale
 #define a_flw	( CLS*24 + w_flw*24 + CLD*24)	// area in byte del grafico di flusso
 #define a_emg	a_flw			// scrivo i label in 4 cifre e non solo 3
@@ -95,36 +95,37 @@
 #define __POINT__
 
 //per stampare
-#define PRI_REP_INT     0    /* Flag Stampa Report : Intestazione          */
-#define PRI_REP_IDE     0   /* Flag Stampa Report : Identificativi Esame  */
-#define PRI_REP_MODAL	0	  /* Flag stampa Report : modalità d'esame		*/
-#define PRI_REP_GRA     1     /* Flag Stampa Report : Grafico               */
-#define PRI_REP_SRK     0     /* Flag Stampa Report : Siroky                */
-#define PRI_REP_RIS     0     /* Flag Stampa Report : Risultati             */
-//#define PRI_REP_SPA		1	  /* Flag Stampa Report : Spazi per strappare   */
-#define PRI_REP_POS     1     /* Flag Stampa Report : Postfazione e indicazione calibrazione, per debug */
-//per le stringhe
-#define NON_SOTTLINEA   "\x1bU\x0"	// \x 1B U \x 0 che significa 1B = ESC; U = modo sottolineatura; 0 = stampa normale
-#define SOTTLINEA       "\x1bU\x1"
-#define NON_RUOTA_90    "\x1bV\x0" // 1B V 0 : ESC V 0 = modo ruotato 90° non attivato
-#define RUOTA_90        "\x1bV\x2"
-#define REVERS_MODE     "\x1b{\x1"
-#define NOT_REVERS_MODE "\x1b{\x0"
-#define LINE          	"\x1b""d"
-#define F_16x24         "\x1bR\x02"
-#define F_24x32         "\x1bR\x03"
-#define DUBLE_H_L       "\x1b!\x30"
-#define DUBLE_H         "\x1b!\x10"
-#define UNDUBLE         "\x1b!\x00"
-#define DUBLE_L         "\x1b!\x20"
-#define PRI_TIMEOUT     25000
+#define PRI_REP_INT     1   /* Flag Stampa Report : Intestazione          */
+#define PRI_REP_IDE     1   /* Flag Stampa Report : Identificativi Esame  */
+#define PRI_REP_MODAL	1   /* Flag stampa Report : modalita d'esame      */
+#define PRI_REP_GRA     1   /* Flag Stampa Report : Grafico               */
+#define PRI_REP_SRK     1   /* Flag Stampa Report : Siroky                */
+#define PRI_REP_RIS     1   /* Flag Stampa Report : Risultati             */
+#define PRI_REP_POS     0   /* Flag Stampa Report : Postfazione e indicazione calibrazione, per debug */
+#define PRI_REP_SPA		1	  /* Flag Stampa Report : Spazi per strappare   */
 
-#define F_8x16			0x30
-#define F_12x20			0x31
-#define F_7x16			0x32
-#define F_center		0x30
-#define F_right			0x31
-#define F_left			0x32
+//per le stringhe
+//#define NON_SOTTLINEA   "\x1bU\x0"	// \x 1B U \x 0 che significa 1B = ESC; U = modo sottolineatura; 0 = stampa normale
+//#define SOTTLINEA       "\x1bU\x1"
+//#define NON_RUOTA_90    "\x1bV\x0" // 1B V 0 : ESC V 0 = modo ruotato 90? non attivato
+//#define RUOTA_90        "\x1bV\x2"
+//#define REVERS_MODE     "\x1b{\x1"
+//#define NOT_REVERS_MODE "\x1b{\x0"
+#define LINE          	"\n \n"          // "\x1b""d"
+//#define F_16x24         "\x1bR\x02"
+//#define F_24x32         "\x1bR\x03"
+//#define DUBLE_H_L       "\x1b!\x30"
+//#define DUBLE_H         "\x1b!\x10"
+//#define UNDUBLE         "\x1b!\x00"
+//#define DUBLE_L         "\x1b!\x20"
+//#define PRI_TIMEOUT     25000
+
+//#define F_8x16			0x30
+//#define F_12x20			0x31
+//#define F_7x16			0x32
+#define F_center		0x00
+#define F_right			0x01
+#define F_left			0x02
 
 /*
    Codici Ascii
@@ -133,7 +134,7 @@
 #define ESC               0x1B            /* Escape                         */
 #define GS				  0x1D			  /* SET impostazione				*/
 
-#define F_LINE 			"\x0A""d"
+//#define F_LINE 			"\x0A""d"
 
 #define	LOBYTE(x)             ((byte) ((x) & 0xff))
 #define	HIBYTE(x)             ((byte) ((x) >> 8))
@@ -170,7 +171,7 @@ const char str_label_time[29][68]={
     "   0          27         54          81         108        135s"
 };
 
-// numeri ruotati di 90° in senso orario
+// numeri ruotati di 90? in senso orario
 const byte print8x8Set[] = {
     0x3C, 0x7E, 0x81, 0x81, 0x7E, 0x3C, 0x00, 0x00,      /*   0 - 30 - 0 */
     0x84, 0x82, 0xFF, 0xFF, 0x80, 0x80, 0x00, 0x00,      /*   1 - 31 - 1 */
@@ -232,11 +233,11 @@ typedef struct{
 
 //extern bool Pri_Str(int num_car, char *str_pri, byte flag_lf);
 
-class PrinterManager : public QObject
+class printermanager : public QObject
 {
     Q_OBJECT
 public:
-    explicit PrinterManager(QString __namefile, QObject *parent = 0);
+    explicit printermanager(QString __namefile, QObject *parent = 0);
 
     void print();
 
@@ -252,7 +253,8 @@ public:
     void setVolFlussoMax(unsigned int  __val){m_vol_max = __val;}
     void setVolVuotato(unsigned int  __val){m_vol_vuo = __val;}
     void setMode(byte  __val){m_modal_e = __val;}
-
+    void setPrintSiroky(bool __val){m_printSiroky = __val;}
+    void setPrintModeUser(bool __val){m_printModeUser = __val;}
     void setTipoEsame(byte  __val){m_test_type = __val;}
 
 
@@ -261,14 +263,14 @@ signals:
 public slots:
 
 private:
-    PrinterSerialPort *m_port;
+    printerserialport *m_port;
 
     QString m_namefile;
     DatafileManager *m_dfm;
 
     bool m_printMode;
     bool m_printModeUser;
-    bool m_printSyroky;
+    bool m_printSiroky;
 
     //dati paziente
     QString m_name;
@@ -284,7 +286,7 @@ private:
     QString m_dateofexam;		// data del test
     int m_durata;				// durata esame in secondi
     int m_num_VOLsample;  	// scrive il val count_sample, che serve in print report
-    bool m_test_type;			// discrimina se esame veloce oppure completo di dati paziente (servirà nel report di stampa)
+    bool m_test_type;			// discrimina se esame veloce oppure completo di dati paziente (servira nel report di stampa)
     int m_numTest;
 
     int m_num_sam; //numero campioni minimo nas (vol)
@@ -301,9 +303,9 @@ private:
     unsigned int  m_vol_max;              /* Volume al Flusso Massimo (ml)            */
     unsigned int  m_vol_vuo;              /* Volume Vuotato           (ml)            */
     float  m_flu_acc;              /* Accelerazione Flusso     (ml/sec2/10)    */
-    byte  m_modal_e;				 /* Modalità dell'esame 0=auto; 2=manual	 */
+    byte  m_modal_e;				 /* Modalita dell'esame 0=auto; 2=manual	 */
 
-    double *buffer_vol;		// da questo buffer la vengono raccolti i dati poi stampati nel report modalità vecchio Picoflow
+    double *buffer_vol;		// da questo buffer la vengono raccolti i dati poi stampati nel report modalita vecchio Picoflow
     double *buffer_flw;    	// buffer per il report che contiene invece i dati di flusso
     double *buffer_emg;
 
@@ -324,7 +326,7 @@ private:
      int   	m_x[25];
      int   	m_y[25];
     unsigned short 	m_uw3; // dimensioni in byte della riga n-esima dell'area grafico
-     char 	m_str_gr[dim_string_rel2];	// allocazione dinamica ma all'inizio dello stringone che sarà usato per i label dei grafici
+     char 	m_str_gr[dim_string_rel2];	// allocazione dinamica ma all'inizio dello stringone che sara usato per i label dei grafici
      char 	m_str_tr[dim_string_rel2];			// trasposizione stringa per ottenere matrice di punti per stampa grafica
     QVector<unsigned short int> m_flow_store;
     QVector<unsigned short int> m_vol_store;
@@ -377,4 +379,4 @@ private:
 
 };
 
-#endif // PrinterManager_H
+#endif // printermanager_H
