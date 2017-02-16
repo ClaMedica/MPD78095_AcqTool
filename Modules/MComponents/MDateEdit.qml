@@ -16,6 +16,9 @@ Rectangle {
     width:200
     id:rootDateEdit
     color:"transparent"
+
+    signal clicked
+
     Component.onCompleted: {
         var d=new Date()
         cbMonth.currentIndex=d.getMonth()
@@ -99,7 +102,7 @@ Rectangle {
             width:parent.width*0.3
             labelSize: rootDateEdit.labelSize
             onCurrentIndexChanged: date=new Date(edYear.text,cbMonth.currentIndex,cbDay.currentIndex)
-
+            onClicked: if(isTouch) rootDateEdit.clicked()
         }
         MComboBox{
             id:cbMonth
@@ -109,6 +112,7 @@ Rectangle {
             model:["01","02","03","04","05","06","07","08","09","10","11","12"]
             onCurrentIndexChanged: uppa(currentIndex)
             labelSize: rootDateEdit.labelSize
+            onClicked: if(isTouch) rootDateEdit.clicked()
         }
         MTextField{
             id:edYear
@@ -121,7 +125,6 @@ Rectangle {
             horizontalAlignment: Text.AlignHCenter
             labelSize:rootDateEdit.labelSize
             onTextChanged: date=new Date(edYear.text,cbMonth.currentIndex,cbDay.currentIndex)
-
             onFocusChanged:
             {
                 if(focus && isTouch)
@@ -133,6 +136,7 @@ Rectangle {
                         DataEngine.putItemOnTop(keyboardNum)
                         keyboardNum.show()
                     }
+                    rootDateEdit.clicked()
                 }
             }
         }
