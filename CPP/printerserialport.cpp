@@ -4,10 +4,6 @@
 
 printerserialport::printerserialport(QObject *parent) : QObject(parent)
 {
-//    m_serialPortInfo = new QSerialPortInfo;
-//    QList<QSerialPortInfo> list;
-//    list = m_serialPortInfo->availablePorts();
-
     m_serialPort.setPortName("/dev/ttyUSB0");
     //m_serialPort.setPortName("/dev/ttyS0");
     m_serialPort.setBaudRate(115200);
@@ -18,11 +14,7 @@ printerserialport::printerserialport(QObject *parent) : QObject(parent)
 
     if ( ! m_serialPort.open(QIODevice::ReadWrite))
         qCritical() << "Unable to open serial port";
-//    else {
-//        char pri_str[1] = { LF };
-//        (void) m_serialPort.write(pri_str);
-//        m_serialPort.flush();
-//    }
+
 
 }
 

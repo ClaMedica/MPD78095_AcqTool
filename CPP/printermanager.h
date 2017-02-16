@@ -95,12 +95,12 @@
 #define __POINT__
 
 //per stampare
-#define PRI_REP_INT     0   /* Flag Stampa Report : Intestazione          */
-#define PRI_REP_IDE     0   /* Flag Stampa Report : Identificativi Esame  */
-#define PRI_REP_MODAL	0   /* Flag stampa Report : modalita d'esame      */
+#define PRI_REP_INT     1   /* Flag Stampa Report : Intestazione          */
+#define PRI_REP_IDE     1   /* Flag Stampa Report : Identificativi Esame  */
+#define PRI_REP_MODAL	1   /* Flag stampa Report : modalita d'esame      */
 #define PRI_REP_GRA     1   /* Flag Stampa Report : Grafico               */
-#define PRI_REP_SRK     0   /* Flag Stampa Report : Siroky                */
-#define PRI_REP_RIS     0   /* Flag Stampa Report : Risultati             */
+#define PRI_REP_SRK     1   /* Flag Stampa Report : Siroky                */
+#define PRI_REP_RIS     1   /* Flag Stampa Report : Risultati             */
 #define PRI_REP_POS     0   /* Flag Stampa Report : Postfazione e indicazione calibrazione, per debug */
 #define PRI_REP_SPA		1	  /* Flag Stampa Report : Spazi per strappare   */
 
@@ -253,7 +253,8 @@ public:
     void setVolFlussoMax(unsigned int  __val){m_vol_max = __val;}
     void setVolVuotato(unsigned int  __val){m_vol_vuo = __val;}
     void setMode(byte  __val){m_modal_e = __val;}
-
+    void setPrintSiroky(bool __val){m_printSiroky = __val;}
+    void setPrintModeUser(bool __val){m_printModeUser = __val;}
     void setTipoEsame(byte  __val){m_test_type = __val;}
 
 
@@ -269,7 +270,7 @@ private:
 
     bool m_printMode;
     bool m_printModeUser;
-    bool m_printSyroky;
+    bool m_printSiroky;
 
     //dati paziente
     QString m_name;

@@ -11,7 +11,7 @@ printermanager::printermanager(QString __namefile, QObject *parent) : QObject(pa
 
     m_printMode = PORTRAIT_MODE;
     m_printModeUser = PORTRAIT_MODE;
-    m_printSyroky = false;
+    m_printSiroky = true;
     m_realDots = 0;
 
     m_modal_e = 0;
@@ -64,9 +64,6 @@ void printermanager::print()
     if (m_name == "Anonymous")
         m_test_type = true;
 
-    //dove leggo cosa ha scelto l'utente
-    //m_printModeUser = lettura;
-    //m_printSyroky = lettura;
     if(m_printModeUser)
         m_printMode = LANDSCAPE_MODE;
     else
@@ -209,7 +206,7 @@ void printermanager::Pri_Rep()//byte numCurve, char* num_file_to_print, bool pri
     //     Identificativi Esame
 #if PRI_REP_IDE
     Report_data();		// scrive i dati del paziente e lo spazio per le note manuali
-    m_port->Pri_Str(3, (char*)"\n \n", 0); // LINE"\x1", 0);
+    m_port->Pri_Str(3, (char*)"\n \n", 0);
 #endif
 
     // Grafico FLW + VOL ed eventualmente EMG
@@ -261,40 +258,34 @@ void printermanager::Pri_Rep()//byte numCurve, char* num_file_to_print, bool pri
 
     // Grafico Siroky, stampato solo se paziente maschio oppure generico (cioe dove non indicato il sesso)
 #if PRI_REP_SRK
-    Report_siroky();
+     if(m_printSiroky )
+        if( (m_sex != 'F') || m_test_type)		// cosi stampa sempre nel caso di esame veloce e paziente generico
+            Report_siroky();
 
-//    if(m_printSyroky )	{
-//        if( ( m_sex != 'F' ) || (m_test_type != 0x00 ))		// cosi stampa sempre nel caso di esame veloce e paziente generico
-//        {
-//            Report_siroky();
-//        }
-//    }
 #endif
 
 //    // scritta relativa al tipo di modalita dell'esame
-#ifndef __NEW_IND_MOD__
-#if PRI_REP_MODAL
-    char str[60];
+//#if PRI_REP_MODAL
+//    char str[60];
 
-    m_port->Pri_justif(F_center);
-    m_port->Pri_mode(0x10);
+//    m_port->Pri_justif(F_center);
+//    m_port->Pri_mode(0x10);
 
-    if (m_modal_e == 2) {
-        QString modal = tr("MANUAL   MODALITY");
-        sprintf(str, "%s\n", modal.toLatin1().data());
-    }
-    else
-        if (m_modal_e == 0) {
-            QString modal = tr("AUTOMATIC  MODALITY ");
-            sprintf(str, "%s\n", modal.toLatin1().data());
-        }
-    m_port->Pri_Str(strlen(str), str, 0);
+//    if (m_modal_e == 2) {
+//        QString modal = tr("MANUAL   MODALITY");
+//        sprintf(str, "%s\n", modal.toLatin1().data());
+//    }
+//    else
+//        if (m_modal_e == 0) {
+//            QString modal = tr("AUTOMATIC  MODALITY ");
+//            sprintf(str, "%s\n", modal.toLatin1().data());
+//        }
+//    m_port->Pri_Str(strlen(str), str, 0);
 
-    QString line = "\n \n"; // LINE"\x1";
-    m_port->Pri_Str(3,line.toLatin1().data(), 0);
-    m_port->Pri_justif(F_left);
-#endif
-#endif
+//    QString line = "\n \n"; // LINE"\x1";
+//    m_port->Pri_Str(3,line.toLatin1().data(), 0);
+//    m_port->Pri_justif(F_left);
+//#endif
 
     // 	Risultati dell'esame ricavati dall'analisi semplificata, implementata nel firmware
 
@@ -357,7 +348,7 @@ void printermanager::Report_data()
 
     m_port->Pri_mode(0x00); 					// modo default
     m_port->Pri_justif(F_left);					// tutto a sinistra
-    m_port->Pri_Str(3,(char*)"\n \n", 0); // LINE"\x1",0);  			// scrive una riga vuota
+    m_port->Pri_Str(3,(char*)"\n \n", 0); 	// scrive una riga vuota
 
     m_port->Pri_Font(1);							// font 12x20
 
@@ -422,10 +413,11 @@ void printermanager::Report_data()
     m_port->Pri_Str( strlen( str ), str, 0);
     for (int i = 0; i < 3; i++)	{	// tre righe vuote per eventuali commenti
         m_port->Pri_Str( 19, (char *)space_bar, 0 );
-//        sprintf( str, puntini );
         strcpy(str, puntini);
         m_port->Pri_Str( strlen(str), str, 0);
     }
+
+    m_port->Pri_Str(3,(char*)"\n \n", 0); //riga vuota
 
 #if PRI_REP_MODAL		// scritta relativa al tipo di modalita
     if(m_modal_e == 2) {
@@ -468,7 +460,7 @@ void printermanager::Report_flw()
     m_port->Pri_Font(1);
     m_port->Pri_Str(strlen(str_label_time[m_i_max_x]), (char *)str_label_time[m_i_max_x], 1);
 
-    m_port->Pri_Str( 3, (char*)"\n \n", 0); // LINE, 0 );		// modifica per risparm carta e tempo: da riattivare
+    m_port->Pri_Str( 3, (char*)"\n \n", 0); // modifica per risparm carta e tempo: da riattivare
 }
 
 /**
@@ -552,9 +544,6 @@ void printermanager::Pri_Rep_Gra(int __num_riga)
     m_str_gr[0] = ESC;	//0x1B;	// ESC
     m_str_gr[1] = '*';	//0x2A;	// *
 
-//    m_str_gr[2] = 0x90;	// n1	num_byte = 96 + 2256 + 96 = 2448 = ( 65536 * n3 ) + ( 256 * n2 ) + n1
-//    m_str_gr[3] = 0x09;	// n2
-//    m_str_gr[4] = 0x00;	// n3
     int sz = 96 + 2256 + 96;    // 	num_byte = 96 + 2256 + 96 = 2448 = ( 65536 * n3 ) + ( 256 * n2 ) + n1
     m_str_gr[2] = sz % 256         ;	// n1
     m_str_gr[3] = (sz >>  8) & 0xff;	// n2
@@ -646,7 +635,6 @@ void printermanager::Pri_Rep_Gra(int __num_riga)
             m_y2 = flow_pt;
             if( Int_Pun(i4 ) ) { //questa funzione utilizza m_x2 e m_y2
                 if (m_num_xy > 25)
-                    //Fatal_Error(FATAL_ERROR_PRI);
                     m_num_xy = 25;
                 for(int i22 = 0; i22 < m_num_xy; i22++) {
                     m_y[i22] -= i4;
@@ -661,7 +649,6 @@ void printermanager::Pri_Rep_Gra(int __num_riga)
 
             vol_pt = 239 - (int) ((239 * buffer_vol[uw6]) / (graf_g_vl));
             if( vol_pt > 239 )
-                //vol_pt = 239;
                 vol_pt = m_y1; // se campione sfarlocco, scrive quello precedente
 
             m_x1 = x_pt_prec;
@@ -692,7 +679,7 @@ void printermanager::Pri_Rep_Gra(int __num_riga)
             second_char = ( max_x_vol - (first_char * 1000) ) / 100; // cifra delle centinaia
             third_char  = ( max_x_vol - (first_char * 1000) - (second_char * 100)) / 10; // cifra delle decine
             fourth_char = ( max_x_vol - (first_char * 1000) - (second_char * 100) - (third_char * 10)); // cifra delle unita
-            //for( j = 0; j < p; j++ )	{
+
             for(int i = 0; i < 13; i++ )
                 m_str_gr[ pos_lab_vol + (CLD-4)*24 + i ] = (char)print7x13Set[ first_char*13 + i];
             for(int i = 13; i < 24; i++)
@@ -954,7 +941,6 @@ void printermanager::Str_Trasposta(byte __type, unsigned short __sx_byte, unsign
     else if( __type == 1 )		// trasposizione della stringa dei grafici di siroky
         num_byte = __sx_byte + w_ave + w_SD + __sx_byte + w_max + w_SD;
 
-    //static char  str4[ n + 24*(sx_byte+dx_byte+94) ];
 
     for( j = 0; j < (num_byte * 24); j++ )
         m_str_tr[j] = 0x00;	// azzero tutta questa stringona
@@ -1137,7 +1123,6 @@ void printermanager::Pri_Rep_Gra_EMG(byte __num_riga)
                     m_str_gr[LCMD + (CLD-1)*24 + i ] = (char)0x00;
                 }
             }
-            // else if( FC > 9) allora 2 byte di spazio, 2 di valore
             else
             {
                 for(int i = 0; i < 24; i++ )	// spazio (primo carattere)
@@ -1298,14 +1283,10 @@ short printermanager::adatta_buffer_dati(int __num_sample, long __fs_flw)
             if(k < __num_sample)
             {
                 j++;
-                //buffer_vol[i] = *(ExamParam.PRINTPhysValBuf[READ_VOL] + i);
                 m_vol_store[i] = buffer_vol[k];
                 m_flow_store[i] = (unsigned short)buffer_flw[k];
-                //*( vol_store + i ) = *( m_PRINTPhysValBuf[READ_VOL] + k );
-                //*( flow_store + i ) = *( ExamParam.PRINTPhysValBuf[READ_FLW] + k );
                 if (m_emgPresent)
                     m_emg_store[i] = buffer_emg[k];
-                //*( s3 + i ) = *( ExamParam.PRINTPhysValBuf[READ_EMG] + k );
 
                 if((j == 2) || (j == 4) || (j == 5) || (j == 7))
                     k++;
@@ -1338,10 +1319,6 @@ short printermanager::adatta_buffer_dati(int __num_sample, long __fs_flw)
                 m_flow_store[i] = buffer_flw[i+k];
                 if (m_emgPresent)
                     m_emg_store[i] = buffer_emg[i+k];
-                //                *( vol_store + i ) = *( ExamParam.PRINTPhysValBuf[READ_VOL] + i + k );
-                //                *( flow_store + i ) = *( ExamParam.PRINTPhysValBuf[READ_FLW] + i + k );
-                //                if(__num_curve == NUMOF_READ_CHAN)
-                //                    *( s3 + i ) = *( ExamParam.PRINTPhysValBuf[READ_EMG] + i + k );
             }
             else
             {
@@ -1357,10 +1334,6 @@ short printermanager::adatta_buffer_dati(int __num_sample, long __fs_flw)
                 if (m_emgPresent)
                     m_emg_store[i] = 0; // fissata a zero, perche qui non devo avere attivita alettrica registrata, o meglio non devo inventarmi dei valori io
 
-                /**( vol_store + i ) = *( ExamParam.PRINTPhysValBuf[READ_VOL] + (num_max_sample + k -1)); // fissata ala valore finale perche questo non varia
-                *( flow_store + i ) = 0;		// fissata a zero, perche non c'e flusso
-                if(__num_curve == NUMOF_READ_CHAN)
-                    *( s3 + i ) = 0;	*/		// fissata a zero, perche qui non devo avere attivita alettrica registrata, o meglio non devo inventarmi dei valori io
             }
         break;
     case 75:		// rapporto 1,5sec per mm, cioe 15sample per mm, 8punti per mm, cioe 15 sample per 8 punti, allora 1 sample ogni 2
@@ -1375,10 +1348,6 @@ short printermanager::adatta_buffer_dati(int __num_sample, long __fs_flw)
                 m_flow_store[k] = buffer_flw[i];
                 if (m_emgPresent)
                     m_emg_store[k] = buffer_emg[i];
-                //                *( vol_store + k) = *( ExamParam.PRINTPhysValBuf[READ_VOL] + i );
-                //                *( flow_store + k ) = *( ExamParam.PRINTPhysValBuf[READ_FLW] + i );
-                //                if(__num_curve == NUMOF_READ_CHAN)
-                //                    *( s3 + k ) = *( ExamParam.PRINTPhysValBuf[READ_EMG] + i);
                 k++;
                 j = 0;
             }
@@ -1409,10 +1378,7 @@ short printermanager::adatta_buffer_dati(int __num_sample, long __fs_flw)
                 m_flow_store[k] = buffer_flw[i];
                 if (m_emgPresent)
                     m_emg_store[k] = buffer_emg[i];
-                //                *( vol_store + k) = *( ExamParam.PRINTPhysValBuf[READ_VOL] + i );
-                //                *( flow_store + k ) = *( ExamParam.PRINTPhysValBuf[READ_FLW] + i );
-                //                if(__num_curve == NUMOF_READ_CHAN)
-                //                    *( s3 + k ) = *( ExamParam.PRINTPhysValBuf[READ_EMG] + i);
+
                 if(j == 5)	j = 0;
                 k++;
 
@@ -1426,10 +1392,6 @@ short printermanager::adatta_buffer_dati(int __num_sample, long __fs_flw)
             m_flow_store[i] = 0;
             if (m_emgPresent)
                 m_emg_store[i] = 0;
-            //            *( vol_store + i ) = *( ExamParam.PRINTPhysValBuf[READ_VOL] + k -1); // fissata ala valore finale perche questo non varia
-            //            *( flow_store + i ) = 0;		// fissata a zero, perche non c'e flusso
-            //            if(__num_curve == NUMOF_READ_CHAN)
-            //                *( s3 + i ) = 0;			// fissata a zero, perche qui non devo avere attivita alettrica registrata, o meglio non devo inventarmi dei valori io
         }
         break;
     }
@@ -1534,7 +1496,6 @@ void printermanager::Report_Real_Time(short __num_sample)
     //	righe = 40 (8 punti per secondo = 5sec)
     //	colonne = 1(label tempo) + 1(spazio) + 50(grafici) + 1(spazio) + 50(grafici) + 1(spazio)= 104byte
 
-    //mem_alloc( dim_string_gr*sizeof(char), (void **)&str_tr);		// trasposizione stringa per ottenere matrice di punti per stampa grafica
     // SCOMPONGO LA STAMPA DEL GRAFICO IN TANTE STAMPE DA 5 SECONDI CIASCUNA
     num_righe = (int)(__num_sample / NUM_POINTS) + 1;	// numero intero di blocchi da 40 righe (5sec), il restante e stampato in un altro blocco da 40
     for(int riga = 0; riga < num_righe; riga++ )                        // scompone la griglia in tante righe
@@ -2432,13 +2393,9 @@ void printermanager::Report_siroky()
     m_port->Pri_Font(1);
     m_port->Pri_mode(0x10);
 
-    //Pri_Str(19,(char *)space_bar,0);
-    m_port->Pri_justif(0);
+     m_port->Pri_justif(0);
     QString siroky = tr("Siroky Diagram");
     m_port->Pri_Str(strlen(siroky.toLatin1().data()), siroky.toLatin1().data(), 1);
-
-    m_port->Pri_Str(3,(char*)"\n \n", 0); // LINE"\x1",0); !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
-    m_port->Pri_Font(1);
 
     m_port->Pri_justif(2);
     m_port->Pri_mode(0x00);
@@ -2448,7 +2405,6 @@ void printermanager::Report_siroky()
     sprintf(str,   "  Q(ml/s)   %s    SD        %s       SD", ave.toLatin1().data(),max.toLatin1().data());
     m_port->Pri_Str(strlen(str),str,1);//Pri_Str(strlen(str),str,0);
 
-//    m_port->Pri_Speed(0);
     for(int ub = 0; ub < 10; ub++) {  /*scompone la griglia in 10 righe*/
         Pri_Rep_Gra_Siroky(ub,0);  // qui passo sempre grap=0 cosi lo resetto ad ogni giro
 
@@ -2487,11 +2443,12 @@ void printermanager::Report_siroky()
             else 	// nessuno fuori scala, scrivo centrato valido solo per maschi adulti
             {
                 m_port->Pri_justif(F_center);
+                m_port->Pri_Font(1);
                 QString valid = tr("  Valid for male adult only      ");
                 m_port->Pri_Str(strlen(valid.toLatin1().data()),valid.toLatin1().data(),1);
             }
     }
-    m_port->Pri_Str(3,(char*)"\n \n", 0); // LINE"\x1",0);//Pri_Str(3,LINE"\x3",0);
+    m_port->Pri_Str(3,(char*)"\n \n", 0);
 }
 
 
@@ -2900,7 +2857,9 @@ void printermanager::Report_result()
         if (m_tem_flu < 30) // se la flussata e molto breve e intensa, l'algoritmo sbaglia e puo risultare flu_med > flu_max
             m_flu_med = m_flu_max;
 
-    QString message = tr("Maximum Flow Rate .........");
+    QString message = tr("Waiting Time ..............");
+    Pri_Rep_Lin(message.toLatin1().data(), (int)( m_tem_att * Fc_FLW ), 1, (char *)"s\n", 0);
+    message = tr("Maximum Flow Rate .........");
     Pri_Rep_Lin(message.toLatin1().data(), (int)( m_flu_max * Fc_FLW ), 1, (char *)"ml/s\n", 0);
     message = tr("Average Flow Rate .........");
     Pri_Rep_Lin(message.toLatin1().data(), (int)( m_flu_med * Fc_FLW ), 1, (char *)"ml/s\n", 0);
@@ -2921,7 +2880,7 @@ void printermanager::Report_result()
     // per ora il flus max corretto non lo metto perche non ho la funzione radice quadrata
     //"Corrected Maximum Flow ...."Pri_Rep_Lin((char *)msg_flu_cor[Language_selected],(rep.flu_cor)*Fc_FLW,1,"ml 1/2 /s",1);    // 1/2 =1/2 apice
     message = tr( "Flow Acceleration .........");
-    Pri_Rep_Lin(message.toLatin1().data(),(short unsigned)((m_flu_acc)*Fc_FLW),2,(char *)"ml/s^2\n",0);    //?=2 apice
+    Pri_Rep_Lin(message.toLatin1().data(),(short unsigned)((m_flu_acc)*Fc_FLW*10),2,(char *)"ml/s^2\n",0);    //?=2 apice
 }
 
 /**

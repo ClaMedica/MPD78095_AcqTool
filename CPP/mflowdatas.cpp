@@ -76,7 +76,7 @@ void mflowdatas::buildTable()
     m_datasInfo->setData(10,"value",QString::number(getCQ(), 'f', 1));
 
     m_datasInfo->setData(11,"descr",tr(" Flow acceleration (ml/sec^2))"));
-    m_datasInfo->setData(11,"value",QString::number(getAcceleration()/10, 'f', 1));
+    m_datasInfo->setData(11,"value",QString::number(getAcceleration(), 'f', 1));
 
     m_datasInfo->setData(12,"descr",tr(" Maximun contraction speed (mm/sec)"));
     m_datasInfo->setData(12,"value",QString::number(getVDetMax(), 'f', 1));

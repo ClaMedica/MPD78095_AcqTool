@@ -113,10 +113,6 @@ private:
     m_fileName,
     m_configurationFileName;
 
-    Ancestry m_configLocale,    //A? la prima ad essere caricata e contiene la lingua
-    m_configAcq,                //contiene le info fisse di acquisizione
-    m_configUser;               //contiene le info modificate dall'utente
-
     MSignal *m_pCurrentSignal;
 
     AnalysisType m_anaType;
@@ -129,8 +125,6 @@ private:
 
     DatafileManager *m_copy;
 
-
-
     MStorage m_storage;
 
     QMap<QString,QStringList> m_modelMap;
@@ -140,11 +134,16 @@ private:
 
     bool m_analized;
     bool m_autoPrint;
+    int m_autoFlow; //Modalita dell'esame 0=auto; 2=manual
+    bool m_Siroky; //se stampare Siroky
+    bool m_landscape; //modalità di stampa: portrait o landascape (ture se landscape)
     //true se donna, false se uomo
     bool m_sexPatient;
 
     int m_numAna; //numero di analisi --> non sappiamo se serve
     QVector<mflowdatas*> m_aflwdatas; //array di analisi di tipo flussimetria
+
+    printermanager *m_mngPrint;
 
 
 //----
