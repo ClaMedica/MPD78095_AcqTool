@@ -80,7 +80,7 @@ ApplicationWindow {
             mngAcq.newAcquisition(dataFile)
             forReal.setMarkersInfo(mngAcq.markersInfo("type", [1, 6]))
             forReal.configurationFile = mngAcq.plotConfigFileName()
-            forReal.displayMessage("Aspetta e spera", -1)    //"Wait for initialization..."
+            forReal.displayMessage("Wait for initialization...", -1)
             forHome.whoIsVisible = forReal.name
             forReal.setAcqInfo(mngData.acqInfo())
         }
@@ -124,7 +124,7 @@ ApplicationWindow {
         onSystemInAcqStatus:
         {
             console.log("Go Go Go");
-            forReal.displayMessage("Go go go!",2000)
+            forReal.displayMessage("start",2000)
         }
     }
 
@@ -188,11 +188,11 @@ ApplicationWindow {
         //@@@@@@@@@@    Properties      @@@@@@@@@@
         id: forReal
         anchors.fill: parent
-        name:"RealTimeForm"
+        name: "RealTimeForm"
         whoIsVisible: forHome.whoIsVisible
 
         //@@@@@@@@@@    Events          @@@@@@@@@@
-        onBack: forHome.whoIsVisible=forHome.name
+        onBack: forHome.whoIsVisible = forHome.name
     }
 
 

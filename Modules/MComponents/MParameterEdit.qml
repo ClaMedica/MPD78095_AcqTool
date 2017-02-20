@@ -20,6 +20,7 @@ Rectangle {
     property color labelColor:"black"//colore della role
     property var beginInfo:undefined//è il valore che ha la info la prima volta
     property bool keyboardAlfaNum: true
+    property string containerBorderColor: "transparent"
     readonly property int currentIndex:type===typComboBox && component!=undefined?component.currentIndex:-1
     readonly property string typTextField:"TextField"
     readonly property string typComboBox: "ComboBox"
@@ -35,6 +36,12 @@ Rectangle {
     onTypeChanged: reload()
     height:100
     width:300
+
+    //Since the Parmeter are created on the fly,
+    //we need to identify them on which the user
+    // has clicked. The id must be unique
+    property int parameterId: 0
+    signal clicked()
 
     signal openKeyboard
 
@@ -79,6 +86,7 @@ Rectangle {
                         c.testo = connection.target.text
                     c.show()
                 }
+                rootParEdit.clicked()
             }
         }
     }
@@ -190,7 +198,7 @@ Rectangle {
         anchors.top:parent.top
         anchors.bottom:parent.bottom
         color:"transparent"
-        border.color: "transparent"
+        border.color: containerBorderColor
         border.width: 2
         enabled:editable
 
@@ -235,6 +243,8 @@ Rectangle {
             default:console.error("erroreeeee",rootParEdit.type)
             }
 
+            c.anchors.margins = 2
+
             if(type!==typComboBox && type!==typComboFont)
                 c.anchors.fill=container
             else
@@ -244,8 +254,12 @@ Rectangle {
                 c.anchors.left=container.left
                 c.anchors.right=container.right
             }
+
             if(c.labelSize !== undefined)
                 c.labelSize=rootParEdit.labelSize
+
+            if (type === typDateEdit || type === typComboBox)
+                c.clicked.connect(cliccato)
 
             component=c
             created=true
@@ -254,7 +268,11 @@ Rectangle {
                 setInfo(beginInfo)
         }
     }
-
+    function cliccato()
+    {
+        console.log("cliccato")
+        rootParEdit.clicked()
+    }
 
     MLabel{
         id:labelSide

@@ -21,6 +21,8 @@ Rectangle{
     onModelChanged: if(modelOk)currentIndex=0
     onCurrentIndexChanged: if(modelOk)curEle.text=model[currentIndex]
 
+    signal clicked
+
     function find(text){
         if(model === undefined || model === null)
             return 0
@@ -46,6 +48,7 @@ Rectangle{
         curEle.visible=false
         DataEngine.putItemOnTop(rootComboBox)
         opened=true
+        rootComboBox.clicked()
     }
 
     function closeBox(index,text)
@@ -62,6 +65,7 @@ Rectangle{
         arrow.visible=true
         curEle.visible=true
         opened=false
+
     }
 
     Timer{

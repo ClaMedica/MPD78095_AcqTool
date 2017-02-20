@@ -8,7 +8,6 @@ TextField {
     id: rootLabel
     property real labelSize: 8
     property string safeText: ""
-    signal cliccato
     onTextChanged: {
         if(acceptableInput)
             safeText = text
@@ -18,16 +17,10 @@ TextField {
     text: ""
     font.family: (layout !== undefined) ? layout.value("FFamily") : "Arial"
     font.bold: true
-    font.pixelSize: screenH * 0.01 * 3
+    font.pixelSize: screenH * 0.01 * labelSize
     verticalAlignment: Text.AlignVCenter
     style: TextFieldStyle {
         textColor: "black"
     }
-//    MouseArea {
-//        height: parent.height
-//        width: parent.width
-//        onClicked: parent.cliccato
-
-//    }
 }
 
