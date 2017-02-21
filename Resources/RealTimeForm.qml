@@ -165,20 +165,15 @@ MForm{
         width:0
         owner:"Marker"
         itemsInRow:2
-        delegate: MMarkerButton{}
-        visible:false
-        //@@@@@@@@@@    Events          @@@@@@@@@@
-        onClicked:
-        {
-            switch(owner)
-            {
-            case "Marker":
+        delegate: MMarkerButton{
+            onClick:{
                 mngAcq.addMarker(value);
                 //console.log(mngAcq.acqMarkers)
                 plot.markers=mngAcq.acqMarkers;
-                break;
             }
         }
+        visible:false
+
     }
 
 
@@ -191,16 +186,8 @@ MForm{
         width:60
         owner:"Acq"
         itemsInRow:1
-        delegate: MMarkerButton{}
-        visible:true
-
-
-        //@@@@@@@@@@    Events          @@@@@@@@@@
-        onClicked:
-        {
-            switch(owner)
-            {
-            case "Acq":
+        delegate: MMarkerButton{
+            onClick:{
                 if (value === "112") {
                     mngAcq.sendStopAcq()
                     plot.stopAll()
@@ -213,10 +200,9 @@ MForm{
                     mngAcq.endAcquisitionDiscard()
                     timClose.start(1000);
                 }
-
-                break;
             }
         }
+        visible:true
     }
 
     Timer{

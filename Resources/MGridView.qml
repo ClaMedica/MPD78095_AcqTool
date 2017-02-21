@@ -14,8 +14,8 @@ Rectangle{
     property string owner:"none"
     property var currentItem
     property var items:[]
-    signal clicked(var value)
-    signal tooltipActived(var testo, var posY)
+    //signal clicked(var value)
+    //signal tooltipActived(var testo, var posY)
 
     //@@@@@@@@@@    Properties      @@@@@@@@@@
     id:rootGrid
@@ -74,7 +74,7 @@ Rectangle{
     {//smista gli elementi
         var row=0
         var col=0
-        var w=rootGrid.width - 10
+        var w=rootGrid.width + 5
         var n=itemsInRow
         var itemSize=(w/n)/(1+(n+1)*0.2/n)
         var d=itemSize*0.2
@@ -91,8 +91,8 @@ Rectangle{
             rep.itemAt(i).oriH=itemSize
             rep.itemAt(i).oriX=d+(d+itemSize)*col
             rep.itemAt(i).oriY=d+(d+itemSize)*row
-            rep.itemAt(i).click.connect(clicked)
-            rep.itemAt(i).tooltipActive.connect(tooltipActived)
+            //rep.itemAt(i).click.connect(clicked)
+            //rep.itemAt(i).tooltipActive.connect(tooltipActived)
            // console.log("Elemento ",i,rep.itemAt(i).width,rep.itemAt(i).height,rep.itemAt(i).x,rep.itemAt(i).y)
             col++
         }

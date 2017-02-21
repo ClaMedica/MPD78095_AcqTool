@@ -22,8 +22,8 @@
             type="ComboBox"
             dt="string"
             unit=""
-            model="Arial#Ubuntu"
-            value="Arial"
+            model=""
+            value="ubuntu"
             />
             <F1
             label="Font 1"

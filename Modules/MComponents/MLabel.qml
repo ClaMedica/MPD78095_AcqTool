@@ -10,7 +10,7 @@ Text {
     height: 100
     width: 200
     text: "ciao"//"Èope"
-    font.family: "Arial" //(layout !== undefined) ? layout.value("FFamily") : "Arial"
+    font.family: (layout !== undefined) ? layout.value("FFamily") : "ubuntu"
     font.bold: true
     font.pixelSize: screenH * 0.01 * labelSize
     fontSizeMode: Text.Fit

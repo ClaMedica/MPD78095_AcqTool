@@ -99,7 +99,7 @@ Rectangle{
         //@@@@@@@@@@    Properties      @@@@@@@@@@
         id:toolTip
         color:"black"
-        font.family: "Courier 8 Pitch"
+        font.family: (layout !== undefined) ? layout.value("FFamily") : "ubuntu"
         font.bold: false
         font.pixelSize: 12
         anchors.top:img.top
@@ -128,7 +128,7 @@ Rectangle{
             }
         }
         onReleased: {
-            if(!isTouch)
+            //if(!isTouch)
                 rootMarkerButton.state="hov"
         }
         onExited:    {
@@ -138,7 +138,7 @@ Rectangle{
             }
         }
         onPressed:  {
-            if(!isTouch)
+            //if(!isTouch)
                 rootMarkerButton.state="pre"
         }
         onClicked:  {

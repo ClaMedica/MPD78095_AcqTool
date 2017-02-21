@@ -24,7 +24,7 @@ TableView{
             color: styleData.textColor
             elide: styleData.elideMode
             text: styleData.value
-            font.family: "Courier 8 Pitch"
+            font.family:  (layout !== undefined) ? layout.value("FFamily") : "ubuntu"
             font.bold: false
             font.pixelSize: 12
         }

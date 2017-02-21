@@ -1,13 +1,14 @@
 import QtQuick 2.5
 import QtQuick.Window 2.0
+import MComponents 1.0
 
 Rectangle {
     id: anaBtn
-    width: 120
+    width: 130
     height: 30
     color:"whitesmoke"
     border.color: "gray"
-    radius: 7
+    property real labelSize:4
 
     //Since the buttons are created on the fly,
     //we need to identify the button on which the user
@@ -17,14 +18,13 @@ Rectangle {
 
     property string myText;
 
-    Text {
-        id: textBtn
-        text: myText
-        font.family: "Courier 8 Pitch"
+    MLabel{
+        text:myText
+        anchors.fill: anaBtn
+        labelSize: anaBtn.labelSize
+        horizontalAlignment: Text.AlignHCenter
+        verticalAlignment: Text.AlignVCenter
         font.bold: false
-        font.pixelSize: anaBtn.height//*0.4
-        anchors.horizontalCenter: parent.horizontalCenter
-        anchors.verticalCenter: parent.verticalCenter
     }
 
     MouseArea {

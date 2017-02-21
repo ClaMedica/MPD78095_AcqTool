@@ -58,7 +58,7 @@ Rectangle{
         //@@@@@@@@@@    Properties      @@@@@@@@@@
         id:popText
         color:"black"
-        font.family: "Courier 10 Pitch"
+        font.family: (layout !== undefined) ? layout.value("FFamily") : "ubuntu"
         font.bold: true
         font.pixelSize: 16
         anchors.centerIn: rootPopUp

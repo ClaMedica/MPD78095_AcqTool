@@ -283,7 +283,7 @@ MForm {
     }
 
     //@@@@@@@@@@    Graphics      @@@@@@@@@@
-    Button {
+    MButton {
         id:btnBack
         text: qsTr("back to graphs")
 
@@ -293,6 +293,7 @@ MForm {
         anchors.rightMargin: 10
         width:parent.width*0.2
         height:parent.height*0.08
+        labelSize: 4
         onClicked: {            
             for (var i = 0; i < pagesLocal.length; i++) {
                 if (pagesLocal[i].visible)

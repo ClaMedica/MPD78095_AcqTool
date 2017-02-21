@@ -106,7 +106,7 @@ Rectangle{
                 color: !control.enabled ? "#DADAD9" : "#6F6E6E"
                 anchors.fill: parent
                 font.pixelSize: 12
-                font.family: "arial"
+                font.family: (layout !== undefined) ? layout.value("FFamily") : "ubuntu"
             }
             selectedTextColor: "steelblue"
         }

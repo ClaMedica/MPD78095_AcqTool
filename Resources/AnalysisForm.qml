@@ -16,7 +16,7 @@ MForm{
 
     //@@@@@@@@@@    Properties      @@@@@@@@@@
     id : rootAna
-    anchors.fill: parent.fill   
+    anchors.fill: parent.fill
 
     //@@@@@@@@@@    Functions       @@@@@@@@@@
     function populate()
@@ -68,7 +68,7 @@ MForm{
         anchors.top: parent.top
         anchors.left: parent.left
         anchors.right: gridComand.left
-        height: rootAna.height - 15
+        height: rootAna.height - 25
         plotProp:mngCon.plotSetting
 
         //@@@@@@@@@@    Events          @@@@@@@@@@
@@ -157,23 +157,14 @@ MForm{
         width:0
         owner:"Marker"
         itemsInRow:1
-        delegate: MMarkerButton{}
-        visible:false
-
-
-        //@@@@@@@@@@    Events          @@@@@@@@@@
-        onClicked:
-        {
-            switch(owner)
-            {
-            case "Marker":
+        delegate: MMarkerButton{
+            onClick: {
                 mngAcq.addMarker(value);
                 //console.log(mngAcq.acqMarkers)
                 plot.markers=mngAcq.acqMarkers;
-
-                break;
             }
         }
+        visible:false
     }
 
     MGridView{
@@ -185,22 +176,11 @@ MForm{
         width:0
         owner:"Definers"
         itemsInRow:1
-        delegate: MMarkerButton{}
+        delegate: MMarkerButton {
+
+        }
         visible:true
 
-
-        //@@@@@@@@@@    Events          @@@@@@@@@@
-//        onClicked:
-//        {
-//            switch(owner)
-//            {
-//            case "Marker":
-//                mngAcq.addMarker(value);
-//                //console.log(mngAcq.acqMarkers)
-//                plot.markers=mngAcq.acqMarkers;
-//                break;
-//            }
-//        }
     }
 
     MGridView{
@@ -212,34 +192,14 @@ MForm{
         width:60
         owner:"Commands"
         itemsInRow:1
-        delegate: MMarkerButton{}
-        visible:true
-
-        onTooltipActived:
-        {
-            if (testo === "")
-                toolTip.visible = false
-            else
-            {
-                toolTip.y = posY
-                toolTip.text = testo
-                toolTip.visible = true
-            }
-        }
-
-        //@@@@@@@@@@    Events          @@@@@@@@@@
-
-        onClicked:
-        {
-            switch(owner)
-            {
-            case "Commands":
+        delegate: MMarkerButton{
+            onClick: {
                 if (value === "111")
                     mngData.analysis();
 
-                if (value === "112") {
+                if (value === "112")
                     mngData.exitFromReview()
-                }
+
                 if (value === "113"){
                     //zoom in
                     plot.oldToZoom = plot.toZoom
@@ -255,9 +215,63 @@ MForm{
                     plot.oldToZoom = 0
                     plot.toZoom = 0
                 }
-                break;
+            }
+            onTooltipActive: {
+                if (testo === "")
+                    toolTip.visible = false
+                else
+                {
+                    toolTip.y = posY
+                    toolTip.text = testo
+                    toolTip.visible = true
+                }
             }
         }
+        visible:true
+
+//        onTooltipActived:
+//        {
+//            if (testo === "")
+//                toolTip.visible = false
+//            else
+//            {
+//                toolTip.y = posY
+//                toolTip.text = testo
+//                toolTip.visible = true
+//            }
+//        }
+
+        //@@@@@@@@@@    Events          @@@@@@@@@@
+
+//        onClicked:
+//        {
+//            switch(owner)
+//            {
+//            case "Commands":
+//                if (value === "111")
+//                    mngData.analysis();
+
+//                if (value === "112") {
+//                    mngData.exitFromReview()
+//                }
+//                if (value === "113"){
+//                    //zoom in
+//                    plot.oldToZoom = plot.toZoom
+//                    plot.toZoom = plot.toZoom + 1
+//                }
+//                if (value === "114"){
+//                    //zoom out
+//                    plot.oldToZoom = plot.toZoom
+//                    plot.toZoom = plot.toZoom - 1
+//                }
+//                if (value === "115"){
+//                    //zoom none
+//                    plot.oldToZoom = 0
+//                    plot.toZoom = 0
+//                }
+//                break;
+//            }
+//        }
     }
 
 
@@ -276,7 +290,7 @@ MForm{
             //@@@@@@@@@@    Properties      @@@@@@@@@@
             id:toolTipText
             color:"blue"
-            font.family: "Courier 8 Pitch"
+            font.family:  (layout !== undefined) ? layout.value("FFamily") : "ubuntu"
             font.bold: false
             font.pixelSize:12
             text:toolTip.text
@@ -284,126 +298,5 @@ MForm{
             verticalAlignment: Text.AlignVCenter
         }
     }
-
-
-    //@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@-
-//    MMenuBar {
-//        //@@@@@@@@@@    Properties      @@@@@@@@@@
-//        id: mainMenu
-//        anchors.top: parent.top
-//        color: "transparent"
-//        height: root.height
-//        width: root.width
-//        opacity: rootAna.opacity
-//        theme: "red"
-//        items: [
-//            //["File","Open Audio","Open Exam","Save","Back"],
-//            //["Add","Data to Plot","New Marker","New Definer"],
-//            //["Select Signal","To Analyze","To Play"],
-//            //--["Analisys", "Analizza",qsTr("Exit")],
-//            //["Actions","Send Toast","Start Service","Connect Client"],
-//            //["Plot","Load Settings"]
-//        ]
-
-//        //@@@@@@@@@@    Events          @@@@@@@@@@
-//        onSelected: {
-
-////            if (itemClicked === "Send Toast"){
-////                androidmanager.showToast("ciao dal qml");
-////            }
-////            if(itemClicked === "Start Service"){
-////                androidmanager.launchService("medica.blue.START_SERVICE");
-////            }
-////            if(itemClicked === "Connect Client"){
-////                androidmanager.connectClient();
-////            }
-
-////            if (itemClicked == "Open Audio") {
-////                fileDial.owner="mngData"
-////                fileDial.folder="../../ProgettoDoppler/Exams/Audio di Prova"
-////                fileDial.setNameFilters("*.wav")
-////                fileDial.open()
-////            }
-////            if (itemClicked == "Open Exam") {
-////                fileDial.owner="mngData"
-////                fileDial.folder="../../ProgettoDoppler/Exams"
-////                fileDial.setNameFilters("*.pic")
-////                fileDial.open()
-////            }
-////            if (itemClicked == "Back") {
-////                rootAna.back()
-////            }
-////            if (itemClicked == "Save") {
-////                mngData.saveChanges()
-////            }
-////            //Add
-////            if (itemClicked == "Data to Plot")
-////                plotDial.visible=true
-////            if (itemClicked == "New Marker")
-////            {
-////                selector.type="Marker"
-////                selector.owner="family"
-////                selector.title="Choose a family"
-////                selector.multipleChoice=true
-////            }
-////            if (itemClicked == "New Definer")
-////            {
-////                selector.type="Definer"
-////                selector.owner="family"
-////                selector.title="Choose a family"
-////                selector.multipleChoice=true
-////            }
-////            //Select
-////            if (itemClicked == "To Play")
-////            {
-////                selector.owner="audioPlayer"
-////            }
-////            if (itemClicked == "To Analyze")
-////            {
-////                selector.owner="dopAna"
-////            }
-//            //Analysis
-
-//            if (itemClicked == "Analizza")
-//            {
-//                console.log("Sono dentro il click analysis")
-//                mngData.analysis();
-//            }
-
-//            if (itemClicked == "Exit")
-//            {
-//                console.log("Sono dentro il click Exit")
-//                mngData.exitFromReview();
-//            }
-
-////            var str=items[3];
-////            if (str.indexOf(itemClicked)!==-1)
-////            {
-////                mngPar.curAnalysis=itemClicked
-
-////                box.ready=false
-////                box.currentAna=itemClicked
-////                box.items=mngPar.items
-////                box.width=parent.width/2
-////                box.popola()
-////                box.ready=true
-////            }
-
-//            //Settings
-////            if (itemClicked == "Load Settings")
-////            {
-////                fileDial.owner="mngCon"
-////                fileDial.folder="../../ProgettoDoppler/Doppler/Config"
-////                fileDial.setNameFilters("*.xml")
-////                fileDial.open()
-////            }
-
-
-
-//        }
-//    }
-
-
-
 
 }

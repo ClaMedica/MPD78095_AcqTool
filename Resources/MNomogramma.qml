@@ -216,10 +216,10 @@ Rectangle {
         max:rootPlot.yMax
         min:rootPlot.yMin
         // Y Axis General properties
-        format:            AxisSettings.EFORMAT_FLOAT
+        format:            AxisSettings.EFORMAT_INT
         decimalsMaj:       1
         //Y Proprietà del testo Major
-        fontMajFamily:     "Arial"
+        fontMajFamily:     "ubuntu"
         fontMajColor:      colorLabelAssi
         fontMajSize:       8
         textMajDist:       2
@@ -229,6 +229,7 @@ Rectangle {
         textMinVisible:    true
         // Y Axis unit of measure
         unitOfMeasureRotation:       -90
+        unitOfMeasureVisible:        false
     }
 
     PlotGrid2D{ //Y AXIS NOTECHES

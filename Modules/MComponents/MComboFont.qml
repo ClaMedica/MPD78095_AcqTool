@@ -69,8 +69,8 @@ Rectangle{
         anchors.leftMargin: rootComboBox.border.width
         height: oriH
         labelSize: rootComboBox.labelSize
-        font.family: (text != "") ? text : layout.value("FFamily")
-        text: "Courier"
+        font.family: layout.value("FFamily")
+        text: font.family
         horizontalAlignment: (text.length > 5) ? Text.AlignLeft : Text.AlignHCenter
     }
 
