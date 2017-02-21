@@ -104,6 +104,7 @@ int main(int argc, char *argv[])
     engine.rootContext()->setContextProperty("screenH", 480);
     engine.rootContext()->setContextProperty("screenW", 640);
     engine.rootContext()->setContextProperty("isTouch", bool_true);
+    engine.rootContext()->setContextProperty("PicoFlow", bool_true);
     engine.addPluginPath("../PicoFlow");
 #endif
 
@@ -120,6 +121,7 @@ int main(int argc, char *argv[])
     engine.rootContext()->setContextProperty("screenH", 480);
     engine.rootContext()->setContextProperty("screenW", 640);
     engine.rootContext()->setContextProperty("isTouch", bool_false);
+    engine.rootContext()->setContextProperty("PicoFlow", bool_false);
 #endif
 
     engine.rootContext()->setContextProperty("layout", &mngLayout);
