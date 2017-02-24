@@ -23,22 +23,22 @@ MForm{
     //@@@@@@@@@@    Functions       @@@@@@@@@@
     function displayMessage(mex,time)
     {
-        pop.message=mex
-        pop.display(1,0)
-        if(time!==-1)
-            pop.display(0,time)
+        pop.message = mex
+        pop.display(1, 0)
+        if(time !== -1)
+            pop.display(0, time)
     }
 
     function setMarkersInfo(info)
     {
         console.log(info)
-        grid.items=info
+        grid.items = info
     }
 
     function setAcqInfo(info)
     {
         console.log(info)
-        gridAcq.items=info
+        gridAcq.items = info
     }
 
     //@@@@@@@@@@    Events      @@@@@@@@@@
@@ -285,11 +285,10 @@ MForm{
 //        }
 //    }
 
-    MPopUp{
-        id:pop
+    MPopUp {
+        id: pop
         anchors.centerIn: parent
-        width:200
-        height:100
+        width: 200
+        height: 100
     }
-
 }
