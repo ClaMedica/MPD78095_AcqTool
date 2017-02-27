@@ -32,6 +32,8 @@
 #include <androidmanager.h>
 #endif
 
+char strvers[] = "AcqTool del " __DATE__ " alle " __TIME__;
+
 bool DebugAcqTool = false;
 
 AcqBridge *g_mainAppBridge;
