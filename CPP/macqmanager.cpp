@@ -67,6 +67,7 @@ MAcqManager::~MAcqManager()
 void MAcqManager::dataOnTCP(QObject *__pParent, SimpleTCPClient *__pTCP, QByteArray __block)
 {//arriviamo qua dentro ogni volta che arriva qualcosa da uno dei server a cui siamo collegati
 
+    qDebug() << __pTCP->hostAddress() << __pTCP->hostPort() << __block;
     if(__pParent != NULL) {     //punta a qualcosa andiamo avanti
         if(__pTCP != NULL) {    //punta a qualcosa proviamo a gestirlo
             ((MAcqManager *) __pParent)->handleTCP(__pTCP, __block);
@@ -391,12 +392,12 @@ void MAcqManager::handleTCP(SimpleTCPClient *__client, QByteArray __block)
 {
     if(m_tcpClients.values().contains(__client)) {
         QString who = m_tcpClients.key(__client);
-        //qDebug()<<who<<__block;
+        qDebug() << who << __block;
 
         if(who == "STA") {      //allora e' uno stato
             m_supeConnected = true;
             __block.remove(0, 4);
-            //#BUG non e' in gradi di interpretare lo stato del picoflow ma sono quello della cella
+            //#BUG non e' in gradi di interpretare lo stato del picoflow ma solo quello della cella
             flowBT_status_t status;
             alarms_t alarms;
             uint i = 0;
@@ -408,7 +409,7 @@ void MAcqManager::handleTCP(SimpleTCPClient *__client, QByteArray __block)
 
             analyzeStatus(status);
             analyzeAlarms(alarms);
-            //qDebug()<<"Supervisoore connesso";
+            qDebug() << "Supervisore connesso";
         }
         else if(who == "VAL")
         {
@@ -418,7 +419,7 @@ void MAcqManager::handleTCP(SimpleTCPClient *__client, QByteArray __block)
             // finche' i buffer hanno abbastanza campioni
             // faccio le mie operazioni e rimuovo i primi campioni
             while(buffersReady()) {
-                //qDebug()<<"BUFFER ready";
+                qDebug() << "BUFFER ready";
                 applyOperations();
                 foreach(QString hwc, m_totalHWChan)
                     m_bufferMap[hwc]->remove(0, m_frameMap[hwc]);
@@ -483,7 +484,7 @@ bool MAcqManager::loadConnectivityInfo(Ancestry *__info)
 void MAcqManager::analyzeStatus(flowBT_status_t __status)
 {
     m_alarmMng.stopTimeoutAlarm(ALA_TIMEOUT_STATUS);
-    if(__status.currState != m_oldState)
+//    if(__status.currState != m_oldState)
         qDebug() << "Stato " << __status.currState << m_oldState;
 
     switch(__status.currState)
@@ -492,7 +493,7 @@ void MAcqManager::analyzeStatus(flowBT_status_t __status)
         if(m_oldState == ESTATE_IDLE_CONNECTED)
             m_alarmMng.addAlarm(ALA_NOT_CONNECTED);
         else
-            m_alarmMng.startTimeoutAlarm(ALA_NOT_CONNECTED, 1000);
+            m_alarmMng.startTimeoutAlarm(ALA_NOT_CONNECTED, 3000);
         break;
 
     case ESTATE_IDLE_CONNECTED:

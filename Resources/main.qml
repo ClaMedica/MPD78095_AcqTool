@@ -106,11 +106,15 @@ ApplicationWindow {
         id: connMainApp
         target: bridgeMain
         ignoreUnknownSignals: true
-        onNewAcquisition: launch("acq",datafile)
+        onNewAcquisition:
+        {
+            console.log(datafile);
+            launch("acq", datafile)
+        }
         onNewVisualization:
         {
             console.log(datafile);
-            launch("vis",datafile)
+            launch("vis", datafile)
         }
     }
 

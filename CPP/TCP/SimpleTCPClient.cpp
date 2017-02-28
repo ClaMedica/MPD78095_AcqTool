@@ -67,11 +67,14 @@ bool SimpleTCPClient::setHostPort(int __port)
 
 bool SimpleTCPClient::connectToHost()
 {
-    if(m_channelInUse)
-        return false;
-    m_channelInUse = true;
-    m_channelTcpSocket->connectToHost(m_hostAddress, m_hostPort);
-    return true;
+    bool ret = false;
+    if( ! m_channelInUse) {
+        m_channelInUse = true;
+        m_channelTcpSocket->connectToHost(m_hostAddress, m_hostPort);
+        ret = true;
+    }
+    qDebug() << m_hostAddress << m_hostPort << "ret:" << ret;
+    return ret;
 }
 
 bool SimpleTCPClient::connectToHost(QHostAddress __address, int __port)

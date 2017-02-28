@@ -6,7 +6,7 @@ import QtQuick.Window 2.2
 import QtQuick.Controls.Styles 1.3
 import MComponents 1.0
 
-import QtQuick.VirtualKeyboard 1.0
+//import QtQuick.VirtualKeyboard 1.0
 
 Rectangle{
     id:rootForm
