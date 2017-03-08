@@ -302,7 +302,7 @@ void printermanager::Pri_Rep()//byte numCurve, char* num_file_to_print, bool pri
 
     // fa avanzare la carta per consentire lo strappo
 #if PRI_REP_SPA
-    int npix = (int) (5 / 0.125);
+    int npix = (int) (25 / 0.125);
     m_port->Pri_forward(npix);
 #endif
 
