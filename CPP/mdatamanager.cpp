@@ -917,7 +917,7 @@ bool MDataManager::checkForVolRes()
         int anaType = m_mng->GetAnalysis(i).toInt();
         if (anaType == FLW_AVD_STUDY) {
             if (m_autoPrint)
-                setValVolRes(-1);
+                setValVolRes(0);//-1?;
             else {
                 volRes = true;
                 setValVolRes(0);    //in futuro sarA  letto da proprietA  xml

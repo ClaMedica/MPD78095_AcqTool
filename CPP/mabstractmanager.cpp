@@ -336,11 +336,11 @@ bool MAbstractManager::buildConfigurationFile()
     for(int32_t nc = 0; nc < chanlNum; nc++) {  //contiamo i grafici e popoliamo le mappe di associazione
         QString chanName = m_mng->GetChanName(nc);
 
-        //per i grafici devo appendere l'informazione perchA? posso avere piA? canali
+        //per i grafici devo appendere l'informazione perche posso avere piu canali
         QString graphName = "Graph_" + QString::number(m_mng->GetGraph(nc));
         m_chanInPlots[graphName] << chanName;
 
-        //aggiungo il canale su cui comunicherA  questo plot
+        //aggiungo il canale su cui comunichera  questo plot
         m_tcpChannels[graphName] = new SimpleTCPChannel(QHostAddress("127.0.0.1"), 9000 + m_mng->GetGraph(nc) - 1, this);
         qDebug() << nc << chanName << "inviato su" << graphName << 9000 + m_mng->GetGraph(nc) - 1;
 
