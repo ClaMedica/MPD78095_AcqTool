@@ -14,12 +14,11 @@ printerserialport::printerserialport(QObject *parent) : QObject(parent)
 
     if ( ! m_serialPort.open(QIODevice::ReadWrite))
         qCritical() << "Unable to open serial port";
-
-
 }
 
 void printerserialport::init_printer()
 {
+    system("/root/PicoFlow/initprinter.sh");
     Pri_Reset();
 //    Pri_Default();
 }
