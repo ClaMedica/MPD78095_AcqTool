@@ -138,7 +138,7 @@ ApplicationWindow {
 
         //@@@@@@@@@@    Events          @@@@@@@@@@
         onLoadingCompleted: {
-            forAna.configurationFile = mngData.plotConfigFileName()
+            forAna.loadConfigurationFile(mngData.plotConfigFileName())
             forAna.populate()
             forHome.whoIsVisible = forAna.name
         }

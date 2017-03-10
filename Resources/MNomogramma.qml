@@ -32,6 +32,7 @@ Rectangle {
     property var bandeColore: ["lightgreen", "peachpuff"]
     property int numBande: 1
 
+    property int fontSize: 15
     border.width: 1
 
     color: "lightgrey"
@@ -154,10 +155,8 @@ Rectangle {
             color: colorTesti
             x: rootPlot.width/2 - nome.length*4
             y: 10
-            font {
-                family: "Arial"
-                pointSize: 8
-            }
+            font.family:  (layout !== undefined) ? layout.value("FFamily") : "ubuntu"
+            font.pixelSize: fontSize
         }
     }
 
@@ -171,12 +170,10 @@ Rectangle {
         Text {
             text: udmY
             color: colorTesti
-            x: 10
+            x: 5
             y: rootPlot.height/2 + udmY.length*4
-            font {
-                family: "Arial"
-                pointSize: 8
-            }
+            font.family:  (layout !== undefined) ? layout.value("FFamily") : "ubuntu"
+            font.pixelSize: fontSize
             transform: Rotation {
                 angle: -90
             }
@@ -194,11 +191,9 @@ Rectangle {
             text: udmX
             color: colorTesti
             x: rootPlot.width/2 - udmX.length*4
-            y: 20
-            font {
-                family: "Arial"
-                pointSize: 8
-            }
+            y: 30
+            font.family:  (layout !== undefined) ? layout.value("FFamily") : "ubuntu"
+            font.pixelSize: fontSize
         }
     }
 
@@ -409,11 +404,6 @@ Rectangle {
             color: "slateblue"
             opacity: 1
         }
-
-
-
-
-
     }
 }
 
