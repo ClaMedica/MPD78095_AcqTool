@@ -4,8 +4,8 @@
 
 printerserialport::printerserialport(QObject *parent) : QObject(parent)
 {
-    m_serialPort.setPortName("/dev/ttyUSB0");
-    //m_serialPort.setPortName("/dev/ttyS0");
+//    m_serialPort.setPortName("/dev/ttyUSB0");
+    m_serialPort.setPortName("/dev/ttyS0");
     m_serialPort.setBaudRate(115200);
     m_serialPort.setFlowControl(QSerialPort::HardwareControl);
     m_serialPort.setParity(QSerialPort::NoParity);
@@ -14,12 +14,11 @@ printerserialport::printerserialport(QObject *parent) : QObject(parent)
 
     if ( ! m_serialPort.open(QIODevice::ReadWrite))
         qCritical() << "Unable to open serial port";
-
-
 }
 
 void printerserialport::init_printer()
 {
+    system("/root/PicoFlow/initprinter.sh");
     Pri_Reset();
 //    Pri_Default();
 }
@@ -150,6 +149,7 @@ bool printerserialport::Pri_Str(int m_num_car, char *m_str_pri, unsigned char m_
 #if 1
     while(m_serialPort.waitForBytesWritten(100) == false)
         ;
+    m_serialPort.flush();
 #else
 #ifdef  _PRISTR_SPLIT_
     if(recurse == false)
