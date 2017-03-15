@@ -83,7 +83,7 @@ private:
 
     AlarmManager    m_alarmMng;         //gestore allarmi
 
-    flowBT_states_t m_oldState;
+    uint8_t m_oldState;
 
     MSignal m_stopBuffer;
 
@@ -91,7 +91,7 @@ private:
     void handleTCP(SimpleTCPClient *__client, QByteArray __block);
     void initializeServers();
     bool loadConnectivityInfo(Ancestry *__info);
-    void analyzeStatus(flowBT_status_t __status);
+    void analyzeStatus(picoFlow_states_t __currState);
     void analyzeAlarms(alarms_t __alarms);
     bool newAcqFromConfigFile();
     bool newAcqFromPIC();
