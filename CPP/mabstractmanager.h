@@ -9,6 +9,7 @@
 #include "ancestry.h"
 #include "msignal.h"
 #include "flowBT_types.h"
+#include "PicoFlow_types.h"
 #include "TcpServerFlowBt_types.h"
 #include "inheritEnum.h"
 #include "alarmmanager.h"

@@ -15,7 +15,7 @@ MAcqManager::MAcqManager(QObject *parent)
     m_saving = false;           //non sto salvando i dati
     m_tcpAttempts = 0;
     m_supeConnected = 0;
-    m_oldState = ESTATE_IDLE_NOT_CONNECTED;
+    m_oldState = 0;
 
 #ifdef PICOFLOW
 
@@ -226,21 +226,21 @@ void MAcqManager::startSupe(QString __mode)
     qDebug() << "Supervisor starting...";
     QString path = g_P7SettingsManager.progPath();
     m_superProcess->start(path + "/FlowBtSupe.exe", QStringList() << __mode);
-//    QString path = g_P7SettingsManager.progPath();
-//    QString program = "run_PicoTarget.sh";
+    //    QString path = g_P7SettingsManager.progPath();
+    //    QString program = "run_PicoTarget.sh";
 
-//    if(!QFile::exists(path + "/" + program))
-//        qCritical() << "No path for" << path + "/" + program;
-//    qDebug() << "Lancio l'applicativo" << path + "/" + program;
-//    QStringList arguments;
-//    arguments << "PicoFlowSupe" << __mode;
+    //    if(!QFile::exists(path + "/" + program))
+    //        qCritical() << "No path for" << path + "/" + program;
+    //    qDebug() << "Lancio l'applicativo" << path + "/" + program;
+    //    QStringList arguments;
+    //    arguments << "PicoFlowSupe" << __mode;
 
-//    QString command = "cd ";
-//    command += path + " && ./" + program + " " + arguments.join(" ");
-//    //arguments<<"--platform eglfs"<<"-plugin tslib:/dev/input/event0";
+    //    QString command = "cd ";
+    //    command += path + " && ./" + program + " " + arguments.join(" ");
+    //    //arguments<<"--platform eglfs"<<"-plugin tslib:/dev/input/event0";
 
-//    qDebug() << "Running process " << command;
-//    qDebug() << "Process returned:" << executeDetached(command);
+    //    qDebug() << "Running process " << command;
+    //    qDebug() << "Process returned:" << executeDetached(command);
 #endif
 
 }
@@ -397,19 +397,37 @@ void MAcqManager::handleTCP(SimpleTCPClient *__client, QByteArray __block)
         if(who == "STA") {      //allora e' uno stato
             m_supeConnected = true;
             __block.remove(0, 4);
-            //#BUG non e' in gradi di interpretare lo stato del picoflow ma solo quello della cella
-            flowBT_status_t status;
+            //#BUG non e' in gradi di interpretare lo stato del picoflow(cavo+emg) ma solo quello della cellaBT
+            // vedere picoFlow_status_t e flowBT_status_t
+            flowBT_status_t stBT;
+            picoFlow_status_t stPico;
             alarms_t alarms;
+            union {
+                flowBT_states_t bt;
+                picoFlow_states_t pf;
+            } currState;
             uint i = 0;
-            for(i = 0; i < sizeof(flowBT_status_t); i++)
-                ((qint8 *) (& status) )[i] = __block[i];
+            if((__block.size() - sizeof(alarms_t)) == sizeof(flowBT_status_t)) {
+                qint8  * d = (qint8 *) &stBT;
+                for(i = 0; i < sizeof(flowBT_status_t); i++)
+                    *d++ = __block.at(i);
+                currState.bt = stBT.currState;
+            }
+            else {
+                qint8  * d = (qint8 *) &stPico;
+                for(i = 0; i < sizeof(picoFlow_status_t); i++)
+                    *d++ = __block.at(i);
+                currState.pf = stPico.currState;
+            }
+//            for(i = 0; i < sizeof(flowBT_status_t); i++)
+//                ((qint8 *) (& status) )[i] = __block[i];
             i++;
             for(uint j = i; j < sizeof(alarms_t) + i; j++)
                 ((qint8 *) (& alarms))[j-i] = __block[j];
 
-            analyzeStatus(status);
+            analyzeStatus(currState.pf);
             analyzeAlarms(alarms);
-            qDebug() << "Supervisore connesso";
+            qDebug() << "Supervisore connesso"<<sizeof(flowBT_status_t)<<sizeof(picoFlow_status_t)<<sizeof(alarms_t)<<__block.size();
         }
         else if(who == "VAL")
         {
@@ -438,6 +456,32 @@ void MAcqManager::handleTCP(SimpleTCPClient *__client, QByteArray __block)
                 if(!m_acqFinished) {
                     sendBuffersToPlot();
                     saveBuffersToFile();
+                }
+            }
+        }
+        else if(who == "CMD")
+        {
+            //decidere che fare se ricevo roba qua
+            if(__block[4] == '5')
+            {//pressione start/stop
+                if(!m_saving)
+                {
+                    //parte immediatamnte l'acquisizione
+                    //effetto buffer tengo solo gli ultimi 5 secondi
+                    foreach(QString type, m_channelMap.keys())
+                        foreach(MSignal *sig, m_channelMap[type])
+                            sig->saveLastSec(5.0);
+
+                    m_saving = true;    //posso iniziare a salvare i dati
+                    emit acquisitionStarted();
+                    qDebug() << "Start acquiring";
+                    m_acqFinished = false;
+                }
+                else
+                {//ferma immediatamente l'acquisizione
+                    qDebug() << "Stop acquiring";
+                    endAcquisitionSave();
+                    m_acqFinished = true;
                 }
             }
         }
@@ -481,13 +525,13 @@ bool MAcqManager::loadConnectivityInfo(Ancestry *__info)
     return true;
 }
 
-void MAcqManager::analyzeStatus(flowBT_status_t __status)
+void MAcqManager::analyzeStatus(picoFlow_states_t __currState)
 {
     m_alarmMng.stopTimeoutAlarm(ALA_TIMEOUT_STATUS);
-//    if(__status.currState != m_oldState)
-        qDebug() << "Stato " << __status.currState << m_oldState;
+    //    if(__status.currState != m_oldState)
+    qDebug() << "Stato " << __currState << m_oldState;
 
-    switch(__status.currState)
+    switch(__currState)
     {
     case ESTATE_IDLE_NOT_CONNECTED:
         if(m_oldState == ESTATE_IDLE_CONNECTED)
@@ -514,8 +558,8 @@ void MAcqManager::analyzeStatus(flowBT_status_t __status)
     default:break;
     }
 
-    m_oldState = __status.currState;
-    m_alarmMng.startTimeoutAlarm(ALA_TIMEOUT_STATUS, 1000);
+    m_oldState = __currState;
+    m_alarmMng.startTimeoutAlarm(ALA_TIMEOUT_STATUS, 3000);
 }
 
 void MAcqManager::analyzeAlarms(alarms_t __alarms)
@@ -579,7 +623,7 @@ void MAcqManager::checkAutomaticStartStop(QString __which)
                     count = 0;
             }
 
-            if(count >= min) {
+            if(count >= min) {//trigger inizio acq
                 //effetto buffer tengo solo gli ultimi 5 secondi
                 foreach(QString type, m_channelMap.keys())
                     foreach(MSignal *sig, m_channelMap[type])
@@ -753,16 +797,16 @@ bool MAcqManager::handleDataFile()
         //controllo se questo canale ha i requisiti per fare l'acq automatica
         //mi fido del software archivio pazienti
         if(m_mng->GetLoc(i) == "a")
-            m_autoStartStop = true;        
+            m_autoStartStop = true;
 #endif
         qDebug() << "handleDataFile(): GetGain,GetOffset:" << m_mng->GetGain(i) << m_mng->GetOffset(i);
     }
 
-//    //qDebug()<<"stato"<<m_mng->GetState();
-//    qDebug() << "Commit Parameters?" << m_mng->CommitParameters();
-//    qDebug() << "Close?" << m_mng->Close();
-//    qDebug() << "Open?" << m_mng->Open();
-//    qDebug() << "Get Parameters?" << m_mng->GetParameters();
+    //    //qDebug()<<"stato"<<m_mng->GetState();
+    //    qDebug() << "Commit Parameters?" << m_mng->CommitParameters();
+    //    qDebug() << "Close?" << m_mng->Close();
+    //    qDebug() << "Open?" << m_mng->Open();
+    //    qDebug() << "Get Parameters?" << m_mng->GetParameters();
     return true;
 }
 
@@ -854,11 +898,11 @@ void MAcqManager::fillBuffers(QByteArray __block)
     qreal sample;
 
     in >> numBytes;
-    //qDebug()<<"NA? bytes: "<<numBytes;
+    qDebug()<<"NA? bytes: "<<numBytes;
 
     //Chan number
     in >> numChan;
-    //qDebug()<<"NA? chan: "<<numChan;
+    qDebug()<<"NA? chan: "<<numChan;
 
     if(numChan > maxNumChan) {
         qCritical( "ERROR, numChan(%d) > maxNumChan(%d)", numChan,maxNumChan);
@@ -868,18 +912,19 @@ void MAcqManager::fillBuffers(QByteArray __block)
     for(int k = 0; k < numChan; k++) {
         in >> currChan;
         in >> numChanData;
-        //qDebug()<<currChan;
+        qDebug() << "currChan:" << currChan;
 
         if((currChan < maxNumChan) && (currChan >= 0)) {    //se e' un canale con del senso
-            if(m_bufferMap.keys().contains(QString::number(currChan)))
+            if(m_bufferMap.keys().contains(QString::number(currChan))) {
                 for(int i = 0; i < numChanData; i++) {
                     in >> sample;
                     m_bufferMap[QString::number(currChan)]->append(sample);
                     qDebug("samples(ch:%d, nd:%d):%f",currChan,numChanData,sample);
                 }
-            else
-                qCritical() << "Channel non recognized" << m_bufferMap.keys() << currChan;
-            qDebug() << currChan << m_bufferMap[QString::number(currChan)]->size();
+//            else
+//                qCritical() << "Channel non recognized" << m_bufferMap.keys() << currChan;
+                qDebug() << currChan << m_bufferMap[QString::number(currChan)]->size();
+            }
         }
         else
             qCritical() << "currChan out of range" << currChan;
@@ -978,7 +1023,7 @@ bool MAcqManager::readConfigurationFile()
         QString operations = channel->getSafeChild(XML_OPERATIONS)->text();
 
         int bufMax = 0;     // massima lunghezza di buffer
-                            // memorizzo la mappa delle operazioni
+        // memorizzo la mappa delle operazioni
         m_operationMap[name] = operations.split("#");
         foreach(QString operation, m_operationMap[name]) {
             QStringList opData = operation.split("@");
