@@ -1,4 +1,7 @@
 TEMPLATE = app
+
+QMAKE_CXXFLAGS += -Wno-psabi
+
 #TARGET = acqTool
 TARGET = PicoAcq
 QT += qml quick widgets sql network multimedia xml core serialport
