@@ -8,76 +8,84 @@ import MComponents 1.0
 
 Rectangle{
     id:rootPage
-    property string prevPage:""
-    property string nextPage:""
-    property string name:""
-    property string backgroundImage:""
-    property var image:undefined
+    property string prevPage: ""
+    property string nextPage: ""
+    property string name: ""
+    property string backgroundImage: ""
+    property var image: undefined
     signal changePage(var page)
     signal backClicked
     signal nextClicked
     signal questionAnswered(bool accepted,var owner,var arg)
-    color:"transparent"
-    function previous(){
-        if(prevPage!==""){
+    color: "transparent"
+
+//    function onLid_inquiry_end() {
+//        console.log("onLid_inquiry_end")
+//        rootPageBluetoothDevice.backgroundImage = ""
+//    }
+
+    function previous() {
+        if(prevPage !== "") {
             changePage(prevPage)
             backClicked()
         }
     }
-    function next(){
-        if(nextPage!==""){
+
+    function next() {
+        if(nextPage !== "") {
             changePage(nextPage)
             nextClicked()
         }
     }
 
-    function askQuestion(owner,arg,question,answ1,answ2)
+    function askQuestion(owner, arg, question, answ1, answ2)
     {
-        var s='import MComponents 1.0;'
-        var mexBox=Qt.createQmlObject(s+"MDialogYesNo{}",rootPage);
-        mexBox.anchors.centerIn=rootPage
-        mexBox.message=question
-        mexBox.yesText=answ1
-        mexBox.noText=answ2
-        mexBox.width=rootPage.width*0.7
-        mexBox.height=rootPage.height*0.7
-        conQuestion.owner=owner
-        conQuestion.arg=arg
-        conQuestion.target=mexBox
+        console.log(arg, question, answ1, answ2)
+        var s = 'import MComponents 1.0;'
+        var mexBox = Qt.createQmlObject(s + "MDialogYesNo{}", rootPage);
+        mexBox.anchors.centerIn = rootPage
+        mexBox.message = question
+        mexBox.yesText = answ1
+        mexBox.noText = answ2
+        mexBox.width = rootPage.width*0.7
+        mexBox.height = rootPage.height*0.7
+        conQuestion.owner = owner
+        conQuestion.arg = arg
+        conQuestion.target = mexBox
         DataEngine.putItemOnTop(mexBox)
     }
 
-    Connections{
-        id:conQuestion
+    Connections {
+        id: conQuestion
         property var owner
         property var arg
         ignoreUnknownSignals: true
         onAccepted:
         {
-            questionAnswered(true,owner,arg)
+            questionAnswered(true, owner, arg)
             target.destroy()
         }
         onRejected:
         {
-            questionAnswered(false,owner,arg)
+            questionAnswered(false, owner, arg)
             target:destroy()
         }
     }
 
     onBackgroundImageChanged: {
-        if(backgroundImage!=="")
+        if(backgroundImage !== "")
         {
-            if(image!==undefined)
+            if(image !== undefined)
                 image.destroy()
-            var s='import QtQuick 2.5;'
+            var s = 'import QtQuick 2.5;'
             if(backgroundImage.search(".gif"))
-                image=Qt.createQmlObject(s+"AnimatedImage{}",rootPage);
+                image = Qt.createQmlObject(s + "AnimatedImage{}", rootPage);
             else
-                image=Qt.createQmlObject(s+"Image{}",rootPage);
+                image = Qt.createQmlObject(s + "Image{}", rootPage);
 
-            image.anchors.fill=rootPage
-            image.source=backgroundImage
-            image.z=-1
+            image.anchors.fill = rootPage
+            image.source = backgroundImage
+            image.z = -1
         }
     }
 }

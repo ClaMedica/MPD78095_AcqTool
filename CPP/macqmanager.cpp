@@ -444,16 +444,19 @@ void MAcqManager::handleTCP(SimpleTCPClient *__client, QByteArray __block)
             }
 
             qDebug() << "m_saving:" << m_saving << "m_autoStartStop:" << m_autoStartStop;
-            if(!m_saving) {
-                if(m_autoStartStop)
+            if(m_autoStartStop) {
+                if(!m_saving)
                     checkAutomaticStartStop("Start");   //finche' non devo salvare riempo il buffer e controllo
-                else
-                    m_saving = true;
+                else {
+                    checkAutomaticStartStop("Stop");
+                    if(!m_acqFinished) {
+                        sendBuffersToPlot();
+                        saveBuffersToFile();
+                    }
+                }
             }
             else {
-                if(m_autoStartStop)
-                    checkAutomaticStartStop("Stop");
-                if(!m_acqFinished) {
+                if(m_saving && !m_acqFinished) {
                     sendBuffersToPlot();
                     saveBuffersToFile();
                 }
@@ -461,27 +464,40 @@ void MAcqManager::handleTCP(SimpleTCPClient *__client, QByteArray __block)
         }
         else if(who == "CMD")
         {
-            //decidere che fare se ricevo roba qua
-            if(__block[4] == '5')
-            {//pressione start/stop
-                if(!m_saving)
-                {
-                    //parte immediatamnte l'acquisizione
-                    //effetto buffer tengo solo gli ultimi 5 secondi
-                    foreach(QString type, m_channelMap.keys())
-                        foreach(MSignal *sig, m_channelMap[type])
-                            sig->saveLastSec(5.0);
+            if(__block[4] == '5') {
+                // pressione start/stop
+                // se tasto premuto ogni 500mSec arriva questo impulso
+                // se tasto rilasciato non arriva
+                //  input: __.__.__|__|__|__|__|__|__|__.__|__|__|__|__|__|__|__|__|__|__|__|__|__|__
+                //  ris:   __.__.__T__.__.__.__.__.__.__.__T__.__.__.__.__.__.__.__.__.__.__.__.__.__
 
-                    m_saving = true;    //posso iniziare a salvare i dati
-                    emit acquisitionStarted();
-                    qDebug() << "Start acquiring";
-                    m_acqFinished = false;
-                }
-                else
-                {//ferma immediatamente l'acquisizione
-                    qDebug() << "Stop acquiring";
-                    endAcquisitionSave();
-                    m_acqFinished = true;
+                static QTime keytim;
+                bool isStart = ! keytim.isValid();
+                if(isStart)
+                    keytim.start();
+                int elapsed = keytim.restart();
+                qDebug("start-stop: elapsed=%d", elapsed);
+                if(isStart || (elapsed > 700)) {   // transizione
+                    // isStart --> appena partito --> inizio nuova sequenza
+                    // elapsed > 700 --> e' stato saltato almeno un impulso --> inizio nuova sequenza
+                    if(!m_saving) {
+                        //parte immediatamnte l'acquisizione
+                        //effetto buffer tengo solo gli ultimi 5 secondi
+                        foreach(QString type, m_channelMap.keys())
+                            foreach(MSignal *sig, m_channelMap[type])
+                                sig->saveLastSec(5.0);
+
+                        m_saving = true;    //posso iniziare a salvare i dati
+                        emit acquisitionStarted();
+                        qDebug() << "Start acquiring";
+                        m_acqFinished = false;
+                    }
+                    else {
+                        //ferma immediatamente l'acquisizione
+                        qDebug() << "Stop acquiring";
+                        endAcquisitionSave();
+                        m_acqFinished = true;
+                    }
                 }
             }
         }
@@ -576,7 +592,7 @@ bool MAcqManager::checkAutomaticFlow()
     Ancestry *autoflow = m_configUser.getSafeChild("AutomaticFlow");
     QString value = autoflow->getSafeChild("Auto")->getSafeAttribute(ATT_VALUE);
 
-    return (value=="true"?true:false);
+    return (value == "true");
 }
 
 
