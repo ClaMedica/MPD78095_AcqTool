@@ -62,7 +62,6 @@ int main(int argc, char *argv[])
     qDebug() << "Start. log:" << gPath_log;
     //dirotto il debug log
     MyMessageOutput::init(gPath_log);
-    qDebug() << "Start. log:" << gPath_log;
 
     QStringList arguments;
     //leggiamo gli argomenti
@@ -106,8 +105,8 @@ int main(int argc, char *argv[])
     engine.rootContext()->setContextProperty("screenH", 480);
     engine.rootContext()->setContextProperty("screenW", 640);
     engine.rootContext()->setContextProperty("isTouch", bool_true);
-    engine.rootContext()->setContextProperty("PicoFlow", bool_true);
-    engine.addPluginPath("../PicoFlow");
+//    engine.rootContext()->setContextProperty("PicoFlow", bool_true);
+//    engine.addPluginPath("../PicoFlow");
 #endif
 
 #ifdef ANDROID

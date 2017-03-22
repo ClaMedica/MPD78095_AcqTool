@@ -10,7 +10,6 @@ import MComponents 1.0
 import "qrc:/Components"
 MForm{
     //@@@@@@@@@@    Definitions     @@@@@@@@@@
-    property alias configurationFile:mngCon.fileName
     property string displayInformations:""
     signal back
 
@@ -26,6 +25,7 @@ MForm{
         plot.frames=mngData.getData("Definer")
         plot.limits=mngData.getPlotLimits();
     }
+
 
     function initialize()
     {
@@ -57,6 +57,13 @@ MForm{
         gridComand.items=info
     }
 
+
+    function loadConfigurationFile(configurationFile)
+    {
+        mngCon.fileName = configurationFile
+        plot.completed=true;
+        mngCon.read()
+    }
 
     //@@@@@@@@@@    Objects     @@@@@@@@@@
 
@@ -143,8 +150,6 @@ MForm{
         //@@@@@@@@@@    Properties      @@@@@@@@@@
         id:mngCon
         fileName: ""
-        //@@@@@@@@@@    Events          @@@@@@@@@@
-        onFileNameChanged: if(fileName!==""){plot.completed=true;read()}
     }
 
 

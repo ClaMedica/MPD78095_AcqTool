@@ -100,7 +100,8 @@ void MDataManager::loadFile(QString __fileName)
     }
     m_fileName = __fileName;
 
-//    int n, i;
+    //devo pulire tutti i vettori utilizzati
+    resetAll();
 
     VarMapVec *mrkOpVec = new VarMapVec;
     VarMapVec *mrkAnVec = new VarMapVec;
@@ -140,11 +141,10 @@ void MDataManager::loadFile(QString __fileName)
 
         m_patientName = m_mng->GetPatient();    //.section(";",0,1);
         m_patientName.replace(";", "_");
-        m_sexPatient = true;
+        m_sexPatient = false;
         if (m_mng->GetPatient().section(";", 12, 12) == "F")
             m_sexPatient = true;
-        else
-            m_sexPatient = false;
+
         m_end = m_mng->GetDuration() / 1000;
         qDebug() << "Durata esame = " << m_end;
         qDebug() << "NA? di canali = "<< m_mng->GetChanNum();
@@ -274,6 +274,7 @@ void MDataManager::loadFile(QString __fileName)
             (*mrk)["family"] = "Markers";
             (*mrk)["nas"] =  m_mng->GetNAS(numCh);
             (*mrk)["valuesY"] = valuesY;
+            (*mrk)["graph"] = m_mng->GetGraph(numCh)-1;
             (*mrk)["code"] =  "f" + QString::number(key);
             (*mrk)["descr"] = descr;
             (*mrk)["lock"] = false;
@@ -389,13 +390,11 @@ void MDataManager::loadFile(QString __fileName)
 
 void MDataManager::resetAll()
 {
-    //    m_data.clear();
-    //    m_availableData.clear();
-    //    for(int i=0;i<m_signalVector.size();i++)
-    //        delete m_signalVector[i];
-    //    m_signalVector.clear();
-    //    emit availableTracksChanged();
-    //    emit availableDataChanged();
+        m_data.clear();
+        m_availableData.clear();
+        for(int i=0;i<m_signalVector.size();i++)
+            delete m_signalVector[i];
+        m_signalVector.clear();
 }
 
 void MDataManager::saveChanges()
@@ -591,7 +590,7 @@ bool MDataManager::updateInfoList()
         VarMapVec *opAn = m_storage.getAll(CAT_MARKER);
         foreach (VarMap *curMap, (*opAn)) {
             if (curMap->value("color") == COLOR_ANALYTICAL) {
-                int ch = curMap->value("channel").toInt();
+                int ch = curMap->value("graph").toInt();
                 if (ch == countGraphs) {
                     elements << "Markers:Analitical";
                     break;
@@ -633,8 +632,8 @@ bool MDataManager::buildInfoList()
      * i marker di distanza per ogni grafico
      */
 
-    //allora dato che questa funzione A? chiamata dopo aver costruito i plotter
-    //so giA  quanti e come si chiamano i grafici
+    //allora dato che questa funzione e chiamata dopo aver costruito i plotter
+    //so gia  quanti e come si chiamano i grafici
 
     QStringList graphs = m_chanInPlots.keys();
     QVariantList infoList;
@@ -961,7 +960,7 @@ qDebug() << "INIZIO";
     qDebug() << "File Caricato?" << m_mng->GetParameters();
 
     //per ora salvo io su file pic l'analisi flussimetria ...
-    m_mng->SetAnalysis("2");
+    //m_mng->SetAnalysis("2");
 
     m_ana->SetData(m_mng);
 
@@ -1296,13 +1295,13 @@ void MDataManager::InitPageGraphs(int __anaType)
                             valuesY.append(sig->at(i));
 
                 double val = (double) numSamp / m_mng->GetNAS(numCh);
-                qDebug() << val;
                 (*mrk)["val"] = val;
                 (*mrk)["type"] = TYPE_ANALYTICAL;
                 (*mrk)["name"] = "Analitical";
                 (*mrk)["family"] = "Markers";
                 (*mrk)["nas"] = m_mng->GetNAS(numCh);
                 (*mrk)["valuesY"] = valuesY;
+                (*mrk)["graph"] = m_mng->GetGraph(numCh)-1;
                 (*mrk)["code"] = "f" + QString::number(key);
                 (*mrk)["descr"] = descr;
                 (*mrk)["lock"] = false;

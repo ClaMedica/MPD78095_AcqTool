@@ -90,20 +90,18 @@ void mflowdatas::buildNomogrammi(bool __sex, int __age)
 {
     //Liverpool MAX
     m_liverpoolMax->setTitle(tr("Liverpool (Q Max)"));
-    m_liverpoolMax->setUnitx(tr("Q (ml/sec)"));
-    m_liverpoolMax->setUnity(tr("Vol. (ml)"));
+    m_liverpoolMax->setUnitx(tr("Vol. (ml)"));
+    m_liverpoolMax->setUnity(tr("Q (ml/sec)"));
     m_liverpoolMax->setXmin(0);
     m_liverpoolMax->setYmin(0);
     m_liverpoolMax->setXmax(600);
     if (__sex)
-        m_liverpoolMax->setYmax(80);
-    else
         m_liverpoolMax->setYmax(60);
+    else
+        m_liverpoolMax->setYmax(80);
 
     m_liverpoolMax->setDatoX(getVoidedVolume());
     m_liverpoolMax->setDatoY(getQMax());
-
-    // m_liverpoolMax->setNumLines(7);
 
     //da sistemare
     int N_LIVERPOOL = 24;
@@ -196,8 +194,8 @@ void mflowdatas::buildNomogrammi(bool __sex, int __age)
 
     //Liverpool AVE
     m_liverpoolAve->setTitle(tr("Liverpool (Q Ave)"));
-    m_liverpoolAve->setUnitx(tr("Q (ml/sec)"));
-    m_liverpoolAve->setUnity(tr("Vol. (ml)"));
+    m_liverpoolAve->setUnitx(tr("Vol. (ml)"));
+    m_liverpoolAve->setUnity(tr("Q (ml/sec)"));
     m_liverpoolAve->setXmin(0);
     m_liverpoolAve->setYmin(0);
     m_liverpoolAve->setXmax(600);
@@ -296,8 +294,8 @@ void mflowdatas::buildNomogrammi(bool __sex, int __age)
     if (!__sex) {
         //max
         m_sirokyMax->setTitle(tr("Siroky (Q Max)"));
-        m_sirokyMax->setUnitx(tr("Q (ml/sec)"));
-        m_sirokyMax->setUnity(tr("Vol. (ml)"));
+        m_sirokyMax->setUnitx(tr("Vol. (ml)"));
+        m_sirokyMax->setUnity(tr("Q (ml/sec)"));
         m_sirokyMax->setXmin(0);
         m_sirokyMax->setYmin(0);
         m_sirokyMax->setXmax(500);
@@ -334,10 +332,6 @@ void mflowdatas::buildNomogrammi(bool __sex, int __age)
             xVal[3].append(m_arrLineX4.at(i));
             yVal[3].append(m_arrLineY4.at(i));
         }
-        //        for (int i=0; i<m_arrMax.length(); i++)
-        //        {
-        //            Value.append(m_arrMax.at(i));
-        //        }
 
         for (int j = 0; j < xVal.size(); j++) {
             pos = 0;
@@ -359,8 +353,8 @@ void mflowdatas::buildNomogrammi(bool __sex, int __age)
 
         //ave
         m_sirokyAve->setTitle(tr("Siroky (Q Ave)"));
-        m_sirokyAve->setUnitx(tr("Q (ml/sec)"));
-        m_sirokyAve->setUnity(tr("Vol. (ml)"));
+        m_sirokyAve->setUnitx(tr("Vol. (ml)"));
+        m_sirokyAve->setUnity(tr("Q (ml/sec)"));
         m_sirokyAve->setXmin(0);
         m_sirokyAve->setYmin(0);
         m_sirokyAve->setXmax(500);

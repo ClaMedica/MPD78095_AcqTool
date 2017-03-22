@@ -270,7 +270,6 @@ Rectangle {
     }
     function cliccato()
     {
-        console.log("cliccato")
         rootParEdit.clicked()
     }
 

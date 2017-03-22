@@ -78,7 +78,7 @@ void MAcqManager::dataOnTCP(QObject *__pParent, SimpleTCPClient *__pTCP, QByteAr
 bool MAcqManager::newAcquisition(QString __dataFile)
 {
     if(m_acqFileOpened) {
-        ;   //sono gia' in acquisizione e voglio farne partire un altra
+        qCritical() << "acquisizione in corso";   //sono gia' in acquisizione e voglio farne partire un altra
     }
     else {
         qDebug() << "carico la configurazione per l'acquisizione";
@@ -121,7 +121,7 @@ bool MAcqManager::newAcquisition(QString __dataFile)
 
         //popoliamo la lista dei canali prenotati
 
-        m_channelNames.clear(); // #################################################
+        m_channelNames.clear();
 
         for(int i = 0; i < m_mng->GetChanNum(); i++)
             m_channelNames.append(m_mng->GetChanName(i));
