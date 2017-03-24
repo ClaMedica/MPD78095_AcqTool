@@ -88,6 +88,12 @@ INCLUDEPATH +=  CPP \
 # Default rules for deployment.
 include(deployment.pri)
 
+TRANSLATIONS += acqtool_it.ts
+lupdate_only{
+    SOURCES = Resources/*.qml \
+             ../MGlobal/MComponents/*.qml
+}
+
 win32:CONFIG(release, debug|release): LIBS += -L$$PWD/../Build/AnaUro7Build/release/ -lAnaUro
 else:win32:CONFIG(debug, debug|release): LIBS += -L$$PWD/../Build/AnaUro7Build/debug/ -lAnaUro
 
