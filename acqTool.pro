@@ -84,6 +84,12 @@ INCLUDEPATH +=  CPP \
 # Default rules for deployment.
 include(deployment.pri)
 
+TRANSLATIONS += acqtool_it.ts
+lupdate_only{
+    SOURCES = Resources/*.qml \
+             ../MGlobal/MComponents/*.qml
+}
+
 
 contains(ANDROID_TARGET_ARCH,armeabi-v7a) {
     DEFINES += ANDROID

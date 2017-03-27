@@ -21,6 +21,7 @@ void printerserialport::init_printer()
     system("/root/PicoFlow/initprinter.sh");
     Pri_Reset();
 //    Pri_Default();
+    m_serialPort.flush();
 }
 
 void printerserialport::closeSerialPort()
