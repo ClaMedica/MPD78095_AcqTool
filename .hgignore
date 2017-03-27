@@ -2,3 +2,4 @@ syntax: glob
 modules.qrc
 acqTool.pro.user.fb43b1d
 acqTool.pro.user.61842fb
+Modules/PicoFlow/MPlotModule/Models/PlotModel.qml.orig
