@@ -465,39 +465,23 @@ void MAcqManager::handleTCP(SimpleTCPClient *__client, QByteArray __block)
         else if(who == "CMD")
         {
             if(__block[4] == '5') {
-                // pressione start/stop
-                // se tasto premuto ogni 500mSec arriva questo impulso
-                // se tasto rilasciato non arriva
-                //  input: __.__.__|__|__|__|__|__|__|__.__|__|__|__|__|__|__|__|__|__|__|__|__|__|__
-                //  ris:   __.__.__T__.__.__.__.__.__.__.__T__.__.__.__.__.__.__.__.__.__.__.__.__.__
+                if(!m_saving) {
+                    //parte immediatamnte l'acquisizione
+                    //effetto buffer tengo solo gli ultimi 5 secondi
+                    foreach(QString type, m_channelMap.keys())
+                        foreach(MSignal *sig, m_channelMap[type])
+                            sig->saveLastSec(5.0);
 
-                static QTime keytim;
-                bool isStart = ! keytim.isValid();
-                if(isStart)
-                    keytim.start();
-                int elapsed = keytim.restart();
-                qDebug("start-stop: elapsed=%d", elapsed);
-                if(isStart || (elapsed > 700)) {   // transizione
-                    // isStart --> appena partito --> inizio nuova sequenza
-                    // elapsed > 700 --> e' stato saltato almeno un impulso --> inizio nuova sequenza
-                    if(!m_saving) {
-                        //parte immediatamnte l'acquisizione
-                        //effetto buffer tengo solo gli ultimi 5 secondi
-                        foreach(QString type, m_channelMap.keys())
-                            foreach(MSignal *sig, m_channelMap[type])
-                                sig->saveLastSec(5.0);
-
-                        m_saving = true;    //posso iniziare a salvare i dati
-                        emit acquisitionStarted();
-                        qDebug() << "Start acquiring";
-                        m_acqFinished = false;
-                    }
-                    else {
-                        //ferma immediatamente l'acquisizione
-                        qDebug() << "Stop acquiring";
-                        endAcquisitionSave();
-                        m_acqFinished = true;
-                    }
+                    m_saving = true;    //posso iniziare a salvare i dati
+                    emit acquisitionStarted();
+                    qDebug() << "Start acquiring";
+                    m_acqFinished = false;
+                }
+                else {
+                    //ferma immediatamente l'acquisizione
+                    qDebug() << "Stop acquiring";
+                    endAcquisitionSave();
+                    m_acqFinished = true;
                 }
             }
         }
