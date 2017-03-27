@@ -130,9 +130,6 @@ void MDataManager::loadFile(QString __fileName)
         res = m_mng->GetParameters();
         qDebug() << "File Caricato?" << res;
 
-        //m_mng->SetAnalysis(QString::number(FLW_AVD_STUDY));//temporaneo
-        // m_mng->CommitParameters();
-
         qDebug() << "Building configuration file ...";
         if(!buildConfigurationFile()) {
             qCritical() << MEX_FILE_CORRUPTED;
@@ -374,7 +371,7 @@ void MDataManager::loadFile(QString __fileName)
         //libreria di analisi: creo oggetto.
         m_ana = new Analyze();
         //creo oggetto per stampare
-        m_mngPrint = new printermanager(m_fileName);
+       // m_mngPrint = new printermanager(m_fileName);
 
         m_mng->Close();
         break;
@@ -828,9 +825,6 @@ void MDataManager::exitFromReview()
 {
     qDebug() << "Exit" << getToSave();
     if (getToSave() == "ret") {
-//#ifndef DEBUGACQTOOL
-//#else
-//#endif
         if(DebugAcqTool == false)
             g_mainAppBridge->sendSwitch();  //send(MEX_SHOW);
         else
@@ -859,9 +853,6 @@ void MDataManager::exitFromReview()
             //cancello il file copy
             qDebug() << "cancellata copia all'exit" << QFile::remove(copyName);
         }
-//#ifndef DEBUGACQTOOL
-//#else
-//#endif
         if(DebugAcqTool == false)
             g_mainAppBridge->sendSwitch(); //poi dovra tornare al modulo database
         else
@@ -1148,25 +1139,25 @@ qDebug() << "INIZIO";
     qDebug() << "File chiuso" << m_mng->Close();
 
 
-    m_mngPrint->setTempoAttesa(m_aflwdatas.at(0)->getWaitingTime());
-    m_mngPrint->setFlussoMax(m_aflwdatas.at(0)->getQMax());
-    m_mngPrint->setFlussoMedio(m_aflwdatas.at(0)->getQAve());
-    m_mngPrint->setTempoMax(m_aflwdatas.at(0)->getTimeAtQmax());
-    m_mngPrint->setTempo595(m_aflwdatas.at(0)->getTime90());
-    m_mngPrint->setTempoFlusso(m_aflwdatas.at(0)->getFlowTime());
-    m_mngPrint->setTempoDisc(m_aflwdatas.at(0)->getDescTime());
-    m_mngPrint->setTempoSvuot(m_aflwdatas.at(0)->getVoidingTime());
-    m_mngPrint->setVolFlussoMax(m_aflwdatas.at(0)->getVolAtQqmax());
-    m_mngPrint->setVolVuotato(m_aflwdatas.at(0)->getVoidedVolume());
-    m_mngPrint->setAccelerazione(m_aflwdatas.at(0)->getAcceleration());
+//    m_mngPrint->setTempoAttesa(m_aflwdatas.at(0)->getWaitingTime());
+//    m_mngPrint->setFlussoMax(m_aflwdatas.at(0)->getQMax());
+//    m_mngPrint->setFlussoMedio(m_aflwdatas.at(0)->getQAve());
+//    m_mngPrint->setTempoMax(m_aflwdatas.at(0)->getTimeAtQmax());
+//    m_mngPrint->setTempo595(m_aflwdatas.at(0)->getTime90());
+//    m_mngPrint->setTempoFlusso(m_aflwdatas.at(0)->getFlowTime());
+//    m_mngPrint->setTempoDisc(m_aflwdatas.at(0)->getDescTime());
+//    m_mngPrint->setTempoSvuot(m_aflwdatas.at(0)->getVoidingTime());
+//    m_mngPrint->setVolFlussoMax(m_aflwdatas.at(0)->getVolAtQqmax());
+//    m_mngPrint->setVolVuotato(m_aflwdatas.at(0)->getVoidedVolume());
+//    m_mngPrint->setAccelerazione(m_aflwdatas.at(0)->getAcceleration());
 
-    //letto dai setting
-    //mi dice se la flussimetria automatica o manuale
-    m_mngPrint->setMode(m_autoFlow);
-    m_mngPrint->setPrintSiroky(m_Siroky);
-    m_mngPrint->setPrintModeUser(m_landscape);
-    if (m_autoPrint)
-        m_mngPrint->print();
+//    //letto dai setting
+//    //mi dice se la flussimetria automatica o manuale
+//    m_mngPrint->setMode(m_autoFlow);
+//    m_mngPrint->setPrintSiroky(m_Siroky);
+//    m_mngPrint->setPrintModeUser(m_landscape);
+//    if (m_autoPrint)
+//        m_mngPrint->print();
 
     //qml
     qDebug() << "FINE";

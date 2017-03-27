@@ -639,7 +639,7 @@ void printermanager::Pri_Rep_Gra(int __num_riga)
                 for(int i22 = 0; i22 < m_num_xy; i22++) {
                     m_y[i22] -= i4;
                     int i33 = 24 * (m_x[i22] / 8) + m_y[i22];
-                    unsigned char ub3 = 0x80 >> (byte)(m_x[i22] % 8);
+                    unsigned char ub3 = 0x80 >> (byte_)(m_x[i22] % 8);
                     int i6 = i33 / 24;
                     int i7 = i33 % 24;
                     m_str_gr[ pos_gra + 24 * i6 + i7] |= (char)ub3;
@@ -660,7 +660,7 @@ void printermanager::Pri_Rep_Gra(int __num_riga)
                 for(int i22 = 0; i22 < m_num_xy; i22++) {
                     m_y[i22] -= i4;
                     int i33 = 24 * (m_x[i22] / 8) + m_y[i22];
-                    unsigned char ub3 = 0x80 >> (byte)(m_x[i22] % 8);
+                    unsigned char ub3 = 0x80 >> (byte_)(m_x[i22] % 8);
                     int i6 = i33 / 24;
                     int i7 = i33 % 24;
                     m_str_gr[ pos_gra + 24*i6 + i7] |= (char)ub3;
@@ -803,7 +803,7 @@ void printermanager::Pri_Rep_Gra_Ini_Grid(int __n_riga)
 
 
 
-byte printermanager::Int_Pun(int __i4)
+byte_ printermanager::Int_Pun(int __i4)
 {
     /*
         Interpola i Punti ("x1","_y1") e ("x2","y2") rispetto alla Banda
@@ -931,7 +931,7 @@ void printermanager::Gra_Line()
 }
 
 // crea la trasposta della stringa str_gr, ottenendo una matrice scritta per righe
-void printermanager::Str_Trasposta(byte __type, unsigned short __sx_byte, unsigned short __dx_byte)
+void printermanager::Str_Trasposta(byte_ __type, unsigned short __sx_byte, unsigned short __dx_byte)
 {
     int num_byte, num_col, num_rig;
     int j;
@@ -1024,7 +1024,7 @@ void printermanager::Calc_Max_EMG()
 }
 
 
-void printermanager::Pri_Rep_Gra_EMG(byte __num_riga)
+void printermanager::Pri_Rep_Gra_EMG(byte_ __num_riga)
 {
     static bool label = false;
     static short int max_emg;
@@ -1214,7 +1214,7 @@ void printermanager::Pri_Rep_Gra_EMG(byte __num_riga)
                 {
                     m_y[i22] -= i4;
                     int i33 = 24 * ( m_x[i22] / 8 ) + m_y[i22];
-                    unsigned char ub3 = 0x80 >> (byte)(m_x[i22] % 8);
+                    unsigned char ub3 = 0x80 >> (byte_)(m_x[i22] % 8);
                     int i6 = i33 / 24;
                     int i7 = i33 % 24;
                     m_str_gr[ pos_gra + 24*i6 + i7] |= (char)ub3;
@@ -2455,9 +2455,9 @@ void printermanager::Report_siroky()
 /**
 disegna i diagrammi di Siriolokky
 */
-void  printermanager::Pri_Rep_Gra_Siroky (byte __num_riga, byte __grap)
+void  printermanager::Pri_Rep_Gra_Siroky (byte_ __num_riga, byte_ __grap)
 {
-    byte z = 0;
+    byte_ z = 0;
 
     static bool label = false;
     static short int max_y_flw;
@@ -2639,7 +2639,7 @@ void  printermanager::Pri_Rep_Gra_Siroky (byte __num_riga, byte __grap)
 
 
 
-void printermanager::Pri_Rep_Gra_Ini_Grid_Sir(byte __num_rig, byte __curve )
+void printermanager::Pri_Rep_Gra_Ini_Grid_Sir(byte_ __num_rig, byte_ __curve )
 {
     static unsigned short pos_gra_corr;
 
@@ -2681,7 +2681,7 @@ void printermanager::Pri_Rep_Gra_Ini_Grid_Sir(byte __num_rig, byte __curve )
 }	// fine funzione Pri_Rep_Gra_Ini_Grid_Sir
 
 
-void printermanager::Plot_StdCurve_Siroky(byte __num_rig, byte __curve )
+void printermanager::Plot_StdCurve_Siroky(byte_ __num_rig, byte_ __curve )
 {
     static unsigned short pos_gra_corr;
 
@@ -2699,8 +2699,8 @@ void printermanager::Plot_StdCurve_Siroky(byte __num_rig, byte __curve )
             if( flow_pt_prec < 240 )
             {
                 int flow_pt = 240 - SD[ __curve ][ i22 ][ ub3 ];
-                unsigned char ub2 = (byte)( flow_pt / 24 );
-                unsigned char ub4 = (byte)( flow_pt_prec / 24);
+                unsigned char ub2 = (byte_)( flow_pt / 24 );
+                unsigned char ub4 = (byte_)( flow_pt_prec / 24);
                 if( ( ub2 == __num_rig ) || ( ub4 == __num_rig ))
                 {
                     int vol_pt_prec = ( 18 * ub3 );
@@ -2709,10 +2709,10 @@ void printermanager::Plot_StdCurve_Siroky(byte __num_rig, byte __curve )
                     for(int i3 = vol_pt_prec; i3 < vol_pt; i3 += i5)
                     {
                         flow_pt = flow_pt_prec - ( i3 - vol_pt_prec ) * i4 / 18;
-                        ub4 = (byte)( flow_pt / 24);
+                        ub4 = (byte_)( flow_pt / 24);
                         if( __num_rig == ub4)
                         {
-                            ub4 = 0x80 >> (byte)(i3 % 8);
+                            ub4 = 0x80 >> (byte_)(i3 % 8);
                             unsigned short uw4 = (unsigned short)( i3 / 8);
                             ub2 = ( flow_pt % 24 );
                             uw4 = uw4 * 24;
@@ -2752,7 +2752,7 @@ void printermanager::Plot_StdCurve_Siroky(byte __num_rig, byte __curve )
 /**
 Verifica se deve inserire e dove, il punto syroki con il suo tratteggio
 */
-void printermanager::Plot_Point_Siroky(byte __num_rig, byte __curve, unsigned short __flu )
+void printermanager::Plot_Point_Siroky(byte_ __num_rig, byte_ __curve, unsigned short __flu )
 {
     static unsigned short pos_gra_corr;
 
@@ -2767,9 +2767,9 @@ void printermanager::Plot_Point_Siroky(byte __num_rig, byte __curve, unsigned sh
     {
         unsigned short uw4 = (unsigned short)( m_max_vol * 18 ) / 25;
         int vol_pt = (int)uw4;                             /*x  grap 1 46*8=368 pix =500ml gain =368/500=92/125; x0= pix 400 =0ml pix 368=500ml*/
-        unsigned char ub4 = (byte)( flow_pt / 24);                     /*n_r=int(y/24)  Num riga*/
-        unsigned char ub3 = (byte)( flow_pt % 24);                     /*y_st=y(mod)24  scostameto riga*/
-        unsigned char ub2 = 0x80 >> (byte)( vol_pt % 8);             /*byt=x(mod)8   u=x_st*24+y_st*/
+        unsigned char ub4 = (byte_)( flow_pt / 24);                     /*n_r=int(y/24)  Num riga*/
+        unsigned char ub3 = (byte_)( flow_pt % 24);                     /*y_st=y(mod)24  scostameto riga*/
+        unsigned char ub2 = 0x80 >> (byte_)( vol_pt % 8);             /*byt=x(mod)8   u=x_st*24+y_st*/
         uw4 = (unsigned short)( vol_pt / 8);               /*x_st=int(x/8)  n? byte */
         uw4 *= 24;          /*non fare uw4=vol_pt*3*/  /*x_st*24*/
         if( __num_rig >= ub4)                           /* riga grafica attiva point*/
@@ -2811,9 +2811,9 @@ void printermanager::Plot_Point_Siroky(byte __num_rig, byte __curve, unsigned sh
 }
 
 
-void printermanager::Plot_Quadro_Siroky(byte __ubstrt, byte __ubend, unsigned short __new_pos, int __vol_pt, unsigned char __uw4)
+void printermanager::Plot_Quadro_Siroky(byte_ __ubstrt, byte_ __ubend, unsigned short __new_pos, int __vol_pt, unsigned char __uw4)
 {
-    unsigned char ub2 = 0x80 >> (byte)( __vol_pt % 8);             /*byt=x(mod)8   u=x_st*24+y_st*/
+    unsigned char ub2 = 0x80 >> (byte_)( __vol_pt % 8);             /*byt=x(mod)8   u=x_st*24+y_st*/
     unsigned short uw6 = (unsigned short)( ub2 * 256);
     unsigned short uw5 = ub2;
     for(int i3 = 0; i3 < 3; i3++){                            /*riempie +-3 pix dest sin dal punto*/
@@ -2891,7 +2891,7 @@ void printermanager::Report_result()
          -   "str_udm"  =  Stringa Unita' di Misura
          -   "flag_lf"  =  Flag LF Finale
 */
-void printermanager::Pri_Rep_Lin(char *__str_des, int __rep_dat, byte __num_dec, char *__str_udm, byte __flag_lf)
+void printermanager::Pri_Rep_Lin(char *__str_des, int __rep_dat, byte_ __num_dec, char *__str_udm, byte_ __flag_lf)
 {
     static short d_strlen;
     char str2[40];

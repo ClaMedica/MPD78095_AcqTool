@@ -46,8 +46,8 @@ MForm {
         {
             //pages for flowmetry
             var rectf = Qt.createQmlObject('import QtQuick 2.5; Rectangle {}',this)
-            rectf.width = 640//forAna.width - 200
-            rectf.height = 480 //forAna.height
+            rectf.width = forAna.width
+            rectf.height = forAna.height
             rectf.color = "transparent"
             rectf.border.color = "blue"
             rectf.border.width = 2
@@ -87,8 +87,8 @@ MForm {
                 }
 
                 var rectdata = Qt.createQmlObject('import QtQuick 2.5; Rectangle {}',rectf)
-                rectdata.width = 480
-                rectdata.height = 480
+                rectdata.width = forAna.width - 200
+                rectdata.height = forAna.height
                 rectdata.color = "transparent"
                 rectdata.border.color = "transparent"
                 rectdata.border.width = 2

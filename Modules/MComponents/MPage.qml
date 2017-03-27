@@ -19,11 +19,6 @@ Rectangle{
     signal questionAnswered(bool accepted,var owner,var arg)
     color: "transparent"
 
-//    function onLid_inquiry_end() {
-//        console.log("onLid_inquiry_end")
-//        rootPageBluetoothDevice.backgroundImage = ""
-//    }
-
     function previous() {
         if(prevPage !== "") {
             changePage(prevPage)
@@ -40,9 +35,7 @@ Rectangle{
 
     function askQuestion(owner, arg, question, answ1, answ2)
     {
-        console.log(arg, question, answ1, answ2)
-        var s = 'import MComponents 1.0;'
-        var mexBox = Qt.createQmlObject(s + "MDialogYesNo{}", rootPage);
+        var mexBox = Qt.createQmlObject("import MComponents 1.0; MDialogYesNo{}", rootPage);
         mexBox.anchors.centerIn = rootPage
         mexBox.message = question
         mexBox.yesText = answ1
@@ -52,7 +45,7 @@ Rectangle{
         conQuestion.owner = owner
         conQuestion.arg = arg
         conQuestion.target = mexBox
-        DataEngine.putItemOnTop(mexBox)
+        mexBox.open()
     }
 
     Connections {
@@ -68,7 +61,7 @@ Rectangle{
         onRejected:
         {
             questionAnswered(false, owner, arg)
-            target:destroy()
+            target.destroy()
         }
     }
 

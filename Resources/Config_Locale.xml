@@ -3,7 +3,7 @@
         <DataFolders>
             <LucaTecnoideal value="C:/Medica/urodata"/>
             <LucaPortatile  value="C:/Medica/urodata"/>
-	    <Claudia        value="/home/user/Documents/urodata"/>
+            <Claudia        value="C:/Users/Menfis/Documents/urodata"/>
 	    <falcioni       value="/home/falcioni/Documents/urodata"/>
             <m4400          value="/home/gio/Documents/urodata"/>
             <ubuntu         value="/sviluppo/sviluppo_home/Documents/urodata"/>
@@ -13,7 +13,7 @@
         <ProgFolders>
             <LucaTecnoideal value="M:/Lavoro/Software/Build/StandAlone"/>
             <LucaPortatile  value="C:/Users/MEZ/Lavoro/Software/Build/StandAlone"/>
-            <Claudia        value="/media/user/Dati/Piattaforma70/standalone"/>
+            <Claudia        value="E:/Piattaforma70/standalone"/>
 	    <falcioni       value="/home/falcioni/Desktop/StandAlone"/>
             <m4400          value="/home/gio/qt/Piattaforma70/standalone"/>
             <ubuntu         value="/sviluppo/qt/Piattaforma70/standalone"/>

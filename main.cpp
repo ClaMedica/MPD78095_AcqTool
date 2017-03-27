@@ -52,11 +52,15 @@ int main(int argc, char *argv[])
 #ifdef ANDROID
     QtAndroid::androidActivity().callMethod<void>("registerBroadcastReceiver", "()V");
 #endif
-    QString logFile = "acqTool_log_" + QDateTime::currentDateTime().toString("yyyyMMdd_hhmmss")+".htm";
+
 #ifdef ANDROID
     gPath_log = "/mnt/sdcard/" + logFile;
-#else
+#elseif PICOFLOW
+    QString logFile = "acqTool_log_" + QDateTime::currentDateTime().toString("yyyyMMdd_hhmmss")+".htm";
     gPath_log = /*QApplication::applicationDirPath()*/ + "/tmp/" + logFile;
+#else
+     QString logFile = "acqTool_log.htm";
+     gPath_log = QApplication::applicationDirPath() + logFile;
 #endif
 
     qDebug() << "Start. log:" << gPath_log;
@@ -69,12 +73,12 @@ int main(int argc, char *argv[])
         arguments << QString(argv[i]);
     qDebug() << "Argomenti" << arguments;
 
-//#ifndef DEBUGACQTOOL
+
     if((argc > 1) && (strcmp(argv[argc - 1], (const char *)"debug") == 0))
         DebugAcqTool = true;
     if(DebugAcqTool == false)
         g_mainAppBridge = new AcqBridge(QStringList() << argv[1] << argv[2]);   //definisco un bridge tra app di tipo server
-//#endif
+
 
     qmlRegisterType<ParameterManager>("Managers", 1, 0, "ParameterManager");
     qmlRegisterType<ModelManager>("Managers", 1, 0, "ModelManager");
@@ -95,10 +99,8 @@ int main(int argc, char *argv[])
     //engine.addImportPath("../standalone");
     engine.addImportPath(QApplication::applicationDirPath());
 
-//#ifdef DEBUGACQTOOL
     if(DebugAcqTool)
         engine.addImportPath(QApplication::applicationDirPath() + "/Modules");
-//#endif
 
 #ifdef PICOFLOW//metto questo altrimenti su target non carica il plugin cpp
     engine.rootContext()->setContextProperty(QLatin1String("platform"), "linux");
@@ -125,6 +127,14 @@ int main(int argc, char *argv[])
     engine.rootContext()->setContextProperty("PicoFlow", bool_false);
 #endif
 
+#ifdef WIN32
+    engine.rootContext()->setContextProperty(QLatin1String("platform"), "window");
+    engine.rootContext()->setContextProperty("isTouch", bool_false);
+    QSize size = app.primaryScreen()->size();
+    engine.rootContext()->setContextProperty("screenH", size.height());
+    engine.rootContext()->setContextProperty("screenW", size.width());
+#endif
+
     engine.rootContext()->setContextProperty("layout", &mngLayout);
     engine.rootContext()->setContextProperty("settings", &g_P7SettingsManager);
     engine.rootContext()->setContextProperty("bridgeMain", g_mainAppBridge);
@@ -133,12 +143,9 @@ int main(int argc, char *argv[])
     engine.load(QUrl(QStringLiteral("qrc:/main.qml")));
     qDebug() << "engine caricato";
 
-//#ifndef DEBUGACQTOOL
+
     if(DebugAcqTool == false)
         g_mainAppBridge->setRootObjects(engine.rootObjects());
-//#endif
-//        g_mainAppBridge->m_arguments << argv[3] << argv[4];
-//    }
 
     int ret = app.exec();
 
