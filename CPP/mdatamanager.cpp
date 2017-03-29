@@ -109,13 +109,13 @@ void MDataManager::loadFile(QString __fileName)
     QMap<int, QVariantList> defEn;
 
     double sigMin = INF, sigMax = -INF;
-    byte key;
+    byte_ key;
     int32_t numCh;
     int32_t numSamp[4]; //4 byte per avere il numero del campione
     int32_t numDef;
     int32_t tStart[20], tEnd[20];
     QString descr;
-    byte chEn[20];
+    byte_ chEn[20];
 
     switch(fileType(__fileName)) {
     case PIC:
@@ -1205,7 +1205,7 @@ void MDataManager::InitPageGraphs(int __anaType)
         int evStart;
         int evEnd;
         VarMap *evMarkOpIn;
-        byte evAuto = 0;
+        byte_ evAuto = 0;
         QVector<unsigned char> enCh;
 
         VarMapVec* elements = m_storage.getAll(CAT_DEFINER);
@@ -1270,7 +1270,7 @@ void MDataManager::InitPageGraphs(int __anaType)
         //se gli anMarker li trovo per la prima volta li inserisco in grafica
         if (evAuto != 0) {
             VarMapVec *mrkAnVec = new VarMapVec;
-            byte key;
+            byte_ key;
             int32_t numCh;
             int32_t numSamp;
             int32_t numDef;
@@ -1326,7 +1326,7 @@ bool MDataManager::InitArraysFLW(int __start,
                                  int __end,
                                  QVector<unsigned char> __chEn,
                                  int __curDef,
-                                 byte __auto)
+                                 byte_ __auto)
 {
     double startTh = 0;
     double heightTh = 0;
@@ -1536,7 +1536,7 @@ int MDataManager::ReadResult(int & __numEv)
     case FLW_AVD_STUDY: {
         //dati analisi
         m_aflwdatas.append(new mflowdatas());
-        byte * strTemp = (byte *) malloc (sizeof(FLWAdvRepStruct));
+        byte_ * strTemp = (byte_ *) malloc (sizeof(FLWAdvRepStruct));
         m_aflwdatas.at(0)->setParent(this);
         m_aflwdatas.at(0)->setWaitingTime(0);
         m_aflwdatas.at(0)->setQMax(0);
