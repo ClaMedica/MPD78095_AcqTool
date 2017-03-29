@@ -57,7 +57,7 @@ int main(int argc, char *argv[])
     QString logFile = "acqTool_log_" + QDateTime::currentDateTime().toString("yyyyMMdd_hhmmss")+".htm";
     gPath_log = /*QApplication::applicationDirPath()*/ + "/tmp/" + logFile;
 #else
-     QString logFile = "acqTool_log.htm";
+     QString logFile = "acqTool_log_" + QDateTime::currentDateTime().toString("yyyyMMdd_hhmmss")+".htm";
      gPath_log = QApplication::applicationDirPath() + logFile;
 #endif
 
@@ -115,8 +115,8 @@ int main(int argc, char *argv[])
     engine.rootContext()->setContextProperty("screenH", 480);
     engine.rootContext()->setContextProperty("screenW", 640);
     engine.rootContext()->setContextProperty("isTouch", bool_true);
-//    engine.rootContext()->setContextProperty("PicoFlow", bool_true);
-//    engine.addPluginPath("../PicoFlow");
+    engine.rootContext()->setContextProperty("PicoFlow", bool_true);
+    //engine.addPluginPath("../PicoFlow");
 #endif
 
 #ifdef ANDROID
@@ -141,6 +141,7 @@ int main(int argc, char *argv[])
     QSize size = app.primaryScreen()->size();
     engine.rootContext()->setContextProperty("screenH", size.height());
     engine.rootContext()->setContextProperty("screenW", size.width());
+    engine.rootContext()->setContextProperty("PicoFlow", bool_false);
 #endif
 
     engine.rootContext()->setContextProperty("layout", &mngLayout);
