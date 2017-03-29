@@ -3,6 +3,7 @@ TEMPLATE = app
 QT += qml quick widgets sql network multimedia xml core serialport
 
 RESOURCES += Resources/qml.qrc
+RESOURCES += Resources/Icone/icons.qrc
 
 DEFINES += QT_MESSAGELOGCONTEXT
 #debug campioni di acquisizione
@@ -39,7 +40,7 @@ SOURCES += \
     ../MGlobal/UdmImpl.cpp \
     ../AnaUro/anauro.cpp \
     ../AnaUro/analysis.cpp \
-    ../AnaUro/anautils.cpp \ 
+    ../AnaUro/anautils.cpp \
 
 HEADERS += \
     CPP/alarmmanager.h \
@@ -74,7 +75,7 @@ HEADERS += \
     ../MGlobal/UdmImpl.h
 
 INCLUDEPATH +=  CPP \
-                CPP/TCP \                
+                CPP/TCP \
                 ../AnaUro \
                 ../MGlobal \
                 ../MPF78003-Picoflow2R3Supe \
@@ -113,11 +114,9 @@ win32 {
     #creo la cartella da copiare in giro
     #plugin.path = $${rootPath}\Lavoro\Software\Build\StandAlone
     #claudia
-    plugin.path = $${rootPath}\standalone
+    plugin.path = $${rootPath}\build\standalone
     plugin.files += $$shell_path($$OUT_PWD)\release\acqTool.exe
     INSTALLS += plugin
-
-    RESOURCES += Resources/Icone/icons.qrc
 
     win32:CONFIG(release, debug|release): LIBS += -L$$PWD/../Build/DatafileManager/release/ -lDatafileManager
     else:win32:CONFIG(debug, debug|release): LIBS += -L$$PWD/../Build/DatafileManager/debug/ -lDatafileManager
@@ -153,7 +152,6 @@ QMAKE_CXXFLAGS += -Wno-psabi
     DEFINES += LINUX
     TARGET = PicoAcq
     RESOURCES += modules_LinuxDesktop.qrc
-    RESOURCES += Resources/Icone/icons.qrc
 
     #datafile manager
     LIBS        += -L$$PWD/../Build-Linux/DatafileManager -lDatafileManager
@@ -174,7 +172,6 @@ QMAKE_CXXFLAGS += -Wno-psabi
     TARGET = PicoAcq
 
     RESOURCES += modules_picoflow.qrc
-    RESOURCES += Resources/Icone/icons.qrc
 
     LIBS        += -L$$PWD/../Build-IMX6/DatafileManager/ -lDatafileManager
     INCLUDEPATH +=   $$PWD/../Build-IMX6/DatafileManager
