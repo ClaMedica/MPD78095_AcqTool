@@ -5,49 +5,51 @@ import QtQuick.Window 2.0
 import QtQuick.Layouts 1.1
 import MComponents 1.0
 import "Images"
-Rectangle{
-    id:rootComboBox
-    property string currentText:""
-    property int currentIndex:0
-    property var model:[1,2,3]
+
+Rectangle {
+    id: rootComboBox
+    property string currentText: ""
+    property int currentIndex: 0
+    property var model: [1,2,3]
     property int oriH: height
-    property int labelSize:2
-    property var lastSelected:[]
-    property bool opened:false
-    readonly property bool modelOk: model.length !=0 && model[0]!=undefined
-    clip:true
-    Behavior on height{NumberAnimation{duration:300; easing.type: Easing.OutExpo}}
+    property int labelSize: 2
+    property var lastSelected: []
+    property bool opened: false
+    readonly property bool modelOk: (model.length != 0) && (model[0] !== undefined)
+    clip: true
+    Behavior on height { NumberAnimation { duration:300; easing.type: Easing.OutExpo}}
     border.width: screenH*0.005
-    onModelChanged: if(modelOk)currentIndex=0
-    onCurrentIndexChanged: if(modelOk)curEle.text=model[currentIndex]
+    onModelChanged:        if(modelOk) currentIndex = 0
+    onCurrentIndexChanged: if(modelOk) curEle.text = model[currentIndex]
 
     signal clicked
 
-    function find(text){
+    function find(text)
+    {
         if(model === undefined || model === null)
             return 0
-        if(model.indexOf(text)<0)
+        if(model.indexOf(text) < 0)
             return 0
         return model.indexOf(text)
     }
 
     function openBox()
     {
-        if(model.length==0 || opened)
+        if(model.length == 0 || opened)
             return
         //console.log("open box")
-        oriH=height
+        oriH = height
         //se è ancorato si espanderà dove può
-        if(model.length>5)
-            rootComboBox.height*=5//model.length
+        if(model.length > 5)
+            rootComboBox.height *= 5//model.length
         else
-            rootComboBox.height*=model.length
-        arrow.visible=false
-        view.model=rootComboBox.model
-        view.visible=true
-        curEle.visible=false
+            rootComboBox.height *= model.length
+        arrow.visible = false
+        view.model = rootComboBox.model
+        view.visible = true
+        curEle.visible = false
         DataEngine.putItemOnTop(rootComboBox)
-        opened=true
+        opened = true
         rootComboBox.clicked()
     }
 
@@ -56,25 +58,24 @@ Rectangle{
         //console.log("close box")
         if(!opened)
             return
-        currentIndex=index
-        currentText=text
-        curEle.text=text
-        view.visible=false
-        view.model=[]
-        rootComboBox.height=oriH
-        arrow.visible=true
-        curEle.visible=true
-        opened=false
-
+        currentIndex = index
+        currentText = text
+        curEle.text = text
+        view.visible = false
+        view.model = []
+        rootComboBox.height = oriH
+        arrow.visible = true
+        curEle.visible = true
+        opened =false
     }
 
-    Timer{
-        id:autoClose
-        interval:2000
-        onTriggered: closeBox(lastSelected[0],lastSelected[1])
+    Timer {
+        id: autoClose
+        interval: 2000
+        onTriggered: closeBox(lastSelected[0], lastSelected[1])
     }
 
-    MLabel{
+    MLabel {
         id:curEle
         anchors.right: parent.right
         anchors.left: parent.left
@@ -89,14 +90,14 @@ Rectangle{
     ListView{
         id:view
         anchors.fill: parent
-        delegate:MLabel{
+        delegate:MLabel {
             y:index*height
             height:oriH
             width:parent.width
             labelSize: rootComboBox.labelSize
             text:modelData
             horizontalAlignment: text.length>10?Text.AlignLeft:Text.AlignHCenter
-            MouseArea{
+            MouseArea {
                 hoverEnabled: true
                 anchors.fill: parent
                 onEntered: {
@@ -111,7 +112,7 @@ Rectangle{
                 }
                 onClicked:closeBox(index,modelData)
             }
-            Rectangle{
+            Rectangle {
                 id:highlight
                 Behavior on opacity{NumberAnimation{duration:100; easing.type: Easing.OutExpo}}
                 anchors.fill: parent
@@ -121,7 +122,7 @@ Rectangle{
             }
         }
     }
-    Rectangle{
+    Rectangle {
         id:arrow
         anchors.right:parent.right
         anchors.top:parent.top

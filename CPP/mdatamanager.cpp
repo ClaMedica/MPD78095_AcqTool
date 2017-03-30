@@ -109,13 +109,13 @@ void MDataManager::loadFile(QString __fileName)
     QMap<int, QVariantList> defEn;
 
     double sigMin = INF, sigMax = -INF;
-    byte key;
+    byte_ key;
     int32_t numCh;
     int32_t numSamp[4]; //4 byte per avere il numero del campione
     int32_t numDef;
     int32_t tStart[20], tEnd[20];
     QString descr;
-    byte chEn[20];
+    byte_ chEn[20];
 
     switch(fileType(__fileName)) {
     case PIC:
@@ -129,9 +129,6 @@ void MDataManager::loadFile(QString __fileName)
         qDebug() << "File Aperto?" << res;
         res = m_mng->GetParameters();
         qDebug() << "File Caricato?" << res;
-
-        //m_mng->SetAnalysis(QString::number(FLW_AVD_STUDY));//temporaneo
-        // m_mng->CommitParameters();
 
         qDebug() << "Building configuration file ...";
         if(!buildConfigurationFile()) {
@@ -374,7 +371,7 @@ void MDataManager::loadFile(QString __fileName)
         //libreria di analisi: creo oggetto.
         m_ana = new Analyze();
         //creo oggetto per stampare
-        m_mngPrint = new printermanager(m_fileName);
+       // m_mngPrint = new printermanager(m_fileName);
 
         m_mng->Close();
         break;
@@ -828,9 +825,6 @@ void MDataManager::exitFromReview()
 {
     qDebug() << "Exit" << getToSave();
     if (getToSave() == "ret") {
-//#ifndef DEBUGACQTOOL
-//#else
-//#endif
         if(DebugAcqTool == false)
             g_mainAppBridge->sendSwitch();  //send(MEX_SHOW);
         else
@@ -859,9 +853,6 @@ void MDataManager::exitFromReview()
             //cancello il file copy
             qDebug() << "cancellata copia all'exit" << QFile::remove(copyName);
         }
-//#ifndef DEBUGACQTOOL
-//#else
-//#endif
         if(DebugAcqTool == false)
             g_mainAppBridge->sendSwitch(); //poi dovra tornare al modulo database
         else
@@ -1148,25 +1139,25 @@ qDebug() << "INIZIO";
     qDebug() << "File chiuso" << m_mng->Close();
 
 
-    m_mngPrint->setTempoAttesa(m_aflwdatas.at(0)->getWaitingTime());
-    m_mngPrint->setFlussoMax(m_aflwdatas.at(0)->getQMax());
-    m_mngPrint->setFlussoMedio(m_aflwdatas.at(0)->getQAve());
-    m_mngPrint->setTempoMax(m_aflwdatas.at(0)->getTimeAtQmax());
-    m_mngPrint->setTempo595(m_aflwdatas.at(0)->getTime90());
-    m_mngPrint->setTempoFlusso(m_aflwdatas.at(0)->getFlowTime());
-    m_mngPrint->setTempoDisc(m_aflwdatas.at(0)->getDescTime());
-    m_mngPrint->setTempoSvuot(m_aflwdatas.at(0)->getVoidingTime());
-    m_mngPrint->setVolFlussoMax(m_aflwdatas.at(0)->getVolAtQqmax());
-    m_mngPrint->setVolVuotato(m_aflwdatas.at(0)->getVoidedVolume());
-    m_mngPrint->setAccelerazione(m_aflwdatas.at(0)->getAcceleration());
+//    m_mngPrint->setTempoAttesa(m_aflwdatas.at(0)->getWaitingTime());
+//    m_mngPrint->setFlussoMax(m_aflwdatas.at(0)->getQMax());
+//    m_mngPrint->setFlussoMedio(m_aflwdatas.at(0)->getQAve());
+//    m_mngPrint->setTempoMax(m_aflwdatas.at(0)->getTimeAtQmax());
+//    m_mngPrint->setTempo595(m_aflwdatas.at(0)->getTime90());
+//    m_mngPrint->setTempoFlusso(m_aflwdatas.at(0)->getFlowTime());
+//    m_mngPrint->setTempoDisc(m_aflwdatas.at(0)->getDescTime());
+//    m_mngPrint->setTempoSvuot(m_aflwdatas.at(0)->getVoidingTime());
+//    m_mngPrint->setVolFlussoMax(m_aflwdatas.at(0)->getVolAtQqmax());
+//    m_mngPrint->setVolVuotato(m_aflwdatas.at(0)->getVoidedVolume());
+//    m_mngPrint->setAccelerazione(m_aflwdatas.at(0)->getAcceleration());
 
-    //letto dai setting
-    //mi dice se la flussimetria automatica o manuale
-    m_mngPrint->setMode(m_autoFlow);
-    m_mngPrint->setPrintSiroky(m_Siroky);
-    m_mngPrint->setPrintModeUser(m_landscape);
-    if (m_autoPrint)
-        m_mngPrint->print();
+//    //letto dai setting
+//    //mi dice se la flussimetria automatica o manuale
+//    m_mngPrint->setMode(m_autoFlow);
+//    m_mngPrint->setPrintSiroky(m_Siroky);
+//    m_mngPrint->setPrintModeUser(m_landscape);
+//    if (m_autoPrint)
+//        m_mngPrint->print();
 
     //qml
     qDebug() << "FINE";
@@ -1214,7 +1205,7 @@ void MDataManager::InitPageGraphs(int __anaType)
         int evStart;
         int evEnd;
         VarMap *evMarkOpIn;
-        byte evAuto = 0;
+        byte_ evAuto = 0;
         QVector<unsigned char> enCh;
 
         VarMapVec* elements = m_storage.getAll(CAT_DEFINER);
@@ -1279,7 +1270,7 @@ void MDataManager::InitPageGraphs(int __anaType)
         //se gli anMarker li trovo per la prima volta li inserisco in grafica
         if (evAuto != 0) {
             VarMapVec *mrkAnVec = new VarMapVec;
-            byte key;
+            byte_ key;
             int32_t numCh;
             int32_t numSamp;
             int32_t numDef;
@@ -1335,7 +1326,7 @@ bool MDataManager::InitArraysFLW(int __start,
                                  int __end,
                                  QVector<unsigned char> __chEn,
                                  int __curDef,
-                                 byte __auto)
+                                 byte_ __auto)
 {
     double startTh = 0;
     double heightTh = 0;
@@ -1545,7 +1536,7 @@ int MDataManager::ReadResult(int & __numEv)
     case FLW_AVD_STUDY: {
         //dati analisi
         m_aflwdatas.append(new mflowdatas());
-        byte * strTemp = (byte *) malloc (sizeof(FLWAdvRepStruct));
+        byte_ * strTemp = (byte_ *) malloc (sizeof(FLWAdvRepStruct));
         m_aflwdatas.at(0)->setParent(this);
         m_aflwdatas.at(0)->setWaitingTime(0);
         m_aflwdatas.at(0)->setQMax(0);
