@@ -80,5 +80,8 @@ Rectangle{
             image.source = backgroundImage
             image.z = -1
         }
+        else
+            if(image !== undefined)
+                image.source = ""
     }
 }

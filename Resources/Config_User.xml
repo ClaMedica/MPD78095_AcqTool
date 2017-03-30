@@ -4,7 +4,7 @@
             label="Automatic flow"
             type="CheckBox"
             unit=""
-            value="1"
+            value="true"
         />
         <AutoStarts>
                 <Step>

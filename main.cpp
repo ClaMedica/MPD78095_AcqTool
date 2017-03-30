@@ -53,12 +53,14 @@ int main(int argc, char *argv[])
 
 #ifdef ANDROID
     gPath_log = "/mnt/sdcard/" + logFile;
-#elseif PICOFLOW
+#endif
+#ifdef PICOFLOW
     QString logFile = "acqTool_log_" + QDateTime::currentDateTime().toString("yyyyMMdd_hhmmss")+".htm";
     gPath_log = /*QApplication::applicationDirPath()*/ + "/tmp/" + logFile;
-#else
+#endif
+#ifdef WIN32
      QString logFile = "acqTool_log_" + QDateTime::currentDateTime().toString("yyyyMMdd_hhmmss")+".htm";
-     gPath_log = QApplication::applicationDirPath() + logFile;
+     gPath_log = QApplication::applicationDirPath() + "/"+ logFile;
 #endif
 
     qDebug() << "Start. log:" << gPath_log;
