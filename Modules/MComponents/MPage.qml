@@ -19,6 +19,11 @@ Rectangle{
     signal questionAnswered(bool accepted,var owner,var arg)
     color: "transparent"
 
+//    function onLid_inquiry_end() {
+//        console.log("onLid_inquiry_end")
+//        rootPageBluetoothDevice.backgroundImage = ""
+//    }
+
     function previous() {
         if(prevPage !== "") {
             changePage(prevPage)
