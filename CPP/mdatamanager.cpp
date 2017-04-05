@@ -194,6 +194,7 @@ void MDataManager::loadFile(QString __fileName)
             qDebug() << "sig:" << sig;
             sig->setName(m_mng->GetChanName(h));
             sig->setSamplingFrequency(m_mng->GetNAS(h));
+            sig->setSupLim(m_mng->GetSupLim(h));
 
             double M = sig->maximum();
             double m = sig->minimum();
@@ -736,16 +737,16 @@ QVariantList MDataManager::getPlotLimits()
                     if(sig->getT0()       < xMin) xMin = sig->getT0();
                     if(sig->getDuration() > xMax) xMax = sig->getDuration();
                     if(sig->minimum()     < yMin) yMin = sig->minimum();
-                    if(sig->maximum()     > yMax) yMax = sig->maximum();
+                    //if(sig->maximum()     > yMax) yMax = sig->maximum();
+                    yMax = sig->getSupLim();
                     //qDebug()<<yMin<<yMax;
                     //qDebug()<<"Segnale lungo:"<<sig->getSize();
                 }
             }
-            limits << xMin << xMax << yMin << (yMax + abs(yMax*0.05));
+            limits << xMin << xMax << yMin << yMax;//(yMax + abs(yMax*0.05));
         }
         limits << "&Limit";
     }
-    //qDebug()<<limits;
     return limits;
 }
 
