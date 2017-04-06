@@ -136,7 +136,7 @@ void MDataManager::loadFile(QString __fileName)
             return;
         }
 
-        m_patientName = m_mng->GetPatient();    //.section(";",0,1);
+        m_patientName = m_mng->GetPatient().section(";",0,1);
         m_patientName.replace(";", "_");
         m_sexPatient = false;
         if (m_mng->GetPatient().section(";", 12, 12) == "F")
