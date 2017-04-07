@@ -92,6 +92,7 @@ lupdate_only{
 }
 
 
+
 contains(ANDROID_TARGET_ARCH,armeabi-v7a) {
     DEFINES += ANDROID
     QT += androidextras

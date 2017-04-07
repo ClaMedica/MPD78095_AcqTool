@@ -77,6 +77,16 @@ int main(int argc, char *argv[])
     qDebug() << translator.load(g_P7SettingsManager.appPath() + "/acqtool_" + local);
     app.installTranslator(&translator);
 
+
+    //carico i settaggi
+    g_P7SettingsManager.loadSettings();
+    //localizzazione
+    QString local = g_P7SettingsManager.localization();
+    qDebug()<<"Language to load: "<<g_P7SettingsManager.appPath() + "/acqtool_" + local;
+    QTranslator translator;
+    qDebug() << translator.load(g_P7SettingsManager.appPath() + "/acqtool_" + local);
+    app.installTranslator(&translator);
+
     QStringList arguments;
     //leggiamo gli argomenti
     for(int i = 0; i < argc; i++)
