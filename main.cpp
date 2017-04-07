@@ -67,17 +67,6 @@ int main(int argc, char *argv[])
     //dirotto il debug log
     MyMessageOutput::init(gPath_log);
 
-
-    //carico i settaggi
-    g_P7SettingsManager.loadSettings();
-    //localizzazione
-    QString local = g_P7SettingsManager.localization();
-    qDebug()<<"Language to load: "<<g_P7SettingsManager.appPath() + "/acqtool_" + local;
-    QTranslator translator;
-    qDebug() << translator.load(g_P7SettingsManager.appPath() + "/acqtool_" + local);
-    app.installTranslator(&translator);
-
-
     //carico i settaggi
     g_P7SettingsManager.loadSettings();
     //localizzazione
