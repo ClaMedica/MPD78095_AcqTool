@@ -17,6 +17,8 @@ MForm{
     id : rootAna
     anchors.fill: parent.fill
 
+    color:"lightgray"
+
     //@@@@@@@@@@    Functions       @@@@@@@@@@
     function populate()
     {
@@ -24,6 +26,7 @@ MForm{
         plot.markers=mngData.getData("Marker")
         plot.frames=mngData.getData("Definer")
         plot.limits=mngData.getPlotLimits();
+        lbNamePat.text = mngData.patientInfo
     }
 
 
@@ -75,7 +78,7 @@ MForm{
         anchors.top: parent.top
         anchors.left: parent.left
         anchors.right: gridComand.left
-        height: rootAna.height - 25
+        height: PicoFlow?(rootAna.height - 15):(rootAna.height - 25)
         plotProp:mngCon.plotSetting
 
         //@@@@@@@@@@    Events          @@@@@@@@@@
@@ -87,18 +90,20 @@ MForm{
 
         onToZoomChanged:
         {
-            var startTime = mngData.getStartTime()
-            var endTime = mngData.getEndTime()
-            var numSec = (endTime - startTime)/2
+            if (!PicoFlow)
+            {
+                var startTime = mngData.getStartTime()
+                var endTime = mngData.getEndTime()
+                var numSec = (endTime - startTime)/2
 
-            var pageSize
-            if (toZoom > oldToZoom){
-                pageSize = scroolBar.pageSize - (1/numSec)
-                if (pageSize < 0)
-                    pageSize = 0
-                scroolBar.pageSize = pageSize
-            }
-            if (toZoom < oldToZoom){
+                var pageSize
+                if (toZoom > oldToZoom){
+                    pageSize = scroolBar.pageSize - (1/numSec)
+                    if (pageSize < 0)
+                        pageSize = 0
+                    scroolBar.pageSize = pageSize
+                }
+                if (toZoom < oldToZoom){
                     pageSize = scroolBar.pageSize + (1/numSec)
                     var LimitSx,LimitDx
                     LimitSx = (scroolBar.position * (scroolBar.width-2) + 1 - scroolBar.barW/2)
@@ -115,10 +120,11 @@ MForm{
                     if (pageSize > 1)
                         pageSize = 1
                     scroolBar.pageSize = pageSize
-            }
-            if (toZoom === 0 && oldToZoom === 0){
-                scroolBar.pageSize = 1.0
-                scroolBar.position = 0.5
+                }
+                if (toZoom === 0 && oldToZoom === 0){
+                    scroolBar.pageSize = 1.0
+                    scroolBar.position = 0.5
+                }
             }
         }
     }
@@ -126,6 +132,7 @@ MForm{
     MScroolBar{
         id: scroolBar
         clip:true
+        visible: PicoFlow? false:true
         anchors.top:plot.bottom
         anchors.bottom: parent.bottom
         anchors.right: gridComand.left
@@ -133,10 +140,18 @@ MForm{
         onMoved: {
             var moved = scroolBar.step
             plot.movingZoom = moved
-            //console.log("onmoved ",moved)
         }
     }
 
+    MLabel{
+        id: lbNamePat
+        clip:true
+        visible: PicoFlow? true:false
+        anchors.top:plot.bottom
+        anchors.bottom: parent.bottom
+        anchors.horizontalCenter: parent.horizontalCenter
+        text: "patientName"
+    }
 
     //Models
 
@@ -233,50 +248,6 @@ MForm{
             }
         }
         visible:true
-
-//        onTooltipActived:
-//        {
-//            if (testo === "")
-//                toolTip.visible = false
-//            else
-//            {
-//                toolTip.y = posY
-//                toolTip.text = testo
-//                toolTip.visible = true
-//            }
-//        }
-
-        //@@@@@@@@@@    Events          @@@@@@@@@@
-
-//        onClicked:
-//        {
-//            switch(owner)
-//            {
-//            case "Commands":
-//                if (value === "111")
-//                    mngData.analysis();
-
-//                if (value === "112") {
-//                    mngData.exitFromReview()
-//                }
-//                if (value === "113"){
-//                    //zoom in
-//                    plot.oldToZoom = plot.toZoom
-//                    plot.toZoom = plot.toZoom + 1
-//                }
-//                if (value === "114"){
-//                    //zoom out
-//                    plot.oldToZoom = plot.toZoom
-//                    plot.toZoom = plot.toZoom - 1
-//                }
-//                if (value === "115"){
-//                    //zoom none
-//                    plot.oldToZoom = 0
-//                    plot.toZoom = 0
-//                }
-//                break;
-//            }
-//        }
     }
 
 

@@ -55,7 +55,6 @@ Rectangle {
 
     function closeBox(index,text)
     {
-        //console.log("close box")
         if(!opened)
             return
         currentIndex = index

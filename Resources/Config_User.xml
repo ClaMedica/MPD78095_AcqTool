@@ -199,7 +199,7 @@
                     dt="real"
                     unit="ml"
                     model="500#50#5#0#"
-                    value="150"
+                    value="200"
                 />
                 <Zero
                     label="Zero"
@@ -240,8 +240,8 @@
                     type="SpinBox"
                     dt="real"
                     unit="ml/sec"
-                    model="50#0#0.5#1#"
-                    value="20"
+                    model="100#25#25#0#"
+                    value="50"
                 />
                 <Zero
                     label="Zero"
@@ -282,8 +282,8 @@
                     type="SpinBox"
                     dt="real"
                     unit="uV"
-                    model="50#0#0.5#1#"
-                    value="20"
+                    model="5000#500#500#0#"
+                    value="1000"
                 />
                 <Zero
                     label="Zero"

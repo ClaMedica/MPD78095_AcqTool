@@ -35,7 +35,10 @@ public:
     Q_INVOKABLE QVariantList definersInfo();
     Q_INVOKABLE QVariantList acqInfo();
 
+    Q_PROPERTY(QString patientInfo READ patientInfo NOTIFY patientInfoChanged)
+
 signals:
+    void patientInfoChanged();
 
 public slots:
     bool load(void);

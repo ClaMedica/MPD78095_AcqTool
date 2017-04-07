@@ -281,14 +281,6 @@ QVariantList MAbstractManager::acqInfo()
     list << "visible" << true;
     list << "&GridElement";
 
-    //salva e chiudi
-    list << "$GridElement";
-    list << "descr" << tr("save&exit");
-    list << "img" << "qrc:/salvaChiudi";
-    list << "key" << 112;
-    list << "visible" << true;
-    list << "&GridElement";
-
     return list;
 }
 
@@ -413,7 +405,7 @@ bool MAbstractManager::buildConfigurationFile()
                 trkN->setAttribute(ATT_THICK,      ch->getSafeChild(ATT_THICK)->getSafeAttribute(ATT_VALUE));
                 trkN->setAttribute(ATT_COLOR,      ch->getSafeChild(ATT_COLOR)->getSafeAttribute(ATT_VALUE));
                 trkN->setAttribute(ATT_WIDTH,      ch->getSafeChild(ATT_WIDTH)->getSafeAttribute(ATT_VALUE));
-                //axis->setAttribute(ATT_YAUTOSCALE, ch->getSafeChild(ATT_YAUTOSCALE)->getSafeAttribute(ATT_VALUE));
+                axis->setAttribute(ATT_YAUTOSCALE, ch->getSafeChild(ATT_YAUTOSCALE)->getSafeAttribute(ATT_VALUE));
             }
             else
                 qWarning() << "Canale" << chanName << "senza proprieta grafiche. Uso le default";

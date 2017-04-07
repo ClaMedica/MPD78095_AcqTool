@@ -109,9 +109,8 @@ private:
     m_filesLoaded;//contiene l'elenco di tutti i file che sono stati aperti e di cui vi sono i dati disponibili per l'utente
 
     QString m_currentSignalName,
-    //m_plotConfigFileName,
-    m_fileName;
-    //m_configurationFileName;
+    m_fileName,
+    m_copyFileName;
 
     MSignal *m_pCurrentSignal;
 
