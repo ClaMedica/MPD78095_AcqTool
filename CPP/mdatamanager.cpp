@@ -99,6 +99,11 @@ void MDataManager::loadFile(QString __fileName)
         return;
     }
     m_fileName = __fileName;
+    //la prima volta che salvo mi faccio la copia del file originale
+    m_copyFileName = m_fileName;
+    m_copyFileName.insert(m_copyFileName.length() - 4, "_origin");
+    if (!QFile(m_copyFileName).exists())
+        QFile::copy(m_fileName, m_copyFileName);
 
     //devo pulire tutti i vettori utilizzati
     resetAll();
@@ -372,7 +377,7 @@ void MDataManager::loadFile(QString __fileName)
         //libreria di analisi: creo oggetto.
         m_ana = new Analyze();
         //creo oggetto per stampare
-       // m_mngPrint = new printermanager(m_fileName);
+        m_mngPrint = new printermanager(m_copyFileName);
 
         m_mng->Close();
         break;
@@ -397,23 +402,15 @@ void MDataManager::resetAll()
 
 void MDataManager::saveChanges()
 {
-    QString copyName = m_fileName;
-    copyName.insert(copyName.length() - 4, "_origin");
-
-    //la prima volta che salvo mi faccio la copia del file originale
-    if (!QFile(copyName).exists())
-        QFile::copy(m_fileName, copyName);
-
     if(m_copy != NULL)
         delete m_copy;
     m_copy = new DatafileManager;
-    m_copy->SetFileName(m_fileName);
+    m_copy->SetFileName(m_copyFileName);
     m_copy->SetFileType(7);
 
     qDebug() << "Copia aperta?" << m_copy->Open();
     qDebug() << "Copia caricata?" << m_copy->GetParameters();
     qDebug() << "Eliminati marker e definer?" << m_copy->DeleteAllMarkers();
-
 
     //-Salvataggio Marker
     VarMapVec *elements = m_storage.getAll(CAT_MARKER);
@@ -836,61 +833,40 @@ void MDataManager::exitFromReview()
 
     if (getToSave() == "")
         emit sg_exitFromReview();
-    else {
-        QString copyName = m_fileName;
-        copyName.insert(copyName.length() - 4, "_origin");
-        if (getToSave() == "no")        //copio il file copy nell'originale
-        {
-            if (QFile::exists(copyName)) {
-                qDebug() << "cancello vecchio file" << QFile::remove(m_fileName);
-                qDebug() << "copio le modifiche" << QFile::copy(copyName,m_fileName);
-                qDebug() << "cancellata copia all'exit" << QFile::remove(copyName);
+    else
+    {
+        if (m_copy != NULL)
+            delete m_copy;
+        m_copy = NULL;
+        if (getToSave() == "yes")
+        {        //copio il file copy nell'originale
+            if (QFile::exists(m_copyFileName))
+            {
+                saveChanges();
+                qDebug()<<"cancello vecchio file"<<QFile::remove(m_fileName);
+                qDebug()<<"copio le modifiche"<<QFile::rename(m_copyFileName,m_fileName);
             }
         }
-        else //"yes"
+        else //"no"
         {
-            //salvo
-            saveChanges();
             //cancello il file copy
-            qDebug() << "cancellata copia all'exit" << QFile::remove(copyName);
+            qDebug()<<"cancellata copia all'exit"<<QFile::remove(m_copyFileName);
         }
         if(DebugAcqTool == false)
             g_mainAppBridge->sendSwitch(); //poi dovra tornare al modulo database
         else
             exit(0);
-
     }
-
-    //    if (getToSave() == "")
-    //        emit sg_exitFromReview();
-    //    else
-    //    {
-    //        QString copyName=m_fileName;
-    //        copyName.insert(copyName.length()-4,"_copy");
-    //        if (getToSave() == "yes")
-    //        {        //copio il file copy nell'originale
-    //            if (QFile::exists(copyName))
-    //            {
-    //                qDebug()<<"cancello vecchio file"<<QFile::remove(m_fileName);
-    //                qDebug()<<"copio le modifiche"<<QFile::copy(copyName,m_fileName);
-    //                qDebug()<<"cancellata copia all'exit"<<QFile::remove(copyName);
-    //            }
-    //        }
-    //        else //"no"
-    //            //cancello il file copy
-    //            qDebug()<<"cancellata copia all'exit"<<QFile::remove(copyName);
-    //        exit(0); //poi dovra tornare al modulo database
-    //    }
 }
 
 bool MDataManager::checkForVolRes()
 {
-    qDebug() << "INIZIO";
     if (getValVolRes() != -999)
         return false;
 
     m_mng = new DatafileManager;
-    m_mng->SetFileName(m_fileName);
+    qDebug() << m_copyFileName;
+    m_mng->SetFileName(m_copyFileName);
     m_mng->SetFileType(7);
 
     qDebug() << "File Aperto?" << m_mng->Open();
@@ -901,7 +877,7 @@ bool MDataManager::checkForVolRes()
 
     m_numAna = m_mng->GetAnalysiNum();
 
-    //ciclo per individuare se A? necessario aprire la dlg del volume residuo
+    //ciclo per individuare se e necessario aprire la dlg del volume residuo
     bool volRes = false;
     for (int i = 0; i < m_numAna; i++)
     {
@@ -945,7 +921,7 @@ qDebug() << "INIZIO";
     setToSave("");  //necessario chiedere se salvare
 
     m_mng = new DatafileManager;
-    m_mng->SetFileName(m_fileName);
+    m_mng->SetFileName(m_copyFileName);
     m_mng->SetFileType(7);
 
     qDebug() << "File Aperto?" << m_mng->Open();
@@ -1140,25 +1116,25 @@ qDebug() << "INIZIO";
     qDebug() << "File chiuso" << m_mng->Close();
 
 
-//    m_mngPrint->setTempoAttesa(m_aflwdatas.at(0)->getWaitingTime());
-//    m_mngPrint->setFlussoMax(m_aflwdatas.at(0)->getQMax());
-//    m_mngPrint->setFlussoMedio(m_aflwdatas.at(0)->getQAve());
-//    m_mngPrint->setTempoMax(m_aflwdatas.at(0)->getTimeAtQmax());
-//    m_mngPrint->setTempo595(m_aflwdatas.at(0)->getTime90());
-//    m_mngPrint->setTempoFlusso(m_aflwdatas.at(0)->getFlowTime());
-//    m_mngPrint->setTempoDisc(m_aflwdatas.at(0)->getDescTime());
-//    m_mngPrint->setTempoSvuot(m_aflwdatas.at(0)->getVoidingTime());
-//    m_mngPrint->setVolFlussoMax(m_aflwdatas.at(0)->getVolAtQqmax());
-//    m_mngPrint->setVolVuotato(m_aflwdatas.at(0)->getVoidedVolume());
-//    m_mngPrint->setAccelerazione(m_aflwdatas.at(0)->getAcceleration());
+    m_mngPrint->setTempoAttesa(m_aflwdatas.at(0)->getWaitingTime());
+    m_mngPrint->setFlussoMax(m_aflwdatas.at(0)->getQMax());
+    m_mngPrint->setFlussoMedio(m_aflwdatas.at(0)->getQAve());
+    m_mngPrint->setTempoMax(m_aflwdatas.at(0)->getTimeAtQmax());
+    m_mngPrint->setTempo595(m_aflwdatas.at(0)->getTime90());
+    m_mngPrint->setTempoFlusso(m_aflwdatas.at(0)->getFlowTime());
+    m_mngPrint->setTempoDisc(m_aflwdatas.at(0)->getDescTime());
+    m_mngPrint->setTempoSvuot(m_aflwdatas.at(0)->getVoidingTime());
+    m_mngPrint->setVolFlussoMax(m_aflwdatas.at(0)->getVolAtQqmax());
+    m_mngPrint->setVolVuotato(m_aflwdatas.at(0)->getVoidedVolume());
+    m_mngPrint->setAccelerazione(m_aflwdatas.at(0)->getAcceleration());
 
-//    //letto dai setting
-//    //mi dice se la flussimetria automatica o manuale
-//    m_mngPrint->setMode(m_autoFlow);
-//    m_mngPrint->setPrintSiroky(m_Siroky);
-//    m_mngPrint->setPrintModeUser(m_landscape);
-//    if (m_autoPrint)
-//        m_mngPrint->print();
+    //letto dai setting
+    //mi dice se la flussimetria automatica o manuale
+    m_mngPrint->setMode(m_autoFlow);
+    m_mngPrint->setPrintSiroky(m_Siroky);
+    m_mngPrint->setPrintModeUser(m_landscape);
+    if (m_autoPrint)
+        m_mngPrint->print();
 
     //qml
     qDebug() << "FINE";
