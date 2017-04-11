@@ -406,6 +406,8 @@ bool MAbstractManager::buildConfigurationFile()
                 trkN->setAttribute(ATT_COLOR,      ch->getSafeChild(ATT_COLOR)->getSafeAttribute(ATT_VALUE));
                 trkN->setAttribute(ATT_WIDTH,      ch->getSafeChild(ATT_WIDTH)->getSafeAttribute(ATT_VALUE));
                 axis->setAttribute(ATT_YAUTOSCALE, ch->getSafeChild(ATT_YAUTOSCALE)->getSafeAttribute(ATT_VALUE));
+                axis->setAttribute(ATT_RANGE, ch->getSafeChild(ATT_RANGE)->getSafeAttribute(ATT_MODEL));
+                axis->setAttribute(ATT_RANGEVALUE, ch->getSafeChild(ATT_RANGE)->getSafeAttribute(ATT_VALUE));
             }
             else
                 qWarning() << "Canale" << chanName << "senza proprieta grafiche. Uso le default";

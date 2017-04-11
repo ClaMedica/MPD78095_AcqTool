@@ -196,10 +196,8 @@ void MDataManager::loadFile(QString __fileName)
             for(int i = 0; i < m_mng->GetSamplesNumber(h); i++)
                 sig->replace(i, m_mng->GetValue(h, i));
 
-            qDebug() << "sig:" << sig;
             sig->setName(m_mng->GetChanName(h));
             sig->setSamplingFrequency(m_mng->GetNAS(h));
-            sig->setSupLim(m_mng->GetSupLim(h));
 
             double M = sig->maximum();
             double m = sig->minimum();
@@ -207,6 +205,23 @@ void MDataManager::loadFile(QString __fileName)
                 sigMax = M;
             if(sigMin > m)
                 sigMin = m;
+
+            double supLim = m_mng->GetSupLim(h);
+            Ancestry *chProp = m_configUser.getSafeChild(XML_CHANNELSPROP);
+            Ancestry *chName = chProp->getSafeChild(m_mng->GetChanName(h).remove("1"));
+            //max#min#step#decimals
+            QStringList rangesDef = chName->getSafeChild(ATT_RANGE)->getSafeAttribute(ATT_MODEL).split("#");
+
+            while (M > supLim)
+            {
+                double newSupLim = supLim + rangesDef.at(2).toInt();//aggiungo lo step
+                if (newSupLim <= rangesDef.at(0).toInt())
+                    supLim = newSupLim;
+                else
+                    break;
+            }
+
+            sig->setSupLim(supLim);
 
             //qDebug()<<(*sig);
             this->addSignal(sig);
