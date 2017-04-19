@@ -325,13 +325,13 @@ void MAcqManager::addDefiner(bool __startEnd, QVariantList __info)
 
 bool MAcqManager::sendStartAcq()
 {
-    return sendCommand(1);
+    return sendCommand(ETCP_CMD_START_WITH_ZERO /*ETCP_CMD_START_WITH_ZERO*/);
 }
 
 bool MAcqManager::sendStopAcq()
 {
     m_alarmMng.manageAlarm(ALA_NOT_ACQUIRING, DISABLE);
-    return sendCommand(3);
+    return sendCommand(ETCP_CMD_STOP);
 }
 
 void MAcqManager::resetAlarms()
