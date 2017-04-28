@@ -238,8 +238,10 @@ class printermanager : public QObject
     Q_OBJECT
 public:
     explicit printermanager(QString __namefile, QObject *parent = 0);
+    ~printermanager();
 
     void print();
+    void closePrinter();
 
     void setTempoAttesa(float __val){m_tem_att = __val;}
     void setFlussoMax(float __val){m_flu_max = __val;}

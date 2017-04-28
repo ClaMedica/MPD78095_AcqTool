@@ -33,6 +33,21 @@ printermanager::printermanager(QString __namefile, QObject *parent) : QObject(pa
     m_port->init_printer();
 }
 
+
+printermanager::~printermanager()
+{
+    m_port->closeSerialPort();
+    if (m_port != NULL)
+        delete m_port;
+}
+
+void printermanager::closePrinter()
+{
+    m_port->closeSerialPort();
+    if (m_port != NULL)
+        delete m_port;
+}
+
 /**
 Stampa automatica alla fine dell'esame: al momento della pressione dello stop, i dati sono analizzati, salvati e poi mandati in stampa.
 */
@@ -95,8 +110,6 @@ void printermanager::print()
     m_dfm->Close();
 
     pri_rep_review();	// qui va subito in stampa
-
-
 }
 
 void printermanager::pri_rep_review()

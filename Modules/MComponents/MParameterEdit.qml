@@ -20,6 +20,7 @@ Rectangle {
     property color labelColor:"black"//colore della role
     property var beginInfo:undefined//è il valore che ha la info la prima volta
     property bool keyboardAlfaNum: true
+    property int comboNumMaxEle:5
     property string containerBorderColor: "transparent"
     readonly property int currentIndex:type===typComboBox && component!=undefined?component.currentIndex:-1
     readonly property string typTextField:"TextField"
@@ -42,10 +43,6 @@ Rectangle {
     // has clicked. The id must be unique
     property int parameterId: 0
     signal clicked()
-
-    signal openKeyboard
-
-
     onComponentChanged: if(component!==undefined)connection.target=component
 
     function reload()
@@ -69,7 +66,6 @@ Rectangle {
 
         onFocusChanged:
         {
-          //console.log("cambio di ",target.focus,isTouch)
             if(target.focus && isTouch)
             {
                 var c
@@ -149,6 +145,7 @@ Rectangle {
             component.model=model
             component.currentIndex=1
             component.labelSize=labelSize
+            component.numElementiMax=comboNumMaxEle
             rootParEdit.info=component.currentText
             setInfo(model[0])
             break;
@@ -195,7 +192,7 @@ Rectangle {
         id: container
         anchors.left:labelFirst?label.right:parent.left
         anchors.right:labelSide.left
-        anchors.top:parent.top
+        anchors.top: parent.top
         anchors.bottom:parent.bottom
         color:"transparent"
         border.color: containerBorderColor
@@ -270,7 +267,6 @@ Rectangle {
     }
     function cliccato()
     {
-        console.log("cliccato")
         rootParEdit.clicked()
     }
 

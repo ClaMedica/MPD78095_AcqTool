@@ -15,6 +15,7 @@ Rectangle {
     property int labelSize: 2
     property var lastSelected: []
     property bool opened: false
+    property int numElementiMax: 5
     readonly property bool modelOk: (model.length != 0) && (model[0] !== undefined)
     clip: true
     Behavior on height { NumberAnimation { duration:300; easing.type: Easing.OutExpo}}
@@ -40,8 +41,8 @@ Rectangle {
         //console.log("open box")
         oriH = height
         //se è ancorato si espanderà dove può
-        if(model.length > 5)
-            rootComboBox.height *= 5//model.length
+        if(model.length > numElementiMax)
+            rootComboBox.height *= numElementiMax
         else
             rootComboBox.height *= model.length
         arrow.visible = false

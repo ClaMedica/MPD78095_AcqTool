@@ -13,7 +13,7 @@ import QtQuick.Window 2.2
 
 ApplicationWindow {
     //@@@@@@@@@@ Definitions @@@@@@@@@@
-    property var keyboard:appKey
+    //property var keyboard:appKey
     property string examFolder:settings.datafilePath
     property string configFolder:settings.appPath()
 

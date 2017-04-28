@@ -133,8 +133,6 @@ Rectangle {
         {
             rootBtn.released(this)
             pressed=false
-            if(switchEnabled)
-                checked=!checked
         }
         onClicked:
         {
