@@ -24,6 +24,7 @@ signals:
     void acqMarkersChanged();
     void acquisitionStarted();
     void systemInAcqStatus();
+    void acquisitionEnded();
 
 public slots:
 

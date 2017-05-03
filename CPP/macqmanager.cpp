@@ -53,6 +53,7 @@ MAcqManager::~MAcqManager()
         }
     }
 
+
     foreach (QList<MSignal *> list, m_channelMap) {
         foreach(MSignal *sig,list) {
             delete sig;
@@ -93,6 +94,15 @@ bool MAcqManager::newAcquisition(QString __dataFile)
 
         //carico info di connettivitA
         loadConnectivityInfo(m_configAcq.getSafeChild(XML_CONNECTIONS));
+
+        //resetto le QMap se non sono pulite
+        m_bufferMap.clear();
+        m_operationMap.clear();
+        m_HWChansMap.clear();
+        m_acqMarker.clear();
+        m_sampleFreqMap.clear();
+        m_frameMap.clear();
+        m_bufSizeMap.clear();
 
         /* non sono in acquisizione e quindi posso lanciarne una nuova aprendo il file e leggendo le info
          * oppure pescandole dal file di configurazione
@@ -298,6 +308,7 @@ void MAcqManager::endAcquisition(bool discard)
     m_tcpAttempts = 0;
     m_supeConnected = 0;
     m_oldState = ESTATE_IDLE_NOT_CONNECTED;
+    emit acquisitionEnded();
 }
 
 void MAcqManager::addMarker(QVariant __key)

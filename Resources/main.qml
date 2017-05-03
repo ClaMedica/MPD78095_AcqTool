@@ -77,6 +77,7 @@ ApplicationWindow {
             mngAcq.load()
             mngAcq.newAcquisition(dataFile)
             forReal.setMarkersInfo(mngAcq.markersInfo("type", [1, 6]))
+            forReal.configurationFile = ""
             forReal.configurationFile = mngAcq.plotConfigFileName()
             //forReal.displayMessage("Wait for initialization...", -1)
             forHome.whoIsVisible = forReal.name
@@ -128,6 +129,12 @@ ApplicationWindow {
             console.log("Go Go Go");
             forReal.displayMessage("start",2000)
         }
+        onAcquisitionEnded:
+        {
+            console.log("ENDED")
+            forReal.endAcq()
+        }
+
     }
 
     MDataManager{

@@ -13,7 +13,7 @@ printerserialport::printerserialport(QObject *parent) : QObject(parent)
     m_serialPort.setStopBits(QSerialPort::OneStop);
 
     if ( ! m_serialPort.open(QIODevice::ReadWrite))
-        qCritical() << "Unable to open serial port";
+        qWarning() << "Unable to open serial port";
 }
 
 void printerserialport::init_printer()

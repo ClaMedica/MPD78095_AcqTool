@@ -41,37 +41,20 @@ MForm{
         gridAcq.items = info
     }
 
-    //@@@@@@@@@@    Events      @@@@@@@@@@
-
-    //@@@@@@@@@@    Objects         @@@@@@@@@@
-
-
-    FileDialog{
-        //@@@@@@@@@@    Definitions     @@@@@@@@@@
-        property string owner:"none"
-
-        //@@@@@@@@@@    Properties      @@@@@@@@@@
-        id: fileDial
-        folder: "../../"
-
-        //@@@@@@@@@@    Events          @@@@@@@@@@
-        onAccepted:
-        {
-            switch(owner)
-            {
-            case "mngCon":
-                console.log(fileUrl)
-                mngCon.fileName=fileUrl
-                mngCon.read()
-                console.log(mngCon.plotSetting)
-                break;
-            default:console.log("Should Not Be Here!");break;
-
-            }
-        }
+    function endAcq()
+    {
+        plot.stopAll()
     }
 
-
+//    function startAcqPlot()
+//    {
+//        console.log("PRIMA DI start!");
+//        if(mngCon.fileName!=="")
+//        {
+//            console.log("start!");
+//            plot.startAll()
+//        }
+//    }
 
     MPlot2DRealStack {
         //@@@@@@@@@@    Properties      @@@@@@@@@@
@@ -84,8 +67,17 @@ MForm{
         plotProp:mngCon.plotSetting
         Behavior on width {NumberAnimation { duration: 1000 }}
 
-        //@@@@@@@@@@    Events          @@@@@@@@@@
-        onPlotPropChanged: if(mngCon.fileName!==""){console.log("start!");plot.startAll()}
+//        //@@@@@@@@@@    Events          @@@@@@@@@@
+        onPlotPropChanged:
+        {
+            console.log("PRIMA DI start!",mngCon.fileName);
+            if(mngCon.fileName!=="")
+            {
+                console.log("start!");
+                plot.startAll()
+            }
+
+        }
     }
 
     //Managers
@@ -129,32 +121,32 @@ MForm{
 
     }
 
-    MNewName{
-        //@@@@@@@@@@    Properties      @@@@@@@@@@
-        id:editName
-        height: 100
-        width:300
-        anchors.centerIn: parent
-        owner:""
+//    MNewName{
+//        //@@@@@@@@@@    Properties      @@@@@@@@@@
+//        id:editName
+//        height: 100
+//        width:300
+//        anchors.centerIn: parent
+//        owner:""
 
-        //@@@@@@@@@@    Events          @@@@@@@@@@
-        onSelected: {
-            //a seconda di chi lo sta usando decido cosa fare
-            switch(owner)
-            {
-            case "NewAcq":
-                lastAcqFileName=examFolder+curText+".pic"
-                mngAcq.newAcquisition(lastAcqFileName);
-                mngCon.fileName=configurationFile
-                mngCon.read()
-                plot.startAll();
-                break;
-            default:break;
-            }
-            visible=false
+//        //@@@@@@@@@@    Events          @@@@@@@@@@
+//        onSelected: {
+//            //a seconda di chi lo sta usando decido cosa fare
+//            switch(owner)
+//            {
+//            case "NewAcq":
+//                lastAcqFileName=examFolder+curText+".pic"
+//                mngAcq.newAcquisition(lastAcqFileName);
+//                mngCon.fileName=configurationFile
+//                mngCon.read()
+//                plot.startAll();
+//                break;
+//            default:break;
+//            }
+//            visible=false
 
-        }
-    }
+//        }
+//    }
 
     MGridView{
         //@@@@@@@@@@    Properties      @@@@@@@@@@
