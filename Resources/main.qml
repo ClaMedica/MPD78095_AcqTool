@@ -79,7 +79,7 @@ ApplicationWindow {
             forReal.setMarkersInfo(mngAcq.markersInfo("type", [1, 6]))
             forReal.configurationFile = ""
             forReal.configurationFile = mngAcq.plotConfigFileName()
-            //forReal.displayMessage("Wait for initialization...", -1)
+            forReal.displayMessage("Wait for initialization...", -1)
             forHome.whoIsVisible = forReal.name
             forReal.setAcqInfo(mngData.acqInfo())
         }
