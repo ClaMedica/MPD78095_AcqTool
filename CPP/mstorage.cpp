@@ -7,6 +7,35 @@ MStorage::MStorage(QObject *parent) :
 
 }
 
+void MStorage::clearAll()
+{
+    //QMap< QString,QVector< QMap<QString,QVariant> *> *> m_allMap;
+//    foreach (QString s,m_allMap.keys())
+//    {
+//        VarMapVec *curVec = m_allMap[s];
+//        for (int i=0; i<curVec->size(); i++)
+//            delete curVec->at(i);
+
+//        curVec->clear();
+//        delete curVec;
+//    }
+//    m_allMap.clear();
+
+    //QMap<QString,QMap<QString,QVector< QMap<QString,QVariant> *> *> > m_storage;
+    //non cancello le family ma solo gli elementi
+    foreach (QString s,m_storage.keys())
+    {
+        foreach (QString s1, m_storage[s].keys())
+        {
+            VarMapVec *curVec = m_storage[s][s1];
+            for (int i=0; i<curVec->size(); i++)
+                delete curVec->at(i);
+
+            curVec->clear();
+        }
+    }
+}
+
 VarMapVec* MStorage::pickUp(QString __family, QString __name)
 {
     if(m_storage.keys().contains(__family))
@@ -60,7 +89,7 @@ QStringList MStorage::getNames(QStringList __families, QStringList __filterCateg
  */
 bool MStorage::archive(QString __family, QString __name, VarMapVec *__elements, bool __whatIfAlreadyPresent)
 {
-    //verifichiamo se c'A? giA  qualcosa con lo stesso nome all'interno della famiglia
+    //verifichiamo se c'e' gia'  qualcosa con lo stesso nome all'interno della famiglia
     bool present = false;
     if(m_storage.keys().contains(__family))
         if(m_storage[__family].keys().contains(__name))

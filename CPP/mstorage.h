@@ -10,6 +10,7 @@ class MStorage : public QObject
     Q_OBJECT
 public:
     explicit MStorage(QObject *parent = 0);
+    void clearAll();
 
     VarMapVec* pickUp(QString __family,QString __name);
     VarMapVec* getAll(QString __category);

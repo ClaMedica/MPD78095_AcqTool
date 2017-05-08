@@ -46,16 +46,6 @@ MForm{
         plot.stopAll()
     }
 
-//    function startAcqPlot()
-//    {
-//        console.log("PRIMA DI start!");
-//        if(mngCon.fileName!=="")
-//        {
-//            console.log("start!");
-//            plot.startAll()
-//        }
-//    }
-
     MPlot2DRealStack {
         //@@@@@@@@@@    Properties      @@@@@@@@@@
         id: plot
@@ -70,7 +60,6 @@ MForm{
 //        //@@@@@@@@@@    Events          @@@@@@@@@@
         onPlotPropChanged:
         {
-            console.log("PRIMA DI start!",mngCon.fileName);
             if(mngCon.fileName!=="")
             {
                 console.log("start!");

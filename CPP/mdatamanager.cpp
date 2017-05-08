@@ -223,7 +223,6 @@ void MDataManager::loadFile(QString __fileName)
 
             sig->setSupLim(supLim);
 
-            //qDebug()<<(*sig);
             this->addSignal(sig);
         }
 
@@ -408,11 +407,12 @@ void MDataManager::loadFile(QString __fileName)
 
 void MDataManager::resetAll()
 {
-        m_data.clear();
-        m_availableData.clear();
-        for(int i=0;i<m_signalVector.size();i++)
-            delete m_signalVector[i];
-        m_signalVector.clear();
+    m_data.clear();
+    m_availableData.clear();
+    for(int i=0;i<m_signalVector.size();i++)
+        delete m_signalVector[i];
+    m_signalVector.clear();
+    m_storage.clearAll();
 }
 
 void MDataManager::saveChanges()
@@ -891,7 +891,7 @@ bool MDataManager::checkForVolRes()
     qDebug() << "File Caricato?" << m_mng->GetParameters();
 
     //per ora salvo io su file pic l'analisi flussimetria ...
-    m_mng->SetAnalysis("2");
+    //m_mng->SetAnalysis("2");
 
     m_numAna = m_mng->GetAnalysiNum();
 
@@ -1011,10 +1011,9 @@ qDebug() << "INIZIO";
                     (*def)["category"] = CAT_DEFINER;
                     (*def)["resizeable"] = 1;
 
-                    //qDebug()<<*def;
                     VarMapVec *defVec = new VarMapVec;
                     defVec->append(def);
-                    saveDataAndUpdate(family, name, defVec, APPEND);
+                    saveDataAndUpdate(family, name, defVec);
                     mkOpAnIn = *def;
                     found = true;
 

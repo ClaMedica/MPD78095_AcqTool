@@ -320,7 +320,7 @@ bool MAbstractManager::buildConfigurationFile()
 {
     //carico i dati necessari
     int32_t chanlNum = m_mng->GetChanNum();
-    qDebug()<<"N? Canali: "<<chanlNum << "m_chanInPlots" << m_chanInPlots;
+    qDebug()<<"N? Canali: "<<chanlNum;
 
     m_chanInPlots.clear();
     m_dataChanNameMap.clear();
@@ -332,7 +332,6 @@ bool MAbstractManager::buildConfigurationFile()
         m_tcpChannels.clear();
     }
 
-    qDebug()<< "m_chanInPlots_after_clear" << m_chanInPlots;
 
     if(chanlNum == 0)
         qCritical() << "No channels in file";
@@ -343,7 +342,6 @@ bool MAbstractManager::buildConfigurationFile()
         //per i grafici devo appendere l'informazione perche posso avere piu canali
         QString graphName = "Graph_" + QString::number(m_mng->GetGraph(nc));
         m_chanInPlots[graphName] << chanName;
-        qDebug() << "METTO DENTRO" << m_chanInPlots;
 
         //aggiungo il canale su cui comunichera  questo plot
         m_tcpChannels[graphName] = new SimpleTCPChannel(QHostAddress("127.0.0.1"), 9000 + m_mng->GetGraph(nc) - 1, this);
@@ -352,8 +350,6 @@ bool MAbstractManager::buildConfigurationFile()
         //per il datafile invece no
         m_dataChanNameMap[chanName] = nc;
     }
-
-    qDebug()<< "m_chanInPlots_after_for" << m_chanInPlots;
 
     //scriviamo un file di configurazione che poi l'utente potra modificare a suo gusto
     Ancestry configPlot;
