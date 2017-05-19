@@ -563,7 +563,7 @@ void printermanager::Pri_Rep_Gra(int __num_riga)
     m_str_gr[4] = (sz >> 16) & 0xff;	// n3
 
     m_str_gr[5] = 0x02;	// n4	doppia altezza
-    m_str_gr[6] = 0x00;	// n5	scrive a 2 byte dal bordo
+    m_str_gr[6] = 0x00;	// n5	scrive a n5 byte dal bordo
     m_str_gr[7] = 0x66;	// n6	larghezza 4+94+4=102 byte
 
     // se label e' true devo scrivere i valori sugli assi di flw e vol
@@ -1048,12 +1048,15 @@ void printermanager::Pri_Rep_Gra_EMG(byte_ __num_riga)
 
     m_str_gr[0] = ESC;	//0x1B;	// ESC
     m_str_gr[1] = '*';	//0x2A;	// *
-    m_str_gr[2] = 0x90;	// n1	num_byte = 96 + 2256 = 2328 = ( 65536 * n3 ) + ( 256 * n2 ) + n1 // larghezza fissa tipo grafico flusso
-    m_str_gr[3] = 0x09;	// n2
-    m_str_gr[4] = 0x00;	// n3
-    m_str_gr[5] = 0x02;	// n4	doppia altezza
-    // con label di 4 cifre
-    m_str_gr[6] = 0x02;	// n5	scrive a n5 byte dal bordo
+//    m_str_gr[2] = 0x90;	// n1	num_byte = 96 + 2256 = 2328 = ( 65536 * n3 ) + ( 256 * n2 ) + n1 // larghezza fissa tipo grafico flusso
+//    m_str_gr[3] = 0x09;	// n2
+//    m_str_gr[4] = 0x00;	// n3
+    int sz = 96 + 2256 + 96;    // 	num_byte = 96 + 2256 + 96 = 2448 = ( 65536 * n3 ) + ( 256 * n2 ) + n1
+    m_str_gr[2] = sz % 256         ;	// n1
+    m_str_gr[3] = (sz >>  8) & 0xff;	// n2
+    m_str_gr[4] = (sz >> 16) & 0xff;	// n3
+    m_str_gr[5] = 0x02;	// n4	doppia altezza // con label di 4 cifre
+    m_str_gr[6] = 0x00;	// n5	scrive a n5 byte dal bordo
     m_str_gr[7] = 0x66;	// n6	larghezza 4+4+94=102 byte
 
     if( (__num_riga == 0) || ( !(__num_riga % 2) ) )
@@ -1267,34 +1270,35 @@ long printermanager::Calc_Max_Flw()
 
 
 /**
-In stampa devo avere una distribuzione dell'asse del tempo dipendente dalla scala della curva del flusso1sec/mm; ho 8 punti/mm e per ogni risoluzione dipendente
+In stampa devo avere una distribuzione dell'asse del tempo dipendente dalla scala della curva
+del flusso1sec/mm; ho 8 punti/mm e per ogni risoluzione dipendente
 dal valore di FS del flusso, dovro adattare, dal caso minore di 5 sample ogni 8punti, fino al 20sample ogni 8 punti.
-Il paramentro num_sample e il valore assoluto di dati reali acqusiti, e dividendo per 10 questo valore ho i secondi effettivi di acquisizione.
-ritorna il numero di punti da stampare, ricavati dall'adattamento del num_sample a seconda della risoluzione dell'asse tempo richiesta
+Il paramentro num_sample e il valore assoluto di dati reali acqusiti, e dividendo per 10 questo
+valore ho i secondi effettivi di acquisizione.
+ritorna il numero di punti da stampare, ricavati dall'adattamento del num_sample a seconda della
+risoluzione dell'asse tempo richiesta
 */
 short printermanager::adatta_buffer_dati(int __num_sample, long __fs_flw)
 {
     unsigned short j, k;		// valore massimo = 20min*60sec*10sample/sec = 12000
     unsigned short num_max_sample = __num_sample;
 
-    for(int i = 0; i < (FREQ_ACQ * MAX_DURATA_ESAME *60); i++)
-    {
+    for(int i = 0; i < (FREQ_ACQ * MAX_DURATA_ESAME * 60); i++) {
         m_vol_store.append(0);
         m_flow_store.append(0);
+        m_emg_store.append(0);
     }
 
-    for (int i=0; i<(FREQ_ACQ*MAX_DURATA_ESAME * 60);i++ )
-        m_emg_store.append(0);
+//    for (int i = 0; i < (FREQ_ACQ * MAX_DURATA_ESAME * 60); i++)
+//        m_emg_store.append(0);
 
     j = 0;
     k = 0;
     switch(__fs_flw)
     {
     case 25:		// 5 sample al mm, cioe 5 sample effettivi per 8 punti: ne devo aggiungrere 3 fittizi
-        for(int i = 0; i < (2*__num_sample); i++)
-        {
-            if(k < __num_sample)
-            {
+        for(int i = 0; i < (2*__num_sample); i++) {
+            if(k < __num_sample) {
                 j++;
                 m_vol_store[i] = buffer_vol[k];
                 m_flow_store[i] = (unsigned short)buffer_flw[k];
@@ -1303,60 +1307,51 @@ short printermanager::adatta_buffer_dati(int __num_sample, long __fs_flw)
 
                 if((j == 2) || (j == 4) || (j == 5) || (j == 7))
                     k++;
-                else if(j == 8)
-                {
+                else if(j == 8) {
                     k++;
                     j = 0;
                 }
             }
-            else
-            {
+            else {
                 num_max_sample = i - 1;
                 break;
             }
         }
         break;
     case 50:		// rapporto 1:1 cioe 1mm per 1sec, allora 10 sample per mm, cioe ne devo eliminare 2 ogni 10
-
-        for(int i = 0; i < __num_sample; i++)
-        {
-            if( (i + k) < (__num_sample - 1))
-            {
+        for(int i = 0; i < __num_sample; i++) {
+            if( (i + k) < (__num_sample - 1)) {
                 j++;
-                if( 5 == j )
-                {
+                if( j == 5 ) {
                     j = 1;
                     k++;
                 }
-                m_vol_store[i] = buffer_vol[i+k];
-                m_flow_store[i] = buffer_flw[i+k];
+                m_vol_store[i] = buffer_vol[i + k];
+                m_flow_store[i] = buffer_flw[i + k];
                 if (m_emgPresent)
-                    m_emg_store[i] = buffer_emg[i+k];
+                    m_emg_store[i] = buffer_emg[i + k];
             }
-            else
-            {
+            else {
                 num_max_sample = i;
                 break;
             }
         }
         if(num_max_sample > 0)	// le celle preallocate ma non usate causa compressione buffer dati, le fisso a valori precisi
-            for(int i = (num_max_sample - 1); i < __num_sample; i++)
-            {
+            for(int i = (num_max_sample - 1); i < __num_sample; i++) {
                 m_vol_store[i] = buffer_vol[num_max_sample + k -1];// fissata ala valore finale perche questo non varia
                 m_flow_store[i] = 0; // fissata a zero, perche non c'e flusso
                 if (m_emgPresent)
-                    m_emg_store[i] = 0; // fissata a zero, perche qui non devo avere attivita alettrica registrata, o meglio non devo inventarmi dei valori io
-
+                    // fissata a zero, perche qui non devo avere attivita alettrica registrata,
+                    // o meglio non devo inventarmi dei valori io
+                    m_emg_store[i] = 0;
             }
         break;
     case 75:		// rapporto 1,5sec per mm, cioe 15sample per mm, 8punti per mm, cioe 15 sample per 8 punti, allora 1 sample ogni 2
         j = 1;	// devo prendere il primo valore
         k = 0;
-        for(int i = 0; i < __num_sample; i++)
-        {
+        for(int i = 0; i < __num_sample; i++) {
             j++;
-            if(j == 2)	// poi un campione ogni due
-            {
+            if(j == 2) {	// poi un campione ogni due
                 m_vol_store[k] = buffer_vol[i];
                 m_flow_store[k] = buffer_flw[i];
                 if (m_emgPresent)
@@ -1367,10 +1362,9 @@ short printermanager::adatta_buffer_dati(int __num_sample, long __fs_flw)
         }
         num_max_sample = k;	// se num_sample=21, num_max_sample e 12, uno ogni due ma compreso il primo...
         // le celle preallocate ma non usate causa compressione buffer dati, le fisso a valori precisi
-        for(int i = num_max_sample; i < __num_sample; i++)
-        {
-            m_vol_store[i] = buffer_vol[k -1];
-            m_flow_store[i] =0;
+        for(int i = num_max_sample; i < __num_sample; i++) {
+            m_vol_store[i] = buffer_vol[k - 1];
+            m_flow_store[i] = 0;
             if (m_emgPresent)
                 m_emg_store[i] = 0;
             //            *( vol_store + i ) = *( ExamParam.PRINTPhysValBuf[READ_VOL] + k -1); // fissata ala valore finale perche questo non varia
@@ -1382,26 +1376,23 @@ short printermanager::adatta_buffer_dati(int __num_sample, long __fs_flw)
     case 100:	// rapporto 20 sample per mm, allora 20 sample per 8 punti, ogni 5 prendo il secondo e il quinto
         // il primo campione da prendere e il secondo, poi il quinto, il settimo, il decimo, il dodicesimo e cosi via
         j = k = 0;
-        for(int i = 0; i < __num_sample; i++)
-        {
+        for(int i = 0; i < __num_sample; i++) {
             j++;
-            if((j == 2) || (j == 5))
-            {
+            if((j == 2) || (j == 5)) {
                 m_vol_store[k] = buffer_vol[i];
                 m_flow_store[k] = buffer_flw[i];
                 if (m_emgPresent)
                     m_emg_store[k] = buffer_emg[i];
 
-                if(j == 5)	j = 0;
+                if(j == 5)
+                    j = 0;
                 k++;
-
             }
         }
         num_max_sample = k;	// se num_sample=21, num_max_sample e 12, uno ogni due ma compreso il primo...
         // le celle preallocate ma non usate causa compressione buffer dati, le fisso a valori precisi
-        for(int i = num_max_sample; i < __num_sample; i++)
-        {
-            m_vol_store[i] = buffer_vol[k-1];
+        for(int i = num_max_sample; i < __num_sample; i++) {
+            m_vol_store[i] = buffer_vol[k - 1];
             m_flow_store[i] = 0;
             if (m_emgPresent)
                 m_emg_store[i] = 0;
@@ -1478,23 +1469,21 @@ void printermanager::Report_Real_Time(short __num_sample)
 
     m_port->Pri_Font(1);		// altezza carattere 20 punti (righe) 0x18 in HEX
     m_port->Pri_mode(0x10);
-    m_port->Pri_justif(2);	// bandiera a siistra
+    m_port->Pri_justif(2);	// bandiera a sinistra
 
-    // STAMPA DEI LABEL E DELL'ASSE SINISTRO (label EMG E FLUSSO)
+    // STAMPA DELLE LABEL E DELL'ASSE SINISTRO (label EMG E FLUSSO)
     m_pos_gra_emg = 0;
     m_pos_gra_flw = 50;
     m_num_byte_x_gra_flw = 50;
     m_num_dots_gra_flw = 400.0;
-    if(m_emgPresent)
-    {
+    if(m_emgPresent) {
         m_pos_gra_vol = 20;
         m_num_dots_gra_emg = 160.0;
         m_num_dots_gra_vol = 240.0;
         m_num_byte_x_gra_emg = 20;
         m_num_byte_x_gra_vol = 30;
     }
-    else
-    {
+    else {
         m_pos_gra_vol = 0;
         m_num_dots_gra_emg = 0;
         m_num_dots_gra_vol = 400.0;
@@ -1511,6 +1500,7 @@ void printermanager::Report_Real_Time(short __num_sample)
 
     // SCOMPONGO LA STAMPA DEL GRAFICO IN TANTE STAMPE DA 5 SECONDI CIASCUNA
     num_righe = (int)(__num_sample / NUM_POINTS) + 1;	// numero intero di blocchi da 40 righe (5sec), il restante e stampato in un altro blocco da 40
+    Pri_Rep_Gra_Landscape(-1);      // forza init delle variabili
     for(int riga = 0; riga < num_righe; riga++ )                        // scompone la griglia in tante righe
         Pri_Rep_Gra_Landscape(__num_sample); // scrive label di tempo ad ogni accesso
 
@@ -1541,11 +1531,15 @@ void printermanager::Pri_Rep_Label()
     // setta la stampa grafica
     m_str_gr[0]=ESC;	//0x1B;	// ESC
     m_str_gr[1]='*';	//0x2A;	// *
-    m_str_gr[2]=0x40;	// n1	num_byte = dim_string_rel2 - 8 = 6472-8= 6464 = ( 65536 * n3 ) + ( 256 * n2 ) + n1 = 256*0x19 + 0x40
-    m_str_gr[3]=0x19;	// n2
-    m_str_gr[4]=0x00;	// n3
+//    m_str_gr[2]=0x40;	// n1	num_byte = dim_string_rel2 - 8 = 6472-8= 6464 = ( 65536 * n3 ) + ( 256 * n2 ) + n1 = 256*0x19 + 0x40
+//    m_str_gr[3]=0x19;	// n2
+//    m_str_gr[4]=0x00;	// n3
+    int sz = 6464;    // 	num_byte = dim_string_rel2 - 8 = 6472-8= 6464
+    m_str_gr[2] = sz % 256         ;	// n1
+    m_str_gr[3] = (sz >>  8) & 0xff;	// n2
+    m_str_gr[4] = (sz >> 16) & 0xff;	// n3
     m_str_gr[5]=0x00;	// n4	normal
-    m_str_gr[6]=0x03;	// n5	scrive a n5 byte dal bordo
+    m_str_gr[6]=0x00;	// n5	scrive a n5 byte dal bordo
     m_str_gr[7]=0x65;	// n6	larghezza 808dots=101 byte
     // stampo lo zero dell'emg senza udm
     if(m_emgPresent)
@@ -1811,164 +1805,152 @@ void printermanager::print_udm_label(int ch_type, short __pos_in_string, short i
 
 /**
 GRAFICI IN LANDASCAPE MODE in accordo con specifiche ISC (indifferentemente dal fondoscala,
-l'area sottesa al grafico del flussso, deve essere proporzionale al valore di flusso, quindi anche l'asse dei tempi si adegua al fondoscala
-funzione chiamata ciclicamente per stampare le righe in cui e suddiviso il grafico del flusso/volume
+l'area sottesa al grafico del flusso, deve essere proporzionale al valore di flusso, quindi anche l'asse
+dei tempi si adegua al fondoscala.
+funzione chiamata ciclicamente per stampare le righe in cui e' suddiviso il grafico del flusso/volume
 a seconda del parametro num_rig si stampano o meno i label degli assi di flusso e volume
 */
-void printermanager::Pri_Rep_Gra_Landscape(short __num_cample)
+void printermanager::Pri_Rep_Gra_Landscape(short __num_sample)
 {
-    bool stamp_x_label = false;
-    //word i, z, j;
-    short int first_char, second_char, third_char, num_char_label; //short fourth_char;
-    int init_pos_in_string;
-    static Print_Graph_Parameters PriGraParam_FLW;	// inizializzate a zero automaticamente all'inizializzazione
+    static Print_Graph_Parameters PriGraParam_FLW;
     static Print_Graph_Parameters PriGraParam_VOL;
     static Print_Graph_Parameters PriGraParam_EMG;
     Print_Graph_Parameters PriGraParam_OLD;
 
+    if(__num_sample < 0) {      // init
+        static Print_Graph_Parameters zero = { 0, 0, 0, false };
+        PriGraParam_FLW = zero;
+        PriGraParam_VOL = zero;
+        PriGraParam_EMG = zero;
+        return;
+    }
+
+    bool stamp_x_label = false;
+    int init_pos_in_string;
     float fattore_scala;
 
-    for(int i = 0; i < dim_string_gr; i++ )	// rimepio di zeri le stringhe, cioe "spengo" tutti i pixel
-    {
-        m_str_gr[ i ] = 0x00;
-        m_str_tr[ i ] = 0x00;
-    }
+    for(int i = 0; i < dim_string_gr; i++ )	// riempio di zeri le stringhe, cioe "spengo" tutti i pixel
+        m_str_gr[ i ] = m_str_tr[ i ] = 0;
+
     // setta la stampa grafica: i primi 8 caratteri della stringa sono comandi
-    m_str_gr[0]=ESC;
-    m_str_gr[1]='*';
-    m_str_gr[2]=0x40;	// n1 = 64	num_byte = 4160 = ( 65536 * n3 ) + ( 256 * n2 ) + n1
-    m_str_gr[3]=0x10;	// n2 = 16
-    m_str_gr[4]=0x00;	// n3 = 0
-    m_str_gr[5]=0x00;	// n4	normal
-    m_str_gr[6]=0x01;	// n5 = 1	scrive a n5 byte dal bordo
-    m_str_gr[7]=0x68;	// n6 = 104	larghezza 1+50+1+50+1=104 byte
+    m_str_gr[0] = ESC;
+    m_str_gr[1] = '*';
+    int sz = 4160;    // 	num_byte = 4160
+    m_str_gr[2] = sz % 256         ;	// n1
+    m_str_gr[3] = (sz >>  8) & 0xff;	// n2
+    m_str_gr[4] = (sz >> 16) & 0xff;	// n3
+    m_str_gr[5] = 0x00;	// n4	normal
+    m_str_gr[6] = 0x00;	// n5 = 1	scrive a n5 byte dal bordo
+    m_str_gr[7] = 0x68;	// n6 = 104	larghezza 1+50+1+50+1=104 byte
 
     // incrementando init_time_to_print di 5 ad ogni chiamata di questa funzione, sara sempre un multiplo di 5
     // incrementando init_time_to_print del valore in secondi, corrispondente a 40punti stampati, ad ogni chiamata di questa funzione,
     // sara sempre un multiplo della divisione elementare (dipendente dal F.S. del flusso impostato)
-    if(m_cursore == 0)	// stampo anche il carattere "s" del secondo
-    {
+    if(m_cursore == 0) {    // stampo anche il carattere "s" del secondo
         init_pos_in_string = _NUM_BYTE_CMD + (0)*_HEIGHT_CHAR_LABEL;
-        for(int i = 0; i < _HEIGHT_CHAR_LABEL; i++ )	{// scrivo il carattere delle unita per colonne come 1Bx13righe
+        for(int i = 0; i < _HEIGHT_CHAR_LABEL; i++) { // scrivo il carattere delle unita per colonne come 1Bx13righe
             m_str_gr[ init_pos_in_string + i ] = (char)print8x8Set[ m_init_time_to_print*_WEIGHT_CHAR_LABEL + i];	// carattere "0"
         }
         init_pos_in_string = _NUM_BYTE_CMD + (1)*_HEIGHT_CHAR_LABEL;
-        for(int i = 0; i < _HEIGHT_CHAR_LABEL; i++ )	{// scrivo il carattere delle unita per colonne come 1Bx13righe
+        for(int i = 0; i < _HEIGHT_CHAR_LABEL; i++) { // scrivo il carattere delle unita per colonne come 1Bx13righe
             m_str_gr[ init_pos_in_string + i ] = (char)print8x8Set[ 14*_WEIGHT_CHAR_LABEL + i];					// carattere "S"
         }
         init_pos_in_string +=_HEIGHT_CHAR_LABEL;
-        for(int i = 0; i < _HEIGHT_CHAR_LABEL; i++ )	{// scrivo il carattere delle unita per colonne come 1Bx13righe
+        for(int i = 0; i < _HEIGHT_CHAR_LABEL; i++) { // scrivo il carattere delle unita per colonne come 1Bx13righe
             m_str_gr[ init_pos_in_string + i ] = (char)print8x8Set[ 17*_WEIGHT_CHAR_LABEL + i];					// carattere "e"
         }
         init_pos_in_string += _HEIGHT_CHAR_LABEL;
-        for(int i = 0; i < _HEIGHT_CHAR_LABEL; i++ )	{// scrivo il carattere delle unita per colonne come 1Bx13righe
+        for(int i = 0; i < _HEIGHT_CHAR_LABEL; i++) { // scrivo il carattere delle unita per colonne come 1Bx13righe
             m_str_gr[ init_pos_in_string + i ] = (char)print8x8Set[ 18*_WEIGHT_CHAR_LABEL + i];					// carattere "c"
         }
     }
-    else
-    {
+    else {
         stamp_x_label = check_stamp_label();	// verifica se si deve stampare il label e ne definisce il valore a seconda della scala adottata
 
-        if(stamp_x_label == true)
-        {
-            if( m_init_time_to_print > 99L )
-            {
+        if(stamp_x_label == true) {
+            int first_char, second_char, third_char, num_char_label; //short fourth_char;
+            if(m_init_time_to_print > 99) {
                 num_char_label = 3;
                 first_char = m_init_time_to_print / 100;
                 init_pos_in_string = _NUM_BYTE_CMD + (num_char_label -3)*_HEIGHT_CHAR_LABEL;
-                for(int i = 0; i < _HEIGHT_CHAR_LABEL; i++ )	{// scrivo il carattere delle centinaia per colonne come 1Bx13righe
+                for(int i = 0; i < _HEIGHT_CHAR_LABEL; i++ )    // scrivo il carattere delle centinaia per colonne come 1Bx13righe
                     m_str_gr[ init_pos_in_string + i ] = (char)print8x8Set[ first_char*_WEIGHT_CHAR_LABEL + i];
-                }
+
                 init_pos_in_string = _NUM_BYTE_CMD + (num_char_label -2)*_HEIGHT_CHAR_LABEL;
                 second_char = ( m_init_time_to_print - ( first_char * 100 ) ) / 10;
-                for(int i = 0; i < _HEIGHT_CHAR_LABEL; i++ )	{// scrivo il carattere delle decine per colonne come 1Bx13righe
+                for(int i = 0; i < _HEIGHT_CHAR_LABEL; i++ )    // scrivo il carattere delle decine per colonne come 1Bx13righe
                     m_str_gr[init_pos_in_string + i ] = (char)print8x8Set[ second_char*_WEIGHT_CHAR_LABEL + i];
-                }
+
                 init_pos_in_string = _NUM_BYTE_CMD + (num_char_label - 1)*_HEIGHT_CHAR_LABEL;
                 third_char = ( m_init_time_to_print - ( first_char * 100 ) - ( second_char * 10 ) );
-                for(int i = 0; i < _HEIGHT_CHAR_LABEL; i++ )	{// scrivo il carattere delle unita per colonne come 1Bx13righe
+                for(int i = 0; i < _HEIGHT_CHAR_LABEL; i++ )    // scrivo il carattere delle unita per colonne come 1Bx13righe
                     m_str_gr[ init_pos_in_string + i ] = (char)print8x8Set[ third_char*_WEIGHT_CHAR_LABEL + i];
-                }
             }
-            else
-            {
-                if( m_init_time_to_print > 9 ) 	// da 10 a 99 quindi 2 char
-                {
+            else {
+                if(m_init_time_to_print > 9) { 	// da 10 a 99 quindi 2 char
                     num_char_label = 2;
                     init_pos_in_string = _NUM_BYTE_CMD + (num_char_label-2)*_HEIGHT_CHAR_LABEL;
                     second_char =  m_init_time_to_print / 10;
-                    for(int i = 0; i < _HEIGHT_CHAR_LABEL; i++ )	{// scrivo il carattere delle decine per colonne come 1Bx13righe
+                    for(int i = 0; i < _HEIGHT_CHAR_LABEL; i++) // scrivo il carattere delle decine per colonne come 1Bx13righe
                         m_str_gr[ init_pos_in_string + i ] = (char)print8x8Set[ second_char*_WEIGHT_CHAR_LABEL + i];
-                    }
+
                     init_pos_in_string = _NUM_BYTE_CMD + (num_char_label-1)*_HEIGHT_CHAR_LABEL;
                     third_char = m_init_time_to_print - ( second_char * 10 );
-                    for(int i = 0; i < _HEIGHT_CHAR_LABEL; i++ )	{// scrivo il carattere delle unita per colonne come 1Bx13righe
+                    for(int i = 0; i < _HEIGHT_CHAR_LABEL; i++) // scrivo il carattere delle unita per colonne come 1Bx13righe
                         m_str_gr[ init_pos_in_string + i ] = (char)print8x8Set[ third_char*_WEIGHT_CHAR_LABEL + i];
-                    }
                 }
                 else {		// < 10 cioe un char
                     num_char_label = 1;
                     init_pos_in_string = _NUM_BYTE_CMD + (num_char_label-1)*_HEIGHT_CHAR_LABEL;
                     third_char = m_init_time_to_print;
-                    for(int i = 0; i < _HEIGHT_CHAR_LABEL; i++ )	{// scrivo il carattere delle unita per colonne come 1Bx13righe
+                    for(int i = 0; i < _HEIGHT_CHAR_LABEL; i++) // scrivo il carattere delle unita per colonne come 1Bx13righe
                         m_str_gr[ init_pos_in_string + i ] = (char)print8x8Set[ third_char*_WEIGHT_CHAR_LABEL + i];
-                    }
                 }
             }
         }
     }
-    // inserisco i trattini riferitiagli intervalli di 1 sec
-    for(int i = 0; i < 5; i++ )
-    {
-        if((stamp_x_label == true) && (i == 0))	// trattino + grosso per i multpli di cinque
-        {
-            m_str_gr[ _NUM_BYTE_CMD + NUM_POINTS + i*8] |= (char)0x0f;	// trattino corrispondente ad ogni secondo sull'asse del tempo
+
+    // inserisco i trattini riferiti agli intervalli di 1 sec
+    for(int i = 0; i < 5; i++ ) {
+        if(stamp_x_label && (i == 0)) { // trattino + grosso per i multipli di cinque
+            m_str_gr[ _NUM_BYTE_CMD + NUM_POINTS + i*8    ] |= (char)0x0f;	// trattino corrispondente ad ogni secondo sull'asse del tempo
             m_str_gr[ _NUM_BYTE_CMD + NUM_POINTS + i*8 + 1] |= (char)0x0f;
         }
         else
-            m_str_gr[ _NUM_BYTE_CMD + NUM_POINTS + i*8] |= (char)0x07;
+            m_str_gr[ _NUM_BYTE_CMD + NUM_POINTS + i*8]     |= (char)0x07;
     }
+
     // inserisco bordo  grafico emg e flw
     for(int i = NUM_POINTS; i < 2*NUM_POINTS; i++ )
-    {
         m_str_gr[ _NUM_BYTE_CMD + i] |= (char)0x01;	// bordo inferiore riga 1
-    }
     for(int i = 2*NUM_POINTS; i < 3*NUM_POINTS; i++ )
-    {
         m_str_gr[ _NUM_BYTE_CMD + i] |= (char)0x80;	// bordo inferiore riga2
-    }
     for(int i = 102*NUM_POINTS; i < 103*NUM_POINTS; i++ )
-    {
         m_str_gr[ _NUM_BYTE_CMD + i] |= (char)0xC0;	// bordo superiore flw doppia
-    }
+
     // linea separazione grafico volume e flusso a meta scala
     for(int i = 51*NUM_POINTS; i < 52*NUM_POINTS; i++ )
-    {
         m_str_gr[ _NUM_BYTE_CMD + i] |= (char)0x01;	// bordo superiore volume
-    }
     for(int i = 52*NUM_POINTS; i < 53*NUM_POINTS; i++ )
-    {
         m_str_gr[ _NUM_BYTE_CMD + i] |= (char)0x80;	// bordo inferiore flusso
-    }
+
     // inserisco tratteggi verticali, riferiti agli istanti multipli di 10sec
-    if(stamp_x_label == true)
-    {
+    if(stamp_x_label)
         for(int i = 0; i < 100; i++ )
-        {
             m_str_gr[ _NUM_BYTE_CMD + (2 + i)*NUM_POINTS] |= (char)0x44;	// tratteggio verticale istante di tempo
-        }
-    }
-    // inserisco tratteggi orrizzontali, riferiti ai valori della grandezza mostrata,
-    // partendo dal basso le prime 4 linee tratteggiate ci sono sempre e a quota fissa sulla scala 0-800 (40, 80, 120, 160). Se riferito alla matrice di 102byte
-    //si tratta di (5+2, 10+2, 15+2, 20+2) cioe 6*NUM_POINTS, 10*NUM_POINTS....
-    // Se c'e l'emg, allora altre 4 linee tratteggiate distanti tra loro 40, a quota (240, 280, 320, 360) poi 24 linee distanti tra loro 16
+
+    // inserisco tratteggi orizzontali, riferiti ai valori della grandezza mostrata,
+    // partendo dal basso le prime 4 linee tratteggiate ci sono sempre e a quota fissa
+    // sulla scala 0-800 (40, 80, 120, 160). Se riferito alla matrice di 102byte
+    // si tratta di (5+2, 10+2, 15+2, 20+2) cioe 6*NUM_POINTS, 10*NUM_POINTS....
+    // Se c'e l'emg, allora altre 4 linee tratteggiate distanti tra loro 40,
+    // a quota (240, 280, 320, 360) poi 24 linee distanti tra loro 16
     // delle quali, ogni 5, la quinta e intera, le altre tratteggiate
-    // se non c'e l'emg, allora 24 linee distanti tra loro 24 delle quali, ogni 5, la quinta e intera, le altre tratteggiate
+    // se non c'e l'emg, allora 24 linee distanti tra loro 24 delle quali, ogni 5,
+    // la quinta e intera, le altre tratteggiate
     // primo grafico 4 tratteggi: 1/5, 2/5, 3/5, 4/5 del val max
-    for(int i = 0; i < 5; i++ )
-    {
-        for(int z = 0; z < 8; z++ )		//for( z = 2; z < 6; z++ )
-        {
+    for(int i = 0; i < 5; i++ ) {
+        for(int z = 0; z < 8; z++ ) {
             m_str_gr[ _NUM_BYTE_CMD + 62*NUM_POINTS + i*_WEIGHT_CHAR_LABEL + z] |= (char)0x80;	// tratteggio
             m_str_gr[ _NUM_BYTE_CMD + 72*NUM_POINTS + i*_WEIGHT_CHAR_LABEL + z] |= (char)0x80;	// tratteggio
             m_str_gr[ _NUM_BYTE_CMD + 82*NUM_POINTS + i*_WEIGHT_CHAR_LABEL + z] |= (char)0x80;	// tratteggio
@@ -2003,18 +1985,14 @@ void printermanager::Pri_Rep_Gra_Landscape(short __num_cample)
             }
         }
     }
-    // se c'e anche il emg allora devo creare i due bordi separatori dei e grafic
-    if(m_emgPresent)
-    {
+    // se c'e anche l'emg allora devo creare i due bordi separatori dei grafici
+    if(m_emgPresent) {
         for(int i = 21*NUM_POINTS; i < 22*NUM_POINTS; i++ )
-        {
             m_str_gr[ _NUM_BYTE_CMD + i] |= (char)0x01;	// bordo superiore emg
-        }
         for(int i = 22*NUM_POINTS; i < 23*NUM_POINTS; i++ )
-        {
             m_str_gr[ _NUM_BYTE_CMD + i] |= (char)0x80;	// bordo inferiore volume
-        }
     }
+
     // costruzione assi grafico: quattro sono i caratteri anteposti senza byte dei comandi
     // inserimento pixel curve
     //str_gr[ pos_gra + BYTE_GRAPH ] = (char)0xFF;
@@ -2022,24 +2000,20 @@ void printermanager::Pri_Rep_Gra_Landscape(short __num_cample)
     //cursore = init_time_to_print*NUM_DOTS_X_SEC;
 
     fattore_scala = m_num_dots_gra_flw/(float)(10*m_max_y);	// dove max_y = 25, 50, 75, 100, quindi il rapporto = 4, 2, 1, 0.5, 0.25
-    for(int i = 0; i < NUM_POINTS; i++)
-    {
+    qDebug("fattore scala FLW: %d, %f", __num_sample, fattore_scala);
+    for(int i = 0; i < NUM_POINTS; i++) {
         PriGraParam_OLD.uw8 = PriGraParam_FLW.uw8;
         PriGraParam_OLD.uw9 = PriGraParam_FLW.uw9;
         PriGraParam_OLD.sample_adattato = PriGraParam_FLW.sample_adattato;				// salviamo il valor eprecedente
-        if((i+m_cursore) < __num_cample)
-        {
+        if((i+m_cursore) < __num_sample) {
             PriGraParam_FLW.sample_adattato = (int)(m_flow_store[i + m_cursore] * fattore_scala);	// adattamento del valore corrente al fondoscala corrente
 
-            if(PriGraParam_FLW.sample_adattato > 0)
-            {
+            if(PriGraParam_FLW.sample_adattato > 0) {
                 PriGraParam_FLW.uw8 = PriGraParam_FLW.sample_adattato / 8;	// individuo di quanti byte mi devo spostare a destra, a partire dall'asse sinistro
                 PriGraParam_FLW.uw9 = PriGraParam_FLW.sample_adattato % 8;	// il resto della divisione mi da il dot dell'ultimo byte che devo accendere, individuo il bit (o dot) da accendere partendo pero da MSB nel byte individuato
-                if(PriGraParam_FLW.sample_adattato > PriGraParam_OLD.sample_adattato)
-                {
-                    PriGraParam_FLW.verso_curva = positivo;
-                    if(PriGraParam_FLW.uw8 > PriGraParam_OLD.uw8)
-                    {
+                if(PriGraParam_FLW.sample_adattato > PriGraParam_OLD.sample_adattato) {
+                    PriGraParam_FLW.verso_curva = true;
+                    if(PriGraParam_FLW.uw8 > PriGraParam_OLD.uw8) {
                         for(int j = (PriGraParam_OLD.uw8 + 1); j < PriGraParam_FLW.uw8; j++)
                             m_str_gr[_NUM_BYTE_CMD + (2 + m_pos_gra_flw + j)*NUM_POINTS + i ] |= (char)0xFF;	// creo la riga dei byte interi
                         for(int j = 0; j < PriGraParam_FLW.uw9; j++)
@@ -2047,24 +2021,20 @@ void printermanager::Pri_Rep_Gra_Landscape(short __num_cample)
                         for(int j = PriGraParam_OLD.uw9; j < 8; j++)
                             m_str_gr[_NUM_BYTE_CMD + (2 + m_pos_gra_flw + PriGraParam_OLD.uw8)*NUM_POINTS + i ] |= (char)(0xC0 >> j);	// creo la riga dei dots dell'ultimo byte
                     }
-                    else
-                    {
+                    else {
                         for(int j = (PriGraParam_OLD.uw9 + 1); j <= PriGraParam_FLW.uw9; j++)
                             m_str_gr[_NUM_BYTE_CMD + (2 + m_pos_gra_flw + PriGraParam_FLW.uw8)*NUM_POINTS + i ] |= (char)(0xC0 >> j);	// creo la riga dei dots dell'ultimo byte
                     }
                 }
-                else
-                    if(PriGraParam_FLW.sample_adattato < PriGraParam_OLD.sample_adattato)
-                    {
-                        if(PriGraParam_FLW.verso_curva == positivo)	// niente riga perche si sovrapporrebbe con quella del precedente
-                        {
-                            PriGraParam_FLW.verso_curva = negativo;
+                else {
+                    if(PriGraParam_FLW.sample_adattato < PriGraParam_OLD.sample_adattato) {
+                        if(PriGraParam_FLW.verso_curva == true) {
+                            // niente riga perche si sovrapporrebbe con quella del precedente
+                            PriGraParam_FLW.verso_curva = false;
                             m_str_gr[_NUM_BYTE_CMD + (2 + m_pos_gra_flw + PriGraParam_FLW.uw8)*NUM_POINTS + i ] |= (char)(0xC0 >> PriGraParam_FLW.uw9); // qui niente riga solo un punto.
                         }
-                        else	// qui invece la riga dal valore prec all'attuale
-                        {
-                            if( PriGraParam_FLW.uw8 < PriGraParam_OLD.uw8)
-                            {
+                        else {	// qui invece la riga dal valore prec all'attuale
+                            if( PriGraParam_FLW.uw8 < PriGraParam_OLD.uw8) {
                                 for(int j = (PriGraParam_FLW.uw8 + 1); j < PriGraParam_OLD.uw8; j++)
                                     m_str_gr[_NUM_BYTE_CMD + (2 + m_pos_gra_flw + j)*NUM_POINTS + i ] |= (char)0xFF;	// creo la riga dei byte interi
                                 for(int j = 0; j < PriGraParam_OLD.uw9; j++)
@@ -2072,59 +2042,50 @@ void printermanager::Pri_Rep_Gra_Landscape(short __num_cample)
                                 for(int j = PriGraParam_FLW.uw9; j < 8; j++)
                                     m_str_gr[_NUM_BYTE_CMD + (2 + m_pos_gra_flw + PriGraParam_FLW.uw8)*NUM_POINTS + i ] |= (char)(0xC0 >> j);	// creo la riga dei dots dell'ultimo byte
                             }
-                            else
-                            {
+                            else {
                                 for(int j = PriGraParam_FLW.uw9; j < PriGraParam_OLD.uw9; j++)
                                     m_str_gr[_NUM_BYTE_CMD + (2 + m_pos_gra_flw + PriGraParam_FLW.uw8)*NUM_POINTS + i ] |= (char)(0xC0 >> j);	// creo la riga dei dots dell'ultimo byte
                             }
                         }
                     }
-                    else	// qui niente riga solo un punto.
-                    {
-                        PriGraParam_FLW.verso_curva = negativo;
+                    else {	// qui niente riga solo un punto.
+                        PriGraParam_FLW.verso_curva = false;
                         m_str_gr[_NUM_BYTE_CMD + (2 + m_pos_gra_flw + PriGraParam_FLW.uw8)*NUM_POINTS + i ] |= (char)(0xC0 >> PriGraParam_FLW.uw9); // qui niente riga solo un punto.
                     }
+                }
             }
-            else	// il nuovo valore e 0 (reale o adattato) comunque sta sull'asse
-            {
+            else {	// il nuovo valore e 0 (reale o adattato) comunque sta sull'asse
                 PriGraParam_FLW.uw8 = PriGraParam_FLW.uw9 = 0;
-                PriGraParam_FLW.verso_curva = positivo;
-                if(PriGraParam_OLD.sample_adattato > 0)	// allora riga da 0 a sample_adattato_prec
-                {
+                PriGraParam_FLW.verso_curva = true;
+                if(PriGraParam_OLD.sample_adattato > 0) { // allora riga da 0 a sample_adattato_prec
                     for(int j = 0; j < PriGraParam_OLD.uw8; j++)
                         m_str_gr[_NUM_BYTE_CMD + (2 + m_pos_gra_flw + j)*NUM_POINTS + i ] |= (char)0xFF;	// creo la riga dei byte interi
                     for(int j = 0; j < PriGraParam_OLD.uw9; j++)
                         m_str_gr[_NUM_BYTE_CMD + (2 + m_pos_gra_flw + PriGraParam_OLD.uw8)*NUM_POINTS + i ] |= (char)(0xC0 >> j);
                 }
                 else
-                {
                     m_str_gr[_NUM_BYTE_CMD + (2 + m_pos_gra_flw)*NUM_POINTS + i ] |= (char)0xC0; // accendo solo un pixel in piu allo zero per evidenziare il valore a zero
-                }
             }
         }
         else
             break;
     }
 
-    fattore_scala = m_num_dots_gra_vol/(float)(m_max_vol);	// dove max_vol = 250, 500, 750, 1000
-    for(int i = 0; i < NUM_POINTS; i++)
-    {
+    fattore_scala = m_num_dots_gra_vol / (m_max_vol);	// dove max_vol = 250, 500, 750, 1000
+    qDebug("fattore scala VOL: %f", fattore_scala);
+    for(int i = 0; i < NUM_POINTS; i++) {
         PriGraParam_OLD.uw8 = PriGraParam_VOL.uw8;
         PriGraParam_OLD.uw9 = PriGraParam_VOL.uw9;
         PriGraParam_OLD.sample_adattato = PriGraParam_VOL.sample_adattato;				// salviamo il valor eprecedente
-        if((i+m_cursore) < __num_cample)
-        {
+        if((i+m_cursore) < __num_sample) {
             PriGraParam_VOL.sample_adattato = (int)(m_vol_store[i + m_cursore] * fattore_scala);	// adattamento del valore corrente al fondoscala corrente
 
-            if(PriGraParam_VOL.sample_adattato > 0)
-            {
+            if(PriGraParam_VOL.sample_adattato > 0) {
                 PriGraParam_VOL.uw8 = PriGraParam_VOL.sample_adattato / 8;	// individuo di quanti byte mi devo spostare a destra, a partire dall'asse sinistro
                 PriGraParam_VOL.uw9 = PriGraParam_VOL.sample_adattato % 8;	// il resto della divisione mi da il dot dell'ultimo byte che devo accendere, individuo il bit (o dot) da accendere partendo pero da MSB nel byte individuato
-                if(PriGraParam_VOL.sample_adattato > PriGraParam_OLD.sample_adattato)
-                {
-                    PriGraParam_VOL.verso_curva = positivo;
-                    if(PriGraParam_VOL.uw8 > PriGraParam_OLD.uw8)
-                    {
+                if(PriGraParam_VOL.sample_adattato > PriGraParam_OLD.sample_adattato) {
+                    PriGraParam_VOL.verso_curva = true;
+                    if(PriGraParam_VOL.uw8 > PriGraParam_OLD.uw8) {
                         for(int j = (PriGraParam_OLD.uw8 + 1); j < PriGraParam_VOL.uw8; j++)
                             m_str_gr[_NUM_BYTE_CMD + (2 + m_pos_gra_vol + j)*NUM_POINTS + i ] |= (char)0xFF;	// creo la riga dei byte interi
                         for(int j = 0; j < PriGraParam_VOL.uw9; j++)
@@ -2132,24 +2093,19 @@ void printermanager::Pri_Rep_Gra_Landscape(short __num_cample)
                         for(int j = PriGraParam_OLD.uw9; j < 8; j++)
                             m_str_gr[_NUM_BYTE_CMD + (2 + m_pos_gra_vol + PriGraParam_OLD.uw8)*NUM_POINTS + i ] |= (char)(0x80 >> j);	// creo la riga dei dots dell'ultimo byte
                     }
-                    else
-                    {
+                    else {
                         for(int j = (PriGraParam_OLD.uw9 + 1); j <= PriGraParam_VOL.uw9; j++)
                             m_str_gr[_NUM_BYTE_CMD + (2 + m_pos_gra_vol + PriGraParam_VOL.uw8)*NUM_POINTS + i ] |= (char)(0x80 >> j);	// creo la riga dei dots dell'ultimo byte
                     }
                 }
                 else
-                    if(PriGraParam_VOL.sample_adattato < PriGraParam_OLD.sample_adattato)
-                    {
-                        if(PriGraParam_VOL.verso_curva == positivo)	// niente riga perche si sovrapporrebbe con quella del precedente
-                        {
-                            PriGraParam_VOL.verso_curva = negativo;
+                    if(PriGraParam_VOL.sample_adattato < PriGraParam_OLD.sample_adattato) {
+                        if(PriGraParam_VOL.verso_curva == true) { // niente riga perche si sovrapporrebbe con quella del precedente
+                            PriGraParam_VOL.verso_curva = false;
                             m_str_gr[_NUM_BYTE_CMD + (2 + m_pos_gra_vol + PriGraParam_VOL.uw8)*NUM_POINTS + i ] |= (char)(0xC0 >> PriGraParam_VOL.uw9); // qui niente riga solo un punto.
                         }
-                        else	// qui invece la riga dal valore prec all'attuale
-                        {
-                            if(PriGraParam_VOL.uw8 < PriGraParam_OLD.uw8)
-                            {
+                        else { // qui invece la riga dal valore prec all'attuale
+                            if(PriGraParam_VOL.uw8 < PriGraParam_OLD.uw8) {
                                 for(int j = (PriGraParam_VOL.uw8 + 1); j < PriGraParam_OLD.uw8; j++)
                                     m_str_gr[_NUM_BYTE_CMD + (2 + m_pos_gra_vol + j)*NUM_POINTS + i ] |= (char)0xFF;	// creo la riga dei byte interi
                                 for(int j = 0; j < PriGraParam_OLD.uw9; j++)
@@ -2157,32 +2113,27 @@ void printermanager::Pri_Rep_Gra_Landscape(short __num_cample)
                                 for(int j = PriGraParam_VOL.uw9; j < 8; j++)
                                     m_str_gr[_NUM_BYTE_CMD + (2 + m_pos_gra_vol + PriGraParam_VOL.uw8)*NUM_POINTS + i ] |= (char)(0x80 >> j);	// creo la riga dei dots dell'ultimo byte
                             }
-                            else
-                            {
+                            else {
                                 for(int j = PriGraParam_VOL.uw9; j < PriGraParam_OLD.uw9; j++)
                                     m_str_gr[_NUM_BYTE_CMD + (2 + m_pos_gra_vol + PriGraParam_VOL.uw8)*NUM_POINTS + i ] |= (char)(0x80 >> j);	// creo la riga dei dots dell'ultimo byte
                             }
                         }
                     }
-                    else	// qui niente riga solo un punto.
-                    {
-                        PriGraParam_VOL.verso_curva = negativo;
+                    else { // qui niente riga solo un punto.
+                        PriGraParam_VOL.verso_curva = false;
                         m_str_gr[_NUM_BYTE_CMD + (2 + m_pos_gra_vol + PriGraParam_VOL.uw8)*NUM_POINTS + i ] |= (char)(0xC0 >> PriGraParam_VOL.uw9); // qui niente riga solo un punto.
                     }
             }
-            else	// il nuovo valore e 0 (reale o adattato) comunque sta sull'asse
-            {
+            else { // il nuovo valore e 0 (reale o adattato) comunque sta sull'asse
                 PriGraParam_VOL.uw8 = PriGraParam_VOL.uw9 = 0;
-                PriGraParam_VOL.verso_curva = positivo;
-                if(PriGraParam_OLD.sample_adattato > 0)	// allora riga da 0 a sample_adattato_prec
-                {
+                PriGraParam_VOL.verso_curva = true;
+                if(PriGraParam_OLD.sample_adattato > 0) { // allora riga da 0 a sample_adattato_prec
                     for(int j = 0; j < PriGraParam_OLD.uw8; j++)
                         m_str_gr[_NUM_BYTE_CMD + (2 + m_pos_gra_vol + j)*NUM_POINTS + i ] |= (char)0xFF;	// creo la riga dei byte interi
                     for(int j = 0; j < PriGraParam_OLD.uw9; j++)
                         m_str_gr[_NUM_BYTE_CMD + (2 + m_pos_gra_vol + PriGraParam_OLD.uw8)*NUM_POINTS + i ] |= (char)(0x80 >> j);
                 }
-                else
-                {
+                else {
                     m_str_gr[_NUM_BYTE_CMD + (2 + m_pos_gra_vol)*NUM_POINTS + i ] |= (char)0xC0; // accendo solo un pixel in piu allo zero per evidenziare il valore a zero
                 }
             }
@@ -2190,27 +2141,23 @@ void printermanager::Pri_Rep_Gra_Landscape(short __num_cample)
         else
             break;
     }
-    if(m_emgPresent)
-    {
-        fattore_scala = m_num_dots_gra_emg/(float)(m_max_emg);	// dove max_y = 10, 20, 40, 80, 160, quindi il rapporto = 4, 2, 1, 0.5, 0.25
-        for(int i = 0; i < NUM_POINTS; i++)
-        {
+
+    if(m_emgPresent) {
+        fattore_scala = m_num_dots_gra_emg / (m_max_emg);	// dove max_y = 10, 20, 40, 80, 160, quindi il rapporto = 4, 2, 1, 0.5, 0.25
+        qDebug("fattore scala EMG: %f", fattore_scala);
+        for(int i = 0; i < NUM_POINTS; i++) {
             PriGraParam_OLD.uw8 = PriGraParam_EMG.uw8;
             PriGraParam_OLD.uw9 = PriGraParam_EMG.uw9;
             PriGraParam_OLD.sample_adattato = PriGraParam_EMG.sample_adattato;				// salviamo il valor eprecedente
-            if((i+m_cursore) < __num_cample)
-            {
+            if((i+m_cursore) < __num_sample) {
                 PriGraParam_EMG.sample_adattato = (int)(m_emg_store[i + m_cursore] * fattore_scala);	// adattamento del valore corrente al fondoscala corrente
 
-                if(PriGraParam_EMG.sample_adattato > 0)
-                {
+                if(PriGraParam_EMG.sample_adattato > 0) {
                     PriGraParam_EMG.uw8 = PriGraParam_EMG.sample_adattato / 8;	// individuo di quanti byte mi devo spostare a destra, a partire dall'asse sinistro
                     PriGraParam_EMG.uw9 = PriGraParam_EMG.sample_adattato % 8;	// il resto della divisione mi da il dot dell'ultimo byte che devo accendere, individuo il bit (o dot) da accendere partendo pero da MSB nel byte individuato
-                    if(PriGraParam_EMG.sample_adattato > PriGraParam_OLD.sample_adattato)
-                    {
-                        PriGraParam_EMG.verso_curva = positivo;
-                        if(PriGraParam_EMG.uw8 > PriGraParam_OLD.uw8)
-                        {
+                    if(PriGraParam_EMG.sample_adattato > PriGraParam_OLD.sample_adattato) {
+                        PriGraParam_EMG.verso_curva = true;
+                        if(PriGraParam_EMG.uw8 > PriGraParam_OLD.uw8) {
                             for(int j = (PriGraParam_OLD.uw8 + 1); j < PriGraParam_EMG.uw8; j++)
                                 m_str_gr[_NUM_BYTE_CMD + (2 + j)*NUM_POINTS + i ] |= (char)0xFF;	// creo la riga dei byte interi
                             for(int j = 0; j < PriGraParam_EMG.uw9; j++)
@@ -2218,24 +2165,19 @@ void printermanager::Pri_Rep_Gra_Landscape(short __num_cample)
                             for(int j = PriGraParam_OLD.uw9; j < 8; j++)
                                 m_str_gr[_NUM_BYTE_CMD + (2 + PriGraParam_OLD.uw8)*NUM_POINTS + i ] |= (char)(0x80 >> j);	// creo la riga dei dots dell'ultimo byte
                         }
-                        else
-                        {
+                        else {
                             for(int j = (PriGraParam_OLD.uw9 + 1); j <= PriGraParam_EMG.uw9; j++)
                                 m_str_gr[_NUM_BYTE_CMD + (2 + PriGraParam_EMG.uw8)*NUM_POINTS + i ] |= (char)(0x80 >> j);	// creo la riga dei dots dell'ultimo byte
                         }
                     }
                     else
-                        if(PriGraParam_EMG.sample_adattato < PriGraParam_OLD.sample_adattato)
-                        {
-                            if(PriGraParam_EMG.verso_curva == positivo)	// niente riga perche si sovrapporrebbe con quella del precedente
-                            {
-                                PriGraParam_EMG.verso_curva = negativo;
+                        if(PriGraParam_EMG.sample_adattato < PriGraParam_OLD.sample_adattato) {
+                            if(PriGraParam_EMG.verso_curva == true) { // niente riga perche si sovrapporrebbe con quella del precedente
+                                PriGraParam_EMG.verso_curva = false;
                                 m_str_gr[_NUM_BYTE_CMD + (2 + PriGraParam_EMG.uw8)*NUM_POINTS + i ] |= (char)(0xC0 >> PriGraParam_EMG.uw9); // qui niente riga solo un punto.
                             }
-                            else	// qui invece la riga dal valore prec all'attuale
-                            {
-                                if(PriGraParam_EMG.uw8 < PriGraParam_OLD.uw8)
-                                {
+                            else { // qui invece la riga dal valore prec all'attuale
+                                if(PriGraParam_EMG.uw8 < PriGraParam_OLD.uw8) {
                                     for(int j = (PriGraParam_EMG.uw8 + 1); j < PriGraParam_OLD.uw8; j++)
                                         m_str_gr[_NUM_BYTE_CMD + (2 + j)*NUM_POINTS + i ] |= (char)0xFF;	// creo la riga dei byte interi
                                     for(int j = 0; j < PriGraParam_OLD.uw9; j++)
@@ -2243,32 +2185,27 @@ void printermanager::Pri_Rep_Gra_Landscape(short __num_cample)
                                     for(int j = PriGraParam_EMG.uw9; j < 8; j++)
                                         m_str_gr[_NUM_BYTE_CMD + (2 + PriGraParam_EMG.uw8)*NUM_POINTS + i ] |= (char)(0x80 >> j);	// creo la riga dei dots dell'ultimo byte
                                 }
-                                else
-                                {
+                                else {
                                     for(int j = PriGraParam_EMG.uw9; j < PriGraParam_OLD.uw9; j++)
                                         m_str_gr[_NUM_BYTE_CMD + (2 + PriGraParam_EMG.uw8)*NUM_POINTS + i ] |= (char)(0x80 >> j);	// creo la riga dei dots dell'ultimo byte
                                 }
                             }
                         }
-                        else	// qui niente riga solo un punto.
-                        {
-                            PriGraParam_EMG.verso_curva = negativo;
+                        else { // qui niente riga solo un punto.
+                            PriGraParam_EMG.verso_curva = false;
                             m_str_gr[_NUM_BYTE_CMD + (2 + PriGraParam_EMG.uw8)*NUM_POINTS + i ] |= (char)(0xC0 >> PriGraParam_EMG.uw9); // qui niente riga solo un punto.
                         }
                 }
-                else	// il nuovo valore e 0 (reale o adattato) comunque sta sull'asse
-                {
+                else { // il nuovo valore e 0 (reale o adattato) comunque sta sull'asse
                     PriGraParam_EMG.uw8 = PriGraParam_EMG.uw9 = 0;
-                    PriGraParam_EMG.verso_curva = positivo;
-                    if(PriGraParam_OLD.sample_adattato > 0)	// allora riga da 0 a sample_adattato_prec
-                    {
+                    PriGraParam_EMG.verso_curva = true;
+                    if(PriGraParam_OLD.sample_adattato > 0) { // allora riga da 0 a sample_adattato_prec
                         for(int j = 0; j < PriGraParam_OLD.uw8; j++)
                             m_str_gr[_NUM_BYTE_CMD + (2 + j)*NUM_POINTS + i ] |= (char)0xFF;	// creo la riga dei byte interi
                         for(int j = 0; j < PriGraParam_OLD.uw9; j++)
                             m_str_gr[_NUM_BYTE_CMD + (2 + PriGraParam_OLD.uw8)*NUM_POINTS + i ] |= (char)(0x80 >> j);
                     }
-                    else
-                    {
+                    else {
                         m_str_gr[_NUM_BYTE_CMD + (2)*NUM_POINTS + i ] |= (char)0xC0; // accendo solo un pixel in piu allo zero per evidenziare il valore a zero
                     }
                 }
@@ -2277,31 +2214,32 @@ void printermanager::Pri_Rep_Gra_Landscape(short __num_cample)
                 break;
         }
     }
-    m_cursore += NUM_POINTS;	// incrementato di 40 punti (quindi sample) ogni giro
-    // trasposizione
 
-    unsigned short num_col_max = NUM_POINTS;	// 40
-    unsigned short num_rig_max = (dim_string_gr -8) / num_col_max;	// 104
+    m_cursore += NUM_POINTS;	// incrementato di 40 punti (quindi sample) ogni giro
+
+    // trasposizione
+    int c_max = NUM_POINTS;	// 40
+    int r_max = (dim_string_gr -8) / c_max;	// 104
 
     for(int i = 0; i < (dim_string_gr - 8); i++ )
-        m_str_tr[i] = (char)0x00;	// azzero tutta questa stringona
-    for(int num_col = 0; num_col < num_col_max; num_col++ )
-    {
-        for(int num_rig = 0; num_rig < num_rig_max; num_rig++)
-        {
-            m_str_tr[ ( num_rig_max * num_col ) + num_rig ] = m_str_gr[ _NUM_BYTE_CMD + ( num_col_max * num_rig ) + num_col ];
+        m_str_tr[i] = 0;	// azzero tutta questa stringona
+    for(int c = 0; c < c_max; c++ )
+        for(int r = 0; r < r_max; r++) {
+            int src = ( c_max * r ) + c + _NUM_BYTE_CMD;
+            int dst = ( r_max * c ) + r ;
+            m_str_tr[dst] = m_str_gr[src];
         }
-    }
-    for(int str_byte = 0; str_byte < (dim_string_gr -8); str_byte++ )
-        m_str_gr[ _NUM_BYTE_CMD + str_byte ] = m_str_tr[ str_byte ];
+
+    for(int i = 0; i < (dim_string_gr - 8); i++ )
+        m_str_gr[ _NUM_BYTE_CMD + i ] = m_str_tr[ i ];
 
     // finalmente stampa
     m_port->Pri_Str( (dim_string_gr), (char *)m_str_gr, 0);
-
 }
 
 /**
-a seconda del massimo del flusso, si sceglie un fondo scala verticale e il conseguente asse dei tempi. A seconda dei sample fin qui stampati,
+a seconda del massimo del flusso, si sceglie un fondo scala verticale e il conseguente asse dei tempi.
+A seconda dei sample fin qui stampati,
 si risale al tempo per comandare la stampa del label (in secondi) o meno
 */
 bool printermanager::check_stamp_label()
@@ -2311,37 +2249,32 @@ bool printermanager::check_stamp_label()
     switch(m_max_y)	// i F.S. previsti per il flusso in ml/sec
     {
     case 25:	// ml/sec
-        num_sec = (m_cursore / 16);		// 1 secondo ogni 16 punti
-        if((num_sec % 5) == 0)				// e numero divisibile per 5sec quindi e uno dei label da stampare
-        {
-            m_init_time_to_print = num_sec;		// puo assumere i valori 5,10,15,20,25,30....
+        num_sec = (m_cursore / 16);         // 1 secondo ogni 16 punti
+        if((num_sec % 5) == 0) {            // e numero divisibile per 5sec quindi e uno dei label da stampare
+            m_init_time_to_print = num_sec; // puo assumere i valori 5,10,15,20,25,30....
             return true;
         }
         break;
     case 50:
-        num_sec = (m_cursore / 8);			// 1 secondo ogni 8 punti
-        if((num_sec % 10) == 0)				// e numero divisibile per 10sec quindi e uno dei label da stampare
-        {
-            m_init_time_to_print = num_sec;		// puo assumere i valori 10,20,30,40....
+        num_sec = (m_cursore / 8);          // 1 secondo ogni 8 punti
+        if((num_sec % 10) == 0) {           // e numero divisibile per 10sec quindi e uno dei label da stampare
+            m_init_time_to_print = num_sec; // puo assumere i valori 10,20,30,40....
             return true;
         }
         break;
     case 75:
-        num_sec = (m_cursore * 3 / 16);		// 3 second1 ogni 16 punti
-        if((num_sec % 15) == 0)				// e numero divisibile per 10sec quindi e uno dei label da stampare
-        {
-            m_init_time_to_print = num_sec;		// puo assumere i valori 10,20,30,40....
+        num_sec = (m_cursore * 3 / 16);     // 3 second1 ogni 16 punti
+        if((num_sec % 15) == 0) {           // e numero divisibile per 10sec quindi e uno dei label da stampare
+            m_init_time_to_print = num_sec; // puo assumere i valori 10,20,30,40....
             return true;
         }
         break;
     case 100:
-        num_sec = (m_cursore / 4);		// 3 second1 ogni 16 punti
-        if((num_sec % 20) == 0)				// e numero divisibile per 10sec quindi e uno dei label da stampare
-        {
+        num_sec = (m_cursore / 4);          // 3 second1 ogni 16 punti
+        if((num_sec % 20) == 0) {           // e numero divisibile per 10sec quindi e uno dei label da stampare
             m_init_time_to_print = num_sec;		// puo assumere i valori 10,20,30,40....
             return true;
         }
-        break;
         break;
     }
     return false;
@@ -2360,11 +2293,15 @@ void printermanager::Pri_Rep_asse_dx()
     // setta la stampa grafica
     m_str_gr[0]=ESC;	//0x1B;	// ESC
     m_str_gr[1]='*';	//0x2A;	// *
-    m_str_gr[2]=0x30;	// n1	num_byte = dim_string_solo_ax - 8 = 816 = ( 65536 * n3 ) + ( 256 * n2 ) + n1 = 256*0x03 + 0x30
-    m_str_gr[3]=0x03;	// n2
-    m_str_gr[4]=0x00;	// n3
+//    m_str_gr[2]=0x30;	// n1	num_byte = dim_string_solo_ax - 8 = 816 = ( 65536 * n3 ) + ( 256 * n2 ) + n1 = 256*0x03 + 0x30
+//    m_str_gr[3]=0x03;	// n2
+//    m_str_gr[4]=0x00;	// n3
+    int sz = 816;    // 	num_byte = dim_string_solo_ax - 8 = 816
+    m_str_gr[2] = sz % 256         ;	// n1
+    m_str_gr[3] = (sz >>  8) & 0xff;	// n2
+    m_str_gr[4] = (sz >> 16) & 0xff;	// n3
     m_str_gr[5]=0x00;	// n4	normal
-    m_str_gr[6]=0x02;	// n5	scrive a n5 byte dal bordo
+    m_str_gr[6]=0x00;	// n5	scrive a n5 byte dal bordo
     m_str_gr[7]=0x66;	// n6	larghezza 816dots=102 byte
 
     // aggiungo la linea dell''asse  delle ordinate, in ogni colonna il primo bit viene acceso
@@ -2484,12 +2421,16 @@ void  printermanager::Pri_Rep_Gra_Siroky (byte_ __num_riga, byte_ __grap)
 
     m_str_gr[0] = ESC;	//0x1B;	// ESC
     m_str_gr[1] = '*';	//0x2A;	// *
-    m_str_gr[2] = 0x30;	// n1	num_byte = 1080 = ( 65536 * n3 ) + ( 256 * n2 ) + n1
-    m_str_gr[3] = 0x09;	// n2
-    m_str_gr[4] = 0x00;	// n3
+//    m_str_gr[2] = 0x30;	// n1	num_byte = 1080 = ( 65536 * n3 ) + ( 256 * n2 ) + n1
+//    m_str_gr[3] = 0x09;	// n2
+//    m_str_gr[4] = 0x00;	// n3
+    int sz = 2352;    // 	num_byte = 2352 //1080
+    m_str_gr[2] = sz % 256         ;	// n1
+    m_str_gr[3] = (sz >>  8) & 0xff;	// n2
+    m_str_gr[4] = (sz >> 16) & 0xff;	// n3
     m_str_gr[5] = 0x00;	// n4	// singola altezza
-    m_str_gr[6] = 0x02;	// n5
-    m_str_gr[7] = 0x62;	// n6	// larghezza a_ave + a_max
+    m_str_gr[6] = 0x00;	// n5	scrive a n5 byte dal bordo
+    m_str_gr[7] = 98;	// n6	// larghezza a_ave + a_max
 
     // inserimento label Q_ave
     if( (__num_riga == 0) || ( !(__num_riga % 2) ) )

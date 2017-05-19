@@ -49,8 +49,8 @@
 // caratteristiche del font dei caratteri usati per i label (ruotati di 90?)
 #define _HEIGHT_CHAR_LABEL 8
 #define _WEIGHT_CHAR_LABEL 8
-#define negativo  0
-#define positivo 1
+//#define negativo  0
+//#define positivo 1
 
 #define _NUM_BYTE_CMD 8 // numero di char del comando di stampa grafica previsto dal protocollo APS
 #define LCMD 8 //char per comando
@@ -358,7 +358,7 @@ private:
     void Pri_Rep_Gra(int __num_riga);
     void Pri_Rep_Gra_Ini_Grid(int __n_riga);
     void Pri_Rep_Gra_EMG(byte_ __num_riga);
-    void Pri_Rep_Gra_Landscape(short __num_cample);
+    void Pri_Rep_Gra_Landscape(short __num_sample);
     void Pri_Rep_asse_dx();
     void Pri_Rep_Label();
     void Pri_Rep_Gra_Siroky (byte_ __num_riga, byte_ __grap);
