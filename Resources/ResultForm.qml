@@ -139,6 +139,7 @@ MForm {
                 LQM.yPoint = mngData.getFlowDatas(i).getLiverpoolMax().getDatoY()
                 LQM.udmX =  mngData.getFlowDatas(i).getLiverpoolMax().getUnitx()
                 LQM.udmY =  mngData.getFlowDatas(i).getLiverpoolMax().getUnity()
+                LQM.tracksWidth = [2,2,1,1,1,1,2]
                 LQM.traksToDraw =  mngData.getFlowDatas(i).getLiverpoolMax().getTracce()
                 LQM.tracksColors =  mngData.getFlowDatas(i).getLiverpoolMax().getColors()
                 LQM.drawTracks()
@@ -175,6 +176,7 @@ MForm {
                 LQA.yPoint = mngData.getFlowDatas(i).getLiverpoolAve().getDatoY()
                 LQA.udmX =  mngData.getFlowDatas(i).getLiverpoolAve().getUnitx()
                 LQA.udmY =  mngData.getFlowDatas(i).getLiverpoolAve().getUnity()
+                LQA.tracksWidth = [2,2,1,1,1,1,2]
                 LQA.traksToDraw =  mngData.getFlowDatas(i).getLiverpoolAve().getTracce()
                 LQA.tracksColors =  mngData.getFlowDatas(i).getLiverpoolAve().getColors()
                 LQA.drawTracks()
@@ -213,6 +215,7 @@ MForm {
                     SQM.yPoint = mngData.getFlowDatas(i).getSirokyMax().getDatoY()
                     SQM.udmX =  mngData.getFlowDatas(i).getSirokyMax().getUnitx()
                     SQM.udmY =  mngData.getFlowDatas(i).getSirokyMax().getUnity()
+                    SQM.tracksWidth = [1,2,1,1]
                     SQM.traksToDraw =  mngData.getFlowDatas(i).getSirokyMax().getTracce()
                     SQM.tracksColors =  mngData.getFlowDatas(i).getSirokyMax().getColors()
                     SQM.drawTracks()
@@ -255,6 +258,7 @@ MForm {
                     SQA.yPoint = mngData.getFlowDatas(i).getSirokyAve().getDatoY()
                     SQA.udmX =  mngData.getFlowDatas(i).getSirokyAve().getUnitx()
                     SQA.udmY =  mngData.getFlowDatas(i).getSirokyAve().getUnity()
+                    SQA.tracksWidth = [1,2,1,1,1]
                     SQA.traksToDraw =  mngData.getFlowDatas(i).getSirokyAve().getTracce()
                     SQA.tracksColors =  mngData.getFlowDatas(i).getSirokyAve().getColors()
                     SQA.drawTracks()

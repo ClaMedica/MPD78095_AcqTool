@@ -839,7 +839,7 @@ void MDataManager::exitFromReview()
     qDebug() << "Exit" << getToSave();
 
     if (getToSave() == "ret") {
-        m_mngPrint->closePrinter();
+        if (m_mngPrint != NULL) m_mngPrint->closePrinter();
         if(DebugAcqTool == false)
             g_mainAppBridge->sendSwitch();  //send(MEX_SHOW);
         else
@@ -852,7 +852,7 @@ void MDataManager::exitFromReview()
         emit sg_exitFromReview();
     else
     {
-        m_mngPrint->closePrinter();
+        if (m_mngPrint != NULL) m_mngPrint->closePrinter();
         if (m_copy != NULL)
             delete m_copy;
         m_copy = NULL;
@@ -1133,27 +1133,27 @@ qDebug() << "INIZIO";
     qDebug() << "File chiuso" << m_mng->Close();
 
 
-        m_mngPrint->setTempoAttesa(m_aflwdatas.at(0)->getWaitingTime());
-        m_mngPrint->setFlussoMax(m_aflwdatas.at(0)->getQMax());
-        m_mngPrint->setFlussoMedio(m_aflwdatas.at(0)->getQAve());
-        m_mngPrint->setTempoMax(m_aflwdatas.at(0)->getTimeAtQmax());
-        m_mngPrint->setTempo595(m_aflwdatas.at(0)->getTime90());
-        m_mngPrint->setTempoFlusso(m_aflwdatas.at(0)->getFlowTime());
-        m_mngPrint->setTempoDisc(m_aflwdatas.at(0)->getDescTime());
-        m_mngPrint->setTempoSvuot(m_aflwdatas.at(0)->getVoidingTime());
-        m_mngPrint->setVolFlussoMax(m_aflwdatas.at(0)->getVolAtQqmax());
-        m_mngPrint->setVolVuotato(m_aflwdatas.at(0)->getVoidedVolume());
-        m_mngPrint->setAccelerazione(m_aflwdatas.at(0)->getAcceleration());
+    m_mngPrint->setTempoAttesa(m_aflwdatas.at(0)->getWaitingTime());
+    m_mngPrint->setFlussoMax(m_aflwdatas.at(0)->getQMax());
+    m_mngPrint->setFlussoMedio(m_aflwdatas.at(0)->getQAve());
+    m_mngPrint->setTempoMax(m_aflwdatas.at(0)->getTimeAtQmax());
+    m_mngPrint->setTempo595(m_aflwdatas.at(0)->getTime90());
+    m_mngPrint->setTempoFlusso(m_aflwdatas.at(0)->getFlowTime());
+    m_mngPrint->setTempoDisc(m_aflwdatas.at(0)->getDescTime());
+    m_mngPrint->setTempoSvuot(m_aflwdatas.at(0)->getVoidingTime());
+    m_mngPrint->setVolFlussoMax(m_aflwdatas.at(0)->getVolAtQqmax());
+    m_mngPrint->setVolVuotato(m_aflwdatas.at(0)->getVoidedVolume());
+    m_mngPrint->setAccelerazione(m_aflwdatas.at(0)->getAcceleration());
 
-        //letto dai setting
-        //mi dice se la flussimetria automatica o manuale
-        m_mngPrint->setMode(m_autoFlow);
-        m_mngPrint->setPrintSiroky(m_Siroky);
-        m_mngPrint->setPrintModeUser(m_landscape);
+    //letto dai setting
+    //mi dice se la flussimetria automatica o manuale
+    m_mngPrint->setMode(m_autoFlow);
+    m_mngPrint->setPrintSiroky(m_Siroky);
+    m_mngPrint->setPrintModeUser(m_landscape);
 
-        //stampo
-        if (m_autoPrint)
-            m_mngPrint->print();
+    //stampo
+    if (m_autoPrint)
+        m_mngPrint->print();
 
 
     //qml
@@ -1396,7 +1396,7 @@ bool MDataManager::InitArraysFLW(int __start,
         tracce << "$Track" << "family" << sig6->getName() << "name" << "Signal" << "Category" << CAT_TRACK << "descr" << "line7" << "pointer" << (qulonglong)sig6 << "&Track";
 
         QVariantList colori;
-        colori << "green" << "red" << "white" << "white" << "white" << "white" << "green";
+        colori << "green" << "red" << "black" << "black" << "black" << "black" << "green";
 
         m_aflwdatas.at(i+1)->getLiverpoolMax()->setColors(colori);
         m_aflwdatas.at(i+1)->getLiverpoolMax()->setTracce(tracce);
@@ -1437,7 +1437,7 @@ bool MDataManager::InitArraysFLW(int __start,
         tracce << "$Track" << "family" << sig6Ave->getName() << "name" << "Signal" << "Category" << CAT_TRACK << "descr" << "line7" << "pointer" << (qulonglong)sig6Ave << "&Track";
 
         colori.clear();
-        colori << "green" << "red" << "white" << "white" << "white" << "white" << "green";
+        colori << "green" << "red" << "black" << "black" << "black" << "black" << "green";
         m_aflwdatas.at(i+1)->getLiverpoolAve()->setColors(colori);
         m_aflwdatas.at(i+1)->getLiverpoolAve()->setTracce(tracce);
 
@@ -1465,7 +1465,7 @@ bool MDataManager::InitArraysFLW(int __start,
             tracce << "$Track"<<"family"<<sig3SirMax->getName()<<"name"<<"Signal"<<"Category"<<CAT_TRACK<<"descr"<<"line4"<<"pointer"<<(qulonglong)sig3SirMax<<"&Track";
 
             colori.clear();
-            colori << "white" << "red" << "white" << "white";
+            colori << "black" << "red" << "black" << "black";
             m_aflwdatas.at(i+1)->getSirokyMax()->setColors(colori);
             m_aflwdatas.at(i+1)->getSirokyMax()->setTracce(tracce);
 
@@ -1502,7 +1502,7 @@ bool MDataManager::InitArraysFLW(int __start,
             tracce<< "$Track"<<"family"<<sig4SirAve->getName()<<"name"<<"Signal"<<"Category"<<CAT_TRACK<<"descr"<<"line5"<<"pointer"<<(qulonglong)sig4SirAve<<"&Track";
 
             colori.clear();
-            colori << "white" << "red" << "white" << "white" << "white";
+            colori << "black" << "red" << "black" << "black" << "black";
             m_aflwdatas.at(i+1)->getSirokyAve()->setColors(colori);
             m_aflwdatas.at(i+1)->getSirokyAve()->setTracce(tracce);
 

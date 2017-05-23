@@ -1,4 +1,4 @@
-import QtQuick 2.0
+import QtQuick 2.4
 import Managers 1.0
 import MPlotModule 1.0
 
@@ -12,7 +12,7 @@ Rectangle {
     property int yMax: 100
 
     property var tracksColors: []
-    property var tracksWidth: [1,1,2,2,2,2,2]
+    property var tracksWidth: [2,2,2,2,2,2,2]
     property string nome: "nome"
 
     property string udmY: "left"
@@ -335,8 +335,9 @@ Rectangle {
             visible: true
             anchors.fill: parent
             anchors.margins:0
-            stippleEn: false
-            stippleEnSub: false
+            //non funziona
+            stippleEn: true
+            stippleEnSub: true
 
             xMax: rootPlot.xMax
             xMin: rootPlot.xMin

@@ -10,7 +10,6 @@ import MComponents 1.0
 Rectangle {
     property var date:Date(edYear.text,cbMonth.currentIndex,cbDay.currentIndex)
     property int labelSize:2
-
     readonly property int marginPerc:1
     height:50
     width:200
@@ -161,7 +160,11 @@ Rectangle {
         visible: false
         height:calendar.height+50
         width:calendar.width+10
-        anchors.centerIn: parent
+        y: {
+            var globalCoordinares = DataEngine.getAbsolutePosition(this)
+            y = -globalCoordinares.y
+        }
+        anchors.horizontalCenter: parent.horizontalCenter
         anchors.verticalCenterOffset: 50
         anchors.horizontalCenterOffset: -50
 
