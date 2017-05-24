@@ -8,7 +8,7 @@ import QtQuick.Dialogs 1.2
 import MComponents 1.0
 
 Rectangle {
-    property var date:Date(edYear.text,cbMonth.currentIndex,cbDay.currentIndex)
+    property var date:Date(edYear.text,cbMonth.currentIndex,cbDay.currentIndex+1)
     property int labelSize:2
     readonly property int marginPerc:1
     height:50
@@ -22,7 +22,7 @@ Rectangle {
         var d=new Date()
         cbMonth.currentIndex=d.getMonth()
         uppa(d.getMonth())
-        cbDay.currentIndex=d.getDate()
+        cbDay.currentIndex=d.getDate()-1
         edYear.text=d.getFullYear()
     }
 
@@ -31,9 +31,8 @@ Rectangle {
         console.log(newDate,d,date)
         cbMonth.currentIndex=d.getMonth()
         uppa(d.getMonth())
-        cbDay.currentIndex=d.getDate()
+        cbDay.currentIndex=d.getDate()-1
         edYear.text=d.getFullYear()
-
     }
 
     function uppa(month)
@@ -72,7 +71,7 @@ Rectangle {
         if(old<cbDay.model.length)
             cbDay.currentIndex=old
         console.log(old,cbDay.model.length,cbDay.currentIndex)
-        date=new Date(edYear.text,cbMonth.currentIndex,cbDay.currentIndex)
+        date=new Date(edYear.text,cbMonth.currentIndex,cbDay.currentIndex+1)
     }
 
     Row{
@@ -100,7 +99,7 @@ Rectangle {
             height: parent.height
             width:parent.width*0.3
             labelSize: rootDateEdit.labelSize
-            onCurrentIndexChanged: date=new Date(edYear.text,cbMonth.currentIndex,cbDay.currentIndex)
+            onCurrentIndexChanged: date=new Date(edYear.text,cbMonth.currentIndex,cbDay.currentIndex+1)
             onClicked: if(isTouch) rootDateEdit.clicked()
         }
         MComboBox{
@@ -123,7 +122,7 @@ Rectangle {
             verticalAlignment: Text.AlignVCenter
             horizontalAlignment: Text.AlignHCenter
             labelSize:rootDateEdit.labelSize
-            onTextChanged: date=new Date(edYear.text,cbMonth.currentIndex,cbDay.currentIndex)
+            onTextChanged: date=new Date(edYear.text,cbMonth.currentIndex,cbDay.currentIndex+1)
             onFocusChanged:
             {
                 if(focus && isTouch)

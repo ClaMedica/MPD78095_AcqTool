@@ -1132,7 +1132,16 @@ qDebug() << "INIZIO";
 
     qDebug() << "File chiuso" << m_mng->Close();
 
+    //qml
+    qDebug() << "FINE";
+    emit sg_loadResult();
+}
 
+
+
+
+void MDataManager::startPrint()
+{
     m_mngPrint->setTempoAttesa(m_aflwdatas.at(0)->getWaitingTime());
     m_mngPrint->setFlussoMax(m_aflwdatas.at(0)->getQMax());
     m_mngPrint->setFlussoMedio(m_aflwdatas.at(0)->getQAve());
@@ -1158,13 +1167,6 @@ qDebug() << "INIZIO";
 
     //qml
     qDebug() << "FINE";
-    emit sg_loadResult();
-}
-
-void MDataManager::print()
-{
-    qDebug() << "Stampooooo" << m_patientName;
-    SystemManager::executeDetached(QString() + "./PicoPrint immagine.bmp " + m_patientName);
 }
 
 

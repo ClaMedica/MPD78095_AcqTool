@@ -96,9 +96,9 @@ public slots:
     bool changeObject(QVariantList __curObj);
     QVariant getSignal(QString __name);
     QStringList getLinks(QString __what, QStringList __filterFamily=QStringList(), QStringList __filterType=QStringList());
+    void startPrint();
 
 
-    void print();
 private:
     QVector<MSignal *> m_signalVector;
 
