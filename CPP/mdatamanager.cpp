@@ -3,6 +3,73 @@
 
 extern bool DebugAcqTool;
 
+#define NCOLORS 16*16*16
+inline uint32_t decimazioneColore(uint32_t rgb24)
+{
+    uint32_t  colormask = 0x00f0f0f0;
+    rgb24 &= colormask;
+
+    return ((rgb24 & 0x000000f0) >>  4) *   1 |
+           ((rgb24 & 0x0000f000) >> 12) *  16 |
+           ((rgb24 & 0x00f00000) >> 20) * 256;
+}
+
+void MDataManager::getGrabbedImage(QObject *gi, QString nome)
+{
+    qDebug() << nome;
+    bool isSiro = nome.startsWith("Siro");
+    bool isLive = nome.startsWith("Live");
+    bool enab = (isSiro && QFile::exists("/root/PicoFlow/_print_siro")) ||
+                (isLive && QFile::exists("/root/PicoFlow/_print_live"));
+    m_mngPrint->setBitmap(enab, m_resultBm);
+    if( ! enab)
+        return;
+
+    int pale[NCOLORS];
+    bzero((void *) & pale, sizeof(pale));
+
+    bool isAve = nome.contains(" Ave");
+    int  xoffs = isAve  ? 8 : (8 + 400 + 16); // hor pixel offset
+
+    QQuickItemGrabResult *item = qobject_cast<QQuickItemGrabResult *>(gi);
+    QImage  qi(item->image());
+    QSize   qs = qi.size();
+    int     w0 = qs.width();
+    int     h0 = qs.height();
+
+    // frequenza colori
+    uint32_t rgbSiro = decimazioneColore(0xffffdab9);   // colore area
+    for(int w = 0; w < w0; w++)
+        for(int h = 0; h < h0; h++) {
+            uint32_t rgb = decimazioneColore(qi.pixel(w, h));
+            pale[rgb]++;
+        }
+    for (int i = 0; i < NCOLORS; i++) if(pale[i]) qDebug("palette %3.3x: %d", i, pale[i]);
+
+    char  * d = m_resultBm.data();
+    // azzeramento area
+    for(int h = 0; h < h0; h++) {
+        int rowstart  = (h * m_resultBm_w + xoffs) / 8;
+        char  * t = d + rowstart;
+        for(int w = 0; w < w0/8; w++)
+            *t++ = 0;
+    }
+    for(int h = 0; h < h0; h++) {
+        int rowstart  = (h * m_resultBm_w + xoffs) / 8;
+        for(int w = 0; w < w0; w++) {
+            uint32_t rgb = decimazioneColore(qi.pixel(w, h));
+            bool bw = (pale[rgb] < 8000);
+            if(isSiro && (rgb == rgbSiro) && ((w % 3) == 1) && ((h % 3) == 1))
+                bw = true;
+            if(bw) {
+                int byteinrow = w >> 3;
+                int bitinbyte = 7 - (w & 7);
+                d[rowstart + byteinrow] |= 1 << bitinbyte;
+            }
+        }
+    }
+}
+
 
 MDataManager::MDataManager(QObject *parent)
 {
@@ -29,6 +96,11 @@ MDataManager::MDataManager(QObject *parent)
     m_toSave = "ret";
 
     m_mngPrint = NULL;
+
+    m_resultBm_w = 824; // 103 bytes * 8 bit
+    m_resultBm_h = 300;
+    m_resultBm.resize((m_resultBm_w * m_resultBm_h) / 8);
+    m_resultBm.fill(0);
 
     setValVolRes(-999);
 }
@@ -114,13 +186,13 @@ void MDataManager::loadFile(QString __fileName)
     QMap<int, QVariantList> defEn;
 
     double sigMin = INF, sigMax = -INF;
-    byte_ key;
+    unsigned char key;
     int32_t numCh;
     int32_t numSamp[4]; //4 byte per avere il numero del campione
     int32_t numDef;
     int32_t tStart[20], tEnd[20];
     QString descr;
-    byte_ chEn[20];
+    unsigned char chEn[20];
 
     switch(fileType(__fileName)) {
     case PIC:
@@ -1151,14 +1223,18 @@ qDebug() << "INIZIO";
         m_mngPrint->setPrintSiroky(m_Siroky);
         m_mngPrint->setPrintModeUser(m_landscape);
 
-        //stampo
-        if (m_autoPrint)
+//        //stampo
+//        if (m_autoPrint)
             m_mngPrint->print();
 
 
     //qml
-    qDebug() << "FINE";
+    qDebug() << "FINE analisys";
     emit sg_loadResult();
+
+    //stampo
+//    if (m_autoPrint)
+//        m_mngPrint->print();}
 }
 
 void MDataManager::print()
@@ -1199,10 +1275,10 @@ void MDataManager::InitPageGraphs(int __anaType)
         //determina tratti da analizzare.
         //Per ora considera solo il primo.
 
-        int evStart;
-        int evEnd;
-        VarMap *evMarkOpIn;
-        byte_ evAuto = 0;
+        int evStart = 0;
+        int evEnd = 0;
+        VarMap *evMarkOpIn = NULL;
+        unsigned char evAuto = 0;
         QVector<unsigned char> enCh;
 
         VarMapVec* elements = m_storage.getAll(CAT_DEFINER);
@@ -1267,7 +1343,7 @@ void MDataManager::InitPageGraphs(int __anaType)
         //se gli anMarker li trovo per la prima volta li inserisco in grafica
         if (evAuto != 0) {
             VarMapVec *mrkAnVec = new VarMapVec;
-            byte_ key;
+            unsigned char key;
             int32_t numCh;
             int32_t numSamp;
             int32_t numDef;
@@ -1323,7 +1399,7 @@ bool MDataManager::InitArraysFLW(int __start,
                                  int __end,
                                  QVector<unsigned char> __chEn,
                                  int __curDef,
-                                 byte_ __auto)
+                                 unsigned char __auto)
 {
     double startTh = 0;
     double heightTh = 0;
@@ -1533,7 +1609,7 @@ int MDataManager::ReadResult(int & __numEv)
     case FLW_AVD_STUDY: {
         //dati analisi
         m_aflwdatas.append(new mflowdatas());
-        byte_ * strTemp = (byte_ *) malloc (sizeof(FLWAdvRepStruct));
+        unsigned char * strTemp = (unsigned char *) malloc (sizeof(FLWAdvRepStruct));
         m_aflwdatas.at(0)->setParent(this);
         m_aflwdatas.at(0)->setWaitingTime(0);
         m_aflwdatas.at(0)->setQMax(0);

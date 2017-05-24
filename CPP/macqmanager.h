@@ -18,7 +18,6 @@ public:
 
     static void dataOnTCP(QObject *__pParent=NULL, SimpleTCPClient *__pTCP=NULL, QByteArray __block=QByteArray());
 
-
 signals:
     void alarmsChanged();
     void acqMarkersChanged();
