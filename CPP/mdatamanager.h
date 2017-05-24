@@ -6,6 +6,7 @@
 #include "modelmanager.h"
 #include "mflowdatas.h"
 #include "printermanager.h"
+#include <QQuickItemGrabResult>
 
 
 typedef struct {
@@ -44,6 +45,10 @@ public:
 
     Q_PROPERTY(int numAnaFlwAdv READ getNumAnaFlwAdv)
     Q_INVOKABLE int getNumAnaFlwAdv(){return m_aflwdatas.length();}
+
+    Q_INVOKABLE void getGrabbedImage(QObject *gi, QString nome);
+    QByteArray  m_resultBm;
+    int         m_resultBm_w, m_resultBm_h;
 
     QStringList availableData(){return m_availableData;}
     QStringList availableTracks(){return m_data.keys();}
@@ -153,7 +158,7 @@ private:
 
 
     void InitPageGraphs(int __anaType);
-    bool InitArraysFLW(int __start, int __end, QVector<unsigned char> __chEn, int __curDef, byte_ __auto);
+    bool InitArraysFLW(int __start, int __end, QVector<unsigned char> __chEn, int __curDef, unsigned char __auto);
     int ReadResult(int & __numEv);
     bool checkForVolRes();
 };

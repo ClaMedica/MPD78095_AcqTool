@@ -21,7 +21,7 @@ Rectangle {
     property double xPoint: 10
     property double yPoint: 30
 
-    property string colorEsterno: "grey"
+    property string colorEsterno: "darkGrey"
     property string colorTesti: "black"
     property string colorLabelAssi: "white"
     property string colorGriglia: "grey"
@@ -405,6 +405,13 @@ Rectangle {
             color: "slateblue"
             opacity: 1
         }
+    }
+
+    Component.onCompleted: {
+            rootPlot.grabToImage(
+                    function(result) { mngData.getGrabbedImage(result, nome); },
+                    Qt.size(400,300)
+                    )
     }
 }
 

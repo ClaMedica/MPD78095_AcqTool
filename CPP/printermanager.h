@@ -11,7 +11,7 @@
 #define NUM_POINTS	40 // nella versione nuova che corrispondono a 5sec, infatti 40/8 = 5 considerato che 8punti/mm e 8sample/sec
 
 #define 	Fc_FLW        			10   	// frequenza di calcolo del flusso
-            #define 	FREQ_ACQ      		10 		// in Hz -  frequenza di campionamento canale di volume
+#define 	FREQ_ACQ      		10 		// in Hz -  frequenza di campionamento canale di volume
 #define 	FREQ_EMG_ACQ  		100		// in Hz -  frequenza di campionamento canale di emg
 #define 	MAX_DURATA_ESAME	20
 
@@ -49,8 +49,8 @@
 // caratteristiche del font dei caratteri usati per i label (ruotati di 90?)
 #define _HEIGHT_CHAR_LABEL 8
 #define _WEIGHT_CHAR_LABEL 8
-#define negativo  0
-#define positivo 1
+//#define negativo  0
+//#define positivo 1
 
 #define _NUM_BYTE_CMD 8 // numero di char del comando di stampa grafica previsto dal protocollo APS
 #define LCMD 8 //char per comando
@@ -136,8 +136,8 @@
 
 //#define F_LINE 			"\x0A""d"
 
-#define	LOBYTE(x)             ((byte_) ((x) & 0xff))
-#define	HIBYTE(x)             ((byte_) ((x) >> 8))
+#define	LOBYTE(x)             ((unsigned char) ((x) & 0xff))
+#define	HIBYTE(x)             ((unsigned char) ((x) >> 8))
 
 const char str_label_time[29][68]={
     "   0    3     6     9    12    15    18    21    24    27   30s",
@@ -172,7 +172,7 @@ const char str_label_time[29][68]={
 };
 
 // numeri ruotati di 90? in senso orario
-const byte_ print8x8Set[] = {
+const unsigned char  print8x8Set[] = {
     0x3C, 0x7E, 0x81, 0x81, 0x7E, 0x3C, 0x00, 0x00,      /*   0 - 30 - 0 */
     0x84, 0x82, 0xFF, 0xFF, 0x80, 0x80, 0x00, 0x00,      /*   1 - 31 - 1 */
     0xC2, 0xE3, 0xB1, 0x99, 0x8F, 0x86, 0x00, 0x00,      /*   2 - 32 - 2 */
@@ -193,7 +193,7 @@ const byte_ print8x8Set[] = {
     0x00, 0x20, 0x78, 0xa4, 0xa4, 0xa4, 0x18, 0x00,	/* e		17 */
     0x00, 0x00, 0x78, 0x84, 0x84, 0x84, 0x84, 0x00,	/* c		18 */
 };
-const byte_ print7x13Set[]  = {
+const unsigned char  print7x13Set[]  = {
         0x00, 0x00, 0x30, 0x48, 0xCC, 0xCC, 0xCC, 0xCC, 0xCC, 0x48, 0x30, 0x00, 0x00,      /*   0 - 30 - 0 */
         0x00, 0x00, 0x30, 0x70, 0xB0, 0x30, 0x30, 0x30, 0x30, 0x30, 0xFC, 0x00, 0x00,      /*   1 - 31 - 1 */
         0x00, 0x00, 0x78, 0xCC, 0xCC, 0x0C, 0x38, 0x60, 0xC0, 0xC0, 0xFC, 0x00, 0x00,      /*   2 - 32 - 2 */
@@ -205,14 +205,14 @@ const byte_ print7x13Set[]  = {
         0x00, 0x00, 0x78, 0xCC, 0xCC, 0xCC, 0x78, 0xCC, 0xCC, 0xCC, 0x78, 0x00, 0x00,      /*   8 - 38 - 8 */
         0x00, 0x00, 0x78, 0xCC, 0xCC, 0xCC, 0x7C, 0x0C, 0x0C, 0xCC, 0x78, 0x00, 0x00,      /*   9 - 39 - 9 */
         };
-const byte_ print8x10SetSD[]  = {
+const unsigned char  print8x10SetSD[]  = {
         0x00, 0x0E, 0x11, 0x11, 0x11, 0x11, 0x11, 0x11, 0x11, 0x0E,	/* " 0" */
         0x00, 0x02, 0x06, 0x0A, 0x02, 0xF2, 0x02, 0x02, 0x02, 0x07,	/* "-1" */
         0x00, 0x06, 0x09, 0x01, 0x01, 0x72, 0x04, 0x08, 0x08, 0x0F,	/* "-2" */
         0x00, 0x06, 0x09, 0x01, 0x01, 0x77, 0x01, 0x01, 0x09, 0x06,	/* "-3" */
 };
 
-const byte_ SD[2][4][20] =
+const unsigned char  SD[2][4][20] =
 {{{50, 63, 74, 84, 95,105,114,123,132,140,147,154,160,166,170,174,176,178,178,179},
   {34, 44, 54, 62, 70, 78, 84, 91, 98,104,110,116,121,126,130,133,136,139,141,141},
   {10, 19, 26, 34, 40, 46, 52, 58, 64, 70, 75, 79, 84, 88, 93, 98,102,104,106,106},
@@ -243,21 +243,25 @@ public:
     void print();
     void closePrinter();
 
-    void setTempoAttesa(float __val){m_tem_att = __val;}
-    void setFlussoMax(float __val){m_flu_max = __val;}
-    void setFlussoMedio(float __val){m_flu_med = __val;}
-    void setTempoMax(float __val){m_tem_max = __val;}
-    void setTempo595(float __val){m_tem_595 = __val;}
-    void setTempoSvuot(float __val){m_tem_svu = __val;}
-    void setTempoFlusso(float __val){m_tem_flu = __val;}
-    void setTempoDisc(float __val){m_tem_dis = __val;}
-    void setAccelerazione(float __val){m_flu_acc = __val;}
-    void setVolFlussoMax(unsigned int  __val){m_vol_max = __val;}
-    void setVolVuotato(unsigned int  __val){m_vol_vuo = __val;}
-    void setMode(byte_  __val){m_modal_e = __val;}
-    void setPrintSiroky(bool __val){m_printSiroky = __val;}
-    void setPrintModeUser(bool __val){m_printModeUser = __val;}
-    void setTipoEsame(byte_  __val){m_test_type = __val;}
+    void setTempoAttesa(float __val)        {m_tem_att = __val;}
+    void setFlussoMax(float __val)          {m_flu_max = __val;}
+    void setFlussoMedio(float __val)        {m_flu_med = __val;}
+    void setTempoMax(float __val)           {m_tem_max = __val;}
+    void setTempo595(float __val)           {m_tem_595 = __val;}
+    void setTempoSvuot(float __val)         {m_tem_svu = __val;}
+    void setTempoFlusso(float __val)        {m_tem_flu = __val;}
+    void setTempoDisc(float __val)          {m_tem_dis = __val;}
+    void setAccelerazione(float __val)      {m_flu_acc = __val;}
+    void setVolFlussoMax(unsigned int __val)   {m_vol_max = __val;}
+    void setVolVuotato(unsigned int  __val) {m_vol_vuo = __val;}
+    void setMode(unsigned char   __val)     {m_modal_e = __val;}
+    void setPrintSiroky(bool __val)         {m_printSiroky = __val;}
+    void setPrintModeUser(bool __val)       {m_printModeUser = __val;}
+    void setTipoEsame(unsigned char __val)  {m_test_type = __val;}
+    void setBitmap(bool __enable, QByteArray bm)    { m_printBitmap = __enable; m_bitmap = bm;
+                                                      qDebug("en:%d p:%p", __enable?1:0,m_bitmap.data());
+                                                    }
+    void Report_BitMap();
 
 
 signals:
@@ -273,17 +277,18 @@ private:
     bool m_printMode;
     bool m_printModeUser;
     bool m_printSiroky;
+    bool m_printBitmap;
 
     //dati paziente
     QString m_name;
     QString m_surname;
     QString m_dateofbirth;
-    byte_ m_sex;				// M o F (+ eventualmente finestringa)
+    unsigned char  m_sex;				// M o F (+ eventualmente finestringa)
     QString m_ID;
 
     //dati esame
     int m_numchan;  			// 1(volume/flusso) 2(volume/flusso + EMG)(+ eventualmente finestringa)
-    byte_ m_scaricato;			// indica se file scaricato o meno - non usato (0000 oppure 0001)(+ eventualmente finestringa)
+    unsigned char  m_scaricato;			// indica se file scaricato o meno - non usato (0000 oppure 0001)(+ eventualmente finestringa)
     QString m_timeofstart;	//ora inizio esame (hhmmss)
     QString m_dateofexam;		// data del test
     int m_durata;				// durata esame in secondi
@@ -305,7 +310,7 @@ private:
     unsigned int  m_vol_max;              /* Volume al Flusso Massimo (ml)            */
     unsigned int  m_vol_vuo;              /* Volume Vuotato           (ml)            */
     float  m_flu_acc;              /* Accelerazione Flusso     (ml/sec2/10)    */
-    byte_  m_modal_e;				 /* Modalita dell'esame 0=auto; 2=manual	 */
+    unsigned char   m_modal_e;				 /* Modalita dell'esame 0=auto; 2=manual	 */
 
     double *buffer_vol;		// da questo buffer la vengono raccolti i dati poi stampati nel report modalita vecchio Picoflow
     double *buffer_flw;    	// buffer per il report che contiene invece i dati di flusso
@@ -323,13 +328,13 @@ private:
     bool m_emgPresent;
     unsigned char	m_i_max_x;
     long  			m_max_x,m_max_y,m_max_y_gr2;
-     int 		m_x1,m_y1,m_x2,m_y2;
+    int             m_x1,m_y1,m_x2,m_y2;
     int   			m_num_xy;
-     int   	m_x[25];
-     int   	m_y[25];
+    int   	m_x[25];
+    int   	m_y[25];
     unsigned short 	m_uw3; // dimensioni in byte della riga n-esima dell'area grafico
-     char 	m_str_gr[dim_string_rel2];	// allocazione dinamica ma all'inizio dello stringone che sara usato per i label dei grafici
-     char 	m_str_tr[dim_string_rel2];			// trasposizione stringa per ottenere matrice di punti per stampa grafica
+    char 	m_str_gr[dim_string_rel2];	// allocazione dinamica ma all'inizio dello stringone che sara usato per i label dei grafici
+    char 	m_str_tr[dim_string_rel2];			// trasposizione stringa per ottenere matrice di punti per stampa grafica
     QVector<unsigned short int> m_flow_store;
     QVector<unsigned short int> m_vol_store;
     QVector<unsigned short int> m_emg_store;
@@ -339,6 +344,8 @@ private:
     float m_num_dots_gra_vol, m_num_dots_gra_flw, m_num_dots_gra_emg;
     short m_num_byte_x_gra_emg, m_num_byte_x_gra_vol, m_num_byte_x_gra_flw;
     unsigned short m_cursore;
+
+    QByteArray  m_bitmap;
 
 //    void readChanData();
 //    void readTestData();
@@ -354,22 +361,23 @@ private:
     void Report_emg();
     void Report_Real_Time(short __num_sample);
     void Report_siroky();
+//    void Report_BitMap();
     void Report_result();
     void Pri_Rep_Gra(int __num_riga);
     void Pri_Rep_Gra_Ini_Grid(int __n_riga);
-    void Pri_Rep_Gra_EMG(byte_ __num_riga);
-    void Pri_Rep_Gra_Landscape(short __num_cample);
+    void Pri_Rep_Gra_EMG(unsigned char __num_riga);
+    void Pri_Rep_Gra_Landscape(short __num_sample);
     void Pri_Rep_asse_dx();
     void Pri_Rep_Label();
-    void Pri_Rep_Gra_Siroky (byte_ __num_riga, byte_ __grap);
-    void Pri_Rep_Gra_Ini_Grid_Sir( byte_ __num_rig, byte_ __curve );
-    void Pri_Rep_Lin(char *__str_des, int __rep_dat, byte_ __num_dec, char *__str_udm, byte_ __flag_lf);
-    void Plot_StdCurve_Siroky( byte_ __num_rig, byte_ __curve );
-    void Plot_Point_Siroky( byte_ __num_rig, byte_ __curve, unsigned short __flu);
-    void Plot_Quadro_Siroky(byte_ __ubstrt, byte_ __ubend, unsigned short __new_pos, int __vol_pt, unsigned char __uw4);
-    byte_ Int_Pun(int __i4);
+    void Pri_Rep_Gra_Siroky (int __num_riga, int __grap);
+    void Pri_Rep_Gra_Ini_Grid_Sir(int __num_rig, int __curve );
+    void Pri_Rep_Lin(char *__str_des, int __rep_dat, unsigned char __num_dec, char *__str_udm, unsigned char __flag_lf);
+    void Plot_StdCurve_Siroky( unsigned char __num_rig, unsigned char __curve );
+    void Plot_Point_Siroky(int __num_rig, int __curve, unsigned short __flu);
+    void Plot_Quadro_Siroky(int __ubstrt, int __ubend, int __new_pos, int __vol_pt, unsigned char __uw4);
+    unsigned char  Int_Pun(int __i4);
     void Gra_Line();
-    void Str_Trasposta(byte_ __type, unsigned short __sx_byte, unsigned short __dx_byte); // crea la trasposta della stringa str_gr, ottenendo una matrice scritta per righe
+    void Str_Trasposta(unsigned char __type, unsigned short __sx_byte, unsigned short __dx_byte); // crea la trasposta della stringa str_gr, ottenendo una matrice scritta per righe
     short adatta_buffer_dati(int __num_sample, long __fs_flw);
     void Calc_Max_RealReport_rel2(short __num_sample);
     void Calc_Max();
