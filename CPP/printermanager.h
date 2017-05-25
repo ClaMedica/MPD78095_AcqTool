@@ -258,8 +258,8 @@ public:
     void setPrintSiroky(bool __val)         {m_printSiroky = __val;}
     void setPrintModeUser(bool __val)       {m_printModeUser = __val;}
     void setTipoEsame(unsigned char __val)  {m_test_type = __val;}
-    void setBitmap(bool __enable, QByteArray bm)    { m_printBitmap = __enable; m_bitmap = bm;
-                                                      qDebug("en:%d p:%p", __enable?1:0,m_bitmap.data());
+    void setBitmap(bool __enable, QByteArray *bm)    { m_printBitmap = __enable; m_bitmap = bm;
+                                                      qDebug("en:%d p:%p", __enable?1:0,m_bitmap);
                                                     }
     void Report_BitMap();
 
@@ -345,7 +345,7 @@ private:
     short m_num_byte_x_gra_emg, m_num_byte_x_gra_vol, m_num_byte_x_gra_flw;
     unsigned short m_cursore;
 
-    QByteArray  m_bitmap;
+    QByteArray  *m_bitmap;
 
 //    void readChanData();
 //    void readTestData();

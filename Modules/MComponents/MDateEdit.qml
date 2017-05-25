@@ -8,8 +8,9 @@ import QtQuick.Dialogs 1.2
 import MComponents 1.0
 
 Rectangle {
-    property var date:Date(edYear.text,cbMonth.currentIndex,cbDay.currentIndex+1)
+    property var date:Date(edYear.text,cbMonth.currentIndex,cbDay.currentIndex)
     property int labelSize:2
+
     readonly property int marginPerc:1
     height:50
     width:200
@@ -22,7 +23,7 @@ Rectangle {
         var d=new Date()
         cbMonth.currentIndex=d.getMonth()
         uppa(d.getMonth())
-        cbDay.currentIndex=d.getDate()-1
+        cbDay.currentIndex=d.getDate()
         edYear.text=d.getFullYear()
     }
 
@@ -31,8 +32,9 @@ Rectangle {
         console.log(newDate,d,date)
         cbMonth.currentIndex=d.getMonth()
         uppa(d.getMonth())
-        cbDay.currentIndex=d.getDate()-1
+        cbDay.currentIndex=d.getDate()
         edYear.text=d.getFullYear()
+
     }
 
     function uppa(month)
@@ -71,7 +73,7 @@ Rectangle {
         if(old<cbDay.model.length)
             cbDay.currentIndex=old
         console.log(old,cbDay.model.length,cbDay.currentIndex)
-        date=new Date(edYear.text,cbMonth.currentIndex,cbDay.currentIndex+1)
+        date=new Date(edYear.text,cbMonth.currentIndex,cbDay.currentIndex)
     }
 
     Row{
@@ -99,7 +101,7 @@ Rectangle {
             height: parent.height
             width:parent.width*0.3
             labelSize: rootDateEdit.labelSize
-            onCurrentIndexChanged: date=new Date(edYear.text,cbMonth.currentIndex,cbDay.currentIndex+1)
+            onCurrentIndexChanged: date=new Date(edYear.text,cbMonth.currentIndex,cbDay.currentIndex)
             onClicked: if(isTouch) rootDateEdit.clicked()
         }
         MComboBox{
@@ -122,7 +124,7 @@ Rectangle {
             verticalAlignment: Text.AlignVCenter
             horizontalAlignment: Text.AlignHCenter
             labelSize:rootDateEdit.labelSize
-            onTextChanged: date=new Date(edYear.text,cbMonth.currentIndex,cbDay.currentIndex+1)
+            onTextChanged: date=new Date(edYear.text,cbMonth.currentIndex,cbDay.currentIndex)
             onFocusChanged:
             {
                 if(focus && isTouch)
@@ -159,11 +161,7 @@ Rectangle {
         visible: false
         height:calendar.height+50
         width:calendar.width+10
-        y: {
-            var globalCoordinares = DataEngine.getAbsolutePosition(this)
-            y = -globalCoordinares.y
-        }
-        anchors.horizontalCenter: parent.horizontalCenter
+        anchors.centerIn: parent
         anchors.verticalCenterOffset: 50
         anchors.horizontalCenterOffset: -50
 

@@ -3,15 +3,19 @@
 
 extern bool DebugAcqTool;
 
+// conversione da RGB 8*3 = 24 bit a RGB 4*3 = 12 bit
+// ignorati i 4 bit bassi di ogni colore * ridurre le sfumature ad un colore di base
 #define NCOLORS 16*16*16
-inline uint32_t decimazioneColore(uint32_t rgb24)
+inline uint16_t decimazioneColore(uint32_t rgb24)
 {
     uint32_t  colormask = 0x00f0f0f0;
-    rgb24 &= colormask;
+    uint32_t rgb12 = rgb24 & colormask;
 
-    return ((rgb24 & 0x000000f0) >>  4) *   1 |
-           ((rgb24 & 0x0000f000) >> 12) *  16 |
-           ((rgb24 & 0x00f00000) >> 20) * 256;
+    rgb12 = ((rgb12 & 0x000000f0) >>  4) *   1 |
+            ((rgb12 & 0x0000f000) >> 12) *  16 |
+            ((rgb12 & 0x00f00000) >> 20) * 256;
+
+    return (uint16_t) rgb12;
 }
 
 void MDataManager::getGrabbedImage(QObject *gi, QString nome)
@@ -21,12 +25,9 @@ void MDataManager::getGrabbedImage(QObject *gi, QString nome)
     bool isLive = nome.startsWith("Live");
     bool enab = (isSiro && QFile::exists("/root/PicoFlow/_print_siro")) ||
                 (isLive && QFile::exists("/root/PicoFlow/_print_live"));
-    m_mngPrint->setBitmap(enab, m_resultBm);
+    m_mngPrint->setBitmap(enab, & m_resultBm);
     if( ! enab)
         return;
-
-    int pale[NCOLORS];
-    bzero((void *) & pale, sizeof(pale));
 
     bool isAve = nome.contains(" Ave");
     int  xoffs = isAve  ? 8 : (8 + 400 + 16); // hor pixel offset
@@ -38,36 +39,71 @@ void MDataManager::getGrabbedImage(QObject *gi, QString nome)
     int     h0 = qs.height();
 
     // frequenza colori
-    uint32_t rgbSiro = decimazioneColore(0xffffdab9);   // colore area
-    for(int w = 0; w < w0; w++)
-        for(int h = 0; h < h0; h++) {
-            uint32_t rgb = decimazioneColore(qi.pixel(w, h));
-            pale[rgb]++;
-        }
-    for (int i = 0; i < NCOLORS; i++) if(pale[i]) qDebug("palette %3.3x: %d", i, pale[i]);
+    int     bmsz = w0 * h0;
+    uint8_t *bm = (uint8_t *) malloc(bmsz); // per non aggiungere 120k allo stack
+                                            // non viene azzerata perche ogni singolo byte viene assegnato
+    int32_t pale_cnt[NCOLORS];
+    int32_t pale_indx[NCOLORS];
+    int     pale_revindx[NCOLORS];
+    int     pale_seq = 0;
+    bzero((void *) & pale_cnt, sizeof(pale_cnt));
+    for(int i = 0; i < NCOLORS; i++)
+        pale_indx[i] = -1;
 
+    uint16_t rgbSiro1 = decimazioneColore(0xff90ee90);   // colore area
+    uint16_t rgbSiro2 = decimazioneColore(0xffffdab9);   // colore area
+    uint16_t rgbGrid  = decimazioneColore(0xff808080);   // colore griglia
+    uint8_t *slider = bm;
+    for(int h = 0; h < h0; h++)
+        for(int w = 0; w < w0; w++) {
+            uint16_t rgb12 = decimazioneColore(qi.pixel(w, h));
+            int cur_color;
+            if(pale_cnt[rgb12] == 0) {
+                pale_indx[rgb12] = cur_color = pale_seq++;  // n. colore progressivo
+                pale_revindx[cur_color] = rgb12;            // da n.colore a colore
+            }
+            else
+                cur_color = pale_indx[rgb12];
+            *slider++ = cur_color;
+            pale_cnt[rgb12]++;
+        }
+//    pale_cnt[0x0999] = 0;
+//    pale_cnt[0x0ddd] = 0;
+
+    for (int i = 0; i < NCOLORS; i++) if(pale_cnt[i]) qDebug("palette %3.3x cnt:%d", i, pale_cnt[i]);
+    for(int i = 0; i < pale_seq; i++) qDebug("col:%d %3.3x cnt:%d", i, pale_revindx[i], pale_cnt[pale_revindx[i]]);
+
+    int nblack = 0;
     char  * d = m_resultBm.data();
-    // azzeramento area
-    for(int h = 0; h < h0; h++) {
-        int rowstart  = (h * m_resultBm_w + xoffs) / 8;
-        char  * t = d + rowstart;
-        for(int w = 0; w < w0/8; w++)
-            *t++ = 0;
-    }
+    slider = bm;
     for(int h = 0; h < h0; h++) {
         int rowstart  = (h * m_resultBm_w + xoffs) / 8;
         for(int w = 0; w < w0; w++) {
-            uint32_t rgb = decimazioneColore(qi.pixel(w, h));
-            bool bw = (pale[rgb] < 8000);
-            if(isSiro && (rgb == rgbSiro) && ((w % 3) == 1) && ((h % 3) == 1))
-                bw = true;
-            if(bw) {
+            if((w & 7) == 0)
+                d[rowstart] = 0;
+            int ncolor = *slider++;
+            int rgb12 = pale_revindx[ncolor];
+            bool blackdot = (pale_cnt[rgb12] < 3000) || (rgb12 == rgbGrid);
+            if( ! blackdot && isSiro) {
+                if(rgb12 == rgbSiro2) {
+                    if(((w % 3) == 1) && ((h % 3) >= 1))
+                        blackdot = true;
+                }
+                if(rgb12 == rgbSiro1) {
+                    if(((w % 3) == 1) && ((h % 3) == 1))
+                        blackdot = true;
+                }
+            }
+            if(blackdot) {
                 int byteinrow = w >> 3;
                 int bitinbyte = 7 - (w & 7);
                 d[rowstart + byteinrow] |= 1 << bitinbyte;
+                nblack++;
             }
         }
     }
+    free(bm);
+    qDebug("fine getGrabbed, nblack:%d", nblack);
 }
 
 
@@ -1239,10 +1275,6 @@ void MDataManager::startPrint()
 
     //qml
     qDebug() << "FINE analisys";
-
-    //stampo
-//    if (m_autoPrint)
-//        m_mngPrint->print();}
 }
 
 

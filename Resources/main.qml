@@ -163,7 +163,7 @@ ApplicationWindow {
             forAna.visible = false
             forRes.loadPageAnalysis()
             forRes.visible = true
-            mngData.startPrint()
+
         }
 
         onSg_exitFromReview:{

@@ -22,7 +22,6 @@ MForm {
     color : "steelblue"
     visible: false
 
-
     //@@@@@@@@@@    Functions      @@@@@@@@@@
     function clickButtonSameAna(btnId) {
         for (var i = 0; i < pagesSameAna.length; i++) {
@@ -283,6 +282,15 @@ MForm {
             }
 
             pagesSameAna[firstPageSameAna].visible = true
+            timPrint.start()
+        }
+    }
+
+    Timer{
+        id:timPrint
+        interval:1000
+        onTriggered: {
+            mngData.startPrint()
         }
     }
 

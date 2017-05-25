@@ -98,7 +98,7 @@ void mflowdatas::buildNomogrammi(bool __sex, int __age)
     if (__sex)
         m_liverpoolMax->setYmax(60);
     else
-        m_liverpoolMax->setYmax(80);
+        m_liverpoolMax->setYmax(50);
 
     m_liverpoolMax->setDatoX(getVoidedVolume());
     m_liverpoolMax->setDatoY(getQMax());
@@ -199,7 +199,7 @@ void mflowdatas::buildNomogrammi(bool __sex, int __age)
     m_liverpoolAve->setXmin(0);
     m_liverpoolAve->setYmin(0);
     m_liverpoolAve->setXmax(600);
-    m_liverpoolAve->setYmax(40);
+    m_liverpoolAve->setYmax(30);
     m_liverpoolAve->setDatoX(getVoidedVolume());
     m_liverpoolAve->setDatoY(getQAve());
 

@@ -2335,8 +2335,9 @@ Stampa dei grafici di Syroki, sono 2 uno fianco l'altro
 */
 void printermanager::Report_BitMap()
 {
-    int     sz = m_bitmap.size();
-    char  * p = m_bitmap.data();
+    qDebug("inizio pr bitm");
+    int     sz = m_bitmap->size();
+    char  * p = m_bitmap->data();
     int     szchunk = 103;  // 824/8
     char    head[8];
     qDebug("sz:%d szch:%d p:%p", sz,szchunk,p);
@@ -2356,11 +2357,14 @@ void printermanager::Report_BitMap()
         p += szchunk;
         s += szchunk;
     }
+    m_bitmap->fill(0);
+
     m_port->Pri_Font(1);
     m_port->Pri_mode(0x00);
     m_port->Pri_justif(F_left);
-    QString xxx = tr("\r\nend Diagram\r\n");
+    QString xxx = tr("\r\nend Diagram\r\n\n\n\n\n");
     m_port->Pri_Str(strlen(xxx.toLatin1().data()), xxx.toLatin1().data(), 1);
+    qDebug("fine pr bitm");
 }
 
 void printermanager::Report_siroky()
