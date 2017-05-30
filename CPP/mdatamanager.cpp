@@ -23,14 +23,14 @@ void MDataManager::getGrabbedImage(QObject *gi, QString nome)
     qDebug() << nome;
     bool isSiro = nome.startsWith("Siro");
     bool isLive = nome.startsWith("Live");
-    bool enab = (isSiro && QFile::exists("/root/PicoFlow/_print_siro")) ||
-                (isLive && QFile::exists("/root/PicoFlow/_print_live"));
-    m_mngPrint->setBitmap(enab, & m_resultBm);
+    bool enab = (isSiro && m_Siroky) ||
+                (isLive && m_Liverpool);
     if( ! enab)
         return;
+    m_mngPrint->setBitmap(enab, & m_resultBm);
 
-    bool isAve = nome.contains(" Ave");
-    int  xoffs = isAve  ? 8 : (8 + 400 + 16); // hor pixel offset
+    bool isAve = nome.contains(" Ave");         // test Average / QMax
+    int  xoffs = isAve  ? 8 : (8 + 400 + 16);   // horizz pixel offset
 
     QQuickItemGrabResult *item = qobject_cast<QQuickItemGrabResult *>(gi);
     QImage  qi(item->image());
@@ -39,52 +39,52 @@ void MDataManager::getGrabbedImage(QObject *gi, QString nome)
     int     h0 = qs.height();
 
     // frequenza colori
-    int     bmsz = w0 * h0;
+    int     bmsz = w0 * h0;         // image size
     uint8_t *bm = (uint8_t *) malloc(bmsz); // per non aggiungere 120k allo stack
-                                            // non viene azzerata perche ogni singolo byte viene assegnato
-    int32_t pale_cnt[NCOLORS];
-    int32_t pale_indx[NCOLORS];
-    int     pale_revindx[NCOLORS];
+                                            // non viene azzerata perche ogni singolo byte viene comunque assegnato
+    int32_t pale_cnt[NCOLORS];      // n.occorrenze del colore decimato
+    int32_t pale_indx[NCOLORS];     // da colore decimato a n.progressivo
+    int     pale_revindx[NCOLORS];  // da n.progressivo a colore decimato
     int     pale_seq = 0;
     bzero((void *) & pale_cnt, sizeof(pale_cnt));
     for(int i = 0; i < NCOLORS; i++)
         pale_indx[i] = -1;
 
+    // decimazione colori per eliminare le sfumature
     uint16_t rgbSiro1 = decimazioneColore(0xff90ee90);   // colore area
     uint16_t rgbSiro2 = decimazioneColore(0xffffdab9);   // colore area
     uint16_t rgbGrid  = decimazioneColore(0xff808080);   // colore griglia
     uint8_t *slider = bm;
-    for(int h = 0; h < h0; h++)
+    for(int h = 0; h < h0; h++)                             // immagine scandita in modo raster
         for(int w = 0; w < w0; w++) {
             uint16_t rgb12 = decimazioneColore(qi.pixel(w, h));
             int cur_color;
-            if(pale_cnt[rgb12] == 0) {
-                pale_indx[rgb12] = cur_color = pale_seq++;  // n. colore progressivo
+            if(pale_cnt[rgb12] == 0) {                      // prima occorrenza del colore
+                pale_indx[rgb12] = cur_color = pale_seq++;  // n. progressivo colore
                 pale_revindx[cur_color] = rgb12;            // da n.colore a colore
             }
             else
                 cur_color = pale_indx[rgb12];
-            *slider++ = cur_color;
-            pale_cnt[rgb12]++;
+            *slider++ = cur_color;                          // serializzazione colori ridotti
+            pale_cnt[rgb12]++;                              // statistica
         }
-//    pale_cnt[0x0999] = 0;
-//    pale_cnt[0x0ddd] = 0;
 
-    for (int i = 0; i < NCOLORS; i++) if(pale_cnt[i]) qDebug("palette %3.3x cnt:%d", i, pale_cnt[i]);
-    for(int i = 0; i < pale_seq; i++) qDebug("col:%d %3.3x cnt:%d", i, pale_revindx[i], pale_cnt[pale_revindx[i]]);
+//    for (int i = 0; i < NCOLORS; i++) if(pale_cnt[i]) qDebug("palette %3.3x cnt:%d", i, pale_cnt[i]);
+//    for(int i = 0; i < pale_seq; i++) qDebug("col:%d %3.3x cnt:%d", i, pale_revindx[i], pale_cnt[pale_revindx[i]]);
 
     int nblack = 0;
     char  * d = m_resultBm.data();
     slider = bm;
-    for(int h = 0; h < h0; h++) {
+    for(int h = 0; h < h0; h++) {                           // raster
         int rowstart  = (h * m_resultBm_w + xoffs) / 8;
         for(int w = 0; w < w0; w++) {
-            if((w & 7) == 0)
+            if((w & 7) == 0)                                // clear byte 8bit risultato in B/N
                 d[rowstart] = 0;
-            int ncolor = *slider++;
+            int ncolor = *slider++;                         // de-serializzazione
             int rgb12 = pale_revindx[ncolor];
-            bool blackdot = (pale_cnt[rgb12] < 3000) || (rgb12 == rgbGrid);
-            if( ! blackdot && isSiro) {
+            bool blackdot = (pale_cnt[rgb12] < 3000) || (rgb12 == rgbGrid); // immagine standard
+
+            if( ! blackdot && isSiro) {                     // livelli di grigio per Siroky
                 if(rgb12 == rgbSiro2) {
                     if(((w % 3) == 1) && ((h % 3) >= 1))
                         blackdot = true;
@@ -94,11 +94,12 @@ void MDataManager::getGrabbedImage(QObject *gi, QString nome)
                         blackdot = true;
                 }
             }
-            if(blackdot) {
+
+            if(blackdot) {                  // dot in stampa
                 int byteinrow = w >> 3;
                 int bitinbyte = 7 - (w & 7);
                 d[rowstart + byteinrow] |= 1 << bitinbyte;
-                nblack++;
+                nblack++;                   // statistica debug
             }
         }
     }
@@ -125,8 +126,9 @@ MDataManager::MDataManager(QObject *parent)
 
     m_analized = false;
     m_autoPrint = false;
-    m_Siroky = true;
-    m_landscape = true;
+    m_Siroky = false;
+    m_Liverpool = false;
+    m_landscape = false;
 
     m_numAna = 0;
     m_toSave = "ret";
@@ -488,13 +490,22 @@ void MDataManager::loadFile(QString __fileName)
 
         //carico le info necessarie dal file di config
         Ancestry *autoflow = m_configUser.getSafeChild("AutomaticFlow");
-        m_autoFlow = (autoflow->getSafeChild("Auto")->getSafeAttribute(ATT_VALUE)=="1"?0:2);
+        m_autoFlow = (autoflow->getSafeChild("Auto")->getSafeAttribute(ATT_VALUE) == "1" ? 0 : 2);
+
         Ancestry *autoprint = m_configUser.getSafeChild("AdvancedSettings");
-        m_autoPrint = (autoprint->getSafeChild("AutoPrint")->getSafeAttribute(ATT_VALUE)=="true"?true:false);
+        m_autoPrint = (autoprint->getSafeChild("AutoPrint")->getSafeAttribute(ATT_VALUE) == "true" ? true : false);
+
         Ancestry *siroky = m_configUser.getSafeChild("AdvancedSettings");
-        m_Siroky = (siroky->getSafeChild("Siroky")->getSafeAttribute(ATT_VALUE)=="true"?true:false);
+        m_Siroky = (siroky->getSafeChild("Siroky")->getSafeAttribute(ATT_VALUE) == "true" ? true : false);
+
+        Ancestry *liverpool = m_configUser.getSafeChild("AdvancedSettings");
+        m_Liverpool = (liverpool->getSafeChild("Liverpool")->getSafeAttribute(ATT_VALUE) == "true" ? true : false);
+
         Ancestry *printmode = m_configUser.getSafeChild("AdvancedSettings");
-        m_landscape = (printmode->getSafeChild("PrinterMode")->getSafeAttribute(ATT_VALUE)=="true"?true:false);
+        m_landscape = (printmode->getSafeChild("PrinterMode")->getSafeAttribute(ATT_VALUE) == "true" ? true : false);
+
+        if (m_Liverpool)
+            m_Siroky = false;
 
         //libreria di analisi: creo oggetto.
         m_ana = new Analyze();
@@ -517,7 +528,7 @@ void MDataManager::resetAll()
 {
     m_data.clear();
     m_availableData.clear();
-    for(int i=0;i<m_signalVector.size();i++)
+    for(int i = 0; i < m_signalVector.size(); i++)
         delete m_signalVector[i];
     m_signalVector.clear();
     m_storage.clearAll();
@@ -525,8 +536,10 @@ void MDataManager::resetAll()
 
 void MDataManager::saveChanges()
 {
-    if(m_copy != NULL)
+    if(m_copy != NULL) {
         delete m_copy;
+        m_copy = NULL;
+    }
     m_copy = new DatafileManager;
     m_copy->SetFileName(m_copyFileName);
     m_copy->SetFileType(7);
@@ -1266,6 +1279,7 @@ void MDataManager::startPrint()
     //mi dice se la flussimetria automatica o manuale
     m_mngPrint->setMode(m_autoFlow);
     m_mngPrint->setPrintSiroky(m_Siroky);
+    m_mngPrint->setPrintLiverpool(m_Liverpool);
     m_mngPrint->setPrintModeUser(m_landscape);
 
     //stampo

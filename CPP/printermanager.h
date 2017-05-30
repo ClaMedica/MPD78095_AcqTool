@@ -15,8 +15,8 @@
 #define 	FREQ_EMG_ACQ  		100		// in Hz -  frequenza di campionamento canale di emg
 #define 	MAX_DURATA_ESAME	20
 
-#define 	PORTRAIT_MODE 		0
-#define 	LANDSCAPE_MODE 		1
+#define 	PORTRAIT_MODE 		false
+#define 	LANDSCAPE_MODE 		true
 
 #define WIN			5
 
@@ -256,10 +256,11 @@ public:
     void setVolVuotato(unsigned int  __val) {m_vol_vuo = __val;}
     void setMode(unsigned char   __val)     {m_modal_e = __val;}
     void setPrintSiroky(bool __val)         {m_printSiroky = __val;}
+    void setPrintLiverpool(bool __val)      {m_printLiverpool = __val;}
     void setPrintModeUser(bool __val)       {m_printModeUser = __val;}
     void setTipoEsame(unsigned char __val)  {m_test_type = __val;}
     void setBitmap(bool __enable, QByteArray *bm)    { m_printBitmap = __enable; m_bitmap = bm;
-                                                      qDebug("en:%d p:%p", __enable?1:0,m_bitmap);
+                                                      qDebug("en:%s p:%p", __enable?"TRUE":"false",m_bitmap);
                                                     }
     void Report_BitMap();
 
@@ -277,6 +278,7 @@ private:
     bool m_printMode;
     bool m_printModeUser;
     bool m_printSiroky;
+    bool m_printLiverpool;
     bool m_printBitmap;
 
     //dati paziente
@@ -360,7 +362,6 @@ private:
     void Report_flw();
     void Report_emg();
     void Report_Real_Time(short __num_sample);
-    void Report_siroky();
 //    void Report_BitMap();
     void Report_result();
     void Pri_Rep_Gra(int __num_riga);
@@ -369,12 +370,15 @@ private:
     void Pri_Rep_Gra_Landscape(short __num_sample);
     void Pri_Rep_asse_dx();
     void Pri_Rep_Label();
+    void Pri_Rep_Lin(char *__str_des, int __rep_dat, unsigned char __num_dec, char *__str_udm, unsigned char __flag_lf);
+#if 0
+    void Report_siroky();
     void Pri_Rep_Gra_Siroky (int __num_riga, int __grap);
     void Pri_Rep_Gra_Ini_Grid_Sir(int __num_rig, int __curve );
-    void Pri_Rep_Lin(char *__str_des, int __rep_dat, unsigned char __num_dec, char *__str_udm, unsigned char __flag_lf);
     void Plot_StdCurve_Siroky( unsigned char __num_rig, unsigned char __curve );
     void Plot_Point_Siroky(int __num_rig, int __curve, unsigned short __flu);
     void Plot_Quadro_Siroky(int __ubstrt, int __ubend, int __new_pos, int __vol_pt, unsigned char __uw4);
+#endif
     unsigned char  Int_Pun(int __i4);
     void Gra_Line();
     void Str_Trasposta(unsigned char __type, unsigned short __sx_byte, unsigned short __dx_byte); // crea la trasposta della stringa str_gr, ottenendo una matrice scritta per righe

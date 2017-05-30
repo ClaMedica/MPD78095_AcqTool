@@ -6,24 +6,25 @@ import Settings 1.0
 import "qrc:/"
 import "qrc:/Forms"
 import MComponents 1.0 //import MComponents 1.0 //import "qrc:/Components"
-Rectangle{
-    id:rootTree
-    property real labelSize:4
-    color:"transparent"
-    clip:true
-    function loadFile(f){
-        console.log("editSettings",f)
-        if(anctree.ancestry!==undefined)
+
+Rectangle {
+    id: rootTree
+    property real labelSize: 4
+    color: "transparent"
+    clip: true
+
+    function loadFile(f) {
+        console.log("editSettings", f)
+        if(anctree.ancestry !== undefined)
             anctree.ancestry.destroy()
-        var a=Qt.createQmlObject('import Settings 1.0; Ancestry{}',this)
-        if(a.loadFromXML(f)){
-            anctree.ancestry=a
-            //flick.contentItem=anctree
-
-
+        var a = Qt.createQmlObject('import Settings 1.0; Ancestry{}', this)
+        if(a.loadFromXML(f)) {
+            anctree.ancestry = a
+            //flick.contentItem = anctree
         }
     }
-    function saveFile(f){
+
+    function saveFile(f) {
         anctree.save()
         anctree.ancestry.saveToXML(f)
     }

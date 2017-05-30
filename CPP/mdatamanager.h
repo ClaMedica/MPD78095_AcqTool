@@ -136,13 +136,14 @@ private:
     QString m_VolRes;
     QString m_toSave;
 
-    bool m_analized;
-    bool m_autoPrint;
-    int m_autoFlow; //Modalita dell'esame 0=auto; 2=manual
-    bool m_Siroky; //se stampare Siroky
-    bool m_landscape; //modalità di stampa: portrait o landascape (ture se landscape)
+    bool    m_analized;
+    bool    m_autoPrint;
+    int     m_autoFlow;     //Modalita dell'esame 0=auto; 2=manual
+    bool    m_Siroky;       //se stampare Siroky
+    bool    m_Liverpool;    //se stampare Liverpool
+    bool    m_landscape;    //modalità di stampa: portrait o landascape (ture se landscape)
     //true se donna, false se uomo
-    bool m_sexPatient;
+    bool    m_sexPatient;
 
     int m_numAna; //numero di analisi --> non sappiamo se serve
     QVector<mflowdatas*> m_aflwdatas; //array di analisi di tipo flussimetria

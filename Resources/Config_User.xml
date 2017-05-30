@@ -301,19 +301,25 @@
             label="Automatic Print"
             type="CheckBox"
             unit=""
-            value="1"
+            value="true"
         />
         <Siroky
             label="Siroky"
             type="CheckBox"
             unit=""
-            value="1"
+            value="false"
         />
-        <PrinterMode
-            label="Print Landascape Mode"
+        <Liverpool
+            label="Liverpool"
             type="CheckBox"
             unit=""
-            value="0"
+            value="false"
+        />
+        <PrinterMode
+            label="Print Landscape Mode"
+            type="CheckBox"
+            unit=""
+            value="false"
         />
         </AdvancedSettings>
 

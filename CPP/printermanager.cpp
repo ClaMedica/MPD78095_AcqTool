@@ -11,7 +11,7 @@ printermanager::printermanager(QString __namefile, QObject *parent) : QObject(pa
 
     m_printMode = PORTRAIT_MODE;
     m_printModeUser = PORTRAIT_MODE;
-    m_printSiroky = true;
+    m_printSiroky = false;
     m_realDots = 0;
 
     m_modal_e = 0;
@@ -161,8 +161,8 @@ void printermanager::pri_rep_review()
 
     m_dfm->Close();
 
-//    Pri_Rep();
-    Report_BitMap();
+    Pri_Rep();
+//    Report_BitMap();
 }
 
 /**
@@ -213,13 +213,13 @@ void printermanager::Pri_Rep()
 #endif
 
     //     Identificativi Esame
-#if PRI_REP_IDEz
+#if PRI_REP_IDE
     Report_data();		// scrive i dati del paziente e lo spazio per le note manuali
     m_port->Pri_Str(3, (char*)"\n \n", 0);
 #endif
 
     // Grafico FLW + VOL ed eventualmente EMG
-#if PRI_REP_GRAz
+#if PRI_REP_GRA
     if(m_printMode == PORTRAIT_MODE)			// grafico trasversale con numero di punti fisso
     {
         m_correct = false;
@@ -240,7 +240,7 @@ void printermanager::Pri_Rep()
                 m_max_emg = buffer_emg[uw7];  // supponiamo 4000 in uVolt
         }
 
-        if (m_printModeUser)	// e settata la stampa in landscape ma l'esame e trooppo lungo
+        if (m_printModeUser)	// e settata la stampa in landscape ma l'esame e troppo lungo
         {
             m_port->Pri_justif(0);
             m_port->Pri_mode(0x80);	// sottolineato e doppia larghezza
@@ -264,22 +264,21 @@ void printermanager::Pri_Rep()
 #endif
 
     // Grafico Siroky, stampato solo se paziente maschio oppure generico (cioe dove non indicato il sesso)
+    // Grafico Liverpool
 #if PRI_REP_SRK
 //     if(m_printSiroky )
 //        if(m_test_type || (m_sex != 'F'))		// cosi stampa sempre nel caso di esame veloce e paziente generico
 //            Report_siroky();
 
-//     if(m_printBitmap)
-//         Report_BitMap();
+     if(m_printBitmap)
+         Report_BitMap();
 #endif
 
 //    // scritta relativa al tipo di modalita dell'esame
 //#if PRI_REP_MODAL
 //    char str[60];
-
 //    m_port->Pri_justif(F_center);
 //    m_port->Pri_mode(0x10);
-
 //    if (m_modal_e == 2) {
 //        QString modal = tr("MANUAL   MODALITY");
 //        sprintf(str, "%s\n", modal.toLatin1().data());
@@ -290,15 +289,13 @@ void printermanager::Pri_Rep()
 //            sprintf(str, "%s\n", modal.toLatin1().data());
 //        }
 //    m_port->Pri_Str(strlen(str), str, 0);
-
 //    QString line = "\n \n"; // LINE"\x1";
 //    m_port->Pri_Str(3,line.toLatin1().data(), 0);
 //    m_port->Pri_justif(F_left);
 //#endif
 
     // 	Risultati dell'esame ricavati dall'analisi semplificata, implementata nel firmware
-
-#if PRI_REP_RISz
+#if PRI_REP_RIS
     Report_result();		// scrive in elenco i dati calcolati dall'analisi dell'esame
     m_port->Pri_Str(3, (char*)"\n \n", 0); // LINE"\x3",0);
 #endif
@@ -1521,24 +1518,20 @@ void printermanager::Pri_Rep_Label()
 
     // riempio la stringa di zeri
     for(int i = 0; i < dim_string_rel2; i++ )
-        m_str_gr[ i ] = 0x00;
+        m_str_gr[ i ] = 0;
 
     // setta la stampa grafica
-    m_str_gr[0]=ESC;	//0x1B;	// ESC
-    m_str_gr[1]='*';	//0x2A;	// *
-//    m_str_gr[2]=0x40;	// n1	num_byte = dim_string_rel2 - 8 = 6472-8= 6464 = ( 65536 * n3 ) + ( 256 * n2 ) + n1 = 256*0x19 + 0x40
-//    m_str_gr[3]=0x19;	// n2
-//    m_str_gr[4]=0x00;	// n3
+    m_str_gr[0] = ESC;	//0x1B;	// ESC
+    m_str_gr[1] = '*';	//0x2A;	// *
     int sz = 6464;    // 	num_byte = dim_string_rel2 - 8 = 6472-8= 6464
     m_str_gr[2] = sz % 256         ;	// n1
     m_str_gr[3] = (sz >>  8) & 0xff;	// n2
     m_str_gr[4] = (sz >> 16) & 0xff;	// n3
-    m_str_gr[5]=0x00;	// n4	normal
-    m_str_gr[6]=0x00;	// n5	scrive a n5 byte dal bordo
-    m_str_gr[7]=0x65;	// n6	larghezza 808dots=101 byte
+    m_str_gr[5] = 0x00;	// n4	normal
+    m_str_gr[6] = 0x00;	// n5	scrive a n5 byte dal bordo
+    m_str_gr[7] = 0x65;	// n6	larghezza 808dots=101 byte
     // stampo lo zero dell'emg senza udm
-    if(m_emgPresent)
-    {
+    if(m_emgPresent) {
         pos_4_this_string = m_pos_gra_emg;	// inizio dell'asse delle emg
         print_char_left_label(0, pos_4_this_string, 1, false, dim_label);
     }
@@ -1552,10 +1545,8 @@ void printermanager::Pri_Rep_Label()
     // in posizione 400-8 metto il valore massimo che potrebbe essere in 1, 2 o 3 caratteri; valore massimo ammesso 160ml/sec
     //	Imposto fondoscala fissi per avere divisioni dei valori pari, tenendo conto che ho 400 punti
     //	40ml/sec -> 1decimo per punti, 20ml/sec -> 2punti per decimo, 80ml/sec -> 2 decimi per punto, 120ml/sec -> 3 decimi punto, 160ml/sec -> 4 decimi punti
-    for(int i = 1; i <= _NUM_LABEL; i++)
-    {
-        if(i == _NUM_LABEL)	// 5 label + lo zero
-        {
+    for(int i = 1; i <= _NUM_LABEL; i++) {
+        if(i == _NUM_LABEL)	{       // 5 label + lo zero
             pos_4_this_string = _POS_FC_FLW * dots3D;
             max_y = m_max_y;
         }
@@ -1575,10 +1566,10 @@ void printermanager::Pri_Rep_Label()
         print_udm_label(m_chFlw, pos_4_this_string, dim_label);		// scritta dell'unita di misura dell'flw, cioe ml/s, scritta a fianco di ogni label numerica
     }
 
-    if(m_emgPresent)							// stampo lo zero dell'emg senza udm
-    {	// label dell'asse dell'volume
-        for(int i = 1; i < _NUM_LABEL_VOL_EMG; i++)						// se c'e l'emg solo 2 label piu lo zero
-        {														// non scrivo il label del fondoscala, che sarebbe troppo vicino allo zero successivo, quindi scrivo solo
+    if(m_emgPresent) {							// stampo lo zero dell'emg senza udm
+                                                // label dell'asse dell'volume
+        for(int i = 1; i < _NUM_LABEL_VOL_EMG; i++) {			// se c'e l'emg solo 2 label piu lo zero
+                                                                // non scrivo il label del fondoscala, che sarebbe troppo vicino allo zero successivo, quindi scrivo solo
             pos_4_this_string = (m_pos_gra_vol + (m_num_byte_x_gra_vol/_NUM_LABEL_VOL_EMG)*i )* dots3D;
             max_y = (m_max_vol / _NUM_LABEL_VOL_EMG ) * i;
             if(max_y < 10)
@@ -1596,8 +1587,7 @@ void printermanager::Pri_Rep_Label()
             print_udm_label(m_chVol, pos_4_this_string, dim_label);	// scritta dell'unita di misura dell'emg, cioe uV, scritta a fianco di ogni label numerica
         }
         // label dell'asse dell'emg
-        for(int i = 1; i < _NUM_LABEL_EMG; i++)							// un solo label oltre allo zero
-        {
+        for(int i = 1; i < _NUM_LABEL_EMG; i++) {				// un solo label oltre allo zero
             pos_4_this_string = (m_pos_gra_emg + (m_num_byte_x_gra_emg/_NUM_LABEL_EMG)*i )* dots3D;
             max_y = (m_max_emg/ _NUM_LABEL_EMG ) * i;
             if(max_y < 10)
@@ -1615,10 +1605,10 @@ void printermanager::Pri_Rep_Label()
             print_udm_label(m_chEmg, pos_4_this_string, dim_label);	// scritta dell'unita di misura dell'emg, cioe uV, scritta a fianco di ogni label numerica
         }
     }
-    else															// se non c'e l'emg, meta grafico va al volume
-    {// label dell'asse dell'volume
-        for(int i = 1; i < _NUM_LABEL; i++)						// se c'e l'emg solo 2 label piu lo zero
-        {														// non scrivo il label del fondoscala, che sarebbe troppo vicino allo zero successivo, quindi scrivo solo
+    else {														// se non c'e l'emg, meta grafico va al volume
+                                                                // label dell'asse dell'volume
+        for(int i = 1; i < _NUM_LABEL; i++) {					// se c'e l'emg solo 2 label piu lo zero
+                                                                // non scrivo il label del fondoscala, che sarebbe troppo vicino allo zero successivo, quindi scrivo solo
             pos_4_this_string = (m_pos_gra_vol + (m_num_byte_x_gra_vol/_NUM_LABEL)*i )* dots3D;
             max_y = (m_max_vol / _NUM_LABEL ) * i;
             if(max_y < 10)
@@ -1637,8 +1627,7 @@ void printermanager::Pri_Rep_Label()
         }
     }
     // aggiungo la linea dell''asse  delle ordinate, in ogni colonna l'ultimo bit viene acceso
-    for(int i = 1; i < 101; i++)
-    {
+    for(int i = 1; i < 101; i++) {
         m_str_gr[_NUM_BYTE_CMD + i*(dots3D) - 2] = (char)0xFF;
         m_str_gr[_NUM_BYTE_CMD + i*(dots3D) - 1] = (char)0xFF;
     }
@@ -1647,14 +1636,10 @@ void printermanager::Pri_Rep_Label()
     unsigned short num_rig_max = (dim_string_rel2 - 8) / num_col_max;	// 50
 
     for(int i = 0; i < (dim_string_rel2 - 8); i++ )
-        m_str_tr[i] = (char)0x00;	// azzero tutta questa stringona
+        m_str_tr[i] = 0;	// azzero tutta questa stringona
     for(int num_col = 0; num_col < num_col_max; num_col++ )
-    {
         for(int num_rig = 0; num_rig < num_rig_max; num_rig++)
-        {
-            m_str_tr[ ( num_rig_max * num_col ) + num_rig ] = m_str_gr[ _NUM_BYTE_CMD + ( num_col_max * num_rig ) + num_col ];
-        }
-    }
+            m_str_tr[(num_rig_max * num_col) + num_rig] = m_str_gr[_NUM_BYTE_CMD + (num_col_max * num_rig) + num_col];
     for( int str_byte = 0; str_byte < (dim_string_rel2 - 8); str_byte++ )
         m_str_gr[ _NUM_BYTE_CMD + str_byte ] = m_str_tr[ str_byte ];
 
@@ -1665,8 +1650,8 @@ void printermanager::Pri_Rep_Label()
 
 
 /**
-funzioncina dedicata alla stampa dei caratteri dell'asse a sinistra nel caso del report reale, che possono essere volume e flusso,
-oppure emg, volume e flusso
+funzione dedicata alla stampa dei caratteri dell'asse a sinistra nel caso del report reale, che
+possono essere volume e flusso, oppure emg, volume e flusso
 le unita di misura sono invece inserite nella funzione principale
 */
 void printermanager::print_char_left_label(short __value, int __pos_in_string, short int __num_char, bool __pri_decim, short int __pre_char)
@@ -1747,7 +1732,7 @@ void printermanager::print_char_left_label(short __value, int __pos_in_string, s
 
 
 /**
-Inserisce nella stringona le udm delle curve che possono essere: ml/s, ml, uV
+Inserisce nella stringa le udm delle curve che possono essere: ml/s, ml, uV
 */
 void printermanager::print_udm_label(int ch_type, short __pos_in_string, short int __pre_char)
 {
@@ -2357,16 +2342,19 @@ void printermanager::Report_BitMap()
         p += szchunk;
         s += szchunk;
     }
+
+    m_printBitmap = false;  // invalida la bitmap
     m_bitmap->fill(0);
 
     m_port->Pri_Font(1);
     m_port->Pri_mode(0x00);
     m_port->Pri_justif(F_left);
-    QString xxx = tr("\r\nend Diagram\r\n\n\n\n\n");
+    QString xxx = tr("\n\n");
     m_port->Pri_Str(strlen(xxx.toLatin1().data()), xxx.toLatin1().data(), 1);
     qDebug("fine pr bitm");
 }
 
+#if 0
 void printermanager::Report_siroky()
 {
     char str[90];
@@ -2425,7 +2413,6 @@ void printermanager::Report_siroky()
     m_port->Pri_Str(strlen(str), str, 1);
     m_port->Pri_Str(3,(char*)"\n \n", 0);
 }
-
 
 /**
 disegna i diagrammi di Siroky
@@ -2768,6 +2755,7 @@ void printermanager::Plot_Quadro_Siroky(int __ubstrt, int __ubend,
             m_str_gr[__uw4 + i + (24 + __new_pos)] |= LOBYTE(uw6);/*riempimento puo uscire dalla riga su o giu*/
     }
 }
+#endif
 
 
 /**
