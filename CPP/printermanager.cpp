@@ -29,6 +29,8 @@ printermanager::printermanager(QString __namefile, QObject *parent) : QObject(pa
     m_chFlw = -1;
     m_chEmg = -1;
 
+    m_bitmap = NULL;
+
     m_port = new printerserialport(this);
     m_port->init_printer();
 }
@@ -2321,6 +2323,8 @@ Stampa dei grafici di Syroki, sono 2 uno fianco l'altro
 void printermanager::Report_BitMap()
 {
     qDebug("inizio pr bitm");
+    if (m_bitmap == NULL)
+        return;
     int     sz = m_bitmap->size();
     char  * p = m_bitmap->data();
     int     szchunk = 103;  // 824/8
@@ -2345,7 +2349,7 @@ void printermanager::Report_BitMap()
 
     m_printBitmap = false;  // invalida la bitmap
     m_bitmap->fill(0);
-
+    m_bitmap = NULL;
     m_port->Pri_Font(1);
     m_port->Pri_mode(0x00);
     m_port->Pri_justif(F_left);

@@ -26,7 +26,10 @@ void MDataManager::getGrabbedImage(QObject *gi, QString nome)
     bool enab = (isSiro && m_Siroky) ||
                 (isLive && m_Liverpool);
     if( ! enab)
+    {
+        m_resultBm.clear();
         return;
+    }
     m_mngPrint->setBitmap(enab, & m_resultBm);
 
     bool isAve = nome.contains(" Ave");         // test Average / QMax

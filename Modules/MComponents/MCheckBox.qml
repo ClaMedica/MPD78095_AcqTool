@@ -4,9 +4,11 @@ import QtQuick 2.5
 import QtQuick.Window 2.0
 import QtQuick.Layouts 1.1
 import "Images"
+
 Rectangle {
     id:rootCheck
-    property bool   checked:    false
+    property var   checked:    undefined
+    property bool realChecked:  false
     property string text:       textEdit.text
     property bool   editable:   false
     property int    pixelSize:  Screen.height*0.01
@@ -14,11 +16,15 @@ Rectangle {
     height: Screen.height*0.02
     width:  Screen.width*0.05
     onTextChanged: if(!editable)initText(text)
-    onCheckedChanged: console.log(text,checked)
+    onCheckedChanged: {
+        if (checked !== undefined)
+            realChecked = checked
+    }
+
     function initText(t)
     {
-        rootCheck.text=t
-        textEdit.text=t
+        rootCheck.text = t
+        textEdit.text = t
     }
 
     Rectangle {
@@ -33,14 +39,17 @@ Rectangle {
         anchors.top: parent.top
         anchors.bottom: parent.bottom
         Image {
-            visible: checked
+            visible: realChecked
             source:"checked.png"
             anchors.margins: 4
             anchors.fill: parent
         }
         MouseArea{
             anchors.fill: parent
-            onClicked: checked=!checked
+            onClicked: {
+                realChecked=!realChecked;
+                checked = realChecked
+            }
         }
 
     }
@@ -54,7 +63,7 @@ Rectangle {
         anchors.left:indicator.right
         anchors.right:rootCheck.right
         anchors.margins:rootCheck.height/5
-        onFocusChanged:text=focus?"":text
+        onFocusChanged:text=focus ? "" : text
         font.bold:true
         font.pixelSize:rootCheck.pixelSize
         verticalAlignment:Text.AlignVCenter

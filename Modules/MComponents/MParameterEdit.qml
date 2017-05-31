@@ -43,26 +43,25 @@ Rectangle {
     // has clicked. The id must be unique
     property int parameterId: 0
     signal clicked()
-    onComponentChanged: if(component!==undefined)connection.target=component
+    onComponentChanged: if(component !== undefined) connection.target = component
 
     function reload()
     {
-        if(component!==undefined){
+        if(component !== undefined) {
             component.destroy()
             container.loadComponent()
         }
     }
 
-    Connections{
+    Connections {
         id:connection
         //target: viene assegnato dal rootParEdit in onComponentChanged
         ignoreUnknownSignals: true
         onInfoChanged:{
-            if(target===undefined)
+            if(target === undefined)
                 return
-            rootParEdit.info=connection.target.info
+            rootParEdit.info = connection.target.info
         }
-
 
         onFocusChanged:
         {
@@ -88,22 +87,25 @@ Rectangle {
     }
 
 
-    onModelChanged: if(created)loadModel(model)
+    onModelChanged: if(created) loadModel(model)
 
-    function setInfo(__info){
-        if(__info!==undefined)
+    function setInfo(__info) {
+        if(__info !== undefined)
         {
-            if(created){
+            if(created) {
                 //console.log("NUOVE INFO",__info)
-                switch(type){
+                switch(type) {
                 case typTextField:component.text        =__info.toString();break;
                 case typComboBox :component.currentIndex=component.find(__info.toString());break;
-                case typCheckBox :component.checked     =__info==="false"||__info==="0"?false:true;break;
+                case typCheckBox :component.checked     = ((__info === "false") ||
+                                                           (__info === "0") ||
+                                                           (__info === "")) ? false : true;
+                    break;
                 case typPathEdit :component.fileURL     =__info;break;
                 case typDateEdit :component.setDate(__info);break;
                 case typColorBox :component.color       =__info;break;
                 case typSpinBox  :component.value       =__info;break;
-                case typComboFont:component.currentIndex=component.find(__info.toString());break;
+                case typComboFont:component.currentIndex = component.find(__info.toString());break;
                 default:console.log("tipo errato",type);break;
                 }
             }
@@ -114,7 +116,7 @@ Rectangle {
             console.log("info non definita")
     }
 
-    Timer{
+    Timer {
         id:timInfoReSet
         property var tinfo:undefined
         repeat: false

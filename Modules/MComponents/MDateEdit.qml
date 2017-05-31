@@ -8,9 +8,8 @@ import QtQuick.Dialogs 1.2
 import MComponents 1.0
 
 Rectangle {
-    property var date:Date(edYear.text,cbMonth.currentIndex,cbDay.currentIndex)
+    property var date:Date(edYear.text,cbMonth.currentIndex,cbDay.currentIndex+1)
     property int labelSize:2
-
     readonly property int marginPerc:1
     height:50
     width:200
@@ -23,18 +22,16 @@ Rectangle {
         var d=new Date()
         cbMonth.currentIndex=d.getMonth()
         uppa(d.getMonth())
-        cbDay.currentIndex=d.getDate()
+        cbDay.currentIndex=d.getDate()-1
         edYear.text=d.getFullYear()
     }
 
     function setDate(newDate){//accetta una stringa
         var d=new Date(String(newDate))
-        console.log(newDate,d,date)
         cbMonth.currentIndex=d.getMonth()
         uppa(d.getMonth())
-        cbDay.currentIndex=d.getDate()
+        cbDay.currentIndex=d.getDate()-1
         edYear.text=d.getFullYear()
-
     }
 
     function uppa(month)
@@ -72,8 +69,8 @@ Rectangle {
         }
         if(old<cbDay.model.length)
             cbDay.currentIndex=old
-        console.log(old,cbDay.model.length,cbDay.currentIndex)
-        date=new Date(edYear.text,cbMonth.currentIndex,cbDay.currentIndex)
+
+        date=new Date(edYear.text,cbMonth.currentIndex,cbDay.currentIndex+1)
     }
 
     Row{
@@ -101,7 +98,7 @@ Rectangle {
             height: parent.height
             width:parent.width*0.3
             labelSize: rootDateEdit.labelSize
-            onCurrentIndexChanged: date=new Date(edYear.text,cbMonth.currentIndex,cbDay.currentIndex)
+            onCurrentIndexChanged: date=new Date(edYear.text,cbMonth.currentIndex,cbDay.currentIndex+1)
             onClicked: if(isTouch) rootDateEdit.clicked()
         }
         MComboBox{
@@ -124,7 +121,7 @@ Rectangle {
             verticalAlignment: Text.AlignVCenter
             horizontalAlignment: Text.AlignHCenter
             labelSize:rootDateEdit.labelSize
-            onTextChanged: date=new Date(edYear.text,cbMonth.currentIndex,cbDay.currentIndex)
+            onTextChanged: date=new Date(edYear.text,cbMonth.currentIndex,cbDay.currentIndex+1)
             onFocusChanged:
             {
                 if(focus && isTouch)
@@ -161,7 +158,11 @@ Rectangle {
         visible: false
         height:calendar.height+50
         width:calendar.width+10
-        anchors.centerIn: parent
+        y: {
+            var globalCoordinares = DataEngine.getAbsolutePosition(this)
+            y = -globalCoordinares.y
+        }
+        anchors.horizontalCenter: parent.horizontalCenter
         anchors.verticalCenterOffset: 50
         anchors.horizontalCenterOffset: -50
 
@@ -210,7 +211,6 @@ Rectangle {
             text:qsTr("Save")
             onClicked: {
                 var date=new Date(calendar.selectedDate)
-                console.log(date.getDate(),date.getMonth(),date.getFullYear())
                 cbMonth.currentIndex=date.getMonth()
                 cbDay.currentIndex=date.getDate()-1//cbDay parte da 0
                 edYear.text=date.getFullYear()

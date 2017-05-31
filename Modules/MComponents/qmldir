@@ -27,5 +27,6 @@ MForm 1.0               MForm.qml
 MKeyboard 1.0           MKeyboard.qml
 MKeyboardNum 1.0        MKeyboardNum.qml
 MComboFont 1.0          MComboFont.qml
+MHourEdit 1.0           MHourEdit.qml
 MTextField 1.0		MTextField.qml
 DataEngine 1.0          GeneralData.js
