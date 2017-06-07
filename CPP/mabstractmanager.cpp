@@ -293,7 +293,11 @@ bool MAbstractManager::load()
 
     QString configUser = g_P7SettingsManager.userSettings();
     if(!QFile::exists(configUser))
+#ifdef PICOFLOW
+        configUser = ":/Config/Config_User_pico.xml";
+#else
         configUser = ":/Config/Config_User.xml";
+#endif
 
     m_configUser.erase();
     if(!m_configUser.loadFromXML(configUser))

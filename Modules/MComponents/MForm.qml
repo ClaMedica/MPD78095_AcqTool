@@ -15,6 +15,7 @@ Rectangle{
     property string whoIsVisible:"none"
     property var keyboard:appKey
     property var keyboardNum:appKeyNum
+    property var colorPicker: appColorPicker
     property var brothersVis:[]
     signal closing
     signal shown
@@ -65,6 +66,13 @@ Rectangle{
     MKeyboardNum {
         id: appKeyNum
         visible: false
+    }
+
+    MColorPicker {
+        id: appColorPicker
+        visible: false
+        anchors.fill: parent
+        Component.onCompleted: build()
     }
 
     //per la tastiera virtuale

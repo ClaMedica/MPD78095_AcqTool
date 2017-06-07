@@ -211,6 +211,7 @@ void MDataManager::loadFile(QString __fileName)
         qCritical() << __fileName << MEX_FILE_NOT_EXISTS;
         return;
     }
+
     m_fileName = __fileName;
     //la prima volta che salvo mi faccio la copia del file originale
     m_copyFileName = m_fileName;
@@ -238,7 +239,7 @@ void MDataManager::loadFile(QString __fileName)
     switch(fileType(__fileName)) {
     case PIC:
     {
-        if(m_mng != NULL)
+       if(m_mng != NULL)
             delete m_mng;
         m_mng = new DatafileManager;
         m_mng->SetFileName(__fileName);
@@ -495,16 +496,16 @@ void MDataManager::loadFile(QString __fileName)
         Ancestry *autoflow = m_configUser.getSafeChild("AutomaticFlow");
         m_autoFlow = (autoflow->getSafeChild("Auto")->getSafeAttribute(ATT_VALUE) == "1" ? 0 : 2);
 
-        Ancestry *autoprint = m_configUser.getSafeChild("AdvancedSettings");
+        Ancestry *autoprint = m_configUser.getSafeChild("AnalysisSettings");
         m_autoPrint = (autoprint->getSafeChild("AutoPrint")->getSafeAttribute(ATT_VALUE) == "true" ? true : false);
 
-        Ancestry *siroky = m_configUser.getSafeChild("AdvancedSettings");
+        Ancestry *siroky = m_configUser.getSafeChild("AnalysisSettings");
         m_Siroky = (siroky->getSafeChild("Siroky")->getSafeAttribute(ATT_VALUE) == "true" ? true : false);
 
-        Ancestry *liverpool = m_configUser.getSafeChild("AdvancedSettings");
+        Ancestry *liverpool = m_configUser.getSafeChild("AnalysisSettings");
         m_Liverpool = (liverpool->getSafeChild("Liverpool")->getSafeAttribute(ATT_VALUE) == "true" ? true : false);
 
-        Ancestry *printmode = m_configUser.getSafeChild("AdvancedSettings");
+        Ancestry *printmode = m_configUser.getSafeChild("AnalysisSettings");
         m_landscape = (printmode->getSafeChild("PrinterMode")->getSafeAttribute(ATT_VALUE) == "true" ? true : false);
 
         if (m_Liverpool)

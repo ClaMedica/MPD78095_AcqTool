@@ -9,8 +9,8 @@ import "Images"
 Rectangle {
     id: rootComboBox
     property string currentText: ""
-    property int currentIndex: 0
-    property var model: [1,2,3]
+    property int currentIndex: -1
+    property var model: []
     property int oriH: height
     property int labelSize: 2
     property var lastSelected: []

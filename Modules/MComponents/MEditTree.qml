@@ -5,7 +5,7 @@ import "qrc:/GeneralData.js" as DataEngine
 import Settings 1.0
 import "qrc:/"
 import "qrc:/Forms"
-import MComponents 1.0 //import MComponents 1.0 //import "qrc:/Components"
+import MComponents 1.0
 
 Rectangle {
     id: rootTree
@@ -15,8 +15,10 @@ Rectangle {
 
     function loadFile(f) {
         console.log("editSettings", f)
-        if(anctree.ancestry !== undefined)
+        if(anctree.ancestry !== undefined){
+            anctree.destroyAncestry()
             anctree.ancestry.destroy()
+        }
         var a = Qt.createQmlObject('import Settings 1.0; Ancestry{}', this)
         if(a.loadFromXML(f)) {
             anctree.ancestry = a
@@ -27,6 +29,10 @@ Rectangle {
     function saveFile(f) {
         anctree.save()
         anctree.ancestry.saveToXML(f)
+    }
+
+    function destroyTree(){
+        anctree.destroyAncestry()
     }
 
     Flickable{

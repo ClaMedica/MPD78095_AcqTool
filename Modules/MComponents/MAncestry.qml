@@ -15,7 +15,6 @@ Column {
 
     //onHeightChanged: console.log(height)
     onAncestryChanged: {
-        //console.log(ancestry)
         if(ancestry !== undefined) {
             if(ancestry.getAttribute("label") === "")
                 childName = ancestry.name()
@@ -33,8 +32,10 @@ Column {
         var ele = recChildren.elements.length
         if(ele !== 0) {
             var recChH = 0
-            for(var i = 0; i < ele; i++)
-                recChH += recChildren.elements[i].height + rootAncestry.spacing
+            for(var i = 0; i < ele; i++) {
+                if (recChildren.elements[i].visible)
+                    recChH += recChildren.elements[i].height + rootAncestry.spacing
+            }
             recChildren.height = recChH
             newh += recChildren.height
         }
@@ -70,6 +71,7 @@ Column {
         recChildren.children=[]
         recChildren.elements=[]
         recChildren.parChildren=[]
+        recChildren.loaded = false
     }
 
 
@@ -100,10 +102,15 @@ Column {
             text: childName
             onClicked: {
                 btnOpen.opened = !btnOpen.opened
-                if(opened)
-                    recChildren.load()
+                if(opened) {
+                    if (recChildren.loaded)
+                        recChildren.visible = true
+                    else
+                        recChildren.load()
+                }
                 else
-                    destroyAncestry()
+                    recChildren.visible = false
+
                 updateDimensions()
             }
         }
@@ -117,13 +124,24 @@ Column {
         property var parChildren: []//contiene i puntatori alle ancestry dei singoli parametri
         property var children: []//solo altre ancestry qml
         property var elements: []//contiene tutti i qml
+        property bool loaded: false
         anchors.left: parent.left
         anchors.right: parent.right
         anchors.leftMargin: 4*layout.value("Margin")
         spacing: parent.spacing
 
+        onVisibleChanged: {
+            var childrenCount = ancestry.childrenCount()
+            var pchild
+            for(var i = 0; i < childrenCount; i++)
+            {
+                pchild = ancestry.getChildAt(i)
+                pchild.visible = visible
+            }
+        }
 
         function load() {
+            recChildren.loaded = true
             var childrenNames = ancestry.childrenNames()
             var childrenCount = ancestry.childrenCount()
             //console.log(ancestry.childrenNames())

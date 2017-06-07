@@ -1,5 +1,5 @@
 <Configuration>
-        <AutomaticFlow>
+    <AutomaticFlow>
         <Auto
             label="Automatic flow"
             type="CheckBox"
@@ -7,71 +7,56 @@
             value="true"
         />
         <AutoStarts>
-               <Amplitude>
-                                <min
-                                label="Minimum"
-                                type="TextField"
-                                unit="g"
-                                value="2"
-                                />
-                                <max
-                                label="Maximum"
-                                type="TextField"
-                                unit="g"
-                                value="15"
-                                />
-                        </Amplitude>
-                        <Duration>
-                                <min
-                                label="Minimum"
-                                type="TextField"
-                                unit="sec"
-                                value="10"
-                                />
-                        </Duration>
-
+                <Amplitude>
+                    <min
+                        label="Minimum"
+                        type="TextField"
+                        unit="g"
+                        value="2"
+                     />
+                     <max
+                        label="Maximum"
+                        type="TextField"
+                        unit="g"
+                        value="15"
+                     />
+                </Amplitude>
+                <Duration>
+                    <min
+                        label="Minimum"
+                        type="TextField"
+                        unit="sec"
+                        value="10"
+                    />
+                </Duration>
         </AutoStarts>
         <AutoStops>
-                    <Value>
-                                <min
-                                label="Minimum"
-                                type="TextField"
-                                unit="ml/sec"
-                                value="-1"
-                                />
-                                <max
-                                label="Maximum"
-                                type="TextField"
-                                unit="ml/sec"
-                                value="1"
-                                />
-                        </Value>
-                        <Duration>
-                                <min
-                                label="Minimum"
-                                type="TextField"
-                                unit="sec"
-                                value="300"
-                                />
-                                <max
-                                label="Maximum"
-                                type="TextField"
-                                unit="sec"
-                                value="300"
-                                />
-                        </Duration>
-        </AutoStops>
-        </AutomaticFlow>
-        <Supervisor>
-                <Visible
-                label="Visible"
-                type="CheckBox"
-                unit=""
-                value="0"
-                />
+                <Value>
+                    <min
+                        label="Minimum"
+                        type="TextField"
+                        unit="ml/sec"
+                        value="-1"
+                    />
+                    <max
+                        label="Maximum"
+                        type="TextField"
+                        unit="ml/sec"
+                        value="1"
+                    />
+                </Value>
+                <Duration>
+                    <min
+                        label="Minimum"
+                        type="TextField"
+                        unit="sec"
+                        value="300"
+                    />
 
-        </Supervisor>
-        <ChannelsAbilitation>
+               </Duration>
+        </AutoStops>
+    </AutomaticFlow>
+    <ChannelsAbilitation>
             <Emg
                 label="EMG"
                 type="CheckBox"
@@ -127,14 +112,7 @@
                     model="500#50#5#0#"
                     value="200"
                 />
-                <Zero
-                    label="Zero"
-                    type="SpinBox"
-                    dt="real"
-                    unit="%"
-                    model="100#0#10#0#"
-                    value="0"
-                />
+
             </VBT>
             <QBT>
                 <width
@@ -169,14 +147,7 @@
                     model="100#25#25#0#"
                     value="50"
                 />
-                <Zero
-                    label="Zero"
-                    type="SpinBox"
-                    dt="real"
-                    unit="%"
-                    model="100#0#10#0#"
-                    value="0"
-                />
+
             </QBT>
             <EMG>
                 <width
@@ -211,42 +182,35 @@
                     model="5000#500#500#0#"
                     value="1000"
                 />
-                <Zero
-                    label="Zero"
-                    type="SpinBox"
-                    dt="real"
-                    unit="%"
-                    model="100#0#10#0#"
-                    value="0"
-                />
+
             </EMG>
         </ChannelsProp>
 
         <AnalysisSettings>
-        <AutoPrint
-            label="Automatic Print"
-            type="CheckBox"
-            unit=""
-            value="true"
-        />
-        <Siroky
-            label="Siroky"
-            type="CheckBox"
-            unit=""
-            value="false"
-        />
-        <Liverpool
-            label="Liverpool"
-            type="CheckBox"
-            unit=""
-            value="false"
-        />
-        <PrinterMode
-            label="Print Landscape Mode"
-            type="CheckBox"
-            unit=""
-            value="false"
-        />
+            <AutoPrint
+                label="Automatic Print"
+                type="CheckBox"
+                unit=""
+                value="true"
+            />
+            <Siroky
+                label="Siroky"
+                type="CheckBox"
+                unit=""
+                value="false"
+            />
+            <Liverpool
+                label="Liverpool"
+                type="CheckBox"
+                unit=""
+                value="false"
+            />
+            <PrinterMode
+                label="Print Landscape Mode"
+                type="CheckBox"
+                unit=""
+                value="false"
+            />
         </AnalysisSettings>
 
 </Configuration>

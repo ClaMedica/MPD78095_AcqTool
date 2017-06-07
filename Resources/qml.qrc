@@ -53,6 +53,7 @@
         <file>Config_Layout.xml</file>
         <file>markers.xml</file>
         <file>ParAna.xml</file>
+        <file>Config_User_pico.xml</file>
     </qresource>
     <qresource prefix="/Dialog">
         <file>VolResDlg.qml</file>
