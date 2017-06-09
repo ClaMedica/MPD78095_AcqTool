@@ -156,7 +156,12 @@ Column {
                 //console.log(pchild,i,childrenCount,ancestry)
 
                 if(pchild.isYoungest()) {//creo un parametro modificabile
-                    //console.log("creo un parametro modificabile")
+                    //controllo se devo visualizzarlo o no
+                    var vis = pchild.getAttribute("visible")
+                    if (vis === "false")
+                        continue
+
+                    console.log("creo un parametro modificabile")
                     c = Qt.createQmlObject('import MComponents 1.0 ;MParameterEdit{}', recChildren)
                     var attributesNames = ancestry.getAttributesNames()
                     var attributesValues = ancestry.getAttributesValues()

@@ -215,7 +215,7 @@ void MDataManager::loadFile(QString __fileName)
     m_fileName = __fileName;
     //la prima volta che salvo mi faccio la copia del file originale
     m_copyFileName = m_fileName;
-    m_copyFileName.insert(m_copyFileName.length() - 4, "_origin");
+    m_copyFileName.insert(m_copyFileName.length() - 4, "_copy");
     if (!QFile(m_copyFileName).exists())
         QFile::copy(m_fileName, m_copyFileName);
 
@@ -255,8 +255,13 @@ void MDataManager::loadFile(QString __fileName)
             return;
         }
 
-        m_patientName = m_mng->GetPatient().section(";",0,1);
-        m_patientName.replace(";", "_");
+        m_patientInfo = m_mng->GetPatient().section(";",0,1);
+        m_patientInfo.replace(";", " ");
+
+        QDate dateExam = QDate(1899, 12, 30).addDays(m_mng->GetDataEsame());
+        QString dateofexam = dateExam.toString("dd/MM/yyyy");
+        m_patientInfo = m_patientInfo + " - " + dateofexam;
+
         m_sexPatient = false;
         if (m_mng->GetPatient().section(";", 12, 12) == "F")
             m_sexPatient = true;

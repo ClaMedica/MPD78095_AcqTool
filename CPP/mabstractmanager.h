@@ -43,12 +43,12 @@ signals:
 public slots:
     bool load(void);
     QString plotConfigFileName();
-    QString patientInfo() { return m_patientName; }
+    QString patientInfo() { return m_patientInfo; }
 
 
 protected:
     QString m_applicationPath,
-    m_patientName;                      //nome e altre info paziente
+    m_patientInfo;                      //nome e altre info paziente
 
     DatafileManager *m_mng;
     Analyze *m_ana;

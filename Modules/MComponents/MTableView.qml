@@ -23,6 +23,21 @@ TableView{
 
     onSortIndicatorColumnChanged: order(sortIndicatorColumn, sortIndicatorOrder)
     onSortIndicatorOrderChanged: order(sortIndicatorColumn, sortIndicatorOrder)
+
+    signal selected()
+
+    function selectTestFromPk(testPK)
+    {
+        rootTable.selection.clear()
+        if (testPK !== -1)
+        {
+            rootTable.selection.select(model.getIndexFromPK(testPK))
+            rootTable.currentRow = model.getIndexFromPK(testPK)
+        }
+
+        rootTable.selected()
+    }
+
     function populate(){//al caricamento della tabella popolo con le colonne
         sortIndicatorOrder=true
         if(model===undefined)
