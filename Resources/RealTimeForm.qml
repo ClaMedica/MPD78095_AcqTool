@@ -170,7 +170,6 @@ MForm{
         delegate: MMarkerButton{
             onClick:{
                 if (value === "116") {
-                    mngAcq.sendStopAcq()
                     plot.stopAll()
                     mngAcq.endAcquisitionDiscard()
                     timClose.start(1000);

@@ -297,8 +297,19 @@ void MAcqManager::endAcquisition(bool discard)
     qDebug() << "File closed?" << ret;
 
     if (discard)  //devo cancellare il file
+    {
         qDebug() << QFile::remove(m_mng->GetFileName());
-
+        //devo resettare il parametro di flusso automatico a false per non far partire sempre l'analisi in automatico all'apertura in review di un file
+        Ancestry *autoflow = m_configUser.getSafeChild("AutomaticFlow");
+        Ancestry *child = autoflow->getSafeChild("Auto");
+        QString valueAuto = child->getAttribute("value");
+        if (valueAuto == "true")
+        {
+            child->setAttribute("value","false");
+            QString configUser = g_P7SettingsManager.userSettings();
+            m_configUser.saveToXML(configUser);
+        }
+    }
 
     m_acqFileOpened = false;    //nessuna acquisizione in atto
     m_sendingToPlot = false;    //nessuno sta spedendo qualcosa per cui ci si puo scrivere sopra

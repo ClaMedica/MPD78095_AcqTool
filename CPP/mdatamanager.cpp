@@ -311,6 +311,7 @@ void MDataManager::loadFile(QString __fileName)
         }
 
         //------Aggiungo i canali
+        qDebug()<<"aggiungo i canali";
 
         for(int h = 0; h < m_mng->GetChanNum(); h++) {
             MSignal *sig  = new MSignal;
@@ -379,19 +380,22 @@ void MDataManager::loadFile(QString __fileName)
             saveDataAndUpdate(family, descr, defVec);
         }
 
-        for(int nc = 0; nc < m_mng->GetChanNum(); nc++) {
+        //mi genera un crash dell'acqtool alla ripaertura dell'esame analizzato
+        //il ciclo associa i definitori ai canali abilitati
+        //non so se mi servirà in seguito
+/*        for(int nc = 0; nc < m_mng->GetChanNum(); nc++) {
             VarMapVec *subVec = new VarMapVec;
             for(int i = 0; i < m_mng->GetNumDefiners(); i++)
                 if(defEn[i].at(nc).toBool())
                     subVec->append(defVec->at(i));
             if(!subVec->isEmpty())
                 saveDataAndUpdate(m_mng->GetChanName(nc), "Definers", subVec);
-        }
+        }*/
 
         //------ Aggiungo i markers analitici, sono associati ad un definitore
         qDebug() << "Marker Analitici = " << m_mng->GetNumAnalyticalMarkers();
 
-        mrkAnVec->clear();
+        //mrkAnVec->clear();
         QVector<int32_t> numChVec;
         for(int i = 0; i < m_mng->GetNumAnalyticalMarkers(); i++) {
             VarMap *mrk = new VarMap;
@@ -974,12 +978,17 @@ void MDataManager::exitFromReview()
     //devo resettare il parametro di flusso automatico a false per non far partire sempre l'analisi in automatico all'apertura in review di un file
     Ancestry *autoflow = m_configUser.getSafeChild("AutomaticFlow");
     Ancestry *child = autoflow->getSafeChild("Auto");
-    child->setAttribute("value","false");
-    QString configUser = g_P7SettingsManager.userSettings();
-    m_configUser.saveToXML(configUser);
+    QString valueAuto = child->getAttribute("value");
+    if (valueAuto == "true")
+    {
+        child->setAttribute("value","false");
+        QString configUser = g_P7SettingsManager.userSettings();
+        m_configUser.saveToXML(configUser);
+    }
 
     if (getToSave() == "ret") {
         if (m_mngPrint != NULL) m_mngPrint->closePrinter();
+        qDebug()<<"cancellata copia all'exit"<<QFile::remove(m_copyFileName);
         if(DebugAcqTool == false)
             g_mainAppBridge->sendSwitch();  //send(MEX_SHOW);
         else
