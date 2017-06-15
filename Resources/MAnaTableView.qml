@@ -26,7 +26,7 @@ TableView{
             text: styleData.value
             font.family:  (layout !== undefined) ? layout.value("FFamily") : "ubuntu"
             font.bold: false
-            font.pixelSize: 12
+            font.pixelSize: 14
         }
     }
 

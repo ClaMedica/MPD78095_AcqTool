@@ -5,6 +5,7 @@
             type="CheckBox"
             unit=""
             value="true"
+            visible="false"
         />
         <AutoStarts>
                <Amplitude>
@@ -29,7 +30,20 @@
                                 value="10"
                                 />
                         </Duration>
-
+                        <chanType
+                            type="TextField"
+                            unit=""
+                            label="Channel Type"
+                            value="VBT"
+                            visible = "false"
+                         />
+                         <num
+                            label="Number"
+                            type="TextField"
+                            unit=""
+                            value="1"
+                            visible = "false"
+                         />
         </AutoStarts>
         <AutoStops>
                     <Value>
@@ -60,6 +74,20 @@
                                 value="300"
                                 />
                         </Duration>
+                        <chanType
+                              label="Channel Type"
+                              type="TextField"
+                              unit=""
+                              value="QBT"
+                              visible = "false"
+                          />
+                          <num
+                              label="Number"
+                              type="TextField"
+                              unit=""
+                              value="1"
+                              visible = "false"
+                          />
         </AutoStops>
         </AutomaticFlow>
         <Supervisor>

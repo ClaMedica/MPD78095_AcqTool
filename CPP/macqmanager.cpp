@@ -598,60 +598,62 @@ void MAcqManager::checkAutomaticStartStop(QString __which)
 
     //qDebug()<<"Start check"<<__which;
 
-    Ancestry *contitions = m_configUser.getSafeChild("Auto" + __which + "s");
-    foreach (Ancestry *condition, contitions->getChildren()) {  //scorro le condizioni di autostart anche se ce ne A? solo una
+    Ancestry *condition = m_configUser.getSafeChild("Auto" + __which + "s");
+   // foreach (Ancestry *condition, contitions->getChildren()) {  //scorro le condizioni di autostart anche se ce ne e' solo una
         //pesco su quale canale e' fatta
+
         QString chanType = condition->getSafeChild(ATT_CHANTYPE)->getSafeAttribute(ATT_VALUE);
         int num = condition->getSafeChild(ATT_NUM)->getSafeAttribute(ATT_VALUE).toInt() - 1;    //il -1 e' per ovviare al fatto che si parte da 1
         //e in base a come si chiama vedo che farci
 
-        //qDebug()<<condition->name();
+        //qDebug()<<"Tipo canale"<<chanType<<num;//condition->name();
 
-        if(condition->name() == XML_STEP) {
-            //qDebug()<<"condizione a gradino";
-
+        //if(condition->name() == XML_STEP) { //condizione a gradino
+        if (__which == "Start")
+        {
             Ancestry *childDur = condition->getSafeChild(XML_DURATION);
             Ancestry *childAmp = condition->getSafeChild(XML_AMPLITUDE);
 
-            //per prima cosa controlliamo quanti campioni A?
+            //per prima cosa controlliamo quanti campioni
             int      min = childDur->getSafeChild(ATT_MIN)->getSafeAttribute(ATT_VALUE).toUInt();
             qreal ampMin = childAmp->getSafeChild(ATT_MIN)->getSafeAttribute(ATT_VALUE).toInt();
             qreal ampMax = childAmp->getSafeChild(ATT_MAX)->getSafeAttribute(ATT_VALUE).toInt();
 
-            //qDebug()<<"Buffer"<<chanType<<num<<"="<<*(m_channelMap[chanType].at(num));
+            if (!(m_channelMap[chanType].at(num)->size() < min)) //se non ho ancora abbastanza campioni per decidere non vado avanti
+            { // continue;
+                //ora quindi sono sicuro che arrivo qui solo quando ho abbastanza campioni
 
-            if(m_channelMap[chanType].at(num)->size() < min)
-                continue;   //non ho ancora abbastanza campioni per decidere skip alla prossima condizione
-            //ora quindi sono sicuro che arrivo qui solo quando ho abbastanza campioni
+                //controllo se c'e' un gradino
+                qreal startVal = m_channelMap[chanType].at(num)->first();
+                int count = 0;
+                foreach(qreal sample, (*m_channelMap[chanType].at(num))) {
+                    if((sample-startVal > ampMin) && (sample-startVal < ampMax))
+                        count++;
+                    else
+                        count = 0;
+                }
 
-            //controllo se c'e' un gradino
-            qreal startVal = m_channelMap[chanType].at(num)->first();
-            int count = 0;
-            foreach(qreal sample, (*m_channelMap[chanType].at(num))) {
-                if((sample-startVal > ampMin) && (sample-startVal < ampMax))
-                    count++;
-                else
-                    count = 0;
-            }
+                if(count >= min) {//trigger inizio acq
+                    //effetto buffer tengo solo gli ultimi 5 secondi
+                    foreach(QString type, m_channelMap.keys())
+                        foreach(MSignal *sig, m_channelMap[type])
+                            sig->saveLastSec(5.0);
 
-            if(count >= min) {//trigger inizio acq
-                //effetto buffer tengo solo gli ultimi 5 secondi
-                foreach(QString type, m_channelMap.keys())
-                    foreach(MSignal *sig, m_channelMap[type])
-                        sig->saveLastSec(5.0);
-
-                m_saving = true;    //posso iniziare a salvare i dati
-                emit acquisitionStarted();
-                qDebug() << "Start acquiring";
-                m_acqFinished = false;
-                return;
-            }
-            else {
-                //qDebug()<<"Non ho trovato nulla";
+                    m_saving = true;    //posso iniziare a salvare i dati
+                    emit acquisitionStarted();
+                    qDebug() << "Start acquiring";
+                    m_acqFinished = false;
+                    return;
+                }
+                else {
+                    //qDebug()<<"Non ho trovato nulla";
+                }
             }
         }
 
-        if(condition->name() == XML_STATIONARY) {   //statio
+        //if(condition->name() == XML_STATIONARY) {   //statio
+        if (__which == "Stop")
+        {
             Ancestry *childDur = condition->getSafeChild(XML_DURATION);
             Ancestry *childVal = condition->getSafeChild(XML_VALUE);
 
@@ -664,26 +666,27 @@ void MAcqManager::checkAutomaticStartStop(QString __which)
 
             m_stopBuffer << *m_channelMap[chanType].at(num);
             m_stopBuffer.saveLastSec(min);
-            if(m_stopBuffer.getDuration() < min)
-                continue;
-            //ora quindi sono sicuro che arrivo qui solo quando ho abbastanza campioni
+            if (!(m_stopBuffer.getDuration() < min))
+            {//   continue;
+                //ora quindi sono sicuro che arrivo qui solo quando ho abbastanza campioni
 
-            //controllo gli ultimi min campioni
-            qreal smin = m_stopBuffer.minimum();
-            qreal smax = m_stopBuffer.maximum();
-            //qDebug()<<smin<<valMin<<smax<<valMax;
+                //controllo gli ultimi min campioni
+                qreal smin = m_stopBuffer.minimum();
+                qreal smax = m_stopBuffer.maximum();
+                //qDebug()<<smin<<valMin<<smax<<valMax;
 
-            if((smin > valMin) && (smax < valMax)) {
-                qDebug() << "Stop acquiring";
-                endAcquisitionSave();
-                m_acqFinished = true;
-                return;
-            }
-            else {
-                //qDebug()<<chanType<<num<<(*m_channelMap[chanType].at(num));
+                if((smin > valMin) && (smax < valMax)) {
+                    qDebug() << "Stop acquiring";
+                    endAcquisitionSave();
+                    m_acqFinished = true;
+                    return;
+                }
+                else {
+                    //qDebug()<<chanType<<num<<(*m_channelMap[chanType].at(num));
+                }
             }
         }
-    }
+   // }
 
     //effetto buffer tengo solo gli ultimi 5 secondi
     foreach(QString type, m_channelMap.keys())

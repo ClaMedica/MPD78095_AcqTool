@@ -258,9 +258,12 @@ void MDataManager::loadFile(QString __fileName)
         m_patientInfo = m_mng->GetPatient().section(";",0,1);
         m_patientInfo.replace(";", " ");
 
-        QDate dateExam = QDate(1899, 12, 30).addDays(m_mng->GetDataEsame());
-        QString dateofexam = dateExam.toString("dd/MM/yyyy");
-        m_patientInfo = m_patientInfo + " - " + dateofexam;
+        if (!m_patientInfo.contains("Anonymous"))
+        {
+            QDate dateExam = QDate(1899, 12, 30).addDays(m_mng->GetDataEsame());
+            QString dateofexam = dateExam.toString("dd/MM/yyyy");
+            m_patientInfo = m_patientInfo + " - " + dateofexam;
+        }
 
         m_sexPatient = false;
         if (m_mng->GetPatient().section(";", 12, 12) == "F")
@@ -499,7 +502,7 @@ void MDataManager::loadFile(QString __fileName)
 
         //carico le info necessarie dal file di config
         Ancestry *autoflow = m_configUser.getSafeChild("AutomaticFlow");
-        m_autoFlow = (autoflow->getSafeChild("Auto")->getSafeAttribute(ATT_VALUE) == "1" ? 0 : 2);
+        m_autoFlow = (autoflow->getSafeChild("Auto")->getSafeAttribute(ATT_VALUE) == "true" ? 0 : 2);
 
         Ancestry *autoprint = m_configUser.getSafeChild("AnalysisSettings");
         m_autoPrint = (autoprint->getSafeChild("AutoPrint")->getSafeAttribute(ATT_VALUE) == "true" ? true : false);
@@ -968,6 +971,13 @@ void MDataManager::exitFromReview()
 {
     qDebug() << "Exit" << getToSave();
 
+    //devo resettare il parametro di flusso automatico a false per non far partire sempre l'analisi in automatico all'apertura in review di un file
+    Ancestry *autoflow = m_configUser.getSafeChild("AutomaticFlow");
+    Ancestry *child = autoflow->getSafeChild("Auto");
+    child->setAttribute("value","false");
+    QString configUser = g_P7SettingsManager.userSettings();
+    m_configUser.saveToXML(configUser);
+
     if (getToSave() == "ret") {
         if (m_mngPrint != NULL) m_mngPrint->closePrinter();
         if(DebugAcqTool == false)
@@ -1031,7 +1041,7 @@ bool MDataManager::checkForVolRes()
     {
         int anaType = m_mng->GetAnalysis(i).toInt();
         if (anaType == FLW_AVD_STUDY) {
-            if (m_autoPrint)
+            if (m_autoPrint || m_autoFlow == 0)
                 setValVolRes(0);//-1?;
             else {
                 volRes = true;
@@ -1292,14 +1302,18 @@ void MDataManager::startPrint()
     m_mngPrint->setPrintModeUser(m_landscape);
 
     //stampo
-    if (m_autoPrint)
-        m_mngPrint->print();
-
+    if (m_autoPrint || m_autoFlow == 0)
+        sendToPrint();
 
     //qml
     qDebug() << "FINE analisys";
 }
 
+void MDataManager::sendToPrint()
+{
+     m_mngPrint->print();
+     qDebug() << "stampato";
+}
 
 void MDataManager::setToSave(QString __val)
 {

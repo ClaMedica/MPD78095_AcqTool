@@ -295,17 +295,32 @@ MForm {
     }
 
     //@@@@@@@@@@    Graphics      @@@@@@@@@@
+
+    MButton{
+        id: btnPrint
+        text: qsTr("print")
+        anchors.left: parent.left
+        anchors.bottom: parent.bottom
+        anchors.bottomMargin: 10
+        anchors.leftMargin: 10
+        width:parent.width*0.2
+        height:parent.height*0.08
+        labelSize: layout.value("F4")
+        onClicked: {
+            mngData.sendToPrint()
+        }
+    }
+
     MButton {
         id:btnBack
         text: qsTr("back to graphs")
-
         anchors.right: parent.right
         anchors.bottom: parent.bottom
         anchors.bottomMargin: 10
         anchors.rightMargin: 10
         width:parent.width*0.2
         height:parent.height*0.08
-        labelSize: 4
+        labelSize: layout.value("F4")
         onClicked: {            
             for (var i = 0; i < pagesLocal.length; i++) {
                 if (pagesLocal[i].visible)

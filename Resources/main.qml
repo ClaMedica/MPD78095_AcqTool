@@ -146,6 +146,9 @@ ApplicationWindow {
             forAna.loadConfigurationFile(mngData.plotConfigFileName())
             forAna.populate()
             forHome.whoIsVisible = forAna.name
+            if (mngData.getAutoFlow() === 0)
+                mngData.analysis()
+
         }
 
         onReloadingCompleted: forAna.populate()

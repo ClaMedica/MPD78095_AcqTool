@@ -55,6 +55,8 @@ Rectangle{
                 modM.setProperty(modello[i],modello[i+1])
             state="idl"
 
+            rootMarkerButton.visible = modM.visible
+
         }
     }
 

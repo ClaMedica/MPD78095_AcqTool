@@ -47,6 +47,9 @@ public:
     Q_INVOKABLE int getNumAnaFlwAdv(){return m_aflwdatas.length();}
 
     Q_INVOKABLE void getGrabbedImage(QObject *gi, QString nome);
+    Q_INVOKABLE bool getAutoPrint(){return m_autoPrint;}
+    Q_INVOKABLE int getAutoFlow(){return m_autoFlow;}
+
     QByteArray  m_resultBm;
     int         m_resultBm_w, m_resultBm_h;
 
@@ -102,6 +105,7 @@ public slots:
     QVariant getSignal(QString __name);
     QStringList getLinks(QString __what, QStringList __filterFamily=QStringList(), QStringList __filterType=QStringList());
     void startPrint();
+    void sendToPrint();
 
 
 private:
