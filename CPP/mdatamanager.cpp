@@ -1043,6 +1043,22 @@ bool MDataManager::checkForVolRes()
 
     m_numAna = m_mng->GetAnalysiNum();
 
+    //gestione campo Other del file .pic
+    QString otherString = m_mng->GetOther();
+
+    if (otherString == "")
+    {
+        otherString  = "0;" + QString::number(m_autoFlow) + ";";
+        setValVolRes(0);
+        m_mng->SetOther(otherString);
+        m_mng->CommitParameters();
+    }
+    else
+    {
+        setValVolRes(otherString.split(";").at(0).toInt());
+        m_autoFlow = otherString.split(";").at(1).toInt();
+    }
+
     //ciclo per individuare se e necessario aprire la dlg del volume residuo
     bool volRes = false;
     for (int i = 0; i < m_numAna; i++)
@@ -1053,11 +1069,6 @@ bool MDataManager::checkForVolRes()
                 setValVolRes(0);//-1?;
             else {
                 volRes = true;
-                int volRes = 0;
-                QString volResString = m_mng->GetOther().split(";").at(0);
-                if (volResString != "")
-                    volRes = volResString.toInt();
-                setValVolRes(volRes);
                 emit sg_openVolResDlg("Flowmetry");
                 break;
             }
@@ -1097,18 +1108,16 @@ qDebug() << "INIZIO";
     qDebug() << "File Aperto?" << m_mng->Open();
     qDebug() << "File Caricato?" << m_mng->GetParameters();
 
-    //mi salvo nel campo other il valore del volume residuo
+    //mi salvo nel campo other il valore del volume residuo nel caso l'utente lo avesse cambiato
     QString other = m_mng->GetOther();
     QStringList otherList = other.split(";");
     other.clear();
     otherList[0] = QString::number(getValVolRes());
-    if (otherList.length() == 1)
-        other = otherList.at(0) + ";";
-    else
-        for (int j=0; j<otherList.length()-1;j++)
-            other += otherList.at(j) + ";";
+    for (int j=0; j<otherList.length()-1;j++)
+        other += otherList.at(j) + ";";
 
     m_mng->SetOther(other);
+    m_mng->CommitParameters();
 
     m_ana->SetData(m_mng);
 
