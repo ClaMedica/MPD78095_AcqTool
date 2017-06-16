@@ -1041,9 +1041,6 @@ bool MDataManager::checkForVolRes()
     qDebug() << "File Aperto?" << m_mng->Open();
     qDebug() << "File Caricato?" << m_mng->GetParameters();
 
-    //per ora salvo io su file pic l'analisi flussimetria ...
-    //m_mng->SetAnalysis("2");
-
     m_numAna = m_mng->GetAnalysiNum();
 
     //ciclo per individuare se e necessario aprire la dlg del volume residuo
@@ -1056,7 +1053,11 @@ bool MDataManager::checkForVolRes()
                 setValVolRes(0);//-1?;
             else {
                 volRes = true;
-                setValVolRes(0);    //in futuro sara' letto da other del file .pic
+                int volRes = 0;
+                QString volResString = m_mng->GetOther().split(";").at(0);
+                if (volResString != "")
+                    volRes = volResString.toInt();
+                setValVolRes(volRes);
                 emit sg_openVolResDlg("Flowmetry");
                 break;
             }
@@ -1096,8 +1097,18 @@ qDebug() << "INIZIO";
     qDebug() << "File Aperto?" << m_mng->Open();
     qDebug() << "File Caricato?" << m_mng->GetParameters();
 
-    //per ora salvo io su file pic l'analisi flussimetria ...
-    //m_mng->SetAnalysis("2");
+    //mi salvo nel campo other il valore del volume residuo
+    QString other = m_mng->GetOther();
+    QStringList otherList = other.split(";");
+    other.clear();
+    otherList[0] = QString::number(getValVolRes());
+    if (otherList.length() == 1)
+        other = otherList.at(0) + ";";
+    else
+        for (int j=0; j<otherList.length()-1;j++)
+            other += otherList.at(j) + ";";
+
+    m_mng->SetOther(other);
 
     m_ana->SetData(m_mng);
 
