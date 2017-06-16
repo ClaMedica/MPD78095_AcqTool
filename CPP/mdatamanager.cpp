@@ -221,6 +221,8 @@ void MDataManager::loadFile(QString __fileName)
 
     //devo pulire tutti i vettori utilizzati
     resetAll();
+    //reset del valore di volume residuo diverso per ogni esame
+    setValVolRes(-999);
 
     VarMapVec *mrkOpVec = new VarMapVec;
     VarMapVec *mrkAnVec = new VarMapVec;
@@ -1054,7 +1056,7 @@ bool MDataManager::checkForVolRes()
                 setValVolRes(0);//-1?;
             else {
                 volRes = true;
-                setValVolRes(0);    //in futuro sarA  letto da proprietA  xml
+                setValVolRes(0);    //in futuro sara' letto da other del file .pic
                 emit sg_openVolResDlg("Flowmetry");
                 break;
             }

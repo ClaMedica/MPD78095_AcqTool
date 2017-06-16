@@ -154,10 +154,7 @@ ApplicationWindow {
         onReloadingCompleted: forAna.populate()
 
         onSg_openVolResDlg:{
-            //itemVolRes.visible = true
-            //itemVolRes.focus = true
             volRes.focus = true
-            volRes.volResVal = "0"
             volRes.titleDlg = __tipoAn
             volRes.visible = true
         }
