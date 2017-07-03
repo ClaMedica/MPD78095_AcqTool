@@ -61,8 +61,7 @@ void printermanager::print()
     //paziente
     m_name = m_dfm->GetPatient().section(";", 0, 0);
     m_surname = m_dfm->GetPatient().section(";", 1, 1);
-    QDate date = QDate(1899, 12, 30).addDays(m_dfm->GetPatient().section(";", 3, 3).toInt());
-    m_dateofbirth = date.toString();
+    m_dateofbirth = m_dfm->GetPatient().section(";", 2, 2);
     m_sex = *( m_dfm->GetPatient().section(";", 12, 12).toLatin1().data());
     m_ID = m_dfm->GetPatient().section(";", 3, 3);
     //esame
@@ -70,7 +69,7 @@ void printermanager::print()
     m_numTest = m_dfm->GetTestNum();
 
     QDate dateExam = QDate(1899, 12, 30).addDays(m_dfm->GetDataEsame());
-    m_dateofexam = dateExam.toString();
+    m_dateofexam = dateExam.toString("dd/MM/yyyy");
 
     QTime time = QTime(0,0,0).addSecs(m_dfm->GetStartTime());
     m_timeofstart = time.toString();	//ora inizio esame

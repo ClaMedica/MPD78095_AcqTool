@@ -1619,7 +1619,7 @@ bool MDataManager::InitArraysFLW(int __start,
         m_aflwdatas.at(i+1)->getLiverpoolAve()->setColors(colori);
         m_aflwdatas.at(i+1)->getLiverpoolAve()->setTracce(tracce);
 
-        qDebug() << "nomogramma Siroky Max";
+        qDebug() << "nomogramma Siroky Max & Ave";
         if (!m_sexPatient) {
             MSignal *sig0SirMax = new MSignal;
             MSignal *sig1SirMax = new MSignal;
