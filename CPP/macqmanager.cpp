@@ -16,6 +16,8 @@ MAcqManager::MAcqManager(QObject *parent)
     m_tcpAttempts = 0;
     m_supeConnected = 0;
     m_oldState = 0;
+    m_itsok = "              &";
+    OutFile = NULL;
 
 #ifdef PICOFLOW
 
@@ -81,7 +83,8 @@ bool MAcqManager::newAcquisition(QString __dataFile)
     if(m_acqFileOpened) {
         qCritical() << "acquisizione in corso";   //sono gia' in acquisizione e voglio farne partire un altra
     }
-    else {
+    else
+    {
         qDebug() << "carico la configurazione per l'acquisizione";
         qDebug() << g_P7SettingsManager.progPath();
         if(!m_configAcq.loadFromXML(g_P7SettingsManager.progPath() + "/Config_Acq.xml"))
@@ -116,6 +119,24 @@ bool MAcqManager::newAcquisition(QString __dataFile)
 
         if(!QFile::exists(__dataFile))
             qCritical() << "File does not exists";
+
+        //gestione esami interrotti
+        //creo il file out_file nel quale va scritto l'ok se tutto va a buon fine
+        //altrimenti c'è il nome del file interrotto
+        QString outF = "out_file";
+        OutFile = new QFile(g_P7SettingsManager.progPath() + "/" + outF);
+
+        //Create the out_file new
+        if (QDir(g_P7SettingsManager.progPath() ).exists(outF))
+            QDir(g_P7SettingsManager.progPath()).remove(outF);
+
+        OutFile->open(QIODevice::WriteOnly | QIODevice::Text);
+        QTextStream* out = new QTextStream(OutFile);
+        *out << __dataFile;
+        OutFile->close();
+#ifdef PICOFLOW
+        system("sync");
+#endif
 
         m_mng = new DatafileManager;
 
@@ -154,6 +175,9 @@ bool MAcqManager::newAcquisition(QString __dataFile)
         //ripristino il file in acquisizione
         bool res = m_mng->Continue();
         qDebug() << "Continue ..." << res;
+
+        //dico a medica di salvare il file nel db
+        g_mainAppBridge->sendSave();
 
         //inizializzo i server di comunicazione con i plotter
         initializeServers();
@@ -258,7 +282,7 @@ void MAcqManager::startSupe(QString __mode)
 void MAcqManager::endAcquisitionSave()
 {
     endAcquisition();
-    g_mainAppBridge->sendSave();
+    g_mainAppBridge->sendOpen();
 }
 
 void MAcqManager::endAcquisitionDiscard()
@@ -277,7 +301,6 @@ void MAcqManager::endAcquisition(bool discard)
 
     foreach (SimpleTCPClient *client, m_tcpClients) {
         //mi disconnetto dal supe
-
         if(client->disconnectToHost())
             qDebug() << "disconnect "
                      << client->hostAddress().toString()
@@ -295,6 +318,12 @@ void MAcqManager::endAcquisition(bool discard)
 
     bool ret = m_mng->Close();
     qDebug() << "File closed?" << ret;
+
+    //write in out_file the OK string
+    OutFile->open(QIODevice::WriteOnly | QIODevice::Text);
+    QTextStream* out = new QTextStream(OutFile);
+    *out << m_itsok;
+    OutFile->close();
 
     if (discard)  //devo cancellare il file
     {

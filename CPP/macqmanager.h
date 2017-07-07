@@ -105,6 +105,10 @@ private:
     void fillBuffers(QByteArray __block);
     bool buffersReady();
     bool readConfigurationFile();
+
+    //to manage interrupted file
+    QString m_itsok;
+    QFile *OutFile;
 };
 
 
