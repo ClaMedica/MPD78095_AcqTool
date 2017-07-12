@@ -263,6 +263,7 @@ public:
                                                       qDebug("en:%s p:%p", __enable?"TRUE":"false",m_bitmap);
                                                     }
     void Report_BitMap();
+    void Report_BitMap_test();
 
 
 signals:

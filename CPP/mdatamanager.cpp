@@ -1373,6 +1373,8 @@ int MDataManager::getValVolRes()
 
 void MDataManager::InitPageGraphs(int __anaType)
 {
+//    m_mngPrint->Report_BitMap_test();
+
     if (__anaType == FLW_AVD_STUDY) {
         //determina tratti da analizzare.
         //Per ora considera solo il primo.
