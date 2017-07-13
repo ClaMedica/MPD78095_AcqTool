@@ -6,8 +6,8 @@ import MComponents 1.0
 MForm {
     id:volResDlg
     color: "lightgrey"
-    width: 350
-    height: 200
+    width: parent.width - parent.width/4
+    height: parent.height - parent.height/4
     visible:false
 
     anchors.centerIn: parent
@@ -25,8 +25,8 @@ MForm {
 
     Rectangle{
         color:"dodgerblue"
-        width: 350
-        height: 30
+        width: parent.width
+        height: parent.height/5
         Text{
             anchors.horizontalCenter: parent.horizontalCenter
             anchors.verticalCenter: parent.verticalCenter
@@ -38,12 +38,12 @@ MForm {
     MParameterEdit{
         id:parVolResVal
         anchors.verticalCenter: parent.verticalCenter
-        height:parent.height*0.25
-        anchors.left: label.right
-        anchors.right:parent.right
+        height:parent.height*0.2
+        anchors.horizontalCenter: parent.horizontalCenter
+        //anchors.right:parent.right
         anchors.margins: layout.value("Margin")
         type:typTextField
-        labelSize: 4
+        labelSize: 5
         viewPerc:0.75
         role:qsTr("Insert Residual Volume")
         keyboardAlfaNum: false
@@ -56,8 +56,8 @@ MForm {
         anchors.bottom: parent.bottom
         anchors.bottomMargin: 10
         anchors.rightMargin: 10
-        width:parent.width*0.4
-        height:parent.height*0.2
+        width:parent.width*0.3
+        height:parent.height*0.15
         onClicked: {
             var volResVal = parVolResVal.info
             volResDlg.visible = false
