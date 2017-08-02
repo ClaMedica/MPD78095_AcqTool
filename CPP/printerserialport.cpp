@@ -56,87 +56,44 @@ int hdump(FILE *fp, char *p, int n)
 }
 #endif
 
+int printerserialport::status(bool print)
+{
+    (void) m_serialPort.readAll();
+    // status test
+    char escst[2] = { ESC, 'v' };
+    m_serialPort.write(escst, 2);
+    m_serialPort.flush();
+
+    m_serialPort.waitForReadyRead(100);
+    char ret[2];
+    int  sz = 0;
+    while(sz <= 0) {
+        sz = m_serialPort.read(ret, 1);
+        if(sz > 0 && print) {
+            int v = ret[0] & 0xff;
+            qDebug("ESC_V = cutterfail:%c hole-mark:%c on-line:%c in-use:%c PWR:%c paper-out:%c head-up:%c head:%c",
+                   (v & (1 << 7)) ? 'C' : 'c',
+                   (v & (1 << 6)) ? 'H' : 'h',
+                   (v & (1 << 5)) ? 'O' : 'o',
+                   (v & (1 << 4)) ? 'R' : 'r',
+                   (v & (1 << 3)) ? 'S' : 's',
+                   (v & (1 << 2)) ? 'P' : 'p',
+                   (v & (1 << 1)) ? 'H' : 'h',
+                   (v & (1 << 0)) ? 'T' : 't'
+                  );
+        }
+        else
+            m_serialPort.waitForReadyRead(100);
+    }
+
+    return ret[0] & 0xff;
+}
 /*
    Invia alla Stampante "num_car" caratteri della stringa "str_pri"
    Se "flag_lf" invia il carattere LF alla fine
 */
 bool printerserialport::Pri_Str(int m_num_car, char *m_str_pri, unsigned char m_flag_lf)
 {
-#ifdef  _PRISTR_SPLIT_
-    static bool recurse = false;
-    unsigned char * p = (unsigned char *) m_str_pri;
-    int    n = m_num_car;
-    if((recurse == false) && (p[0] == 0x1b) && (p[1] == 0x2a)) {
-        int ltot = p[2] | (p[3] << 8) | (p[4] << 16);
-        int lrow = p[7];
-        if((n == (ltot + 8)) && (ltot > lrow)) {
-            m_str_pri[2] = lrow;
-            m_str_pri[3] = 0;
-            m_str_pri[4] = 0;
-            p = (unsigned char *)m_str_pri + 8;
-
-#ifdef _HDUMP_
-            FILE * fp = fopen("/home/gio/pritrace", "a");
-            fprintf(fp, "\n{\nrecurse pristr() n:%d sz:%d, l:%d\n", n,ltot,lrow);
-            fclose(fp);
-#endif
-
-            recurse = true;
-            {
-                while(ltot > lrow && ltot > 0) {
-                    Pri_Str(8, m_str_pri, 0);
-                    Pri_Str(lrow, (char *)p, 0);
-                    p    += lrow;
-                    ltot -= lrow;
-                }
-                if(ltot > 0) {
-                    m_str_pri[2] = ltot;
-                    Pri_Str(8, m_str_pri, 0);
-                    Pri_Str(ltot, (char *)p, 0);
-                }
-            }
-            recurse = false;
-
-#ifdef _HDUMP_
-            fp = fopen("/home/gio/pritrace", "a");
-            fprintf(fp, "\n}\n");
-            fclose(fp);
-#endif
-
-            m_serialPort.flush();
-            return true;
-        }
-    }
-#endif
-
-#ifdef  _PRISTR_BINDUMP_
-    {
-        FILE * fp = fopen("/tmp/printer", "a");
-        fwrite(m_str_pri, m_num_car, 1, fp);
-        if(m_flag_lf) {
-            char s[1] = { LF };
-            fwrite(s, 1, 1, fp);
-        }
-        fclose(fp);
-    }
-#endif
-
-#ifdef  _HDUMP_
-    {
-        char * p = m_str_pri;
-        int    n = m_num_car;
-        FILE * fp = fopen("/home/gio/pritrace", "a");
-        fprintf(fp, "%c[%4.4d] '%s'\n", recurse ? '!' : ' ', m_num_car, m_flag_lf ? "LF" : "nolf");
-        if(p[0] == 0x1b && p[1] == 0x2a) {
-            int z = hdump(fp, p, 8);
-            p += z;
-            n -= z;
-        }
-        hdump(fp, p, n);
-        fclose(fp);
-    }
-#endif
-
 //    while((m_serialPort.pinoutSignals() & QSerialPort::ClearToSendSignal) == 0)
 //        QThread::currentThread()->msleep(10);
 
@@ -150,13 +107,8 @@ bool printerserialport::Pri_Str(int m_num_car, char *m_str_pri, unsigned char m_
 #if 1
     while(m_serialPort.waitForBytesWritten(100) == false)
         ;
+#endif
     m_serialPort.flush();
-#else
-#ifdef  _PRISTR_SPLIT_
-    if(recurse == false)
-#endif
-        m_serialPort.flush();
-#endif
 
     return true;
 }
@@ -168,7 +120,7 @@ void printerserialport::Pri_justif(char m_mode)
     // 0 centered; 1 right justified; 2 left justified
 
     char pri_str[] = { ESC, 'C', m_mode} ;
-    Pri_Str(sizeof(pri_str), pri_str, 0);
+    Pri_Str(3, pri_str, 0);
 }
 
 void printerserialport::Pri_mode(char m_mode)
@@ -178,7 +130,7 @@ void printerserialport::Pri_mode(char m_mode)
     // mode = 0xYY = X0XX0XX0 : <underlined> <0> <double w.> <double h.> <0> <quadruple w.> <quadruple h.> <0> */
 
     char pri_str[] = { ESC, '!', m_mode };
-    Pri_Str(sizeof(pri_str), pri_str, 0);
+    Pri_Str(3, pri_str, 0);
 }
 
 void printerserialport::Pri_forward(char m_dotlines)
@@ -186,7 +138,7 @@ void printerserialport::Pri_forward(char m_dotlines)
     /* fa avanzare di "dotlines" righe la carta*/
 
     char pri_str[] = { ESC, 'J', m_dotlines };
-    Pri_Str(sizeof(pri_str), pri_str, 0);
+    Pri_Str(3, pri_str, 0);
 }
 
 void printerserialport::Pri_Reset()
@@ -196,7 +148,7 @@ void printerserialport::Pri_Reset()
 //    char pri_str[] = { ESC, '@' };
 
 //    m_serialPort.setFlowControl(QSerialPort::NoFlowControl);
-//    Pri_Str(sizeof(pri_str), pri_str, 0);
+//    Pri_Str(2, pri_str, 0);
 //    m_serialPort.setFlowControl(QSerialPort::HardwareControl);
 }
 
@@ -206,7 +158,7 @@ void printerserialport::Pri_Font(char m_font)
     /*    0 - 8x16  1 - 12x20 2 - 7x16  */
 
     char pri_str[] = { ESC, '%', m_font };
-    Pri_Str(sizeof(pri_str), pri_str, 0);
+    Pri_Str(3, pri_str, 0);
 }
 
 void printerserialport::Pri_Intensity(char m_intens)
@@ -216,14 +168,14 @@ void printerserialport::Pri_Intensity(char m_intens)
 //   intens > 0x80 higher print
 
     char pri_str[] = { GS, 'D', m_intens };
-    Pri_Str(sizeof(pri_str), pri_str, 0);
+    Pri_Str(3, pri_str, 0);
 }
 
 
 void printerserialport::Pri_Default()
 {
 //    char pri_str[] = { ESC, 'd' };
-//    Pri_Str(sizeof(pri_str), pri_str, 0);
+//    Pri_Str(3, pri_str, 0);
 }
 
 /* numero di pixel scaldati contemporaneamente --> (n+1)*8
@@ -234,7 +186,7 @@ void printerserialport::Pri_Default()
 void printerserialport::Pri_Speed(char m_speed )
 {
     char pri_str[] = { GS, '/', m_speed };     // 1 <= speed <= 32, 0 max speed
-    Pri_Str(sizeof(pri_str), pri_str, 0);
+    Pri_Str(3, pri_str, 0);
 }
 
 /* setta la massima velocita di stampa settando il tempo di avanzamento
@@ -245,7 +197,7 @@ void printerserialport::Pri_Speed(char m_speed )
 void printerserialport::Pri_Max_Speed(char m_n1, char m_n2)
 {
     char pri_str[] = { GS, 's', m_n1, m_n2 };
-    Pri_Str(sizeof(pri_str), pri_str, 0);
+    Pri_Str(4, pri_str, 0);
 }
 
 void printerserialport::waiting()

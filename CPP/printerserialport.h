@@ -21,6 +21,7 @@ public:
     void closeSerialPort();
 
     void init_printer();
+    int status(bool print = true);
 
     bool Pri_Str(int m_num_car, char *m_str_pri, unsigned char m_flag_lf);
     void Pri_justif(char m_mode);

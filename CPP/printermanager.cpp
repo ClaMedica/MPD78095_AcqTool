@@ -115,6 +115,8 @@ void printermanager::print()
 
 void printermanager::pri_rep_review()
 {
+//    Report_BitMap_test();
+
     m_dfm->Open();
     m_dfm->GetParameters();
     int numCh = m_numchan;
@@ -313,7 +315,7 @@ void printermanager::Pri_Rep()
     m_port->Pri_forward(npix);
 #endif
 
-    m_port->Pri_Reset();	// resetta RAM della stampante: equivale ad un reset HW
+//    m_port->Pri_Reset();	// resetta RAM della stampante: equivale ad un reset HW
 }
 
 
@@ -2314,6 +2316,51 @@ void printermanager::Pri_Rep_asse_dx()
     // finalmente stampa
     m_port->Pri_Str( dim_string_solo_ax, (char *)m_str_gr, 0);
 
+}
+
+void printermanager::Report_BitMap_test()
+{
+    m_port->init_printer();
+    m_port->Pri_Speed(1);
+    int sp = 1000;
+    m_port->Pri_Max_Speed((sp >> 8) & 0xff, sp & 0xff);
+
+    char txt0[] = "--iniz test--\n";
+    m_port->Pri_Str(strlen(txt0), txt0, 0);
+
+    int     szchunk = 103;  // 824/8
+    char tbm[103];
+    char    head[8];
+    int     sz = szchunk*100;
+
+    head[0] = ESC;	//0x1B;	// ESC
+    head[1] = '*';	//0x2A;	// *
+    head[2] = szchunk         & 0xff;	// n1
+    head[3] = (szchunk >>  8) & 0xff;	// n2
+    head[4] = (szchunk >> 16) & 0xff;	// n3
+    head[5] =  0;	// n4	singola altezza
+    head[6] =  0;	// n5	scrive a n5 byte dal bordo
+    head[7] = szchunk;	// n6
+
+    for(int s = 0; s < sz; ) {
+        for(int i = 0; i < 103; i++)
+            tbm[i] = (rand() & 0x11);
+        for(int n = 0; (n < 1000) && (m_port->status(false) & (1 << 3)); n++)
+            ;
+        m_port->status();
+        m_port->Pri_Str(8, head, 0);
+        m_port->Pri_Str(szchunk, tbm, 0);
+        s += szchunk;
+    }
+
+    m_port->Pri_Font(1);
+    m_port->Pri_mode(0x00);
+    m_port->Pri_justif(F_left);
+    QString xxx = tr("\n\n");
+    m_port->Pri_Str(strlen(xxx.toLatin1().data()), xxx.toLatin1().data(), 1);
+
+    char txt1[] = "--fine test--\n";
+    m_port->Pri_Str(strlen(txt1), txt1, 0);
 }
 
 /**
