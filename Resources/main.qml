@@ -8,6 +8,7 @@ import "qrc:/Dialog"
 import MComponents 1.0
 import Managers 1.0
 import QtQuick.Window 2.2
+import FileIO 1.0
 
 //import QtQuick.VirtualKeyboard 1.0
 
@@ -60,6 +61,7 @@ ApplicationWindow {
 
     //@@@@@@@@@@    Events          @@@@@@@@@@
      Component.onCompleted: {
+         acqLoaded.createFileLoaded()
          console.log("debug??? ", Qt.application.arguments[3])
          if (Qt.application.arguments[3] === "debug") {
              root.visible = true
@@ -101,6 +103,11 @@ ApplicationWindow {
     }
 
     //@@@@@@@@@@    Objects         @@@@@@@@@@
+    FileIO {
+        id: acqLoaded
+    }
+
+
     Connections {
         id: connMainApp
         target: bridgeMain

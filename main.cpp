@@ -25,6 +25,7 @@
 #include <QQuickWindow>
 #include "layoutmanager.h"
 #include <QSplashScreen>
+#include <fileio.h>
 
 #ifdef ANDROID
 #include <QAndroidJniObject>
@@ -94,6 +95,7 @@ int main(int argc, char *argv[])
     qmlRegisterType<MAcqManager>("Managers", 1, 0, "MAcqManager");
     qmlRegisterType<MDataManager>("Managers", 1, 0, "MDataManager");
     qmlRegisterType<P7Settings>("Managers", 1, 0, "MSettings");
+    qmlRegisterType<fileIO>("FileIO", 1, 0, "FileIO");
 
     qmlRegisterUncreatableType<mflowdatas>("Managers", 1, 0, "mflowdata", "error on anaFlwAdv creation");
     qmlRegisterUncreatableType<mflowdatasModel>("Managers", 1, 0, "mflowdatamodel", "error on anaFlwAdv creation");

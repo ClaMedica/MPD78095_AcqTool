@@ -42,6 +42,7 @@ SOURCES += \
     ../AnaUro/anauro.cpp \
     ../AnaUro/analysis.cpp \
     ../AnaUro/anautils.cpp \
+    ../MGlobal/fileio.cpp
 
 HEADERS += \
     CPP/alarmmanager.h \
@@ -73,7 +74,8 @@ HEADERS += \
     ../MGlobal/msignal.h \
     ../MGlobal/p7settingsmanager.h \
     ../MGlobal/systemmanager.h \
-    ../MGlobal/UdmImpl.h
+    ../MGlobal/UdmImpl.h \
+    ../MGlobal/fileio.h
 
 INCLUDEPATH +=  CPP \
                 CPP/TCP \
