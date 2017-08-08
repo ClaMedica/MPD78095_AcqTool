@@ -116,7 +116,7 @@ Rectangle{
     }
 
 
-    MouseArea{
+    BuzzMouseArea{
         //@@@@@@@@@@    Properties      @@@@@@@@@@
         id:area
         anchors.fill: parent

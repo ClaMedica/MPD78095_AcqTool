@@ -5,7 +5,8 @@ import QtQuick.Window 2.1
 import "qrc:/Forms"
 import "qrc:/Components"
 import MComponents 1.0
-TableView{
+
+BuzzTableView{
     id:rootTable
     property bool completed:false
     property var roles:[]

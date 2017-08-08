@@ -26,6 +26,7 @@
 #include "layoutmanager.h"
 #include <QSplashScreen>
 #include <fileio.h>
+#include <systemmanager.h>
 
 #ifdef ANDROID
 #include <QAndroidJniObject>
@@ -149,7 +150,8 @@ int main(int argc, char *argv[])
 
     engine.rootContext()->setContextProperty("layout", &mngLayout);
     engine.rootContext()->setContextProperty("settings", &g_P7SettingsManager);
-    engine.rootContext()->setContextProperty("bridgeMain", g_mainAppBridge);
+    engine.rootContext()->setContextProperty("bridgeMain", g_mainAppBridge);    
+    engine.rootContext()->setContextProperty("mngSys", &g_systemManager);
 
     qDebug() << engine.importPathList();
     engine.load(QUrl(QStringLiteral("qrc:/main.qml")));

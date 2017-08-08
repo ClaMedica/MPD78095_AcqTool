@@ -27,7 +27,7 @@ Rectangle {
         font.bold: false
     }
 
-    MouseArea {
+    BuzzMouseArea {
         anchors.fill: parent
         onClicked: parent.clicked(parent.buttonId)
 

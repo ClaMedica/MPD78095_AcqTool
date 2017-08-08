@@ -107,7 +107,7 @@ Rectangle {
             alwaysRunToEnd: true
         }
     }
-    MouseArea{
+    BuzzMouseArea{
         id:control
         property bool hovered:false
         property bool pressed:false

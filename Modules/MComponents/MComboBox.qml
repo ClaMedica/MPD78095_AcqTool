@@ -140,7 +140,7 @@ Rectangle {
         }
     }
 
-    MouseArea{
+    BuzzMouseArea{
         id:area
         enabled: arrow.visible
         anchors.fill: parent

@@ -1,6 +1,7 @@
 import QtQuick 2.3
 import QtQuick.Controls 1.2
 import QtQuick.Dialogs 1.2
+import MComponents 1.0
 
 Rectangle {
     id: exitDlg
@@ -37,7 +38,7 @@ Rectangle {
         }
     }
 
-    Button {
+    BuzzButton {
         id:btnYes
         text: qsTr("Yes")
         anchors.left: parent.left
@@ -52,7 +53,7 @@ Rectangle {
         }
     }
 
-    Button {
+    BuzzButton {
         id:btnNo
         text: qsTr("No")
         anchors.horizontalCenter: parent.horizontalCenter
@@ -66,7 +67,7 @@ Rectangle {
         }
     }
 
-    Button {
+    BuzzButton {
         id:btnCancel
         text: qsTr("Cancel")
         anchors.right: parent.right

@@ -44,7 +44,7 @@ Rectangle {
             anchors.margins: 4
             anchors.fill: parent
         }
-        MouseArea{
+        BuzzMouseArea{
             anchors.fill: parent
             onClicked: {
                 realChecked=!realChecked;

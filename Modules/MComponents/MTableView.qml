@@ -4,8 +4,9 @@ import QtQuick.Controls 1.2
 import QtQuick.Window 2.1
 //medica imports
 import MComponents 1.0
+import QtQuick.Controls.Styles 1.4
 
-TableView{
+BuzzTableView{
     id:rootTable
     property bool completed:false
     property var roles:[]
@@ -93,7 +94,36 @@ TableView{
     itemDelegate:TItemDelegate{itemData:styleData}
     headerDelegate:THeaderDelegate{itemData:styleData}
 
-    Rectangle{
+    style: TableViewStyle {
+        scrollToClickedPosition : true
+
+        handle: Rectangle {
+            z: 100
+            implicitWidth: 50
+            implicitHeight: 30
+            Rectangle {
+                color: layout.value("THC1")
+                anchors.fill: parent
+                anchors.topMargin: 6
+                anchors.leftMargin: 4
+                anchors.rightMargin: 4
+                anchors.bottomMargin: 6
+            }
+        }
+        incrementControl: Rectangle {
+            visible: false
+        }
+        decrementControl: Rectangle {
+            visible: false
+        }
+
+        scrollBarBackground: Item {
+            implicitWidth: 50
+            implicitHeight: 30
+        }
+    }
+
+     Rectangle {
         id:frame
         anchors.fill:rootTable
         width:rootTable.width-2

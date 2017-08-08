@@ -29,4 +29,10 @@ MKeyboardNum 1.0        MKeyboardNum.qml
 MComboFont 1.0          MComboFont.qml
 MHourEdit 1.0           MHourEdit.qml
 MTextField 1.0		MTextField.qml
+BuzzButton 1.0          BuzzButton.qml
+BuzzMouseArea 1.0       BuzzMouseArea.qml
+BuzzRadioButton 1.0     BuzzRadioButton.qml
+BuzzSlider 1.0          BuzzSlider.qml
+BuzzSwitch 1.0          BuzzSwitch.qml
+BuzzTableView 1.0       BuzzTableView.qml
 DataEngine 1.0          GeneralData.js

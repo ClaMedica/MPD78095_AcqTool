@@ -49,7 +49,7 @@ MForm {
         keyboardAlfaNum: false
     }
 
-    Button {
+    BuzzButton {
         id:btnOK
         text: "Ok"
         anchors.right: parent.right
