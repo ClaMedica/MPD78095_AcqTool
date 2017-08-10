@@ -97,7 +97,7 @@ Rectangle {
             labelSize: rootComboBox.labelSize
             text:modelData
             horizontalAlignment: text.length>10?Text.AlignLeft:Text.AlignHCenter
-            MouseArea {
+            BuzzMouseArea {
                 hoverEnabled: true
                 anchors.fill: parent
                 onEntered: {

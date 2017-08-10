@@ -67,6 +67,7 @@ Rectangle {
         {
             if(target.focus && isTouch)
             {
+                mngSys.startSound()
                 var c
                 if (keyboardAlfaNum)
                     c = keyboard

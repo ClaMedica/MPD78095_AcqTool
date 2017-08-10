@@ -126,6 +126,7 @@ Rectangle {
             {
                 if(focus && isTouch)
                 {
+                    mngSys.startSound()
                     if (keyboardNum !== undefined)
                     {
                         keyboardNum.testo = edYear.text
