@@ -145,9 +145,10 @@ private:
     int     m_autoFlow;     //Modalita dell'esame 0=auto; 2=manual
     bool    m_Siroky;       //se stampare Siroky
     bool    m_Liverpool;    //se stampare Liverpool
-    bool    m_landscape;    //modalità di stampa: portrait o landascape (ture se landscape)
-    //true se donna, false se uomo
-    bool    m_sexPatient;
+    bool    m_landscape;    //modalità di stampa: portrait o landascape (ture se landscape)   
+    bool    m_sexPatient;   //true se donna, false se uomo
+    QString m_firstHead;    //primo header della stmpa personalizzabile
+    QString m_secondHead;   //secondo header della stampa personalizzabile
 
     int m_numAna; //numero di analisi --> non sappiamo se serve
     QVector<mflowdatas*> m_aflwdatas; //array di analisi di tipo flussimetria

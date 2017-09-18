@@ -298,7 +298,6 @@ bool MAbstractManager::load()
 #else
         configUser = ":/Config/Config_User.xml";
 #endif
-
     m_configUser.erase();
     if(!m_configUser.loadFromXML(configUser))
         qCritical() << "Error on user configuration file";
@@ -306,6 +305,21 @@ bool MAbstractManager::load()
     m_configMarkers.erase();
     if(!m_configMarkers.loadFromXML(":/Config/markers.xml"))
         qCritical() << "Error on user configuration file";
+
+    QString configPrinter = g_P7SettingsManager.printerSettings();
+    if(!QFile::exists(configPrinter))
+        configPrinter = ":/Config/Config_Printer.xml";
+    m_configPrinter.erase();
+    if(!m_configPrinter.loadFromXML(configPrinter))
+        qCritical() << "Error on user configuration file";
+
+    QString configLanguage = g_P7SettingsManager.languageSettings();
+    if(!QFile::exists(configLanguage))
+        configLanguage = ":/Config/Config_Language.xml";
+    m_configLang.erase();
+    if(!m_configLang.loadFromXML(configLanguage))
+        qCritical() << "Error on user configuration file";
+
 
     bool res = buildMarkerInfoMap();
     return res;

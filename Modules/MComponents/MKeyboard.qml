@@ -48,10 +48,11 @@ Rectangle {
         anchors.right:parent.right
         height:parent.height/6
         color:"white"
+
         MTextField{
             id:txtField
-            selectByMouse:false
-            anchors.fill: parent            
+//            selectByMouse:false
+            anchors.fill: parent
             labelSize: rootKeyboard.labelSize
             onTextChanged: if(target!=undefined) target.text=txtField.text
             validator: target!=undefined?target.validator:null

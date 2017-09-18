@@ -261,10 +261,10 @@ public:
     void setTipoEsame(unsigned char __val)  {m_test_type = __val;}
     void setBitmap(bool __enable, QByteArray *bm)    { m_printBitmap = __enable; m_bitmap = bm;
                                                       qDebug("en:%s p:%p", __enable?"TRUE":"false",m_bitmap);
-                                                    }
+                                                        }
     void Report_BitMap();
     void Report_BitMap_test();
-
+    void setPrintHeaders(QString __first, QString __second)     {m_printFirstHeader = __first; m_printSecondHeader = __second;}
 
 signals:
 
@@ -281,6 +281,9 @@ private:
     bool m_printSiroky;
     bool m_printLiverpool;
     bool m_printBitmap;
+
+    QString m_printFirstHeader;
+    QString m_printSecondHeader;
 
     //dati paziente
     QString m_name;

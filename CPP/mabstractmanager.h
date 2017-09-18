@@ -61,7 +61,9 @@ protected:
     QMap<QString, SimpleTCPChannel *> m_tcpChannels;    //canali di comunicazione verso l'esterno
     Ancestry m_configLocale,    //e' la prima ad essere caricata e contiene la lingua
     m_configMarkers,            //contiene le info per i marker
-    m_configUser;               //contiene le info modificate dall'utente
+    m_configUser,               //contiene le info modificate dall'utente
+    m_configPrinter,            //contiene le info relative alla stampa
+    m_configLang;            //contiene le info relative alla lingua
 
     /// lista delle info di entrata:
     /// [[plotName1,[traccia1,markers,ecc]][plotName2,[traccia2,markers,ecc]]]

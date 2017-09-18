@@ -3,6 +3,62 @@
 
 extern bool DebugAcqTool;
 
+MDataManager::MDataManager(QObject *parent)
+{
+    (void) parent;
+
+    m_mng = NULL;
+    m_ana = NULL;
+    m_copy = NULL;
+    m_currentSignalName = "custom_signal";
+    m_pCurrentSignal = NULL;
+    m_updateWhenNews = false;
+    m_start = 0;
+    m_end = 3600;   //fine esame di default a 1 ora
+    //m_applicationPath=applicationDirPath();
+    m_configurationFileLoaded = false;  //nessun file di configurazione caricato
+    m_changesToBeSaved = false;
+
+    m_analized = false;
+    m_autoPrint = false;
+    m_Siroky = false;
+    m_Liverpool = false;
+    m_landscape = false;
+
+    m_numAna = 0;
+    m_toSave = "ret";
+
+    m_mngPrint = NULL;
+
+    m_resultBm_w = 824; // 103 bytes * 8 bit
+    m_resultBm_h = 300;
+    m_resultBm.resize((m_resultBm_w * m_resultBm_h) / 8);
+    m_resultBm.fill(0);
+
+    m_firstHead = "Medica S.p.A - Menfis Divisione";
+    m_secondHead = "Pico Flow 2";
+
+    setValVolRes(-999);
+}
+
+MDataManager::~MDataManager()
+{
+    if(m_mng != NULL) {
+        m_mng->Close();
+        delete m_mng;
+        m_mng = NULL;
+    }
+    if (m_ana != NULL) {
+        delete m_ana;
+        m_ana = NULL;
+    }
+
+    if (m_mngPrint != NULL) {
+        delete m_mngPrint;
+        m_mngPrint = NULL;
+    }
+}
+
 // conversione da RGB 8*3 = 24 bit a RGB 4*3 = 12 bit
 // ignorati i 4 bit bassi di ogni colore * ridurre le sfumature ad un colore di base
 #define NCOLORS 16*16*16
@@ -108,60 +164,6 @@ void MDataManager::getGrabbedImage(QObject *gi, QString nome)
     }
     free(bm);
     qDebug("fine getGrabbed, nblack:%d", nblack);
-}
-
-
-MDataManager::MDataManager(QObject *parent)
-{
-    (void) parent;
-
-    m_mng = NULL;
-    m_ana = NULL;
-    m_copy = NULL;
-    m_currentSignalName = "custom_signal";
-    m_pCurrentSignal = NULL;
-    m_updateWhenNews = false;
-    m_start = 0;
-    m_end = 3600;   //fine esame di default a 1 ora
-    //m_applicationPath=applicationDirPath();
-    m_configurationFileLoaded = false;  //nessun file di configurazione caricato
-    m_changesToBeSaved = false;
-
-    m_analized = false;
-    m_autoPrint = false;
-    m_Siroky = false;
-    m_Liverpool = false;
-    m_landscape = false;
-
-    m_numAna = 0;
-    m_toSave = "ret";
-
-    m_mngPrint = NULL;
-
-    m_resultBm_w = 824; // 103 bytes * 8 bit
-    m_resultBm_h = 300;
-    m_resultBm.resize((m_resultBm_w * m_resultBm_h) / 8);
-    m_resultBm.fill(0);
-
-    setValVolRes(-999);
-}
-
-MDataManager::~MDataManager()
-{
-    if(m_mng != NULL) {
-        m_mng->Close();
-        delete m_mng;
-        m_mng = NULL;
-    }
-    if (m_ana != NULL) {
-        delete m_ana;
-        m_ana = NULL;
-    }
-
-    if (m_mngPrint != NULL) {
-        delete m_mngPrint;
-        m_mngPrint = NULL;
-    }
 }
 
 void MDataManager::setInfoList(QVariantList __list)
@@ -510,17 +512,23 @@ void MDataManager::loadFile(QString __fileName)
         Ancestry *autoflow = m_configUser.getSafeChild("AutomaticFlow");
         m_autoFlow = (autoflow->getSafeChild("Auto")->getSafeAttribute(ATT_VALUE) == "true" ? 0 : 2);
 
-        Ancestry *autoprint = m_configUser.getSafeChild("AnalysisSettings");
+        Ancestry *autoprint = m_configPrinter.getSafeChild("Settings");
         m_autoPrint = (autoprint->getSafeChild("AutoPrint")->getSafeAttribute(ATT_VALUE) == "true" ? true : false);
 
-        Ancestry *siroky = m_configUser.getSafeChild("AnalysisSettings");
+        Ancestry *siroky = m_configPrinter.getSafeChild("Settings");
         m_Siroky = (siroky->getSafeChild("Siroky")->getSafeAttribute(ATT_VALUE) == "true" ? true : false);
 
-        Ancestry *liverpool = m_configUser.getSafeChild("AnalysisSettings");
+        Ancestry *liverpool = m_configPrinter.getSafeChild("Settings");
         m_Liverpool = (liverpool->getSafeChild("Liverpool")->getSafeAttribute(ATT_VALUE) == "true" ? true : false);
 
-        Ancestry *printmode = m_configUser.getSafeChild("AnalysisSettings");
+        Ancestry *printmode = m_configPrinter.getSafeChild("Settings");
         m_landscape = (printmode->getSafeChild("PrinterMode")->getSafeAttribute(ATT_VALUE) == "true" ? true : false);
+
+        Ancestry *head1 = m_configPrinter.getSafeChild("Headers");
+        m_firstHead = head1->getSafeChild("First")->getSafeAttribute(ATT_VALUE);
+
+        Ancestry *head2 = m_configPrinter.getSafeChild("Headers");
+        m_secondHead = head2->getSafeChild("Second")->getSafeAttribute(ATT_VALUE);
 
         if (m_Liverpool)
             m_Siroky = false;
@@ -1331,6 +1339,7 @@ void MDataManager::startPrint()
     m_mngPrint->setPrintSiroky(m_Siroky);
     m_mngPrint->setPrintLiverpool(m_Liverpool);
     m_mngPrint->setPrintModeUser(m_landscape);
+    m_mngPrint->setPrintHeaders(m_firstHead,m_secondHead);
 
     //stampo
     if (m_autoPrint || m_autoFlow == 0)

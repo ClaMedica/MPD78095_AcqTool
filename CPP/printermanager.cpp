@@ -31,6 +31,9 @@ printermanager::printermanager(QString __namefile, QObject *parent) : QObject(pa
 
     m_bitmap = NULL;
 
+    m_printFirstHeader = "";
+    m_printSecondHeader = "";
+
     m_port = new printerserialport(this);
     m_port->init_printer();
 }
@@ -330,12 +333,12 @@ void printermanager::Intest()
     m_port->Pri_mode(0x30);						// modo doppia dimensione non sottolienata
 
     char str[60];
-    QString ditta_pers = tr("MENFIS BIOMEDICA");
+    QString ditta_pers = m_printFirstHeader;
     sprintf( str, "%s\n", ditta_pers.toLatin1().data());
     m_port->Pri_Str(strlen(str), str, 0);			// a capo con il "\n"
 
     m_port->Pri_mode(0x14);						// modo altezza doppia larghezza quadrupla
-    QString logo = tr("PICO FLOW 2");
+    QString logo = m_printSecondHeader;
     sprintf( str, "%s", logo.toLatin1().data());
     m_port->Pri_Str(strlen(str), str, 1);			// a capo con il "\n"
 
