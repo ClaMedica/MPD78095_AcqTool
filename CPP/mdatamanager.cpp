@@ -30,11 +30,6 @@ MDataManager::MDataManager(QObject *parent)
 
     m_mngPrint = NULL;
 
-    m_resultBm_w = 824; // 103 bytes * 8 bit
-    m_resultBm_h = 300;
-    m_resultBm.resize((m_resultBm_w * m_resultBm_h) / 8);
-    m_resultBm.fill(0);
-
     m_firstHead = "Medica S.p.A - Menfis Divisione";
     m_secondHead = "Pico Flow 2";
 
@@ -59,111 +54,10 @@ MDataManager::~MDataManager()
     }
 }
 
-// conversione da RGB 8*3 = 24 bit a RGB 4*3 = 12 bit
-// ignorati i 4 bit bassi di ogni colore * ridurre le sfumature ad un colore di base
-#define NCOLORS 16*16*16
-inline uint16_t decimazioneColore(uint32_t rgb24)
-{
-    uint32_t  colormask = 0x00f0f0f0;
-    uint32_t rgb12 = rgb24 & colormask;
-
-    rgb12 = ((rgb12 & 0x000000f0) >>  4) *   1 |
-            ((rgb12 & 0x0000f000) >> 12) *  16 |
-            ((rgb12 & 0x00f00000) >> 20) * 256;
-
-    return (uint16_t) rgb12;
-}
 
 void MDataManager::getGrabbedImage(QObject *gi, QString nome)
 {
-    qDebug() << nome;
-    bool isSiro = nome.startsWith("Siro");
-    bool isLive = nome.startsWith("Live");
-    bool enab = (isSiro && m_Siroky) ||
-                (isLive && m_Liverpool);
-    if( ! enab)
-    {
-        m_resultBm.clear();
-        return;
-    }
-    m_mngPrint->setBitmap(enab, & m_resultBm);
-
-    bool isAve = nome.contains(" Ave");         // test Average / QMax
-    int  xoffs = isAve  ? 8 : (8 + 400 + 16);   // horizz pixel offset
-
-    QQuickItemGrabResult *item = qobject_cast<QQuickItemGrabResult *>(gi);
-    QImage  qi(item->image());
-    QSize   qs = qi.size();
-    int     w0 = qs.width();
-    int     h0 = qs.height();
-
-    // frequenza colori
-    int     bmsz = w0 * h0;         // image size
-    uint8_t *bm = (uint8_t *) malloc(bmsz); // per non aggiungere 120k allo stack
-                                            // non viene azzerata perche ogni singolo byte viene comunque assegnato
-    int32_t pale_cnt[NCOLORS];      // n.occorrenze del colore decimato
-    int32_t pale_indx[NCOLORS];     // da colore decimato a n.progressivo
-    int     pale_revindx[NCOLORS];  // da n.progressivo a colore decimato
-    int     pale_seq = 0;
-    bzero((void *) & pale_cnt, sizeof(pale_cnt));
-    for(int i = 0; i < NCOLORS; i++)
-        pale_indx[i] = -1;
-
-    // decimazione colori per eliminare le sfumature
-    uint16_t rgbSiro1 = decimazioneColore(0xff90ee90);   // colore area
-    uint16_t rgbSiro2 = decimazioneColore(0xffffdab9);   // colore area
-    uint16_t rgbGrid  = decimazioneColore(0xff808080);   // colore griglia
-    uint8_t *slider = bm;
-    for(int h = 0; h < h0; h++)                             // immagine scandita in modo raster
-        for(int w = 0; w < w0; w++) {
-            uint16_t rgb12 = decimazioneColore(qi.pixel(w, h));
-            int cur_color;
-            if(pale_cnt[rgb12] == 0) {                      // prima occorrenza del colore
-                pale_indx[rgb12] = cur_color = pale_seq++;  // n. progressivo colore
-                pale_revindx[cur_color] = rgb12;            // da n.colore a colore
-            }
-            else
-                cur_color = pale_indx[rgb12];
-            *slider++ = cur_color;                          // serializzazione colori ridotti
-            pale_cnt[rgb12]++;                              // statistica
-        }
-
-//    for (int i = 0; i < NCOLORS; i++) if(pale_cnt[i]) qDebug("palette %3.3x cnt:%d", i, pale_cnt[i]);
-//    for(int i = 0; i < pale_seq; i++) qDebug("col:%d %3.3x cnt:%d", i, pale_revindx[i], pale_cnt[pale_revindx[i]]);
-
-    int nblack = 0;
-    char  * d = m_resultBm.data();
-    slider = bm;
-    for(int h = 0; h < h0; h++) {                           // raster
-        int rowstart  = (h * m_resultBm_w + xoffs) / 8;
-        for(int w = 0; w < w0; w++) {
-            if((w & 7) == 0)                                // clear byte 8bit risultato in B/N
-                d[rowstart] = 0;
-            int ncolor = *slider++;                         // de-serializzazione
-            int rgb12 = pale_revindx[ncolor];
-            bool blackdot = (pale_cnt[rgb12] < 3000) || (rgb12 == rgbGrid); // immagine standard
-
-            if( ! blackdot && isSiro) {                     // livelli di grigio per Siroky
-                if(rgb12 == rgbSiro2) {
-                    if(((w % 3) == 1) && ((h % 3) >= 1))
-                        blackdot = true;
-                }
-                if(rgb12 == rgbSiro1) {
-                    if(((w % 3) == 1) && ((h % 3) == 1))
-                        blackdot = true;
-                }
-            }
-
-            if(blackdot) {                  // dot in stampa
-                int byteinrow = w >> 3;
-                int bitinbyte = 7 - (w & 7);
-                d[rowstart + byteinrow] |= 1 << bitinbyte;
-                nblack++;                   // statistica debug
-            }
-        }
-    }
-    free(bm);
-    qDebug("fine getGrabbed, nblack:%d", nblack);
+    m_mngPrint->getGrabbedImage(gi,nome);
 }
 
 void MDataManager::setInfoList(QVariantList __list)
@@ -530,8 +424,8 @@ void MDataManager::loadFile(QString __fileName)
         Ancestry *head2 = m_configPrinter.getSafeChild("Headers");
         m_secondHead = head2->getSafeChild("Second")->getSafeAttribute(ATT_VALUE);
 
-        if (m_Liverpool)
-            m_Siroky = false;
+//        if (m_Liverpool)
+//            m_Siroky = false;
 
         //libreria di analisi: creo oggetto.
         m_ana = new Analyze();
@@ -1382,8 +1276,6 @@ int MDataManager::getValVolRes()
 
 void MDataManager::InitPageGraphs(int __anaType)
 {
-//    m_mngPrint->Report_BitMap_test();
-
     if (__anaType == FLW_AVD_STUDY) {
         //determina tratti da analizzare.
         //Per ora considera solo il primo.
@@ -1802,3 +1694,11 @@ mflowdatas *MDataManager::getFlowDatas(int __i)
     return m_aflwdatas.at(__i);
 }
 
+void MDataManager::sendPrintTest()
+{
+    qDebug() << "inizio stampa";
+     m_mngPrint = new printermanager();
+     m_mngPrint->printTest();
+     qDebug() << "stampato";
+     m_mngPrint->closePrinter();
+}

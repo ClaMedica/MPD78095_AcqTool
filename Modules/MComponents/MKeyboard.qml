@@ -100,13 +100,13 @@ Rectangle {
                         image: modelData[2]!==undefined?modelData[2]:""
                         Component.onCompleted: btnLetters.push(this)
                         switchEnabled: image==="shift.png"|text==="1@#"
-                        onPressAndHold:
-                        {
-                            if(image=="shift.png"){
-                                shift=true
-                                caps=!caps
-                            }
-                        }
+//                        onPressAndHold:
+//                        {
+//                            if(image=="shift.png"){
+//                                shift=true
+//                                caps=!caps
+//                            }
+//                        }
                         onClicked:{
                             //console.log(text)
                             switch(text)
@@ -121,8 +121,9 @@ Rectangle {
                                 }
                                 break;
                             case "1@#":
+                                btnLetters = []
                                 special=!special
-
+                                if (shift) shift = false
                                 break;
                             case "OK":
                                 if(destroyWhenOK)
@@ -131,7 +132,7 @@ Rectangle {
                                 {
                                     shift=false
                                     special=false
-                                    caps=false
+                                    //caps=false
                                     rootKeyboard.visible=false
                                     target.focus=false
                                 }
@@ -139,9 +140,9 @@ Rectangle {
                                 break;
                             default:
                                 txtField.insert(txtField.cursorPosition,text)
-                                special=false
-                                if(!caps)
-                                    shift=false
+                             //   special=false
+                            //    if(!caps)
+                            //        shift=false
                                 break;
 
                             }
@@ -149,6 +150,7 @@ Rectangle {
                         }
                     }
                 }
+
             }
         }
     }

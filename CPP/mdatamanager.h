@@ -50,9 +50,6 @@ public:
     Q_INVOKABLE bool getAutoPrint(){return m_autoPrint;}
     Q_INVOKABLE int getAutoFlow(){return m_autoFlow;}
 
-    QByteArray  m_resultBm;
-    int         m_resultBm_w, m_resultBm_h;
-
     QStringList availableData(){return m_availableData;}
     QStringList availableTracks(){return m_data.keys();}
 
@@ -106,6 +103,8 @@ public slots:
     QStringList getLinks(QString __what, QStringList __filterFamily=QStringList(), QStringList __filterType=QStringList());
     void startPrint();
     void sendToPrint();
+
+    void sendPrintTest();
 
 
 private:

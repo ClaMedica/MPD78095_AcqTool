@@ -4,6 +4,9 @@
 #include <QObject>
 #include "datafilemanager.h"
 #include "printerserialport.h"
+#include <QQuickItemGrabResult>
+#include "stdint.h"
+
 
 #define     NUMOF_X_PRINT_DOTS 752 // (96 mm - 2mm dovuti agli assi) * 8 bit al mm = 94 * 8 = 752
 #define 	NUMOFMAX_LEGHT_PORTRAIT_REP 3000	// 10 sample/sec x 5min = 3000
@@ -231,13 +234,12 @@ typedef struct{
 } Print_Graph_Parameters; 		// usata nella funzione di creazione stringa per stampa grafici
 
 
-//extern bool Pri_Str(int num_car, char *str_pri, byte flag_lf);
-
 class printermanager : public QObject
 {
     Q_OBJECT
 public:
     explicit printermanager(QString __namefile, QObject *parent = 0);
+    explicit printermanager(QObject *parent = 0) {}
     ~printermanager();
 
     void print();
@@ -259,13 +261,14 @@ public:
     void setPrintLiverpool(bool __val)      {m_printLiverpool = __val;}
     void setPrintModeUser(bool __val)       {m_printModeUser = __val;}
     void setTipoEsame(unsigned char __val)  {m_test_type = __val;}
-    void setBitmap(bool __enable, QByteArray *bm)    { m_printBitmap = __enable; m_bitmap = bm;
-                                                      qDebug("en:%s p:%p", __enable?"TRUE":"false",m_bitmap);
-                                                        }
-    void Report_BitMap();
+
+    void Report_BitMap(bool __isSiro = false);
     void Report_BitMap_test();
+    void getGrabbedImage(QObject *gi, QString nome);
     void setPrintHeaders(QString __first, QString __second)     {m_printFirstHeader = __first; m_printSecondHeader = __second;}
 
+    //stampa una prova di esame
+    void printTest();
 signals:
 
 public slots:
@@ -280,7 +283,6 @@ private:
     bool m_printModeUser;
     bool m_printSiroky;
     bool m_printLiverpool;
-    bool m_printBitmap;
 
     QString m_printFirstHeader;
     QString m_printSecondHeader;
@@ -351,12 +353,10 @@ private:
     short m_num_byte_x_gra_emg, m_num_byte_x_gra_vol, m_num_byte_x_gra_flw;
     unsigned short m_cursore;
 
-    QByteArray  *m_bitmap;
+    int         m_resultBm_w, m_resultBm_h;
+    QByteArray m_bitmapSiroky;
+    QByteArray m_bitmapLiverpool;
 
-//    void readChanData();
-//    void readTestData();
-//    int findMDC_REVIEW();
-//    float floatMax(float __a, float __b);
     void smooting_PRINT_flow();
     void pri_rep_review();
     //report
@@ -366,7 +366,7 @@ private:
     void Report_flw();
     void Report_emg();
     void Report_Real_Time(short __num_sample);
-//    void Report_BitMap();
+
     void Report_result();
     void Pri_Rep_Gra(int __num_riga);
     void Pri_Rep_Gra_Ini_Grid(int __n_riga);
@@ -375,14 +375,7 @@ private:
     void Pri_Rep_asse_dx();
     void Pri_Rep_Label();
     void Pri_Rep_Lin(char *__str_des, int __rep_dat, unsigned char __num_dec, char *__str_udm, unsigned char __flag_lf);
-#if 0
-    void Report_siroky();
-    void Pri_Rep_Gra_Siroky (int __num_riga, int __grap);
-    void Pri_Rep_Gra_Ini_Grid_Sir(int __num_rig, int __curve );
-    void Plot_StdCurve_Siroky( unsigned char __num_rig, unsigned char __curve );
-    void Plot_Point_Siroky(int __num_rig, int __curve, unsigned short __flu);
-    void Plot_Quadro_Siroky(int __ubstrt, int __ubend, int __new_pos, int __vol_pt, unsigned char __uw4);
-#endif
+
     unsigned char  Int_Pun(int __i4);
     void Gra_Line();
     void Str_Trasposta(unsigned char __type, unsigned short __sx_byte, unsigned short __dx_byte); // crea la trasposta della stringa str_gr, ottenendo una matrice scritta per righe
@@ -394,6 +387,7 @@ private:
     void print_char_left_label(short __value, int __pos_in_string, short int __num_char, bool __pri_decim, short int __pre_char);
     void print_udm_label(int __ch_type, short __pos_in_string, short int __pre_char);
     bool check_stamp_label();
+
 
 };
 

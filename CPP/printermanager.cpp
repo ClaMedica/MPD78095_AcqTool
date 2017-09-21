@@ -11,7 +11,7 @@ printermanager::printermanager(QString __namefile, QObject *parent) : QObject(pa
 
     m_printMode = PORTRAIT_MODE;
     m_printModeUser = PORTRAIT_MODE;
-    m_printSiroky = false;
+
     m_realDots = 0;
 
     m_modal_e = 0;
@@ -29,13 +29,20 @@ printermanager::printermanager(QString __namefile, QObject *parent) : QObject(pa
     m_chFlw = -1;
     m_chEmg = -1;
 
-    m_bitmap = NULL;
-
     m_printFirstHeader = "";
     m_printSecondHeader = "";
 
     m_port = new printerserialport(this);
     m_port->init_printer();
+
+    m_resultBm_w = 824; // 103 bytes * 8 bit
+    m_resultBm_h = 300;
+
+    m_bitmapSiroky.resize((m_resultBm_w * m_resultBm_h) / 8);
+    m_bitmapLiverpool.resize((m_resultBm_w * m_resultBm_h) / 8);
+    m_bitmapSiroky.fill(0);
+    m_bitmapLiverpool.fill(0);
+
 }
 
 
@@ -80,7 +87,7 @@ void printermanager::print()
     m_durata = m_dfm->GetDuration() / 1000; //in sec
 
      // discrimina se esame veloce oppure completo di dati paziente (servira nel report di stampa)
-    if (m_name == "Anonymous")
+    if (m_surname == "Anonymous")
         m_test_type = true;
 
     if(m_printModeUser)
@@ -271,34 +278,12 @@ void printermanager::Pri_Rep()
 
     // Grafico Siroky, stampato solo se paziente maschio oppure generico (cioe dove non indicato il sesso)
     // Grafico Liverpool
+    if(m_printLiverpool)
+        Report_BitMap();
 #if PRI_REP_SRK
-//     if(m_printSiroky )
-//        if(m_test_type || (m_sex != 'F'))		// cosi stampa sempre nel caso di esame veloce e paziente generico
-//            Report_siroky();
-
-     if(m_printBitmap)
-         Report_BitMap();
+     if(m_printSiroky)
+         Report_BitMap(true);
 #endif
-
-//    // scritta relativa al tipo di modalita dell'esame
-//#if PRI_REP_MODAL
-//    char str[60];
-//    m_port->Pri_justif(F_center);
-//    m_port->Pri_mode(0x10);
-//    if (m_modal_e == 2) {
-//        QString modal = tr("MANUAL   MODALITY");
-//        sprintf(str, "%s\n", modal.toLatin1().data());
-//    }
-//    else
-//        if (m_modal_e == 0) {
-//            QString modal = tr("AUTOMATIC  MODALITY ");
-//            sprintf(str, "%s\n", modal.toLatin1().data());
-//        }
-//    m_port->Pri_Str(strlen(str), str, 0);
-//    QString line = "\n \n"; // LINE"\x1";
-//    m_port->Pri_Str(3,line.toLatin1().data(), 0);
-//    m_port->Pri_justif(F_left);
-//#endif
 
     // 	Risultati dell'esame ricavati dall'analisi semplificata, implementata nel firmware
 #if PRI_REP_RIS
@@ -2367,15 +2352,24 @@ void printermanager::Report_BitMap_test()
 }
 
 /**
-Stampa dei grafici di Syroki, sono 2 uno fianco l'altro
+Stampa dei nomogrammi
 */
-void printermanager::Report_BitMap()
+void printermanager::Report_BitMap(bool __isSiro)
 {
     qDebug("inizio pr bitm");
-    if (m_bitmap == NULL)
-        return;
-    int     sz = m_bitmap->size();
-    char  * p = m_bitmap->data();
+    int     sz;
+    char  * p;
+    if (__isSiro)
+    {
+        sz = m_bitmapSiroky.size();
+        p = m_bitmapSiroky.data();
+    }
+    else
+    {
+        sz = m_bitmapLiverpool.size();
+        p = m_bitmapLiverpool.data();
+    }
+
     int     szchunk = 103;  // 824/8
     char    head[8];
     qDebug("sz:%d szch:%d p:%p", sz,szchunk,p);
@@ -2390,15 +2384,14 @@ void printermanager::Report_BitMap()
     head[7] = szchunk;	// n6
 
     for(int s = 0; s < sz; ) {
+        //for(int n = 0; (n < 1000) && (m_port->status(false) & (1 << 3)); n++);
+        //m_port->status(false);
         m_port->Pri_Str(8, head, 0);
         m_port->Pri_Str(szchunk, p, 0);
         p += szchunk;
         s += szchunk;
     }
 
-    m_printBitmap = false;  // invalida la bitmap
-    m_bitmap->fill(0);
-    m_bitmap = NULL;
     m_port->Pri_Font(1);
     m_port->Pri_mode(0x00);
     m_port->Pri_justif(F_left);
@@ -2406,410 +2399,6 @@ void printermanager::Report_BitMap()
     m_port->Pri_Str(strlen(xxx.toLatin1().data()), xxx.toLatin1().data(), 1);
     qDebug("fine pr bitm");
 }
-
-#if 0
-void printermanager::Report_siroky()
-{
-    char str[90];
-
-    m_port->Pri_Font(1);
-    m_port->Pri_mode(0x10);
-    m_port->Pri_justif(0);
-
-    QString siroky = tr("Siroky Diagram");
-    m_port->Pri_Str(strlen(siroky.toLatin1().data()), siroky.toLatin1().data(), 1);
-
-    m_port->Pri_justif(2);
-    m_port->Pri_mode(0x00);
-    QString ave = tr(" Average Flow ");
-    QString max = tr(" Maximum Flow ");
-    sprintf(str,   "  Q(ml/s)   %s    SD        %s       SD", ave.toLatin1().data(),max.toLatin1().data());
-    m_port->Pri_Str(strlen(str), str, 1);
-
-    for(int ub = 0; ub < 10; ub++)      // scompone la griglia in 10 righe
-        Pri_Rep_Gra_Siroky(ub, 0);      // qui passo sempre grap=0 cosi lo resetto ad ogni giro
-
-    m_port->Pri_Font(0);	// carico per l'occasione il font + piccolino
-    m_port->Pri_mode(0x00);
-    sprintf(str, "    0     100     200     300     400     500  0      100     200     300     400     500\n");
-    m_port->Pri_Str(strlen(str),str,0);
-
-    // stampo l'indicazione volume sull'asse ordinate dei grafici siroky
-    QString voidvol = tr("     Voided Volume (mL)");
-    m_port->Pri_Str(strlen(voidvol.toLatin1().data()), voidvol.toLatin1().data(), 1);
-    // ora devo stampare o l'indicazione di fuori scala per uno o entrambi i grafici,
-    // oppure le scritta "valido solo per maschi adulti"
-
-    QString out;
-    if((m_max_vol >= 500) || ((m_flu_med >= 30) && (m_flu_max >= 30))) { // entrambi fuori scala, messaggio al centro
-        m_port->Pri_justif(F_center);
-        out = tr("Out of Range");
-        strcpy(str, out.toLatin1().data());
-    }
-    else {
-        if(m_flu_med >= 30) {   // fuori scala il grafico flusso medio, scritta a sinistra
-            m_port->Pri_justif(F_left);
-            sprintf(str, "                     %s", out.toLatin1().data());
-        }
-        else
-            if( m_flu_max >= 30 ) {		// fuori scala flusso massimo, scritta a destra
-                m_port->Pri_justif(F_right);
-                sprintf(str, "%s                     ", out.toLatin1().data());
-            }
-            else { 	// nessuno fuori scala, scrivo centrato valido solo per maschi adulti
-                m_port->Pri_justif(F_center);
-                m_port->Pri_Font(1);
-                out = tr("  Valid for male adult only      ");
-                strcpy(str, out.toLatin1().data());
-            }
-    }
-    m_port->Pri_Str(strlen(str), str, 1);
-    m_port->Pri_Str(3,(char*)"\n \n", 0);
-}
-
-/**
-disegna i diagrammi di Siroky
-*/
-void  printermanager::Pri_Rep_Gra_Siroky (int __num_riga, int __grap)
-{
-    int max_y_flw;
-
-    // azzeramento stringone
-    for(int i = 0; i < (LCMD + a_ave + a_max); i++)  // per aggiungere spazi fra i due grafici
-        m_str_gr[i] = 0;
-
-    m_str_gr[0] = ESC;	//0x1B;	// ESC
-    m_str_gr[1] = '*';	//0x2A;	// *
-    int sz = 2352;    // 	num_byte = 2352 //1080
-    m_str_gr[2] = sz % 256         ;	// n1
-    m_str_gr[3] = (sz >>  8) & 0xff;	// n2
-    m_str_gr[4] = (sz >> 16) & 0xff;	// n3
-    m_str_gr[5] =  0;	// n4	singola altezza
-    m_str_gr[6] =  0;	// n5	scrive a n5 byte dal bordo
-    m_str_gr[7] = 98;	// n6	larghezza a_ave + a_max
-
-    // inserimento label Q_ave
-    // label == true : scrive le label solo nelle righe 0, 2, 4, 6, 8
-    // label == false: nelle righe 1, 3, 5, 7 metter caratteri vuoti
-    bool label = ((__num_riga == 0) || ( !(__num_riga % 2) ));
-
-    // se label e' true devo scrivere i valori sugli assi di flw e vol, altrimenti riempio con caratteri vuoti
-    if(label) {
-        int second_char, third_char;
-        // la prima riga del grafico si compone di 24 righe di 45byte ciascuna alle quali antepongo
-        // le 24 righe di 3 byte del dato di flw
-        max_y_flw = 30 - (__num_riga/2)*(30 / 5);
-        // NOTA BENE: il Qmax e' sempre 30, percio' 2 cifre. Allora la prima cifra del label e' sempre 0
-        // e non devo riempire questo spazio perche str_gr[n]-->str_gr[n+(m-2)*24] e' gia azzerata
-        if(max_y_flw > 9) {
-            // seconda cifra (secondo carattere 1)
-            second_char = max_y_flw / 10;
-            for(int i = 0; i < 13; i++ )        // scrivo il carattere delle decine per colonne come 1Bx13righe
-                m_str_gr[ LCMD + ((CLS-1)-2)*24 + i ] = (char)print7x13Set[ second_char*13 + i];
-            // prima cifra (terzo carattere 2)
-            third_char = max_y_flw - (second_char * 10);
-            for(int i = 0; i < 13; i++ )        // scrivo il carattere delle unita per colonne come 1Bx13righe
-                m_str_gr[ LCMD + ((CLS-1)-1)*24 + i ] = (char)print7x13Set[ third_char*13 + i];
-        }
-        else {	// 2 byte di spazio, 1 di valore
-            third_char = max_y_flw /* - ( second_char * 10 )*/;
-            for(int i = 0; i < 13; i++ )        // scrivo il carattere delle unita per colonne come 1Bx13righe
-                m_str_gr[ LCMD + ((CLS-1)-1)*24 + i ] = (char)print7x13Set[ third_char*13 + i];
-        }
-    }
-#ifdef __ZERO_ASSE_SIROKY__
-    else {					// niente label m caratteri vuoti
-        if(__num_riga == 9)			// se e' l'ultima riga sovrascrivo lo "0" al terzo carattere
-            for(int i = 0; i < 11; i++ ) {	// ho tarato i numeri per avere lo zero esattamente in fondo al grafico
-                m_str_gr[ LCMD + ((CLS-1)-1)*24 + (i+12) ] = (char)print7x13Set[ 0*13 + i];
-            }
-    }
-#endif
-
-    /* assi e griglie */
-    Pri_Rep_Gra_Ini_Grid_Sir(__num_riga, __grap);
-
-#ifdef __DEV_STD__
-    /* Curve Dev Standard   */
-    if((__num_riga > 1) && (__grap == 0))
-        Plot_StdCurve_Siroky(__num_riga, __grap); // disegna le 4 curve di deviazione standard sul grafico del Q_ave
-#endif
-
-#ifdef __LABEL_SD__
-    // scrittura label SD
-    // tarato per avere il numerino proprio in prossimita della fine della curva
-    int     z, n = 0;
-    switch(__num_riga) {
-    case 2:  z = 10; n = 0; break;
-    case 4:  z =  0; n = 1; break;
-    case 5:  z = 10; n = 2; break;
-    case 7:  z =  0; n = 3; break;
-    default: z = -1; break;
-    }
-    if(z >= 0)
-        for(int i = 0; i < 10; i++ )
-            m_str_gr[pos_lab_SD_ave + i + z] = (char)print8x10SetSD[n*10 + i]; // copio il carattere n che e' un (1x10)byte
-#endif
-
-#ifdef __POINT__
-    /*      Punti paziente   */
-    Plot_Point_Siroky( __num_riga, __grap, (short unsigned)m_flu_med);
-#endif
-    // costruzione Grafico Q_max
-    __grap = 1;
-
-    /* label Q_max	*/
-    if(label) {
-        int second_char, third_char;
-        max_y_flw = 30 - (__num_riga/2)*(30 / 5);
-
-        if( max_y_flw > 9 ) {					// 1 byte di spazio , 2 di valore
-            second_char = ( max_y_flw) / 10;			// seconda cifra (secondo carattere 1)
-            for(int i = 0; i < 13; i++ )			// scrivo il carattere delle decine per colonne come 1Bx13righe
-                m_str_gr[ pos_lab_Q_max + ((CLS-1)-2)*24 + i ] = (char)print7x13Set[ second_char*13 + i];
-            third_char = max_y_flw - ( second_char * 10 );	// prima cifra (terzo carattere 2)
-            for(int i = 0; i < 13; i++ )			// scrivo il carattere delle unita per colonne come 1Bx13righe
-                m_str_gr[ pos_lab_Q_max + ((CLS-1)-1)*24 + i ] = (char)print7x13Set[ third_char*13 + i];
-        }
-        else {							// 2 byte di spazio, 1 di valore
-            third_char = max_y_flw;				// prima cifra (terzo carattere 2)
-            for(int i = 0; i < 13; i++ )			// scrivo il carattere delle unita per colonne come 1Bx13righe
-                m_str_gr[ pos_lab_Q_max + ((CLS-1)-1)*24 + i ] = (char)print7x13Set[ third_char*13 + i];
-        }
-    }
-#ifdef __ZERO_ASSE_SIROKY__
-    else {													// niente label m caratteri vuoti
-        if(__num_riga == 9)									// se e l'ultima riga scrivo lo "0" come terzo carattere
-            for(int i = 0; i < 13; i++ )
-                m_str_gr[ pos_lab_Q_max + ((CLS-1)-1)*24 + (i+10) ] = (char)print7x13Set[ 0*13 + i];
-    }
-#endif
-
-    /* assi e griglie */
-    Pri_Rep_Gra_Ini_Grid_Sir(__num_riga, __grap);
-#ifdef __DEV_STD__
-    /* Curve Dev Standard   */
-    Plot_StdCurve_Siroky(__num_riga, __grap); // disegna le 4 curve di deviazione standard sul grafico del Q_ave
-#endif
-#ifdef __LABEL_SD__
-    /* scrittura label SD	*/
-    if( __num_riga == 0) {
-        for(int i = 0; i < 10; i++ )
-            m_str_gr[ pos_lab_SD_max + i ] = (char)print8x10SetSD[ 0*10 + i ];	// copio il carattere "0" che e un (1x10)byte
-    }
-    else {
-        if( __num_riga == 2) {
-            z = 10;// tarato per avere il numerino proprio in prossimita della fine della curva
-            for(int i = 0; i < 10; i++ )// tarato per avere il numerino proprio in prossimita della fine della curva
-                m_str_gr[ pos_lab_SD_max + i + z] = (char)print8x10SetSD[ 1*10 + i ];	// copio il carattere "-1" che e un (1x10)byte
-        }
-        else {
-            if( __num_riga == 4) {
-                z = 14;// tarato per avere il numerino proprio in prossimita della fine della curva
-                for(int i = 0; i < 10; i++ )// tarato per avere il numerino proprio in prossimita della fine della curva
-                    m_str_gr[ pos_lab_SD_max + i +z] = (char)print8x10SetSD[ 2*10 + i ];	// copio il carattere "-2" che e un (1x10)byte
-            }
-            else {
-                if( __num_riga == 7)
-                    for(int i = 0; i < 10; i++ )
-                        m_str_gr[ pos_lab_SD_max + i ] = (char)print8x10SetSD[ 3*10 + i ];	// copio il carattere "-3" che e un (1x10)byte
-            }
-        }
-    }
-#endif
-#ifdef __POINT__
-    /*      Punti paziente   */
-    Plot_Point_Siroky( __num_riga, __grap, (unsigned short)m_flu_max );
-#endif
-
-    Str_Trasposta( 1 , CLS-1, CLD); // fa la trasposta di str_gr che e costruita per colonne mentre noi si stampa per righe
-
-    /* STAMPA DELLA num_riga-esima riga dei grafici siroky	*/
-    m_port->Pri_Str(( LCMD + a_ave + a_max ), (char *)m_str_gr, 0);
-
-}	// fine funzione Pri_rep_gra_Siroky
-
-
-void printermanager::Pri_Rep_Gra_Ini_Grid_Sir(int __num_rig, int __curve)
-{
-    int pos_gra_corr = 0;
-
-    if(__curve == 0)
-        pos_gra_corr = pos_gra_Qmed;	// curve sul grafico Q_ave
-    else if(__curve == 1)
-        pos_gra_corr = pos_gra_Qmax;	// curve sul grafico Q_max quindi spostate di a_ave + 2 spazi
-
-    m_uw3 = 24 * 45;
-
-    /* Bordo Verticale Sinistro e Bordo Verticale Destro */
-    for(int i = 0; i < 24; i++) {
-        m_str_gr[ pos_gra_corr +              i ] = (char)0x80;
-        m_str_gr[ pos_gra_corr + m_uw3 - 24 + i ] = (char)0x01;
-    }
-    if(__num_rig % 2 == 0) {
-        /* Bordo Superiore   */
-        if( __num_rig == 0) {
-            for(int i = 0; i < m_uw3; i += 24)
-                m_str_gr[ pos_gra_corr + i ] = (char)0xFF;
-        }
-        else {
-            /* Griglia Orizzontale   */
-            for(int i = 0; i < m_uw3; i += 24)
-                m_str_gr[ pos_gra_corr + i ] |= (char)0x10;
-        }
-    }
-    /*     Bordo Inferiore   */
-    if( __num_rig == 9)	{
-        for(int i = 23; i < m_uw3; i += 24)
-            m_str_gr[ pos_gra_corr + i ] = (char)0xFF;
-    }
-    /*      Griglia Verticale   */
-    for(int i = 1; i < 5; i++) {
-        int i4 = 216 * i;
-        for(int i3 = 0; i3 < 24; i3 += 4)
-            m_str_gr[ pos_gra_corr + i4 + i3 ] |= 0x80;
-    }
-}	// fine funzione Pri_Rep_Gra_Ini_Grid_Sir
-
-
-void printermanager::Plot_StdCurve_Siroky(unsigned char __num_rig, unsigned char __curve )
-{
-    int pos_gra_corr = 0;
-
-    if( __curve == 0 )
-        pos_gra_corr = pos_gra_Qmed;	// curve sul grafico Q_ave
-    else if( __curve == 1 )
-        pos_gra_corr = pos_gra_Qmax;	// curve sul grafico Q_max quindi spostate di a_ave + 2 spaziettini
-
-    for(int i22 = 0; i22 < 4; i22++ ) {	// sono 4 le curve
-        int i5 = ( ( i22 ) % 2 ) + 1;
-        for(int ub3 = 1; ub3 < 20; ub3++ ) {
-            int flow_pt_prec = 240 - SD[ __curve ][ i22 ][ ub3 - 1 ];
-            if( flow_pt_prec < 240 ) {
-                int flow_pt = 240 - SD[ __curve ][ i22 ][ ub3 ];
-                unsigned char ub2 = (unsigned char)( flow_pt / 24 );
-                unsigned char ub4 = (unsigned char)( flow_pt_prec / 24);
-                if( ( ub2 == __num_rig ) || ( ub4 == __num_rig )) {
-                    int vol_pt_prec = ( 18 * ub3 );
-                    int vol_pt = vol_pt_prec + 18;
-                    int i4 = ( flow_pt_prec - flow_pt );
-                    for(int i3 = vol_pt_prec; i3 < vol_pt; i3 += i5) {
-                        flow_pt = flow_pt_prec - ( i3 - vol_pt_prec ) * i4 / 18;
-                        ub4 = (unsigned char)( flow_pt / 24);
-                        if( __num_rig == ub4) {
-                            ub4 = 0x80 >> (unsigned char)(i3 % 8);
-                            unsigned short uw4 = (unsigned short)( i3 / 8);
-                            ub2 = ( flow_pt % 24 );
-                            uw4 = uw4 * 24;
-                            m_str_gr[ pos_gra_corr + uw4 + ub2 ] |= (char)ub4;
-                            if( ( i3 % 8) == 0 ) {
-                                if( i22 == 2)
-                                    for (int i = 16; i > ub2; i -= 8)
-                                        m_str_gr[ pos_gra_corr + uw4 + i ] |= 0x40;
-                            }
-                        }
-                    }
-                }
-                else {
-                    if(( ub2 < __num_rig ) && ( ub4 < __num_rig )) {
-                        int vol_pt_prec = ( 9 * ub3 );   /* int((vol*18)/8)*24   */
-                        int vol_pt = vol_pt_prec + 9;
-                        vol_pt_prec /= 4;
-                        vol_pt /= 4;
-                        vol_pt_prec *= 24;
-                        vol_pt *= 24;
-                        if( i22 == 2) {
-                            for(int i3 = vol_pt_prec; i3 < vol_pt; i3 += 24)
-                                for(int i = 0; i < 24; i += 8 )
-                                    m_str_gr[ pos_gra_corr + i + i3 ] |= 0x40;
-                        }
-                    }
-                }
-            }
-        }
-    }
-} // fine funzione Plot_StdCurve_Siroky
-
-
-/**
-Verifica se deve inserire e dove, il punto syroki con il suo tratteggio
-*/
-void printermanager::Plot_Point_Siroky(int __num_rig, int __curve, unsigned short __flu )
-{
-    int pos_gra_corr = pos_gra_Qmed;	// curve sul grafico Q_ave
-    if( __curve == 1 )
-        pos_gra_corr = pos_gra_Qmax;	// curve sul grafico Q_max quindi spostate di a_ave + 2 spaziettini
-
-    int flow_pt = 240 - __flu * 8;                              /*y  240 pix =30ml/s gain =240/30=8; pix 0 =30ml/s pix 240=0ml/s*/
-
-    if((flow_pt > 0) && (__flu > 0) && (m_max_vol < 500)) {
-        int vol_pt = (int)(m_max_vol * 18) / 25;
-        int uw4 = vol_pt;                           /* x  grap 1 46*8=368 pix =500ml gain =368/500=92/125; x0= pix 400 =0ml pix 368=500ml*/
-        int ub4 = flow_pt / 24;                     /* n_r = int(y/24)  Num riga*/
-        int ub3 = flow_pt % 24;                     /* y_st = y(mod)24  scostamento riga*/
-        unsigned char ub2 = 0x80 >> (vol_pt % 8);   /* byt = x(mod)8   u=x_st*24+y_st*/
-        uw4 = vol_pt >> 3;                          /* x_st=int(x/8)  n? byte */
-        uw4 *= 24;                                  /*non fare uw4=vol_pt*3*/  /*x_st*24*/
-        if( __num_rig >= ub4) {                     /* riga grafica attiva point Pix(x,y) <=> P(u,byt,n_r)*/
-            if( __num_rig == ub4) {                 /* riga grafica appartiene point*/
-                for(int uw5 = ub3; uw5 < uw4; uw5 += 24) /*1200=(400/8)*24 =int(x0/8)*24*/
-                    m_str_gr[ pos_gra_corr + uw5 ] |= (char)0xF0;         /* tratteggio da x0 a x     proiexione coordinata y*/
-                /*area del punto*/
-                for(int i = 16; i > ub3; i -= 8) {
-                    m_str_gr[(pos_gra_corr + 0) + uw4 + i] |= (char)ub2;
-                    m_str_gr[(pos_gra_corr + 1) + uw4 + i] |= (char)ub2;
-                    m_str_gr[(pos_gra_corr + 2) + uw4 + i] |= (char)ub2;
-                    m_str_gr[(pos_gra_corr + 3) + uw4 + i] |= (char)ub2;
-                }
-                if( ub3 < 3)
-                    Plot_Quadro_Siroky(0,           ub3 + 4, pos_gra_corr, vol_pt, uw4); /*fare quadratino ub2 si distrugge*/
-                else
-                    Plot_Quadro_Siroky(ub3 - (4-1), ub3 + 4, pos_gra_corr, vol_pt, uw4);
-            }
-            else {
-                for(int i = 0; i < 24; i += 8) {              /*proiexione coordinata x*/
-                    m_str_gr[(pos_gra_corr + 0) + uw4 + i] |= (char)ub2;
-                    m_str_gr[(pos_gra_corr + 1) + uw4 + i] |= (char)ub2;
-                    m_str_gr[(pos_gra_corr + 2) + uw4 + i] |= (char)ub2;
-                    m_str_gr[(pos_gra_corr + 3) + uw4 + i] |= (char)ub2;
-                }
-                if((__num_rig == (ub4 + 1)) && (ub3 > 20))
-                    Plot_Quadro_Siroky(0, ub3 - (24-4), pos_gra_corr, vol_pt, uw4);       /*fare quadratino ub2 si distrugge*/
-            }
-        }
-        else {
-            if(((__num_rig + 1) == ub4) && (ub3 < 3))
-                Plot_Quadro_Siroky(21 + ub3, 24, pos_gra_corr, vol_pt, uw4);         /*fare quadratino ub2 si distrugge*/
-        }
-    }                                      /*non plot point fuori grafico*/
-}
-
-
-void printermanager::Plot_Quadro_Siroky(int __ubstrt, int __ubend,
-                                        int __new_pos, int __vol_pt, unsigned char __uw4)
-{
-    unsigned int  ub2 = 0x80 >> (__vol_pt % 8);        /*byt=x(mod)8   u=x_st*24+y_st*/
-    unsigned int  uw5 = ub2;
-    unsigned int  uw6 = ub2 << 8;
-
-    /*riempie +-3 pix su giu dal punto*/
-    for(int i = 0; i < 3; i++) {                     /*riempie +-3 pix dx sx dal punto*/
-        uw6 |= ( uw6 >> 1);                             /*riempimento puo uscire a dx o sx sforando nell'altro byte*/
-        uw5 |= ( uw5 << 1);
-    }
-
-    ub2 = HIBYTE( uw6 ) | LOBYTE(uw5);                  /*if(num_rig==ub4)&&(ub3<3)  ubstrt=0      ubend=ub3+4  */
-    for(int i = __ubstrt; (i < __ubend) && (i < 24); i++) /*if(num_rig==ub4)&&(ub3>=3) ubstrt=ub3-3  ubend=ub3+4  */
-    {
-        if(__vol_pt > 7)
-            m_str_gr[__uw4 + i - (24 - __new_pos)] |= HIBYTE(uw5);  /*if(num_rig==ub4+1)&&(ub3>20) ubstrt=0      ubend=ub3-20 */
-        m_str_gr[__uw4 + i + __new_pos] |= (char)ub2;                 /*if(num_rig+1==ub4)&&(ub3<3)  ubstrt=21+ub3 ubend=24     */
-        if(__vol_pt < 352)
-            m_str_gr[__uw4 + i + (24 + __new_pos)] |= LOBYTE(uw6);/*riempimento puo uscire dalla riga su o giu*/
-    }
-}
-#endif
-
 
 /**
 stampa l'elenco dei dati di analisi delle curve
@@ -2902,3 +2491,257 @@ void printermanager::Pri_Rep_Lin(char *__str_des, int __rep_dat, unsigned char _
     strcat(m_str_gr, __str_udm);
     m_port->Pri_Str(strlen(m_str_gr),m_str_gr,__flag_lf);
 }
+
+// conversione da RGB 8*3 = 24 bit a RGB 4*3 = 12 bit
+// ignorati i 4 bit bassi di ogni colore * ridurre le sfumature ad un colore di base
+#define NCOLORS 16*16*16
+inline uint16_t decimazioneColore(uint32_t rgb24)
+{
+    uint32_t  colormask = 0x00f0f0f0;
+    uint32_t rgb12 = rgb24 & colormask;
+
+    rgb12 = ((rgb12 & 0x000000f0) >>  4) *   1 |
+            ((rgb12 & 0x0000f000) >> 12) *  16 |
+            ((rgb12 & 0x00f00000) >> 20) * 256;
+
+    return (uint16_t) rgb12;
+}
+
+void printermanager::getGrabbedImage(QObject *gi, QString nome)
+{
+    bool isSiro = nome.startsWith("Siro");
+    bool isLive = nome.startsWith("Live");
+
+    QByteArray *cur_bitmap;
+    if (isSiro && m_printSiroky)
+        cur_bitmap = &m_bitmapSiroky;
+    else if (isLive && m_printLiverpool)
+        cur_bitmap = &m_bitmapLiverpool;
+    else
+        return;
+
+    bool isAve = nome.contains(" Ave");         // test Average / QMax
+    int  xoffs = isAve  ? 8 : (8 + 400 + 16);   // horizz pixel offset
+
+    QQuickItemGrabResult *item = qobject_cast<QQuickItemGrabResult *>(gi);
+    QImage  qi(item->image());
+    QSize   qs = qi.size();
+    int     w0 = qs.width();
+    int     h0 = qs.height();
+
+    // frequenza colori
+    int     bmsz = w0 * h0;         // image size
+    uint8_t *bm = (uint8_t *) malloc(bmsz); // per non aggiungere 120k allo stack
+                                            // non viene azzerata perche ogni singolo byte viene comunque assegnato
+    int32_t pale_cnt[NCOLORS];      // n.occorrenze del colore decimato
+    int32_t pale_indx[NCOLORS];     // da colore decimato a n.progressivo
+    int     pale_revindx[NCOLORS];  // da n.progressivo a colore decimato
+    int     pale_seq = 0;
+    bzero((void *) & pale_cnt, sizeof(pale_cnt));
+    for(int i = 0; i < NCOLORS; i++)
+        pale_indx[i] = -1;
+
+    // decimazione colori per eliminare le sfumature
+    uint16_t rgbSiro1 = decimazioneColore(0xff90ee90);   // colore area
+    uint16_t rgbSiro2 = decimazioneColore(0xffffdab9);   // colore area
+    uint16_t rgbGrid  = decimazioneColore(0xff808080);   // colore griglia
+    uint8_t *slider = bm;
+    for(int h = 0; h < h0; h++)                             // immagine scandita in modo raster
+        for(int w = 0; w < w0; w++) {
+            uint16_t rgb12 = decimazioneColore(qi.pixel(w, h));
+            int cur_color;
+            if(pale_cnt[rgb12] == 0) {                      // prima occorrenza del colore
+                pale_indx[rgb12] = cur_color = pale_seq++;  // n. progressivo colore
+                pale_revindx[cur_color] = rgb12;            // da n.colore a colore
+            }
+            else
+                cur_color = pale_indx[rgb12];
+            *slider++ = cur_color;                          // serializzazione colori ridotti
+            pale_cnt[rgb12]++;                              // statistica
+        }
+
+//    for (int i = 0; i < NCOLORS; i++) if(pale_cnt[i]) qDebug("palette %3.3x cnt:%d", i, pale_cnt[i]);
+//    for(int i = 0; i < pale_seq; i++) qDebug("col:%d %3.3x cnt:%d", i, pale_revindx[i], pale_cnt[pale_revindx[i]]);
+
+    int nblack = 0;
+    char  * d = cur_bitmap->data();
+    slider = bm;
+    for(int h = 0; h < h0; h++) {                           // raster
+        int rowstart  = (h * m_resultBm_w + xoffs) / 8;
+        for(int w = 0; w < w0; w++) {
+            if((w & 7) == 0)                                // clear byte 8bit risultato in B/N
+                d[rowstart] = 0;
+            int ncolor = *slider++;                         // de-serializzazione
+            int rgb12 = pale_revindx[ncolor];
+            bool blackdot = (pale_cnt[rgb12] < 3000) || (rgb12 == rgbGrid); // immagine standard
+
+            if( ! blackdot && isSiro) {                     // livelli di grigio per Siroky
+                if(rgb12 == rgbSiro2) {
+                    if(((w % 3) == 1) && ((h % 3) >= 1))
+                        blackdot = true;
+                }
+                if(rgb12 == rgbSiro1) {
+                    if(((w % 3) == 1) && ((h % 3) == 1))
+                        blackdot = true;
+                }
+            }
+
+            if(blackdot) {                  // dot in stampa
+                int byteinrow = w >> 3;
+                int bitinbyte = 7 - (w & 7);
+                d[rowstart + byteinrow] |= 1 << bitinbyte;
+                nblack++;                   // statistica debug
+            }
+        }
+    }
+
+    free(bm);
+    qDebug("fine getGrabbed, nblack:%d", nblack);
+}
+
+
+#include "global.h"
+#include "p7settingsmanager.h"
+#include "ancestry.h"
+
+void printermanager::printTest()
+{
+    QDir dir("/root/PicoFlow/urodata/UDSData");
+    //se esiste
+    QFileInfoList entries = dir.entryInfoList(QDir::NoDotAndDotDot | QDir::Files);
+    for(QList<QFileInfo>::iterator it = entries.begin(); it!=entries.end();++it)
+    {
+        QFileInfo &finfo = *it;
+        if (finfo.fileName().endsWith(".pic") )
+        {
+            m_namefile = "/root/PicoFlow/urodata/UDSData/"+finfo.fileName();
+            break;
+        }
+    }
+
+    qDebug()<<"file name"<<m_namefile;
+
+    QString configPrinterS = g_P7SettingsManager.printerSettings();
+    if(!QFile::exists(configPrinterS))
+        configPrinterS = ":/Config/Config_Printer.xml";
+    Ancestry configPrinter;
+    configPrinter.erase();
+    if(!configPrinter.loadFromXML(configPrinterS))
+        qCritical() << "Error on user configuration file";
+
+    Ancestry *siroky = configPrinter.getSafeChild("Settings");
+    m_printSiroky = (siroky->getSafeChild("Siroky")->getSafeAttribute(ATT_VALUE) == "true" ? true : false);
+
+    Ancestry *liverpool = configPrinter.getSafeChild("Settings");
+    m_printLiverpool = (liverpool->getSafeChild("Liverpool")->getSafeAttribute(ATT_VALUE) == "true" ? true : false);
+
+    Ancestry *printmode = configPrinter.getSafeChild("Settings");
+    m_printModeUser = (printmode->getSafeChild("PrinterMode")->getSafeAttribute(ATT_VALUE) == "true" ? true : false);
+
+    Ancestry *head1 = configPrinter.getSafeChild("Headers");
+    m_printFirstHeader = head1->getSafeChild("First")->getSafeAttribute(ATT_VALUE);
+
+    Ancestry *head2 = configPrinter.getSafeChild("Headers");
+    m_printSecondHeader = head2->getSafeChild("Second")->getSafeAttribute(ATT_VALUE);
+
+//    if (m_printLiverpool)
+//        m_printSiroky = false;
+
+    m_dfm = new DatafileManager();
+    m_dfm->SetFileName(m_namefile);
+    m_dfm->SetFileType(7);
+
+    m_printMode = PORTRAIT_MODE;
+
+    m_realDots = 0;
+
+    m_modal_e = 0;
+    m_numTest = -1;
+    m_test_type = false;
+    m_correct = false;
+    m_emgPresent = false;
+    m_i_max_x = -1;
+    m_max_x = -1;
+    m_max_y = -1;
+    m_uw3 = 1;
+    m_cursore = 0;
+
+    m_chVol = -1;
+    m_chFlw = -1;
+    m_chEmg = -1;
+
+    m_port = new printerserialport(this);
+    m_port->init_printer();
+
+    //dati paziente e esame
+    qDebug()<<"open"<<m_dfm->Open();
+    m_dfm->GetParameters();
+    //paziente
+    m_name = "Stampa";//m_dfm->GetPatient().section(";", 0, 0);
+    m_surname = "Test";//m_dfm->GetPatient().section(";", 1, 1);
+    m_dateofbirth = "01/01/2000";//m_dfm->GetPatient().section(";", 2, 2);
+    m_sex = QString("M").data()->toLatin1();//*( m_dfm->GetPatient().section(";", 12, 12).toLatin1().data());
+    m_ID = "1";//m_dfm->GetPatient().section(";", 3, 3);
+    //esame
+    m_numchan = m_dfm->GetChanNum();
+    m_numTest = m_dfm->GetTestNum();
+
+    m_dateofexam = "12/12/2012";//dateExam.toString("dd/MM/yyyy");
+
+    QTime time = QTime(0,0,0).addSecs(m_dfm->GetStartTime());
+    m_timeofstart = time.toString();	//ora inizio esame
+
+    m_durata = m_dfm->GetDuration() / 1000; //in sec
+
+    //risultati esami
+    m_tem_att = 7.5;
+    m_flu_max = 40.0;
+    m_flu_med = 15.0;
+    m_tem_max = 6.7;
+    m_tem_595 = 6.6;
+    m_tem_svu = 8.7;
+    m_tem_flu = 8.8;
+    m_tem_dis = 0.8;
+    m_flu_acc = 6.0;
+    m_vol_max = 99.6;
+    m_vol_vuo = 132.0;
+    m_modal_e = 0;
+
+    if(m_printModeUser)
+        m_printMode = LANDSCAPE_MODE;
+    else
+        m_printMode = PORTRAIT_MODE;
+
+    int minNas = 5000;
+    for (int i = 0; i < m_dfm->GetChanNum(); i++) {
+        int nas = m_dfm->GetNAS(i);
+        if (nas < minNas)
+            minNas = nas;
+    }
+    m_num_sam = minNas * m_durata;
+    m_realDots = m_num_sam;
+
+    // Dati relativi alla stampa
+    if (m_num_sam >= NUMOF_X_PRINT_DOTS) {
+        if(m_printMode == PORTRAIT_MODE)
+            m_realDots = NUMOF_X_PRINT_DOTS;
+        else	// cioe nel caso di Report_Print_Mode = Landscape
+        {
+            if(m_num_sam > NUMOFMAX_LEGHT_PORTRAIT_REP)	// esame troppo lungo per la modalita di stampa LANDSCAPE (5minuti)
+            {
+                m_printMode = PORTRAIT_MODE;
+                m_realDots = NUMOF_X_PRINT_DOTS;
+            }
+        }
+    }
+
+    m_dfm->Close();
+
+   pri_rep_review();	// qui va subito in stampa
+}
+
+
+
+
+
+

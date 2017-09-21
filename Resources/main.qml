@@ -98,8 +98,16 @@ ApplicationWindow {
             forAna.setDefinersInfo(mngData.definersInfo())
             forAna.setCommandsInfo(mngData.commandsInfo())
         }
+        else if (mode === "sta")
+        {
+            console.log("Start stampa prova")
+            mngData.sendPrintTest()
+        }
+
         console.log("Application Ready!")
-        bridgeMain.sendSwitch()
+        if (mode !== "sta")
+            bridgeMain.sendSwitch()
+
     }
 
     //@@@@@@@@@@    Objects         @@@@@@@@@@
@@ -121,6 +129,11 @@ ApplicationWindow {
         {
             console.log(datafile);
             launch("vis", datafile)
+        }
+        onStampaProva:
+        {
+            console.log("Stampa di prova");
+            launch("sta","")
         }
     }
 
