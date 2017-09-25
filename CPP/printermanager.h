@@ -105,7 +105,7 @@
 #define PRI_REP_SRK     1   /* Flag Stampa Report : Siroky                */
 #define PRI_REP_RIS     1   /* Flag Stampa Report : Risultati             */
 #define PRI_REP_POS     0   /* Flag Stampa Report : Postfazione e indicazione calibrazione, per debug */
-#define PRI_REP_SPA		1	  /* Flag Stampa Report : Spazi per strappare   */
+#define PRI_REP_SPA     1	  /* Flag Stampa Report : Spazi per strappare   */
 
 //per le stringhe
 //#define NON_SOTTLINEA   "\x1bU\x0"	// \x 1B U \x 0 che significa 1B = ESC; U = modo sottolineatura; 0 = stampa normale
@@ -264,7 +264,8 @@ public:
 
     void Report_BitMap(bool __isSiro = false);
     void Report_BitMap_test();
-    void getGrabbedImage(QObject *gi, QString nome);
+    void getGrabbedImage(QObject *__gi, QString __nome);
+    void getImage(QImage __img, QString __nome);
     void setPrintHeaders(QString __first, QString __second)     {m_printFirstHeader = __first; m_printSecondHeader = __second;}
 
     //stampa una prova di esame

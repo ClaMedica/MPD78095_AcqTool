@@ -75,7 +75,8 @@ HEADERS += \
     ../MGlobal/p7settingsmanager.h \
     ../MGlobal/systemmanager.h \
     ../MGlobal/UdmImpl.h \
-    ../MGlobal/fileio.h
+    ../MGlobal/fileio.h \
+    CPP/bitmapsv.h
 
 INCLUDEPATH +=  CPP \
                 CPP/TCP \

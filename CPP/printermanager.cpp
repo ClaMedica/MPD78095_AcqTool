@@ -276,12 +276,13 @@ void printermanager::Pri_Rep()
     }
 #endif
 
-    // Grafico Siroky, stampato solo se paziente maschio oppure generico (cioe dove non indicato il sesso)
     // Grafico Liverpool
     if(m_printLiverpool)
         Report_BitMap();
 #if PRI_REP_SRK
-     if(m_printSiroky)
+    // Grafico Siroky, stampato solo se paziente maschio oppure generico (cioe dove non indicato il sesso)
+    unsigned char f = QString("F").data()->toLatin1();
+     if(m_printSiroky && m_sex != f)
          Report_BitMap(true);
 #endif
 
@@ -2507,10 +2508,16 @@ inline uint16_t decimazioneColore(uint32_t rgb24)
     return (uint16_t) rgb12;
 }
 
-void printermanager::getGrabbedImage(QObject *gi, QString nome)
+void printermanager::getGrabbedImage(QObject *__gi, QString __nome)
 {
-    bool isSiro = nome.startsWith("Siro");
-    bool isLive = nome.startsWith("Live");
+    QQuickItemGrabResult *item = qobject_cast<QQuickItemGrabResult *>(__gi);
+    getImage(item->image(),__nome);
+}
+
+void printermanager::getImage(QImage __img, QString __nome)
+{
+    bool isSiro = __nome.startsWith("Siro");
+    bool isLive = __nome.startsWith("Live");
 
     QByteArray *cur_bitmap;
     if (isSiro && m_printSiroky)
@@ -2519,13 +2526,13 @@ void printermanager::getGrabbedImage(QObject *gi, QString nome)
         cur_bitmap = &m_bitmapLiverpool;
     else
         return;
-
-    bool isAve = nome.contains(" Ave");         // test Average / QMax
+ qDebug()<<"DENTRO1"<<__img;
+    bool isAve = __nome.contains(" Ave");         // test Average / QMax
     int  xoffs = isAve  ? 8 : (8 + 400 + 16);   // horizz pixel offset
 
-    QQuickItemGrabResult *item = qobject_cast<QQuickItemGrabResult *>(gi);
-    QImage  qi(item->image());
-    QSize   qs = qi.size();
+    QImage  qi = __img;
+    QSize   qs = __img.size();
+    qDebug()<<"SIZE IMG"<<qs;
     int     w0 = qs.width();
     int     h0 = qs.height();
 
@@ -2548,7 +2555,7 @@ void printermanager::getGrabbedImage(QObject *gi, QString nome)
     uint8_t *slider = bm;
     for(int h = 0; h < h0; h++)                             // immagine scandita in modo raster
         for(int w = 0; w < w0; w++) {
-            uint16_t rgb12 = decimazioneColore(qi.pixel(w, h));
+            uint16_t rgb12 = decimazioneColore(__img.pixel(w, h));
             int cur_color;
             if(pale_cnt[rgb12] == 0) {                      // prima occorrenza del colore
                 pale_indx[rgb12] = cur_color = pale_seq++;  // n. progressivo colore
@@ -2596,6 +2603,7 @@ void printermanager::getGrabbedImage(QObject *gi, QString nome)
     }
 
     free(bm);
+     qDebug()<<"SIZE IMG"<<cur_bitmap->size();
     qDebug("fine getGrabbed, nblack:%d", nblack);
 }
 
@@ -2603,6 +2611,7 @@ void printermanager::getGrabbedImage(QObject *gi, QString nome)
 #include "global.h"
 #include "p7settingsmanager.h"
 #include "ancestry.h"
+#include "bitmapsv.h"
 
 void printermanager::printTest()
 {
@@ -2644,8 +2653,19 @@ void printermanager::printTest()
     Ancestry *head2 = configPrinter.getSafeChild("Headers");
     m_printSecondHeader = head2->getSafeChild("Second")->getSafeAttribute(ATT_VALUE);
 
-//    if (m_printLiverpool)
-//        m_printSiroky = false;
+    if (m_printLiverpool) //devo caricare l'immagine salvata in "bitmapsv.h"
+    {
+         QString imgHex(fixedbm);
+         imgHex = imgHex.mid(8);
+         qDebug()<<"sto stampando jpg";
+         QByteArray ArrayVal = QByteArray::fromHex(imgHex.toLatin1());
+         QImage img;
+         img.loadFromData(ArrayVal);
+
+         getImage(img,"Liverpool");
+    }
+
+
 
     m_dfm = new DatafileManager();
     m_dfm->SetFileName(m_namefile);
