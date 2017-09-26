@@ -424,7 +424,7 @@ void MDataManager::loadFile(QString __fileName)
         Ancestry *head2 = m_configPrinter.getSafeChild("Headers");
         m_secondHead = head2->getSafeChild("Second")->getSafeAttribute(ATT_VALUE);
 
-//        if (m_Liverpool)
+//        if (m_Liverpool) //da sentire sergio
 //            m_Siroky = false;
 
         //libreria di analisi: creo oggetto.
@@ -1699,6 +1699,5 @@ void MDataManager::sendPrintTest()
     qDebug() << "inizio stampa";
      m_mngPrint = new printermanager();
      m_mngPrint->printTest();
-     qDebug() << "stampato";
      m_mngPrint->closePrinter();
 }

@@ -289,6 +289,7 @@ void printermanager::Pri_Rep()
     // 	Risultati dell'esame ricavati dall'analisi semplificata, implementata nel firmware
 #if PRI_REP_RIS
     Report_result();		// scrive in elenco i dati calcolati dall'analisi dell'esame
+    m_port->status();
     m_port->Pri_Str(3, (char*)"\n \n", 0); // LINE"\x3",0);
 #endif
 
@@ -2526,13 +2527,11 @@ void printermanager::getImage(QImage __img, QString __nome)
         cur_bitmap = &m_bitmapLiverpool;
     else
         return;
- qDebug()<<"DENTRO1"<<__img;
+
     bool isAve = __nome.contains(" Ave");         // test Average / QMax
     int  xoffs = isAve  ? 8 : (8 + 400 + 16);   // horizz pixel offset
 
-    QImage  qi = __img;
-    QSize   qs = __img.size();
-    qDebug()<<"SIZE IMG"<<qs;
+    QSize   qs = __img.size(); 
     int     w0 = qs.width();
     int     h0 = qs.height();
 
@@ -2567,8 +2566,8 @@ void printermanager::getImage(QImage __img, QString __nome)
             pale_cnt[rgb12]++;                              // statistica
         }
 
-//    for (int i = 0; i < NCOLORS; i++) if(pale_cnt[i]) qDebug("palette %3.3x cnt:%d", i, pale_cnt[i]);
-//    for(int i = 0; i < pale_seq; i++) qDebug("col:%d %3.3x cnt:%d", i, pale_revindx[i], pale_cnt[pale_revindx[i]]);
+ //   for (int i = 0; i < NCOLORS; i++) if(pale_cnt[i]) qDebug("palette %3.3x cnt:%d", i, pale_cnt[i]);
+ //   for(int i = 0; i < pale_seq; i++) qDebug("col:%d %3.3x cnt:%d", i, pale_revindx[i], pale_cnt[pale_revindx[i]]);
 
     int nblack = 0;
     char  * d = cur_bitmap->data();
@@ -2603,7 +2602,6 @@ void printermanager::getImage(QImage __img, QString __nome)
     }
 
     free(bm);
-     qDebug()<<"SIZE IMG"<<cur_bitmap->size();
     qDebug("fine getGrabbed, nblack:%d", nblack);
 }
 
@@ -2630,6 +2628,36 @@ void printermanager::printTest()
 
     qDebug()<<"file name"<<m_namefile;
 
+    m_printMode = PORTRAIT_MODE;
+
+    m_realDots = 0;
+
+    m_modal_e = 0;
+    m_numTest = -1;
+    m_test_type = false;
+    m_correct = false;
+    m_emgPresent = false;
+    m_i_max_x = -1;
+    m_max_x = -1;
+    m_max_y = -1;
+    m_uw3 = 1;
+    m_cursore = 0;
+
+    m_chVol = -1;
+    m_chFlw = -1;
+    m_chEmg = -1;
+
+    m_resultBm_w = 824; // 103 bytes * 8 bit
+    m_resultBm_h = 300;
+
+    m_bitmapSiroky.resize((m_resultBm_w * m_resultBm_h) / 8);
+    m_bitmapLiverpool.resize((m_resultBm_w * m_resultBm_h) / 8);
+    m_bitmapSiroky.fill(0);
+    m_bitmapLiverpool.fill(0);
+
+    m_port = new printerserialport(this);
+    m_port->init_printer();
+
     QString configPrinterS = g_P7SettingsManager.printerSettings();
     if(!QFile::exists(configPrinterS))
         configPrinterS = ":/Config/Config_Printer.xml";
@@ -2653,48 +2681,32 @@ void printermanager::printTest()
     Ancestry *head2 = configPrinter.getSafeChild("Headers");
     m_printSecondHeader = head2->getSafeChild("Second")->getSafeAttribute(ATT_VALUE);
 
-    if (m_printLiverpool) //devo caricare l'immagine salvata in "bitmapsv.h"
+    if (m_printLiverpool || m_printSiroky) //devo caricare l'immagine salvata in "bitmapsv.h"
     {
          QString imgHex(fixedbm);
          imgHex = imgHex.mid(8);
-         qDebug()<<"sto stampando jpg";
          QByteArray ArrayVal = QByteArray::fromHex(imgHex.toLatin1());
          QImage img;
          img.loadFromData(ArrayVal);
 
-         getImage(img,"Liverpool");
+         if (m_printLiverpool)
+         {
+             getImage(img,"Liverpool Qmax");
+             getImage(img,"Liverpool Ave");
+         }
+         if (m_printSiroky)
+         {
+             getImage(img,"Siroky Qmax");
+             getImage(img,"Siroky Ave");
+         }
     }
-
-
 
     m_dfm = new DatafileManager();
     m_dfm->SetFileName(m_namefile);
     m_dfm->SetFileType(7);
 
-    m_printMode = PORTRAIT_MODE;
-
-    m_realDots = 0;
-
-    m_modal_e = 0;
-    m_numTest = -1;
-    m_test_type = false;
-    m_correct = false;
-    m_emgPresent = false;
-    m_i_max_x = -1;
-    m_max_x = -1;
-    m_max_y = -1;
-    m_uw3 = 1;
-    m_cursore = 0;
-
-    m_chVol = -1;
-    m_chFlw = -1;
-    m_chEmg = -1;
-
-    m_port = new printerserialport(this);
-    m_port->init_printer();
-
     //dati paziente e esame
-    qDebug()<<"open"<<m_dfm->Open();
+    m_dfm->Open();
     m_dfm->GetParameters();
     //paziente
     m_name = "Stampa";//m_dfm->GetPatient().section(";", 0, 0);
