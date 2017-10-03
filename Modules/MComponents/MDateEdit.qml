@@ -26,12 +26,12 @@ Rectangle {
         edYear.text=d.getFullYear()
     }
 
-    function setDate(newDate){//accetta una stringa
+    function setDate(newDate){//accetta una stringa dal formato MM/dd/yyyy
         var d=new Date(String(newDate))
-        cbMonth.currentIndex=d.getMonth()
-        uppa(d.getMonth())
-        cbDay.currentIndex=d.getDate()-1
         edYear.text=d.getFullYear()
+        cbMonth.currentIndex=d.getMonth()
+        uppa(d.cbMonth)
+        cbDay.currentIndex=d.getDate() - 1
     }
 
     function uppa(month)
@@ -121,7 +121,7 @@ Rectangle {
             verticalAlignment: Text.AlignVCenter
             horizontalAlignment: Text.AlignHCenter
             labelSize:rootDateEdit.labelSize
-            onTextChanged: date=new Date(edYear.text,cbMonth.currentIndex,cbDay.currentIndex+1)
+            onTextChanged: uppa(cbMonth.currentIndex)
             onFocusChanged:
             {
                 if(focus && isTouch)

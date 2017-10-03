@@ -58,6 +58,15 @@ Rectangle {
         return Qt.hsla(offset/steps,(1-i/(steps-1))*(1-j/(steps-1)),(0.5+(j/(steps-1))/2)*(1-i/(steps-1)),1)
     }
 
+    onBeginColorChanged:
+    {
+        recChoosed.color = beginColor
+    }
+
+    MouseArea {
+        anchors.fill: parent
+    }
+
     Row{
         anchors.fill: parent
         spacing:width*0.05

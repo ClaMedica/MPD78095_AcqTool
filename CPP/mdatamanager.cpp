@@ -1048,9 +1048,9 @@ qDebug() << "INIZIO";
                 int i = 0;
                 foreach(MSignal *sig, m_signalVector) {
                     QString name = sig->getName();
-                    if ((name == "Q") || (name == "QBT1") || (name == "Q1"))
+                    if (name.startsWith("Q"))
                         posQ = i;
-                    if ((name == "VLMv") || (name == "VBT1") || (name == "VV1"))
+                    if (name.startsWith("VV") || name ==  "VLMv")
                         posV = i;
                     i++;
                 }

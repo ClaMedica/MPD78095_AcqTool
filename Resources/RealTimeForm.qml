@@ -110,33 +110,6 @@ MForm{
 
     }
 
-//    MNewName{
-//        //@@@@@@@@@@    Properties      @@@@@@@@@@
-//        id:editName
-//        height: 100
-//        width:300
-//        anchors.centerIn: parent
-//        owner:""
-
-//        //@@@@@@@@@@    Events          @@@@@@@@@@
-//        onSelected: {
-//            //a seconda di chi lo sta usando decido cosa fare
-//            switch(owner)
-//            {
-//            case "NewAcq":
-//                lastAcqFileName=examFolder+curText+".pic"
-//                mngAcq.newAcquisition(lastAcqFileName);
-//                mngCon.fileName=configurationFile
-//                mngCon.read()
-//                plot.startAll();
-//                break;
-//            default:break;
-//            }
-//            visible=false
-
-//        }
-//    }
-
     MGridView{
         //@@@@@@@@@@    Properties      @@@@@@@@@@
         id:grid

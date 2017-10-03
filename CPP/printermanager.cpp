@@ -144,11 +144,11 @@ void printermanager::pri_rep_review()
                 m_emgPresent = true;
                 m_chEmg = c;
             }
-            if (chName == "QBT1" || chName == "Q1") {
+            if (chName.startsWith("Q")) {
                 m_dfm->GetChVal(c, 0, m_realDots, buffer_flw, 0);
                 m_chFlw = c;
             }
-            if (chName == "VBT1" || chName == "VV1") {
+            if (chName.startsWith("VV") || chName ==  "VLMv" ) {
                 m_chVol = c;
                 m_dfm->GetChVal(c, 0, m_realDots, buffer_vol, 0);
             }

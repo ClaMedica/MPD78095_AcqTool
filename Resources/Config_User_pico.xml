@@ -34,7 +34,7 @@
                     type="TextField"
                     unit=""
                     label="Channel Type"
-                    value="VBT"
+                    value="VV"
                     visible = "false"
                  />
                  <num
@@ -73,7 +73,7 @@
                      label="Channel Type"
                      type="TextField"
                      unit=""
-                     value="QBT"
+                     value="Q"
                      visible = "false"
                  />
                  <num
@@ -108,7 +108,7 @@
              </Type>
          </ChannelsAbilitation>
         <ChannelsProp>
-            <VBT>
+            <VV>
                 <width
                    label="width track"
                    type="TextField"
@@ -142,8 +142,8 @@
                     value="200"
                 />
 
-            </VBT>
-            <QBT>
+            </VV>
+            <Q>
                 <width
                    label="width track"
                    type="TextField"
@@ -177,7 +177,7 @@
                     value="50"
                 />
 
-            </QBT>
+            </Q>
             <EMG>
                 <width
                    label="width track"

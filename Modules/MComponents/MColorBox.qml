@@ -12,15 +12,9 @@ Rectangle {
     MouseArea{
         anchors.fill:parent
         onClicked: {
-            var c
-            if(colorPicker===undefined){
-                c=Qt.createQmlObject('import MComponents 1.0; MColorPicker{}',rootApp)
-                c.build()
-            }
-            else
-                c=colorPicker
-            DataEngine.putItemOnTop(c)
+            var c=colorPicker
             c.beginColor=rootColorBox.color
+            DataEngine.putItemOnTop(c)
             c.visible=true
             con.target=c
         }
@@ -31,13 +25,12 @@ Rectangle {
         ignoreUnknownSignals: true
         onColorSelected: {
             rootColorBox.color=target.choosedColor
-            if(colorPicker===undefined)
-                target.erase()
-            else
-                target.visible=false
-            DataEngine.putItemOnTop(rootColorBox)
+            target.visible=false
+            target = null
         }
-        onClosing:target.destroy()
+        onClosing:{
+            target.destroy()
+        }
     }
 
 }

@@ -41,12 +41,12 @@ Rectangle {
         contentHeight: anctree.height
         contentWidth: anctree.width
 
-    MAncestry {
-        id:anctree
-        width:rootTree.width
-        labelSize: rootTree.labelSize
-        itemHeight: rootTree.height/10
-    }
+        MAncestry {
+            id:anctree
+            width:rootTree.width
+            labelSize: rootTree.labelSize
+            itemHeight: rootTree.height/10
+        }
     }
 
 }

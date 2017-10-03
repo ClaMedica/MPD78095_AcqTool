@@ -183,6 +183,10 @@ Column {
                     c.setInfo(info)
                     c.role = pchild.getAttribute("label")
                     c.labelSize = rootAncestry.labelSize
+
+                    if (pchild.getAttribute("alfanum") === "false")
+                        c.keyboardAlfaNum = false
+
                     parChildren.push(pchild)
                     parameters[parameters.length] = c
                 }
