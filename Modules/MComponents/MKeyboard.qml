@@ -17,6 +17,8 @@ Rectangle {
     property var target:undefined
     property bool destroyWhenOK:false
     property string testo: ""
+    property string oldTesto: ""
+    property string labelTarget: ""
 
     anchors.fill: parent
 
@@ -37,8 +39,13 @@ Rectangle {
     function show()
     {
         visible=true
+        oldTesto = testo
         txtField.text = testo
 
+    }
+
+    MouseArea{
+        anchors.fill: parent
     }
 
     Rectangle{
@@ -49,11 +56,21 @@ Rectangle {
         height:parent.height/6
         color:"white"
 
+        MLabel{
+            id:txtTarget
+          //  anchors.fill: parent
+            anchors.left: parent.left
+            anchors.verticalCenter: parent.verticalCenter
+            labelSize: rootKeyboard.labelSize
+            text: rootKeyboard.labelTarget;
+        }
         MTextField{
             id:txtField
 //            selectByMouse:false
-            anchors.fill: parent
+            anchors.left: txtTarget.right
+            anchors.right:parent.right
             labelSize: rootKeyboard.labelSize
+            anchors.verticalCenter: parent.verticalCenter
             onTextChanged: if(target!=undefined) target.text=txtField.text
             validator: target!=undefined?target.validator:null
         }
@@ -77,7 +94,7 @@ Rectangle {
                 [100,[["",15,"shift.png"],"z","x","c","v","b","n","m",["",15,"backspace.png"]],
                  [["",15,"shift.png"],"|","à","è","é","ì","ò","ù",["",15,"backspace.png"]]],
 
-                [100,[["1@#",15],[" ",70,"space.png"],["OK",15]],[["1@#",15],[" ",70,"space.png"],["OK",15]]]
+                [100,[["1@#",15],[" ",55,"space.png"],["OK",15],["CANC",15]],[["1@#",15],[" ",55,"space.png"],["OK",15],["CANC",15]]]
             ]
             delegate:
                 Row{
@@ -136,7 +153,19 @@ Rectangle {
                                     rootKeyboard.visible=false
                                     target.focus=false
                                 }
-
+                                break;
+                            case "CANC":
+                                txtField.text = oldTesto
+                                if(destroyWhenOK)
+                                    rootKeyboard.destroy()
+                                else
+                                {
+                                    shift=false
+                                    special=false
+                                    //caps=false
+                                    rootKeyboard.visible=false
+                                    target.focus=false
+                                }
                                 break;
                             default:
                                 txtField.insert(txtField.cursorPosition,text)

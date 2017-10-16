@@ -77,6 +77,7 @@ Rectangle {
                 if (c !== undefined)
                 {
                     c.target = connection.target
+                    c.labelTarget = label.text
                     DataEngine.putItemOnTop(c)
                     if (rootParEdit.type === typTextField)
                         c.testo = connection.target.text

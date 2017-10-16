@@ -2387,7 +2387,7 @@ void printermanager::Report_BitMap(bool __isSiro)
 
     for(int s = 0; s < sz; ) {
         //for(int n = 0; (n < 1000) && (m_port->status(false) & (1 << 3)); n++);
-        //m_port->status(false);
+        m_port->status(false);
         m_port->Pri_Str(8, head, 0);
         m_port->Pri_Str(szchunk, p, 0);
         p += szchunk;
