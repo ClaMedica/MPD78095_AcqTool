@@ -92,7 +92,10 @@ bool MAcqManager::newAcquisition(QString __dataFile)
 
         //e infine carico il file degli allarmi con la lingua giusta
         QString lang = m_configLocale.getChild(XML_LOCALE)->getSafeAttribute("value");
-        if(!m_alarmMng.load(m_applicationPath + "/Config_Alarms_" + lang + ".xml"))
+        QString configAlarms = m_applicationPath + "/Config_Alarms_" + lang + ".xml";
+        if(!QFile::exists(configAlarms))
+            configAlarms = ":/Config/Config_Alarms_"+ lang + ".xml";
+        if(!m_alarmMng.load(configAlarms))
             qCritical() << "Error on alarm configuration file";
 
         //carico info di connettivitA

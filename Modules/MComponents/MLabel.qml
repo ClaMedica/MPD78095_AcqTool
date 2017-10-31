@@ -9,7 +9,7 @@ Text {
     property real labelSize: 8
     height: 100
     width: 200
-    text: "ciao"//"Èope"
+    text: ""
     font.family: (layout !== undefined) ? layout.value("FFamily") : "ubuntu"
     font.bold: true
     font.pixelSize: screenH * 0.01 * labelSize

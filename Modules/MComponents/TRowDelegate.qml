@@ -9,7 +9,7 @@ Rectangle{
         property int column:0
         property int row:0
         property int elideMode:0
-        property string value:"ciao"
+        property string value:""
     }
     height:itemData.selected?Math.round(layout.dimensionOf("TIF")*1.2):layout.dimensionOf("TIF")
     Behavior on height {NumberAnimation {duration: 200}}
