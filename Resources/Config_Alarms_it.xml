@@ -17,7 +17,7 @@
 		<Help>Spegnere e riaccendere la cella</Help>
 	</S_ALA_NOT_ACQUIRING>
 	<T_ALA_TIMEOUT_STATUS code="300">
-		<Text>Timeout sullo statoooooo</Text>
-		<Help>aiutamiiiiii x favoreeee</Help>
+                <Text>Timeout sullo stato</Text>
+                <Help>Fare Reset</Help>
 	</T_ALA_TIMEOUT_STATUS>
 </Root>

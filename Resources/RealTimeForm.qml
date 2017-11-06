@@ -172,66 +172,6 @@ MForm{
         onResetAlarms: mngAcq.resetAlarms()
     }
 
-
-//    MMenuBar {
-//        //@@@@@@@@@@    Properties      @@@@@@@@@@
-//        id: forReaMenu
-//        anchors.top: parent.top
-//        color: "transparent"
-//        height: root.height
-//        width: root.width
-//        opacity: rootRealTime.opacity
-//        theme:"green"
-//        items: [
-//            ["Acquisition","Start",qsTr("Exit without saving"),qsTr("Exit and save"),qsTr("Exit, save and review")],
-//            ["Add","Marker","Start Definer","Stop Definer"],
-//            ["Plot","Properties"]
-//        ]
-
-//        //@@@@@@@@@@    Events          @@@@@@@@@@
-//        onSelected: {
-//            if (itemClicked == "Start") {
-//                editName.owner="NewAcq"
-//                editName.visible=true
-//                box.popola()
-//            }
-//            if (itemClicked === qsTr("Exit without saving")) {
-//                mngAcq.sendStopAcq()
-//                plot.stopAll()
-//                mngAcq.endAcquisitionDiscard()
-//                timClose.start(1000);
-//            }
-//            if (itemClicked === qsTr("Exit and save")) {
-//                mngAcq.sendStopAcq()
-//                plot.stopAll()
-//                mngAcq.endAcquisitionSave()
-//                timClose.start(1000);
-//            }
-//            if (itemClicked === qsTr("Exit, save and review")) {
-//                mngAcq.sendStopAcq()
-//                plot.stopAll()
-//                mngAcq.endAcquisitionSave()
-//                var arg=[]
-//                arg[0]=Qt.application.arguments[0]
-//                arg[1]="vis"
-//                arg[2]=Qt.application.arguments[2]
-//                arg[3]=Qt.application.arguments[3]
-//                console.log("Lancioooo",arg[1])
-//                launch(arg)
-//            }
-
-//            if (itemClicked == "Properties")
-//            {
-//                //box.ready=false
-//                box.width=parent.width/2
-
-//                //box.popola()
-//                //box.ready=true
-//            }
-
-//        }
-//    }
-
     MPopUp {
         id: pop
         anchors.centerIn: parent

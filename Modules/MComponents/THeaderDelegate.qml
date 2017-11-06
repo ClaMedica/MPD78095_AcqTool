@@ -12,7 +12,7 @@ Rectangle{
         property int column:0
         property int row:0
         property int elideMode:0
-        property string value:"ciao"
+        property string value:""
     }
     //Component.onCompleted:console.log(rootInfoBox.title,"Creato header",this,l,img,itemData.column,itemData.value,"#")
     //Component.onDestruction: console.log(rootInfoBox.title,"Distrutto header",this,l,img,itemData.column,itemData.value,"#")

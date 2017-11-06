@@ -6,7 +6,7 @@ Rectangle{
         property int column:0
         property int row:0
         property int elideMode:0
-        property string value:"ciao"
+        property string value:""
     }
 
     opacity:0
