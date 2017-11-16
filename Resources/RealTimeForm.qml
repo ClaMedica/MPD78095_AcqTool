@@ -21,8 +21,9 @@ MForm{
     clip:true
 
     //@@@@@@@@@@    Functions       @@@@@@@@@@
-    function displayMessage(mex,time)
+    function displayMessage(mex,time,rows)
     {
+        pop.rows =rows
         pop.message = mex
         pop.display(1, 0)
         if(time !== -1)
