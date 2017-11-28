@@ -443,7 +443,7 @@ void MAcqManager::handleTCP(SimpleTCPClient *__client, QByteArray __block)
 {
     if(m_tcpClients.values().contains(__client)) {
         QString who = m_tcpClients.key(__client);
-        qDebug() << who << __block;
+        qDebug() << who ;//<< __block;
 
         if(who == "STA") {      //allora e' uno stato
             m_supeConnected = true;
@@ -478,7 +478,7 @@ void MAcqManager::handleTCP(SimpleTCPClient *__client, QByteArray __block)
 
             analyzeStatus(currState.pf);
             analyzeAlarms(alarms);
-            qDebug() << "Supervisore connesso"<<sizeof(flowBT_status_t)<<sizeof(picoFlow_status_t)<<sizeof(alarms_t)<<__block.size();
+            //qDebug() << "Supervisore connesso"<<sizeof(flowBT_status_t)<<sizeof(picoFlow_status_t)<<sizeof(alarms_t)<<__block.size();
         }
         else if(who == "VAL")
         {
@@ -582,13 +582,14 @@ void MAcqManager::analyzeStatus(picoFlow_states_t __currState)
     //    if(__status.currState != m_oldState)
     qDebug() << "Stato " << __currState << m_oldState;
 
+    static bool acquired = false;
     switch(__currState)
     {
     case ESTATE_IDLE_NOT_CONNECTED:
         if(m_oldState == ESTATE_IDLE_CONNECTED)
+            m_alarmMng.startTimeoutAlarm(ALA_NOT_CONNECTED, 1000);
+        else if(m_oldState == ESTATE_ACQUIRING)
             m_alarmMng.addAlarm(ALA_NOT_CONNECTED);
-        else
-            m_alarmMng.startTimeoutAlarm(ALA_NOT_CONNECTED, 3000);
         break;
 
     case ESTATE_IDLE_CONNECTED:
@@ -596,12 +597,19 @@ void MAcqManager::analyzeStatus(picoFlow_states_t __currState)
             m_alarmMng.stopTimeoutAlarm(ALA_NOT_CONNECTED);
             sendStartAcq();
         }
-        m_alarmMng.addAlarm(ALA_NOT_ACQUIRING);
+        if(m_oldState == ESTATE_ACQUIRING) {
+            m_alarmMng.addAlarm(ALA_NOT_ACQUIRING);
+        }
+        if(m_oldState == ESTATE_IDLE_CONNECTED && acquired) {
+            acquired = false;
+            sendStartAcq();
+        }
         break;
 
     case ESTATE_ACQUIRING:
         if(m_oldState == ESTATE_IDLE_CONNECTED) {
             emit systemInAcqStatus();
+            acquired = true;
             m_alarmMng.manageAlarm(ALA_NOT_ACQUIRING, ENABLE);
         }
         break;
@@ -610,13 +618,12 @@ void MAcqManager::analyzeStatus(picoFlow_states_t __currState)
     }
 
     m_oldState = __currState;
-    m_alarmMng.startTimeoutAlarm(ALA_TIMEOUT_STATUS, 3000);
+    m_alarmMng.startTimeoutAlarm(ALA_TIMEOUT_STATUS, 2000);
 }
 
 void MAcqManager::analyzeAlarms(alarms_t __alarms)
 {
-    (void) __alarms;
-    // ????????????????????????????????????
+    qDebug()<<"analyzeAlarm"<<__alarms.ala;
 }
 
 
