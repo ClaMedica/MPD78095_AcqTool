@@ -578,8 +578,7 @@ bool MAcqManager::loadConnectivityInfo(Ancestry *__info)
 
 void MAcqManager::analyzeStatus(picoFlow_states_t __currState)
 {
-    m_alarmMng.stopTimeoutAlarm(ALA_TIMEOUT_STATUS);
-    //    if(__status.currState != m_oldState)
+    // m_alarmMng.stopTimeoutAlarm(ALA_TIMEOUT_STATUS);
     qDebug() << "Stato " << __currState << m_oldState;
 
     static bool acquired = false;
@@ -618,7 +617,7 @@ void MAcqManager::analyzeStatus(picoFlow_states_t __currState)
     }
 
     m_oldState = __currState;
-    m_alarmMng.startTimeoutAlarm(ALA_TIMEOUT_STATUS, 2000);
+   // m_alarmMng.startTimeoutAlarm(ALA_TIMEOUT_STATUS, 2000);
 }
 
 void MAcqManager::analyzeAlarms(alarms_t __alarms)
