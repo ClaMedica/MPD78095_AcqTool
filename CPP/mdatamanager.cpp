@@ -228,6 +228,7 @@ void MDataManager::loadFile(QString __fileName)
                 sigMin = m;
 
             double supLim = m_mng->GetSupLim(h);
+            double infLim = m_mng->GetInfLim(h);
             Ancestry *chProp = m_configUser.getSafeChild(XML_CHANNELSPROP);
             Ancestry *chName = chProp->getSafeChild(m_mng->GetChanName(h).remove("1"));
             //max#min#step#decimals
@@ -241,9 +242,16 @@ void MDataManager::loadFile(QString __fileName)
                 else
                     break;
             }
-
             sig->setSupLim(supLim);
-
+            while (m < infLim)
+            {
+                double newInfLim = infLim - rangesDef.at(2).toInt();//aggiungo lo step
+                if (newInfLim >= -rangesDef.at(0).toInt())
+                    infLim = newInfLim;
+                else
+                    break;
+            }
+            sig->setInfLim(infLim);
             this->addSignal(sig);
         }
 
@@ -269,6 +277,7 @@ void MDataManager::loadFile(QString __fileName)
             (*def)["color"] = "cyan";
             (*def)["category"] = CAT_DEFINER;
             (*def)["resizeable"] = 1;
+            qDebug()<<"Definitori:"<< defEn[i];
             defVec->append(def);
         }
 
@@ -789,8 +798,9 @@ QVariantList MDataManager::getPlotLimits()
                     //qDebug()<<(*sig);
                     if(sig->getT0()       < xMin) xMin = sig->getT0();
                     if(sig->getDuration() > xMax) xMax = sig->getDuration();
-                    if(sig->minimum()     < yMin) yMin = sig->minimum();
+                    //if(sig->minimum()     < yMin) yMin = sig->minimum();
                     //if(sig->maximum()     > yMax) yMax = sig->maximum();
+                    yMin = sig->getInfLim();
                     yMax = sig->getSupLim();
                     //qDebug()<<yMin<<yMax;
                     //qDebug()<<"Segnale lungo:"<<sig->getSize();
