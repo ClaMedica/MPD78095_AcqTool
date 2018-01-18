@@ -1,7 +1,5 @@
 #include "macqmanager.h"
 
-int dataCount=0;
-
 MAcqManager::MAcqManager(QObject *parent)
 {
     (void) parent;
@@ -61,6 +59,7 @@ MAcqManager::~MAcqManager()
             delete sig;
         }
     }
+
 
     //    for(int i=0;i<m_signalVector.size();i++)
     //        if(m_signalVector[i]!=NULL)
@@ -769,8 +768,9 @@ void MAcqManager::saveBuffersToFile()
         while(m_channelMap[type].at(index)->size() > 0) {
             float v = m_channelMap[type].at(index)->takeFirst();
             m_mng->AppendValue(&chanNum, &v, 1);
-            qDebug("AppendValue(chanNum:%d v:%f),chanNum,v)",chanNum,v);
+            //qDebug("AppendValue(chanNum:%d v:%f),chanNum,v)",chanNum,v);
         }
+
     }
     //qDebug()<<"Salvooo"<<m_mng->GetDuration();
 }
@@ -785,7 +785,7 @@ void MAcqManager::sendBuffersToPlot()
         QDataStream out(&block, QIODevice::WriteOnly);
 
         QList<MSignal> channels;
-
+        bool toSend = false;
         foreach(QString chanName, m_chanInPlots[plotName]) {
             int size = chanName.size();
             QString type,number;
@@ -805,7 +805,13 @@ void MAcqManager::sendBuffersToPlot()
 
             channels << copy;
             qDebug() << "Canale" << chanName << index << number << type;
+
+            if (m_channelMap[type].at(index)->size() > 0)
+                toSend = true;
         }
+
+        if (!toSend)
+            return;
 
         qDebug() << "Sending data to" << plotName << m_tcpChannels[plotName]->serverPort() << channels;
 
@@ -930,10 +936,7 @@ void MAcqManager::applyOperations()
         }
     }
 }
-
-void MAcqManager::fillBuffers(QByteArray __block)
-{
-    /**
+/**
      * TCP PACKET:
      * - numChan, type qint32. Number on channel present into the packet. It has to be between 0 and m_maxNumChan
      * The following data are repeated numChan times
@@ -942,54 +945,62 @@ void MAcqManager::fillBuffers(QByteArray __block)
      * - samples, type qreal, lenght numChanData. Channel's samples
      */
 
-    dataCount++;
-
-    QByteArray block;
-    QDataStream in(&block, QIODevice::ReadOnly);
-    block = __block;
-
-    //e poi lo spacchettiamo
-    //qDebug()<<"block "<<block.toHex().data();
-    qint32 numChan = 0;
-    qint32 numBytes = 0;
-    qint32 currChan = 0;
-    qint32 numChanData = 0;
+void MAcqManager::fillBuffers(QByteArray __block)
+{
     uchar maxNumChan = m_mng->GetChanNum();
-    qreal sample;
+    static QByteArray staticblock;
+    staticblock += __block;
 
-    in >> numBytes;
-    qDebug()<<"NA? bytes: "<<numBytes;
+    bool samplesToRead = true;
+    while(samplesToRead)
+    {
+        //qDebug() << "inizio loop bytes rimanenti:" << staticblock.size();
+        qint32 numChan = 0;
+        qint32 numBytes = 0;
+        qint32 currChan = 0;
+        qint32 numChanData = 0;
+        qreal sample;
+        QDataStream in(&staticblock, QIODevice::ReadOnly);
 
-    //Chan number
-    in >> numChan;
-    qDebug()<<"NA? chan: "<<numChan;
+        in >> numBytes;
+        qDebug()<<"NA? bytes: "<<numBytes;
+        if(staticblock.size() < numBytes)
+            break;
 
-    if(numChan > maxNumChan) {
-        qCritical( "ERROR, numChan(%d) > maxNumChan(%d)", numChan,maxNumChan);
-        return;
-    }
+        //Chan number
+        in >> numChan;
+        qDebug()<<"NA? chan: "<<numChan;
 
-    for(int k = 0; k < numChan; k++) {
-        in >> currChan;
-        in >> numChanData;
-        qDebug() << "currChan:" << currChan;
-
-        if((currChan < maxNumChan) && (currChan >= 0)) {    //se e' un canale con del senso
-            if(m_bufferMap.keys().contains(QString::number(currChan))) {
-                for(int i = 0; i < numChanData; i++) {
-                    in >> sample;
-                    m_bufferMap[QString::number(currChan)]->append(sample);
-                    qDebug("samples(ch:%d, nd:%d):%f",currChan,numChanData,sample);
-                }
-//            else
-//                qCritical() << "Channel non recognized" << m_bufferMap.keys() << currChan;
-                qDebug() << currChan << m_bufferMap[QString::number(currChan)]->size();
-            }
+        if(numChan > maxNumChan) {
+            qCritical( "ERROR, numChan(%d) > maxNumChan(%d)", numChan,maxNumChan);
+            return;
         }
-        else
-            qCritical() << "currChan out of range" << currChan;
+
+        for(int k = 0; k < numChan; k++) {
+            in >> currChan;
+            in >> numChanData;
+            qDebug() << "currChan:" << currChan;
+
+            if((currChan < maxNumChan) && (currChan >= 0)) {    //se e' un canale con del senso
+                if(m_bufferMap.keys().contains(QString::number(currChan))) {
+                    for(int i = 0; i < numChanData; i++) {
+                        in >> sample;
+                        m_bufferMap[QString::number(currChan)]->append(sample);
+                        //qDebug("samples(ch:%d, nd:%d):%f",currChan,numChanData,sample);
+                    }
+
+                    //qDebug() << currChan << m_bufferMap[QString::number(currChan)]->size();
+                }
+            }
+            else
+                qCritical() << "currChan out of range" << currChan;
+        }
+        //rimuoviamo roba gia'  processata
+        staticblock.remove(0, numBytes+4);
+
+        if (staticblock.size() < 4)
+            samplesToRead = false;
     }
-    //rimuoviamo roba gia'  processata
 }
 
 bool MAcqManager::buffersReady()
@@ -1000,13 +1011,13 @@ bool MAcqManager::buffersReady()
 
     foreach(QString hwchan, m_totalHWChan) {
         if(m_bufferMap[hwchan]->size() < (m_bufSizeMap[hwchan] + m_frameMap[hwchan])) {
-            qDebug() << hwchan << "buffer non pronto con" << m_bufferMap[hwchan]->size() << "<" << m_bufSizeMap[hwchan] + m_frameMap[hwchan];
+            qDebug() << hwchan << "buffer non pronto con" << m_bufferMap[hwchan]->size() << "<" << (m_bufSizeMap[hwchan] + m_frameMap[hwchan]);
             return false;
         }
     }
 
     foreach(QString hwchan, m_totalHWChan)
-        qDebug() << "buffers pronti" << m_bufferMap[hwchan]->size() << ">" << m_bufSizeMap[hwchan] + m_frameMap[hwchan];
+        qDebug() << "buffers pronti" << m_bufferMap[hwchan]->size() << ">" << (m_bufSizeMap[hwchan] + m_frameMap[hwchan]);
 
     return true;
 }
@@ -1016,7 +1027,6 @@ bool MAcqManager::readConfigurationFile()
     //in questa funzione leggo il file di configurazione e mi annoto le info che mi servono
     qDebug() << "Inizio a leggere il file di configurazione";
 
-    int fmin = 0x7fffffff;  // INF;
     Ancestry *channels = m_configAcq.getSafeChild(XML_CHANNELS);
     qDebug() << "Trovati" << channels->getChildren().size() << "canali";
 
@@ -1063,6 +1073,7 @@ bool MAcqManager::readConfigurationFile()
         if(f == "")
             qCritical() << "File corrupted";
 
+        int fmin = 0x7fffffff;
         int sampleFreq = f.toInt();
         if(sampleFreq < fmin)
             fmin = sampleFreq;
@@ -1073,11 +1084,13 @@ bool MAcqManager::readConfigurationFile()
                 MSignal *p = new MSignal();
                 p->setSamplingFrequency(sampleFreq);
                 m_channelMap[name].append(p);
+
                 qDebug() << "Aggiunto segnale a channelMap" << name << "con frequenza di campionamento" << sampleFreq;
             }
         }
         else
             qCritical() << "Fake channel" << num;
+
 
         //ci sono delle operazioni?
         QString operations = channel->getSafeChild(XML_OPERATIONS)->text();
@@ -1122,6 +1135,7 @@ bool MAcqManager::readConfigurationFile()
         else
             qCritical() << "missing hw channel";
     }
+
 
     // lo faccio adesso perche ho la mappa delle frequenze completata
     foreach(QString c, m_totalHWChan) {     //inizializzo i buffer hardware;
