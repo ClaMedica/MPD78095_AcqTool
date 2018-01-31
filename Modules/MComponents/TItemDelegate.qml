@@ -8,7 +8,7 @@ Rectangle{
         property int elideMode:0
         property string value:""
     }
-
+    property var colonna: []
     opacity:0
     Component.onCompleted: opacity=1
     Component.onDestruction: opacity=0
@@ -33,10 +33,17 @@ Rectangle{
         anchors.margins: 2
         color: DataEngine.TASKBAR_COLOR
         elide: itemData.elideMode
-        text: itemData.value===undefined?"none":itemData.value
+        text: {
+            if (itemData.value!==undefined && (colonna[itemData.column] === "BirthDate" || colonna[itemData.column] === "TestDate" || colonna[itemData.column] === "Date")){
+                Qt.formatDate(new Date(itemData.value), "dd/MM/yyyy")
+            }
+            else
+                itemData.value===undefined?"none":itemData.value
+        }
         labelSize:layout.value("F4")
         horizontalAlignment: Text.AlignHCenter        
     }
+
 
 }
 

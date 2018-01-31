@@ -3,7 +3,7 @@ import QtQuick 2.0
 Rectangle{
     //@@@@@@@@@@    Definitions     @@@@@@@@@@
     property string message:"Ciao questo messaggio vuole verificare come funziona questo cavolo di messaggino piop up"
-    property int rows:5 //identifica il numero di righe su cui voglio esporre il messaggio
+    property int rows:3 //identifica il numero di righe su cui voglio esporre il messaggio
     property int pixelXrow:16
     property real anim:0 //numerino che va da 0 a 1 e indica la percentuale di completamento di un'animazione
     property int xPos:0

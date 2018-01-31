@@ -90,22 +90,9 @@
                 label="EMG"
                 type="CheckBox"
                 unit=""
-                value="0"
+                value="true"
             />
-            <Type>
-                <FlowC
-                    label="flow via cavo"
-                    type="CheckBox"
-                    unit=""
-                    value="1"
-                />
-                <FlowBT
-                    label="flow BT"
-                    type="CheckBox"
-                    unit=""
-                    value="0"
-                />
-             </Type>
+
          </ChannelsAbilitation>
         <ChannelsProp>
             <VV>

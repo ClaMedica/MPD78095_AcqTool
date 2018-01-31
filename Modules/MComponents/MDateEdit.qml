@@ -11,6 +11,7 @@ Rectangle {
     property var date:Date(edYear.text,cbMonth.currentIndex,cbDay.currentIndex+1)
     property int labelSize:2
     readonly property int marginPerc:1
+    property int offset:0
     height:50
     width:200
     id:rootDateEdit
@@ -151,6 +152,7 @@ Rectangle {
         text:"..."
         onClicked: {
             dialog.open()
+            rootDateEdit.clicked()
         }
     }
 
@@ -161,7 +163,7 @@ Rectangle {
         width:calendar.width+10
         y: {
             var globalCoordinares = DataEngine.getAbsolutePosition(this)
-            y = -globalCoordinares.y
+            y = -globalCoordinares.y - offset
         }
         anchors.horizontalCenter: parent.horizontalCenter
         anchors.verticalCenterOffset: 50

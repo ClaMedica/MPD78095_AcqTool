@@ -39,7 +39,7 @@ ApplicationWindow {
              mngAcq.newAcquisition(dataFile)
              forReal.setMarkersInfo(mngAcq.markersInfo("type", [1, 6]))
              forReal.configurationFile = mngAcq.plotConfigFileName()
-             forReal.displayMessage("Wait for inizialization...", -1)
+             forReal.displayMessage(qsTr("Wait for ..."), -1,2)
              forHome.whoIsVisible = forReal.name
              forReal.setAcqInfo(mngData.acqInfo())
          }
@@ -81,7 +81,7 @@ ApplicationWindow {
             forReal.setMarkersInfo(mngAcq.markersInfo("type", [1, 6]))
             forReal.configurationFile = ""
             forReal.configurationFile = mngAcq.plotConfigFileName()
-            forReal.displayMessage("Wait for initialization...", -1)
+            forReal.displayMessage(qsTr("Wait for ..."), -1,2)
             forHome.whoIsVisible = forReal.name
             forReal.setAcqInfo(mngData.acqInfo())
         }
@@ -147,7 +147,7 @@ ApplicationWindow {
         onSystemInAcqStatus:
         {
             console.log("Go Go Go");
-            forReal.displayMessage("start",2000)
+            forReal.displayMessage(qsTr("start"),2000,5)
         }
         onAcquisitionEnded:
         {

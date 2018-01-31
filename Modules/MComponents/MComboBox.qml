@@ -21,7 +21,7 @@ Rectangle {
     Behavior on height { NumberAnimation { duration:300; easing.type: Easing.OutExpo}}
     border.width: screenH*0.005
     onModelChanged:        if(modelOk) currentIndex = 0
-    onCurrentIndexChanged: if(modelOk) curEle.text = model[currentIndex]
+    onCurrentIndexChanged: if(modelOk && model[currentIndex] !== undefined) curEle.text = model[currentIndex]
 
     signal clicked
 

@@ -228,6 +228,7 @@ void MDataManager::loadFile(QString __fileName)
                 sigMin = m;
 
             double supLim = m_mng->GetSupLim(h);
+            double infLim = m_mng->GetInfLim(h);
             Ancestry *chProp = m_configUser.getSafeChild(XML_CHANNELSPROP);
             Ancestry *chName = chProp->getSafeChild(m_mng->GetChanName(h).remove("1"));
             //max#min#step#decimals
@@ -241,9 +242,16 @@ void MDataManager::loadFile(QString __fileName)
                 else
                     break;
             }
-
             sig->setSupLim(supLim);
-
+            while (m < infLim)
+            {
+                double newInfLim = infLim - rangesDef.at(2).toInt();//aggiungo lo step
+                if (newInfLim >= -rangesDef.at(0).toInt())
+                    infLim = newInfLim;
+                else
+                    break;
+            }
+            sig->setInfLim(infLim);
             this->addSignal(sig);
         }
 
@@ -269,6 +277,7 @@ void MDataManager::loadFile(QString __fileName)
             (*def)["color"] = "cyan";
             (*def)["category"] = CAT_DEFINER;
             (*def)["resizeable"] = 1;
+            qDebug()<<"Definitori:"<< defEn[i];
             defVec->append(def);
         }
 
@@ -621,6 +630,7 @@ bool MDataManager::updateInfoList()
         QStringList elements;
         QVariant row, gName, gElemPack;
         gName = graph;
+
         //riempo con gli elementi che mi servono
 
         //tracce molto facile dato che ce le ho giA
@@ -649,11 +659,27 @@ bool MDataManager::updateInfoList()
             }
         }
 
+        //devo trovare i canali dei segnali associati al grafo (countGraphs)
+       QVector<int> chInGraph;
+        int i= 0;
+        foreach(MSignal *sig, m_signalVector) {
+            QString name = sig->getName();
+            foreach (QString chanName, m_chanInPlots[graph]) {
+                if (chanName == name){
+                    chInGraph.append(i);
+                }
+            }
+            i++;
+        }
+
         VarMapVec *def = m_storage.getAll(CAT_DEFINER);
         foreach (VarMap *curMap, (*def)) {
             QStringList enabled = curMap->value("enCh").toStringList();
-            if (enabled.at(countGraphs) == "1")
-                elements << "Definers:" + curMap->value("name").toString();
+            for (int j=0; j<chInGraph.length(); j++)
+            {//se un canale associato al grafo è abilitato disegno il definitore
+                if (enabled.at(chInGraph.at(j)) == "1")
+                    elements << "Definers:" + curMap->value("name").toString();
+            }
         }
 
         //elementi finiti
@@ -789,8 +815,9 @@ QVariantList MDataManager::getPlotLimits()
                     //qDebug()<<(*sig);
                     if(sig->getT0()       < xMin) xMin = sig->getT0();
                     if(sig->getDuration() > xMax) xMax = sig->getDuration();
-                    if(sig->minimum()     < yMin) yMin = sig->minimum();
+                    //if(sig->minimum()     < yMin) yMin = sig->minimum();
                     //if(sig->maximum()     > yMax) yMax = sig->maximum();
+                    yMin = sig->getInfLim();
                     yMax = sig->getSupLim();
                     //qDebug()<<yMin<<yMax;
                     //qDebug()<<"Segnale lungo:"<<sig->getSize();
@@ -1297,7 +1324,7 @@ void MDataManager::InitPageGraphs(int __anaType)
                 evAuto = 1;
 
                 //ogni volta che si passano i definitori alla libreria di analisi dopo aver nascosto/rivisualizzato i canali
-                //A? necessario sistemare l'array dei canali abilitati considerando tutti i canali dell'analisi.
+                //e' necessario sistemare l'array dei canali abilitati considerando tutti i canali dell'analisi.
                 //Se un canale non era visibile al momento dell'analisi,
                 //consideriamo quel canale abilitato
                 //                            If objOpMAn.myEnabled.Length < myGraphPlot.totAnalisysChannel Then

@@ -43,6 +43,9 @@ printermanager::printermanager(QString __namefile, QObject *parent) : QObject(pa
     m_bitmapSiroky.fill(0);
     m_bitmapLiverpool.fill(0);
 
+    buffer_emg = NULL;
+    buffer_flw = NULL;
+    buffer_vol = NULL;
 }
 
 
@@ -126,21 +129,36 @@ void printermanager::print()
 void printermanager::pri_rep_review()
 {
 //    Report_BitMap_test();
+    qDebug("pri_rep_review()");
 
     m_dfm->Open();
     m_dfm->GetParameters();
     int numCh = m_numchan;
 
-    buffer_emg = new double[NUMOF_X_PRINT_DOTS];
-    buffer_flw = new double[NUMOF_X_PRINT_DOTS];
-    buffer_vol = new double[NUMOF_X_PRINT_DOTS];
+    if(buffer_emg == NULL)
+        buffer_emg = new double[NUMOF_X_PRINT_DOTS * 10];
+    if(buffer_flw == NULL)
+        buffer_flw = new double[NUMOF_X_PRINT_DOTS];
+    if(buffer_vol == NULL)
+        buffer_vol = new double[NUMOF_X_PRINT_DOTS];
 
 //    if (m_printMode == PORTRAIT_MODE)
     {
         for (int c = 0; c < numCh; c++) {
             QString chName = m_dfm->GetChanName(c);
-            if(chName == "EMG") {
-                m_dfm->GetChVal(c, 0, m_realDots, buffer_emg, 0);
+            qDebug() << "getChanName()" << c << chName;
+            if(chName.startsWith("EMG")) {
+                int n = m_dfm->GetSamplesNumber(c);
+                m_dfm->GetChVal(c, 0, n, buffer_emg, 0);
+                double l = +9999;
+                double h = -9999;
+                for(int i = 0; i < n; i++) {
+                    if(buffer_emg[i] < l) l = buffer_emg[i];
+                    if(buffer_emg[i] > h) h = buffer_emg[i];
+                }
+                qDebug() << "emg: n:" << n << "l:" << l << "h:" << h;
+                for(int i = 0; i < NUMOF_X_PRINT_DOTS; i++)
+                    buffer_emg[i] = buffer_emg[i * 10];
                 m_emgPresent = true;
                 m_chEmg = c;
             }
@@ -244,14 +262,16 @@ void printermanager::Pri_Rep()
             m_correct = true;
         }
         m_max_vol = buffer_vol[0];
-        m_max_emg = buffer_emg[0];
+        m_max_emg = 0;
 
-        for (int uw7 = 0; uw7 < NUMOF_X_PRINT_DOTS; uw7++)	{	// cerco il massimo del buffer volume
-            if (buffer_vol[uw7] > m_max_vol)
-                m_max_vol = buffer_vol[uw7];
-            if (buffer_emg[uw7] > m_max_emg)
-                m_max_emg = buffer_emg[uw7];  // supponiamo 4000 in uVolt
+        for (int i = 0; i < NUMOF_X_PRINT_DOTS; i++)	{	// cerco il massimo del buffer volume
+            if (buffer_vol[i] > m_max_vol)
+                m_max_vol = buffer_vol[i];
+            double v = fabs(buffer_emg[i]);
+            if (v > m_max_emg)
+                m_max_emg = v;
         }
+        qDebug() << "m_max_emg:"<<m_max_emg;
 
         if (m_printModeUser)	// e settata la stampa in landscape ma l'esame e troppo lungo
         {
@@ -962,17 +982,17 @@ stampa del grafico di EMG nella versione a grafici in portrait mode
 void printermanager::Report_emg()
 {
     Calc_Max_EMG();
+    qDebug() << "m_max_emg:" << m_max_emg << "m_max_y:" << m_max_y;
 
     m_port->Pri_Font(1);		// altezza carattere 20 punti (righe) 0x18 in HEX
     m_port->Pri_mode(0x10);
     char str[60];
     QString emg_title = tr(" EMG Diagram ");
     sprintf(str,"   EMG ( uV )              %s\n",emg_title.toLatin1().data());
-    m_port->Pri_Str( strlen( str ), str, 0 );
-    for(int ub = 0; ub < 5; ub++)          /*scompone la griglia in 5 righe*/
+    m_port->Pri_Str(strlen(str), str, 0);
+    for(int i = 0; i < 10; i++)          /*scompone la griglia in 10 righe*/
     {
-        Pri_Rep_Gra_EMG( ub * 2 );
-        Pri_Rep_Gra_EMG( (ub * 2) + 1 );
+        Pri_Rep_Gra_EMG( i );
     }
     m_port->Pri_mode(0);
     m_port->Pri_Font(1);
@@ -982,54 +1002,69 @@ void printermanager::Report_emg()
 
 void printermanager::Calc_Max_EMG()
 {
-    while (1) {
-        if (m_max_emg <=   50) { m_max_y =   50; break; }
-        if (m_max_emg <=  100) { m_max_y =  100; break; }
-        if (m_max_emg <=  150) { m_max_y =  150; break; }
-        if (m_max_emg <=  200) { m_max_y =  200; break; }
-        if (m_max_emg <=  250) { m_max_y =  250; break; }
-        if (m_max_emg <=  300) { m_max_y =  300; break; }
-        if (m_max_emg <=  350) { m_max_y =  350; break; }
-        if (m_max_emg <=  400) { m_max_y =  400; break; }
-        if (m_max_emg <=  450) { m_max_y =  450; break; }
-        if (m_max_emg <=  500) { m_max_y =  500; break; }
-        if (m_max_emg <=  550) { m_max_y =  550; break; }
-        if (m_max_emg <=  600) { m_max_y =  600; break; }
-        if (m_max_emg <=  650) { m_max_y =  650; break; }
-        if (m_max_emg <=  700) { m_max_y =  700; break; }
-        if (m_max_emg <=  750) { m_max_y =  750; break; }
-        if (m_max_emg <=  800) { m_max_y =  800; break; }
-        if (m_max_emg <=  850) { m_max_y =  850; break; }
-        if (m_max_emg <=  900) { m_max_y =  900; break; }
-        if (m_max_emg <=  950) { m_max_y =  950; break; }
-        if (m_max_emg <= 1000) { m_max_y = 1000; break; }
-        if (m_max_emg <= 1100) { m_max_y = 1100; break; }
-        if (m_max_emg <= 1200) { m_max_y = 1200; break; }
-        if (m_max_emg <= 1300) { m_max_y = 1300; break; }
-        if (m_max_emg <= 1400) { m_max_y = 1400; break; }
-        if (m_max_emg <= 1500) { m_max_y = 1500; break; }
-        if (m_max_emg <= 1600) { m_max_y = 1600; break; }
-        if (m_max_emg <= 1700) { m_max_y = 1700; break; }
-        if (m_max_emg <= 1800) { m_max_y = 1800; break; }
-        if (m_max_emg <= 1900) { m_max_y = 1900; break; }
-        if (m_max_emg <= 2000) { m_max_y = 2000; break; }
-        if (m_max_emg <= 2250) { m_max_y = 2250; break; }
-        if (m_max_emg <= 2500) { m_max_y = 2500; break; }
-        if (m_max_emg <= 2750) { m_max_y = 2750; break; }
-        if (m_max_emg <= 3000) { m_max_y = 3000; break; }
-        m_max_y = 3250L; break;
-    }
+    static int v_max_y[] = {
+                            50,   100,   150,   200,   250,   300,   350,   400,   450,
+                           500,   550,   600,   650,   700,   750,   800,   850,   900,   950,
+                          1000,  1100,  1200,  1300,  1400,  1500,  1600,  1700,  1800,  1900,
+                          2000,  2250,  2500,  2750,  3000,    -1
+                        };
+
+    for(int i = 0; v_max_y[i] > 0; i++)
+        if(m_max_emg <= v_max_y[i]) {
+            m_max_y = v_max_y[i];
+            return;
+        }
+    m_max_y = 3250;
+    return;
+
+//    while (1) {
+//        if (m_max_emg <=   50) { m_max_y =   50; break; }
+//        if (m_max_emg <=  100) { m_max_y =  100; break; }
+//        if (m_max_emg <=  150) { m_max_y =  150; break; }
+//        if (m_max_emg <=  200) { m_max_y =  200; break; }
+//        if (m_max_emg <=  250) { m_max_y =  250; break; }
+//        if (m_max_emg <=  300) { m_max_y =  300; break; }
+//        if (m_max_emg <=  350) { m_max_y =  350; break; }
+//        if (m_max_emg <=  400) { m_max_y =  400; break; }
+//        if (m_max_emg <=  450) { m_max_y =  450; break; }
+//        if (m_max_emg <=  500) { m_max_y =  500; break; }
+//        if (m_max_emg <=  550) { m_max_y =  550; break; }
+//        if (m_max_emg <=  600) { m_max_y =  600; break; }
+//        if (m_max_emg <=  650) { m_max_y =  650; break; }
+//        if (m_max_emg <=  700) { m_max_y =  700; break; }
+//        if (m_max_emg <=  750) { m_max_y =  750; break; }
+//        if (m_max_emg <=  800) { m_max_y =  800; break; }
+//        if (m_max_emg <=  850) { m_max_y =  850; break; }
+//        if (m_max_emg <=  900) { m_max_y =  900; break; }
+//        if (m_max_emg <=  950) { m_max_y =  950; break; }
+//        if (m_max_emg <= 1000) { m_max_y = 1000; break; }
+//        if (m_max_emg <= 1100) { m_max_y = 1100; break; }
+//        if (m_max_emg <= 1200) { m_max_y = 1200; break; }
+//        if (m_max_emg <= 1300) { m_max_y = 1300; break; }
+//        if (m_max_emg <= 1400) { m_max_y = 1400; break; }
+//        if (m_max_emg <= 1500) { m_max_y = 1500; break; }
+//        if (m_max_emg <= 1600) { m_max_y = 1600; break; }
+//        if (m_max_emg <= 1700) { m_max_y = 1700; break; }
+//        if (m_max_emg <= 1800) { m_max_y = 1800; break; }
+//        if (m_max_emg <= 1900) { m_max_y = 1900; break; }
+//        if (m_max_emg <= 2000) { m_max_y = 2000; break; }
+//        if (m_max_emg <= 2250) { m_max_y = 2250; break; }
+//        if (m_max_emg <= 2500) { m_max_y = 2500; break; }
+//        if (m_max_emg <= 2750) { m_max_y = 2750; break; }
+//        if (m_max_emg <= 3000) { m_max_y = 3000; break; }
+//        m_max_y = 3250L; break;
+//    }
 }
 
 
 void printermanager::Pri_Rep_Gra_EMG(unsigned char __num_riga)
 {
-    static bool label = false;
-    static short int max_emg;
-    static short int first_char, second_char, third_char, fourth_char;
+    qDebug() << "Pri_Rep_Gra_EMG(" << __num_riga << ")";
+    bool label = false;
+    int max_emg = (int)(m_max_y - (__num_riga / 2) * (m_max_y / 5));	// valori in unita
 
     for(int i = 0; i < ( LCMD + a_emg); i++ )
-        m_str_gr[ i ] = 0x00;
+        m_str_gr[ i ] = 0;
 
     m_str_gr[0] = ESC;	//0x1B;	// ESC
     m_str_gr[1] = '*';	//0x2A;	// *
@@ -1042,131 +1077,41 @@ void printermanager::Pri_Rep_Gra_EMG(unsigned char __num_riga)
     m_str_gr[4] = (sz >> 16) & 0xff;	// n3
     m_str_gr[5] = 0x02;	// n4	doppia altezza // con label di 4 cifre
     m_str_gr[6] = 0x00;	// n5	scrive a n5 byte dal bordo
-    m_str_gr[7] = 0x66;	// n6	larghezza 4+4+94=102 byte
+    m_str_gr[7] = 102;	// n6	larghezza 4+4+94=102 byte
 
     if( (__num_riga == 0) || ( !(__num_riga % 2) ) )
         label = true;  // scrive i label solo nelle righe 0, 2, 4, 6, 8
     else
         label = false; // nelle righe 1, 3, 5, 7 metter caratteri vuoti
 
-    if( label )	// se label e true devo scivere i valori sull'asse di emg, altrimenti riempio con m caratterei vuoti
+    if( label )	// se label e true devo scrivere i valori sull'asse di emg, altrimenti riempio con m caratterei vuoti
     {
         // la prima riga del grafico si compone di 24 righe di 94byte ciascuna alle quali antepongo le 24 righe di m byte del dato di emg
-        // i m byte aggiuntivi sono per le quattre cifre di dato
-        // if( emg > 99 ) allora 3 cifre quindi 3 byte dal CHARSET
-
-        max_emg = (int)(  m_max_y - (__num_riga / 2 ) * ( m_max_y / 5 ));	// valori in unita
-        if( max_emg > 999 )
-        {
-            // sono m i caratteri da 1Bx13 da inserire
-            // la quarta cifra (primo carattere)
-            first_char = max_emg / 1000;
-            for(int i = 0; i < 13; i++ )	{// scrivo il carattere delle migliaia per colonne come 1Bx13righe
-                m_str_gr[ LCMD + (CLD-4)*24 + i ] = (char)print7x13Set[ first_char*13 + i];
-            }
-            for(int i = 13; i < 24; i++ )	{
-                m_str_gr[ LCMD + (CLD-4)*24 + i ] = (char)0x00;
-            }
-            // la terza cifra (primo carattere)
-            second_char = ( max_emg - ( first_char * 1000)) / 100;
-            for(int i = 0; i < 13; i++ )	{// scrivo il carattere delle centinaia per colonne come 1Bx13righe
-                m_str_gr[ LCMD + (CLD-3)*24 + i ] = (char)print7x13Set[ second_char *13 + i];
-            }
-            for(int i = 13; i < 24; i++ )	{
-                m_str_gr[ LCMD + (CLD-3)*24 + i ] = (char)0x00;
-            }
-            // seconda cifra (secondo carattere 1)
-            third_char = ( max_emg - ( first_char * 1000 ) - ( second_char * 100 ) ) / 10;
-            for(int i = 0; i < 13; i++ )	{// scrivo il carattere delle decine per colonne come 1Bx13righe
-                m_str_gr[ LCMD + (CLD-2)*24 + i ] = (char)print7x13Set[ third_char*13 + i];
-            }
-            for(int i = 13; i < 24; i++ )	{
-                m_str_gr[ LCMD + (CLD-2)*24 + i ] = (char)0x00;
-            }
-            // prima cifra (terzo carattere 2)
-            fourth_char = max_emg - ( first_char * 1000 ) - ( second_char * 100 ) - ( third_char * 10 );
-            for(int i = 0; i < 13; i++ )	{// scrivo il carattere delle unita per colonne come 1Bx13righe
-                m_str_gr[ LCMD + (CLD-1)*24 + i ] = (char)print7x13Set[ fourth_char*13 + i];
-            }
-            for(int i = 13; i < 24; i++ )	{
-                m_str_gr[ LCMD + (CLD-1)*24 + i ] = (char)0x00;
-            }
+        // gli m byte aggiuntivi sono per le quattre cifre di dato
+        int digits[4];
+        int curDigit;
+        int tmax = max_emg;
+        for(int i = 3; i >= 0; i--) {
+            digits[i] = tmax % 10;
+            tmax /= 10;
         }
-        else
-        {
-            for(int i = 0; i < 24; i++ )	// spazio (primo carattere)
-                m_str_gr[ LCMD + (CLD-4)*24 + i] = (char)0x00;
-            if( max_emg > 99L )
-            {
-                // sono m i caratteri da 1Bx13 da inserire
-                // la terza cifra (primo carattere)
-                first_char = max_emg / 100;
-                for(int i = 0; i < 13; i++ )	{// scrivo il carattere delle centinaia per colonne come 1Bx13righe
-                    m_str_gr[ LCMD + (CLD-3)*24 + i ] = (char)print7x13Set[ first_char*13 + i];
-                }
-                for(int i = 13; i < 24; i++ )	{
-                    m_str_gr[ LCMD + (CLD-3)*24 + i ] = (char)0x00;
-                }
-                // seconda cifra (secondo carattere 1)
-                second_char = ( max_emg - ( first_char * 100 ) ) / 10;
-                for(int i = 0; i < 13; i++ )	{// scrivo il carattere delle decine per colonne come 1Bx13righe
-                    m_str_gr[ LCMD + (CLD-2)*24 + i ] = (char)print7x13Set[ second_char*13 + i];
-                }
-                for(int i = 13; i < 24; i++ )	{
-                    m_str_gr[ LCMD + (CLD-2)*24 + i ] = (char)0x00;
-                }
-                // prima cifra (terzo carattere 2)
-                third_char = max_emg - ( first_char * 100 ) - ( second_char * 10 );
-                for(int i = 0; i < 13; i++ )	{// scrivo il carattere delle unita per colonne come 1Bx13righe
-                    m_str_gr[ LCMD + (CLD-1)*24 + i ] = (char)print7x13Set[ third_char*13 + i];
-                }
-                for(int i = 13; i < 24; i++ )	{
-                    m_str_gr[LCMD + (CLD-1)*24 + i ] = (char)0x00;
-                }
-            }
-            else
-            {
-                for(int i = 0; i < 24; i++ )	// spazio (primo carattere)
-                    m_str_gr[ LCMD + (CLD-3)*24 + i] = (char)0x00;
-                if( max_emg > 9 )
-                {
-                    // seconda cifra (secondo carattere 1)
-                    second_char = ( max_emg/* - 100 */) / 10;
-                    for(int i = 0; i < 13; i++ )	{// scrivo il carattere "1" delle centinaia per colonne come 1Bx13righe
-                        m_str_gr[ LCMD + (CLD-2)*24 + i ] = (char)print7x13Set[ second_char*13 + i];
-                    }
-                    for(int i = 13; i < 24; i++ )	{
-                        m_str_gr[ LCMD + (CLD-2)*24 + i ] = (char)0x00;
-                    }
-                    // prima cifra (terzo carattere 2)
-                    third_char = max_emg - ( second_char * 10 );
-                    for(int i = 0; i < 13; i++ )	{// scrivo il carattere "1" delle centinaia per colonne come 1Bx13righe
-                        m_str_gr[ LCMD + (CLD-1)*24 + i ] = (char)print7x13Set[ third_char*13 + i];
-                    }
-                    for(int i = 13; i < 24; i++ )	{
-                        m_str_gr[ LCMD + (CLD-1)*24 + i ] = (char)0x00;
-                    }
-                }
-                // else 2 byte di spazio, 1 di valore
-                else
-                {
-                    for(int i = 0; i < 24; i++ )	// spazio (secondo carattere)
-                        m_str_gr[ LCMD + (CLD-2)*24 + i] = (char)0x00;
-                    // prima cifra (terzo carattere 2)
-                    third_char = max_emg /* - ( second_char * 10 )*/;
-                    for(int i = 0; i < 13; i++ )	{// scrivo il carattere delle unita per colonne come 1Bx13righe
-                        m_str_gr[ LCMD + (CLD-1)*24 + i ] = (char)print7x13Set[ third_char*13 + i];
-                    }
-                    for(int i = 13; i < 24; i++ )	{
-                        m_str_gr[ LCMD + (CLD-1)*24 + i ] = (char)0x00;
-                    }
-                }
-            }
+        for(curDigit = 4; curDigit > 0; curDigit--)
+            for(int i = 0; i < 24; i++ )
+                m_str_gr[ LCMD + (CLD - curDigit)*24 + i] = 0;
+
+        bool leftspace = true;
+        for(curDigit = 4; curDigit > 0; curDigit--) {
+            int digit = digits[4 - curDigit];
+            if(leftspace && (digit == 0))
+                continue;
+            leftspace = false;
+            for(int i = 0; i < 13; i++ )
+                m_str_gr[ LCMD + (CLD - curDigit)*24 + i ] = (char)print7x13Set[ digit*13 + i];
         }
     }
 #ifdef __ZERO_ASSE_EMG__
-    else {// niente label m caratteri vuoti
-        if( __num_riga == 9 )// se e l'ultima riga sovrascrivo lo "0" al terzo carattere
+    else {                      // niente label m caratteri vuoti
+        if( __num_riga == 9 )   // se e l'ultima riga sovrascrivo lo "0" al terzo carattere
             for(int i = 0; i < 13; i++ )	// spazio
                 m_str_gr[ LCMD + (CLD-1)*24 + (i+10) ] = (char)print7x13Set[ 0*13 + i];
     }
@@ -1183,24 +1128,22 @@ void printermanager::Pri_Rep_Gra_EMG(unsigned char __num_riga)
     if( m_tem_svu )
     {
         int x_pt = 0;
-        int flow_pt = 240;                  /*dovrei cambare le var *_fl con *_emg ma non vale la pena ridefinire altre variabili*/
-        int uw5 = m_PointsToPrintout - 1;// correione per evitare l'andata azero //23-03
-
+        int flow_pt = 240;
         int i4 = __num_riga * 24;
-        int graf_g_x = ( 10 * m_max_x ); // disperato
+        int graf_g_x = ( 10 * m_max_x );
         int graf_g_fl = ( m_max_y );
 
-        for (int uw6 = 1; uw6 < uw5; uw6++ ) 	     /*trovo estremi della retta passante per il campione uw6 uw6+1*/
+        for (int uw6 = 1; uw6 < (m_PointsToPrintout - 1); uw6++ ) 	     /*trovo estremi della retta passante per il campione uw6 uw6+1*/
         {
             m_x1 = x_pt;
             if( m_correct )	{
-                x_pt = (int)( m_num_sam * uw6 / graf_g_x); // correzione nel caso di esami + lunghi di 752 campioni
+                x_pt = (int)(m_num_sam * uw6 / graf_g_x); // correzione nel caso di esami + lunghi di 752 campioni
             } else {
-                x_pt =(int)(( 752L * uw6 ) / graf_g_x);                     /*x_pt=x2 retta */
+                x_pt = (int)((752 * uw6) / graf_g_x);                     /*x_pt=x2 retta */
             }
             m_y1 = flow_pt;
 
-            flow_pt = 239L - (int)( ( 239L * buffer_emg[ uw6 ] ) / ( graf_g_fl ) ); /*y2*/
+            flow_pt = 239 - (int)(239 * fabs(buffer_emg[uw6]) / graf_g_fl); /*y2*/
             if( flow_pt > 239 )
                 flow_pt = 239;
             /*ogni riga composta da 1 linee di stampa str_gr*/
@@ -1208,17 +1151,14 @@ void printermanager::Pri_Rep_Gra_EMG(unsigned char __num_riga)
             m_y2 = flow_pt;
             if(Int_Pun(i4))
             {
-                if (m_num_xy > 25)
-                    //Fatal_Error(FATAL_ERROR_PRI);
+                if (m_num_xy > 25)                    //Fatal_Error(FATAL_ERROR_PRI);
                     m_num_xy = 25;
                 for(int i22 = 0; i22 < m_num_xy; i22++)
                 {
                     m_y[i22] -= i4;
                     int i33 = 24 * ( m_x[i22] / 8 ) + m_y[i22];
-                    unsigned char ub3 = 0x80 >> (unsigned char)(m_x[i22] % 8);
-                    int i6 = i33 / 24;
-                    int i7 = i33 % 24;
-                    m_str_gr[ pos_gra + 24*i6 + i7] |= (char)ub3;
+                    unsigned char v = 0x80 >> (unsigned char)(m_x[i22] % 8);
+                    m_str_gr[ pos_gra + i33] |= (char)v;
                 }
             }
         }

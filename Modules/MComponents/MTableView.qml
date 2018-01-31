@@ -22,8 +22,8 @@ BuzzTableView{
     horizontalScrollBarPolicy: Qt.ScrollBarAlwaysOff
     onWidthChanged: if(completed)resize()
 
-    onSortIndicatorColumnChanged: order(sortIndicatorColumn, sortIndicatorOrder)
-    onSortIndicatorOrderChanged: order(sortIndicatorColumn, sortIndicatorOrder)
+    onSortIndicatorColumnChanged: order(sortIndicatorColumn, sortIndicatorOrder,true)
+    onSortIndicatorOrderChanged:  order(sortIndicatorColumn, sortIndicatorOrder,true)
 
     signal selected()
 
@@ -32,15 +32,18 @@ BuzzTableView{
         rootTable.selection.clear()
         if (testPK !== -1)
         {
-            rootTable.selection.select(model.getIndexFromPK(testPK))
-            rootTable.currentRow = model.getIndexFromPK(testPK)
+            var row = model.getIndexFromPK(testPK)
+            rootTable.positionViewAtRow(row,ListView.Beginning)
+            rootTable.selection.select(row)
+            rootTable.currentRow = row
         }
 
         rootTable.selected()
     }
 
+
     function populate(){//al caricamento della tabella popolo con le colonne
-        sortIndicatorOrder=true
+      // sortIndicatorOrder=1
         if(model===undefined)
             return
         var info = model.modelInfo(type)
@@ -61,11 +64,11 @@ BuzzTableView{
             column.title = info[i][2]
             column.movable = false
             column.resizable = false
-            upDowns[upDowns.length]=false
+            upDowns[upDowns.length]=0
         }
         sortIndicatorColumn=0
-        sortIndicatorOrder=false
-        resize()
+        sortIndicatorOrder=0
+        //resize()
     }
     function resize()
     {
@@ -82,16 +85,31 @@ BuzzTableView{
         }
     }
 
-    function order(c,order){
+    function order(c,order,sound){
         if(!sortEnabled)
             return
         upDowns[c]=order
-        //console.log(upDowns)
         model.orderByInfo(type,roles[c],order)
+        if (sound && rootTable.visible && rootTable.completed && isTouch) //altrimenti il click su header non suona
+            mngSys.startSound()
+    }
+
+    function getColumnValues()
+    {
+        var col = []
+        var info = model.modelInfo(type)
+
+        for (var i=0; i<info.length; i++)
+            col[i] = info[i][0]
+
+        return col
     }
 
     rowDelegate:TRowDelegate{itemData:styleData}
-    itemDelegate:TItemDelegate{itemData:styleData}
+    itemDelegate:TItemDelegate{
+        colonna:getColumnValues()
+        itemData:styleData
+    }
     headerDelegate:THeaderDelegate{itemData:styleData}
 
     style: TableViewStyle {
