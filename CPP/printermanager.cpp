@@ -139,7 +139,7 @@ void printermanager::pri_rep_review()
     {
         for (int c = 0; c < numCh; c++) {
             QString chName = m_dfm->GetChanName(c);
-            if(chName == "EMG") {
+            if(chName.startsWith == "EMG") {
                 m_dfm->GetChVal(c, 0, m_realDots, buffer_emg, 0);
                 m_emgPresent = true;
                 m_chEmg = c;
