@@ -22,8 +22,8 @@ BuzzTableView{
     horizontalScrollBarPolicy: Qt.ScrollBarAlwaysOff
     onWidthChanged: if(completed)resize()
 
-    onSortIndicatorColumnChanged: order(sortIndicatorColumn, sortIndicatorOrder)
-    onSortIndicatorOrderChanged: order(sortIndicatorColumn, sortIndicatorOrder)
+    onSortIndicatorColumnChanged: order(sortIndicatorColumn, sortIndicatorOrder,true)
+    onSortIndicatorOrderChanged:  order(sortIndicatorColumn, sortIndicatorOrder,true)
 
     signal selected()
 
