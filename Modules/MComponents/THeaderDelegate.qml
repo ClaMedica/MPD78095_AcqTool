@@ -20,7 +20,7 @@ Rectangle{
     color:itemData.column%2?layout.value("THC1"):layout.value("THC2")
     onSortColChanged: updateArrow()
     onSortDirChanged:updateArrow()
-    clip:true
+
     function updateArrow(){
         //console.log(sortCol,sortDir)
         if(sortCol===itemData.column)
