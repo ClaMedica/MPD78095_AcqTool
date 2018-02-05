@@ -107,19 +107,19 @@ void printermanager::print()
     m_num_sam = minNas * m_durata;
     m_realDots = m_num_sam;
 
-    // Dati relativi alla stampa
-    if (m_num_sam >= NUMOF_X_PRINT_DOTS) {
-        if(m_printMode == PORTRAIT_MODE)
-            m_realDots = NUMOF_X_PRINT_DOTS;
-        else	// cioe nel caso di Report_Print_Mode = Landscape
-        {
-            if(m_num_sam > NUMOFMAX_LEGHT_PORTRAIT_REP)	// esame troppo lungo per la modalita di stampa LANDSCAPE (5minuti)
-            {
-                m_printMode = PORTRAIT_MODE;
-                m_realDots = NUMOF_X_PRINT_DOTS;
-            }
-        }
-    }
+//    // Dati relativi alla stampa
+//    if (m_num_sam >= NUMOF_X_PRINT_DOTS) {
+//        if(m_printMode == PORTRAIT_MODE)
+//            m_realDots = NUMOF_X_PRINT_DOTS;
+//        else	// cioe nel caso di Report_Print_Mode = Landscape
+//        {
+//            if(m_num_sam > NUMOFMAX_LEGHT_PORTRAIT_REP)	// esame troppo lungo per la modalita di stampa LANDSCAPE (5minuti)
+//            {
+//                m_printMode = PORTRAIT_MODE;
+//                m_realDots = NUMOF_X_PRINT_DOTS;
+//            }
+//        }
+//    }
 
     m_dfm->Close();
 
@@ -135,8 +135,8 @@ void printermanager::pri_rep_review()
     m_dfm->GetParameters();
     int numCh = m_numchan;
 
-    if(buffer_emg == NULL)
-        buffer_emg = new double[NUMOF_X_PRINT_DOTS * 10];
+//    if(buffer_emg == NULL)
+//        buffer_emg = new double[NUMOF_X_PRINT_DOTS * 10];
     if(buffer_flw == NULL)
         buffer_flw = new double[NUMOF_X_PRINT_DOTS];
     if(buffer_vol == NULL)
@@ -144,20 +144,21 @@ void printermanager::pri_rep_review()
 
 //    if (m_printMode == PORTRAIT_MODE)
     {
+        double xscale = 1.0;
         for (int c = 0; c < numCh; c++) {
             QString chName = m_dfm->GetChanName(c);
             qDebug() << "getChanName()" << c << chName;
             if(chName.startsWith("EMG")) {
                 int n = m_dfm->GetSamplesNumber(c);
-                m_dfm->GetChVal(c, 0, n, buffer_emg, 0);
-                double l = +9999;
-                double h = -9999;
-                for(int i = 0; i < n; i++) {
-                    if(buffer_emg[i] < l) l = buffer_emg[i];
-                    if(buffer_emg[i] > h) h = buffer_emg[i];
+                if(buffer_emg == NULL)
+                    buffer_emg = new double[n];
+                qDebug() << "emg: n:" << n << "m_realDots:" << m_realDots << "m_durata:" << m_durata;
+                if(n > NUMOF_X_PRINT_DOTS*10) {
+                    xscale = n / (NUMOF_X_PRINT_DOTS * 10.0);
+                    n = NUMOF_X_PRINT_DOTS*10;
                 }
-                qDebug() << "emg: n:" << n << "l:" << l << "h:" << h;
-                for(int i = 0; i < NUMOF_X_PRINT_DOTS; i++)
+                m_dfm->GetChVal(c, 0, n, buffer_emg, 0);
+                for(int i = 0; i < (n / 10)/*NUMOF_X_PRINT_DOTS*/; i++) // decimazione campioni
                     buffer_emg[i] = buffer_emg[i * 10];
                 m_emgPresent = true;
                 m_chEmg = c;
@@ -172,7 +173,7 @@ void printermanager::pri_rep_review()
             }
         }
         smooting_PRINT_flow(); // qui riempe il buffer di stampa con il set mediato dei campioni di flusso
-
+        qDebug("dopo smooting_PRINT_flow()");
         int max_volume = 0;
         for (int i = 0; i < (m_realDots - 1); i++)	// cerco il massimo del buffer volume
             if (buffer_vol[i] > max_volume)
@@ -273,16 +274,16 @@ void printermanager::Pri_Rep()
         }
         qDebug() << "m_max_emg:"<<m_max_emg;
 
-        if (m_printModeUser)	// e settata la stampa in landscape ma l'esame e troppo lungo
-        {
-            m_port->Pri_justif(0);
-            m_port->Pri_mode(0x80);	// sottolineato e doppia larghezza
-            QString strToWrite = tr("! Examination longer than 5 minutes");
-            char str[60];
-            sprintf( str, "%s\n", strToWrite.toLatin1().data());
-            m_port->Pri_Str( strlen(str), str, 1 );
-            m_port->Pri_justif(2);	// bandiera a sinistra
-        }
+//        if (m_printModeUser)	// e settata la stampa in landscape ma l'esame e troppo lungo
+//        {
+//            m_port->Pri_justif(0);
+//            m_port->Pri_mode(0x80);	// sottolineato e doppia larghezza
+//            QString strToWrite = tr("! Examination longer than 5 minutes");
+//            char str[60];
+//            sprintf( str, "%s\n", strToWrite.toLatin1().data());
+//            m_port->Pri_Str( strlen(str), str, 1 );
+//            m_port->Pri_justif(2);	// bandiera a sinistra
+//        }
 
         Report_flw();	// finalmente stampiamo i grafici di volume e flusso
         if(m_emgPresent)
@@ -290,9 +291,13 @@ void printermanager::Pri_Rep()
     }
     else {              // print_mode = LANDSCAPE_MODE - grafico longitudinale, con lunghezza legata alla lunghezza dell'esame
         m_max_y = Calc_Max_Flw();			// fondo scala del flusso
+        qDebug("dopo Calc_Max_Flw()");
         short samples_to_print = adatta_buffer_dati(m_realDots, m_max_y);
+        qDebug("dopo adatta_buffer_dati()");
         Calc_Max_RealReport_rel2(samples_to_print);
+        qDebug("dopo Calc_Max_RealReport_rel2()");
         Report_Real_Time(samples_to_print);		// finalmente stampa
+        qDebug("dopo Report_Real_Time()");
     }
 #endif
 
@@ -1917,7 +1922,7 @@ void printermanager::Pri_Rep_Gra_Landscape(short __num_sample)
     for(int i = 0; i < NUM_POINTS; i++) {
         PriGraParam_OLD.uw8 = PriGraParam_FLW.uw8;
         PriGraParam_OLD.uw9 = PriGraParam_FLW.uw9;
-        PriGraParam_OLD.sample_adattato = PriGraParam_FLW.sample_adattato;				// salviamo il valor eprecedente
+        PriGraParam_OLD.sample_adattato = PriGraParam_FLW.sample_adattato;				// salviamo il valore precedente
         if((i+m_cursore) < __num_sample) {
             PriGraParam_FLW.sample_adattato = (int)(m_flow_store[i + m_cursore] * fattore_scala);	// adattamento del valore corrente al fondoscala corrente
 
@@ -1989,7 +1994,7 @@ void printermanager::Pri_Rep_Gra_Landscape(short __num_sample)
     for(int i = 0; i < NUM_POINTS; i++) {
         PriGraParam_OLD.uw8 = PriGraParam_VOL.uw8;
         PriGraParam_OLD.uw9 = PriGraParam_VOL.uw9;
-        PriGraParam_OLD.sample_adattato = PriGraParam_VOL.sample_adattato;				// salviamo il valor eprecedente
+        PriGraParam_OLD.sample_adattato = PriGraParam_VOL.sample_adattato;				// salviamo il valore precedente
         if((i+m_cursore) < __num_sample) {
             PriGraParam_VOL.sample_adattato = (int)(m_vol_store[i + m_cursore] * fattore_scala);	// adattamento del valore corrente al fondoscala corrente
 
@@ -2061,7 +2066,7 @@ void printermanager::Pri_Rep_Gra_Landscape(short __num_sample)
         for(int i = 0; i < NUM_POINTS; i++) {
             PriGraParam_OLD.uw8 = PriGraParam_EMG.uw8;
             PriGraParam_OLD.uw9 = PriGraParam_EMG.uw9;
-            PriGraParam_OLD.sample_adattato = PriGraParam_EMG.sample_adattato;				// salviamo il valor eprecedente
+            PriGraParam_OLD.sample_adattato = PriGraParam_EMG.sample_adattato;				// salviamo il valore precedente
             if((i+m_cursore) < __num_sample) {
                 PriGraParam_EMG.sample_adattato = (int)(m_emg_store[i + m_cursore] * fattore_scala);	// adattamento del valore corrente al fondoscala corrente
 
