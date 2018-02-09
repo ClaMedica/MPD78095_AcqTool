@@ -72,11 +72,13 @@ void printermanager::print()
     m_dfm->Open();
     m_dfm->GetParameters();
     //paziente
-    m_name = m_dfm->GetPatient().section(";", 0, 0);
-    m_surname = m_dfm->GetPatient().section(";", 1, 1);
-    m_dateofbirth = m_dfm->GetPatient().section(";", 2, 2);
-    m_sex = *( m_dfm->GetPatient().section(";", 12, 12).toLatin1().data());
-    m_ID = m_dfm->GetPatient().section(";", 3, 3);
+    QString dataPaz = m_dfm->GetPatient();
+
+    m_name = dataPaz.section(";", 0, 0);
+    m_surname = dataPaz.section(";", 1, 1);
+    m_dateofbirth = dataPaz.section(";", 2, 2);
+    m_sex = *(dataPaz.section(";", 12, 12).toLatin1().data());
+    m_ID = dataPaz.section(";", 3, 3);
     //esame
     m_numchan = m_dfm->GetChanNum();
     m_numTest = m_dfm->GetTestNum();
@@ -268,9 +270,11 @@ void printermanager::Pri_Rep()
         for (int i = 0; i < NUMOF_X_PRINT_DOTS; i++)	{	// cerco il massimo del buffer volume
             if (buffer_vol[i] > m_max_vol)
                 m_max_vol = buffer_vol[i];
-            double v = fabs(buffer_emg[i]);
-            if (v > m_max_emg)
-                m_max_emg = v;
+            if (m_emgPresent) {
+                double v = fabs(buffer_emg[i]);
+                if (v > m_max_emg)
+                    m_max_emg = v;
+            }
         }
         qDebug() << "m_max_emg:"<<m_max_emg;
 
