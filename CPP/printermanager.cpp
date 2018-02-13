@@ -137,66 +137,70 @@ void printermanager::pri_rep_review()
     m_dfm->GetParameters();
     int numCh = m_numchan;
 
-//    if(buffer_emg == NULL)
-//        buffer_emg = new double[NUMOF_X_PRINT_DOTS * 10];
-//    if(buffer_flw == NULL)
-//        buffer_flw = new double[NUMOF_X_PRINT_DOTS];
-//    if(buffer_vol == NULL)
-//        buffer_vol = new double[NUMOF_X_PRINT_DOTS];
+    if(buffer_emg == NULL)
+        buffer_emg = new double[NUMOF_X_PRINT_DOTS];
+    if(buffer_flw == NULL)
+        buffer_flw = new double[NUMOF_X_PRINT_DOTS];
+    if(buffer_vol == NULL)
+        buffer_vol = new double[NUMOF_X_PRINT_DOTS];
 
 //    if (m_printMode == PORTRAIT_MODE)
     {
-        double xscale = 1.0;
+        double    xscale = NUMOF_X_PRINT_DOTS / m_realDots;
         for (int c = 0; c < numCh; c++) {
             QString chName = m_dfm->GetChanName(c);
             qDebug() << "getChanName()" << c << chName;
             if(chName.startsWith("EMG")) {
-                int n = m_dfm->GetSamplesNumber(c);
-                if(buffer_emg == NULL)
-                    buffer_emg = new double[n];
-                qDebug() << "emg: n:" << n << "m_realDots:" << m_realDots << "m_durata:" << m_durata;
-                if(n > NUMOF_X_PRINT_DOTS*10) {
-                    xscale = n / (NUMOF_X_PRINT_DOTS * 10.0);
-                    n = NUMOF_X_PRINT_DOTS*10;
-                }
-                m_dfm->GetChVal(c, 0, n, buffer_emg, 0);
-                for(int i = 0; i < (n / 10)/*NUMOF_X_PRINT_DOTS*/; i++) // decimazione campioni
-                    buffer_emg[i] = buffer_emg[i * 10];
-                m_emgPresent = true;
                 m_chEmg = c;
+                int n = m_dfm->GetSamplesNumber(c);
+                double  * vtmp = new double[n];
+                qDebug() << "n:" << n << "m_realDots:" << m_realDots;
+                m_dfm->GetChVal(c, 0, n, vtmp, 0);
+                qDebug("got it");
+                for(int i = 0; i < (m_realDots*10); i++) {
+                    double v = vtmp[i];
+                    buffer_emg[(int)(i*xscale / 10)] = (v < 0.0) ? -v : v;
+                }
+                m_emgPresent = true;
+                qDebug("fine get emg");
             }
             if (chName.startsWith("Q")) {
-                int n = m_dfm->GetSamplesNumber(c);
-                if(buffer_flw == NULL)
-                    buffer_flw = new double[n];
                 m_chFlw = c;
-                m_dfm->GetChVal(c, 0, m_realDots, buffer_flw, 0);
+                int n = m_dfm->GetSamplesNumber(c);
+                double  * vtmp = new double[n];
+                m_dfm->GetChVal(c, 0, n, vtmp, 0);
+                for(int i = 0; i < m_realDots; i++) // decimazione campioni
+                    buffer_flw[(int)(i*xscale)] = vtmp[i];
+                qDebug("fine get flw");
             }
             if (chName.startsWith("VV") || chName ==  "VLMv" ) {
-                int n = m_dfm->GetSamplesNumber(c);
-                if(buffer_vol == NULL)
-                    buffer_vol = new double[n];
                 m_chVol = c;
-                m_dfm->GetChVal(c, 0, m_realDots, buffer_vol, 0);
+                int n = m_dfm->GetSamplesNumber(c);
+                double  * vtmp = new double[n];
+                m_dfm->GetChVal(c, 0, n, vtmp, 0);
+                for(int i = 0; i < m_realDots; i++) // decimazione campioni
+                    buffer_vol[(int)(i*xscale)] = vtmp[i];
+                qDebug("fine get vol");
             }
         }
+        m_realDots = NUMOF_X_PRINT_DOTS;
         smooting_PRINT_flow(); // qui riempe il buffer di stampa con il set mediato dei campioni di flusso
         qDebug("dopo smooting_PRINT_flow()");
         int max_volume = 0;
-        for (int i = 0; i < (m_realDots - 1); i++)	// cerco il massimo del buffer volume
+        for (int i = 0; i < NUMOF_X_PRINT_DOTS; i++)	// cerco il massimo del buffer volume
             if (buffer_vol[i] > max_volume)
                 max_volume = buffer_vol[i];
 
-        for (int i = (m_realDots - 1); i < NUMOF_X_PRINT_DOTS; i++) {       // usare realDots
-            buffer_vol[i] = max_volume;
-            buffer_flw[i] = 0;
-        }
+//        for (int i = (m_realDots - 1); i < NUMOF_X_PRINT_DOTS; i++) {       // usare realDots
+//            buffer_vol[i] = max_volume;
+//            buffer_flw[i] = 0;
+//        }
 
-        if (m_emgPresent) {
-            for (int i = (m_realDots - 1); i < NUMOF_X_PRINT_DOTS; i++) {   // usare realDots
-                buffer_emg[i] = buffer_emg[m_realDots - 2];
-            }
-        }
+//        if (m_emgPresent) {
+//            for (int i = (m_realDots - 1); i < NUMOF_X_PRINT_DOTS; i++) {   // usare realDots
+//                buffer_emg[i] = buffer_emg[m_realDots - 2];
+//            }
+//        }
     }
 
     m_dfm->Close();
@@ -266,18 +270,18 @@ void printermanager::Pri_Rep()
         m_PointsToPrintout = m_num_sam;			//Deve stampare solo quelli necessari, quelli calcolati nella funzione review
         // il numero di campioni da stampare e il numero di blocchi scritti su card; il -1 e perche per qualche motivo i campioni buoni nel buffer_vol vanno dallo 0 allo realDots-2
         if( m_PointsToPrintout > NUMOF_X_PRINT_DOTS ) {
-            m_PointsToPrintout = NUMOF_X_PRINT_DOTS;
+//            m_PointsToPrintout = NUMOF_X_PRINT_DOTS;
             //tem_exm_corr = rep.num_sam;
             m_correct = true;
         }
         m_max_vol = buffer_vol[0];
         m_max_emg = 0;
 
-        for (int i = 0; i < NUMOF_X_PRINT_DOTS; i++)	{	// cerco il massimo del buffer volume
+        for (int i = 0; i < m_PointsToPrintout; i++)	{	// cerco il massimo del buffer volume
             if (buffer_vol[i] > m_max_vol)
                 m_max_vol = buffer_vol[i];
             if (m_emgPresent) {
-                double v = fabs(buffer_emg[i]);
+                double v = buffer_emg[i];
                 if (v > m_max_emg)
                     m_max_emg = v;
             }
@@ -637,9 +641,9 @@ void printermanager::Pri_Rep_Gra(int __num_riga)
         int graf_g_fl	=(m_max_y);
         int graf_g_vl	=(m_max_y_gr2);
 
-        QVector<double> tmp;
-        for (int gg=0; gg<NUMOF_X_PRINT_DOTS;gg++)
-            tmp.append(buffer_flw[gg]);
+//        QVector<double> tmp;
+//        for (int gg=0; gg<NUMOF_X_PRINT_DOTS;gg++)
+//            tmp.append(buffer_flw[gg]);
 
         for (int uw6 = 1; uw6 < uw5; uw6++ ) {	     /*trovo estremi della retta passante per il campione uw6 uw6+1*/
             int x_pt_prec = x_pt;                    /*94*8=752 punti x  i2=x1 della retta*/
