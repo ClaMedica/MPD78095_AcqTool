@@ -109,7 +109,7 @@ void printermanager::print()
     m_num_sam = minNas * m_durata;
     m_realDots = m_num_sam;
 
-//    // Dati relativi alla stampa
+    // Dati relativi alla stampa
 //    if (m_num_sam >= NUMOF_X_PRINT_DOTS) {
 //        if(m_printMode == PORTRAIT_MODE)
 //            m_realDots = NUMOF_X_PRINT_DOTS;
@@ -139,10 +139,10 @@ void printermanager::pri_rep_review()
 
 //    if(buffer_emg == NULL)
 //        buffer_emg = new double[NUMOF_X_PRINT_DOTS * 10];
-    if(buffer_flw == NULL)
-        buffer_flw = new double[NUMOF_X_PRINT_DOTS];
-    if(buffer_vol == NULL)
-        buffer_vol = new double[NUMOF_X_PRINT_DOTS];
+//    if(buffer_flw == NULL)
+//        buffer_flw = new double[NUMOF_X_PRINT_DOTS];
+//    if(buffer_vol == NULL)
+//        buffer_vol = new double[NUMOF_X_PRINT_DOTS];
 
 //    if (m_printMode == PORTRAIT_MODE)
     {
@@ -166,10 +166,16 @@ void printermanager::pri_rep_review()
                 m_chEmg = c;
             }
             if (chName.startsWith("Q")) {
-                m_dfm->GetChVal(c, 0, m_realDots, buffer_flw, 0);
+                int n = m_dfm->GetSamplesNumber(c);
+                if(buffer_flw == NULL)
+                    buffer_flw = new double[n];
                 m_chFlw = c;
+                m_dfm->GetChVal(c, 0, m_realDots, buffer_flw, 0);
             }
             if (chName.startsWith("VV") || chName ==  "VLMv" ) {
+                int n = m_dfm->GetSamplesNumber(c);
+                if(buffer_vol == NULL)
+                    buffer_vol = new double[n];
                 m_chVol = c;
                 m_dfm->GetChVal(c, 0, m_realDots, buffer_vol, 0);
             }
