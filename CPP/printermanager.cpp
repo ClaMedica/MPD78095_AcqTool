@@ -130,7 +130,6 @@ void printermanager::print()
 
 void printermanager::pri_rep_review()
 {
-//    Report_BitMap_test();
     qDebug("pri_rep_review()");
 
     m_dfm->Open();
@@ -147,6 +146,8 @@ void printermanager::pri_rep_review()
 //    if (m_printMode == PORTRAIT_MODE)
     {
         double    xscale = NUMOF_X_PRINT_DOTS / m_realDots;
+        if(xscale > 1.0)
+                xscale = 1.0;
         for (int c = 0; c < numCh; c++) {
             QString chName = m_dfm->GetChanName(c);
             qDebug() << "getChanName()" << c << chName;
@@ -191,16 +192,16 @@ void printermanager::pri_rep_review()
             if (buffer_vol[i] > max_volume)
                 max_volume = buffer_vol[i];
 
-//        for (int i = (m_realDots - 1); i < NUMOF_X_PRINT_DOTS; i++) {       // usare realDots
-//            buffer_vol[i] = max_volume;
-//            buffer_flw[i] = 0;
-//        }
+        for (int i = (m_realDots - 1); i < NUMOF_X_PRINT_DOTS; i++) {       // usare realDots
+            buffer_vol[i] = max_volume;
+            buffer_flw[i] = 0;
+        }
 
-//        if (m_emgPresent) {
-//            for (int i = (m_realDots - 1); i < NUMOF_X_PRINT_DOTS; i++) {   // usare realDots
-//                buffer_emg[i] = buffer_emg[m_realDots - 2];
-//            }
-//        }
+        if (m_emgPresent) {
+            for (int i = (m_realDots - 1); i < NUMOF_X_PRINT_DOTS; i++) {   // usare realDots
+                buffer_emg[i] = buffer_emg[m_realDots - 2];
+            }
+        }
     }
 
     m_dfm->Close();
@@ -270,8 +271,7 @@ void printermanager::Pri_Rep()
         m_PointsToPrintout = m_num_sam;			//Deve stampare solo quelli necessari, quelli calcolati nella funzione review
         // il numero di campioni da stampare e il numero di blocchi scritti su card; il -1 e perche per qualche motivo i campioni buoni nel buffer_vol vanno dallo 0 allo realDots-2
         if( m_PointsToPrintout > NUMOF_X_PRINT_DOTS ) {
-//            m_PointsToPrintout = NUMOF_X_PRINT_DOTS;
-            //tem_exm_corr = rep.num_sam;
+            m_PointsToPrintout = NUMOF_X_PRINT_DOTS;
             m_correct = true;
         }
         m_max_vol = buffer_vol[0];
