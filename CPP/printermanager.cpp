@@ -145,7 +145,7 @@ void printermanager::pri_rep_review()
 
 //    if (m_printMode == PORTRAIT_MODE)
     {
-        double    xscale = NUMOF_X_PRINT_DOTS / m_realDots;
+        double    xscale = (double)(NUMOF_X_PRINT_DOTS) / m_realDots;
         if(xscale > 1.0)
                 xscale = 1.0;
         for (int c = 0; c < numCh; c++) {
@@ -163,7 +163,7 @@ void printermanager::pri_rep_review()
                 double isum = 0.0;
                 for(int i = 0; i < (m_realDots*10); i++) {
                     double v = vtmp[i];
-//                    v = (v < 0.0) ? -v : v;
+                    v = (v < 0.0) ? -v : v;
                     int ivirt = (int)(i*xscale / 10);   // virtual index
                     if(ilast < 0)
                         ilast = ivirt;
