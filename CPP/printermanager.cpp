@@ -288,16 +288,16 @@ void printermanager::Pri_Rep()
         }
         qDebug() << "m_max_emg:"<<m_max_emg;
 
-//        if (m_printModeUser)	// e settata la stampa in landscape ma l'esame e troppo lungo
-//        {
-//            m_port->Pri_justif(0);
-//            m_port->Pri_mode(0x80);	// sottolineato e doppia larghezza
-//            QString strToWrite = tr("! Examination longer than 5 minutes");
-//            char str[60];
-//            sprintf( str, "%s\n", strToWrite.toLatin1().data());
-//            m_port->Pri_Str( strlen(str), str, 1 );
-//            m_port->Pri_justif(2);	// bandiera a sinistra
-//        }
+        if (m_printModeUser)	// e settata la stampa in landscape ma l'esame e troppo lungo
+        {
+            m_port->Pri_justif(0);
+            m_port->Pri_mode(0x80);	// sottolineato e doppia larghezza
+            QString strToWrite = tr("! Examination longer than 5 minutes");
+            char str[60];
+            sprintf( str, "%s\n", strToWrite.toLatin1().data());
+            m_port->Pri_Str( strlen(str), str, 1 );
+            m_port->Pri_justif(2);	// bandiera a sinistra
+        }
 
         Report_flw();	// finalmente stampiamo i grafici di volume e flusso
         if(m_emgPresent)

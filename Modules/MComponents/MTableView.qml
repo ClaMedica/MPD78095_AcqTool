@@ -117,7 +117,7 @@ BuzzTableView{
 
         handle: Rectangle {
             z: 100
-            implicitWidth: 50
+            implicitWidth: 40
             implicitHeight: 30
             Rectangle {
                 color: layout.value("THC1")
@@ -136,7 +136,7 @@ BuzzTableView{
         }
 
         scrollBarBackground: Item {
-            implicitWidth: 50
+            implicitWidth: 40
             implicitHeight: 30
         }
     }

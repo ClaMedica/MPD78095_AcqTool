@@ -73,6 +73,10 @@ ApplicationWindow {
     {
         console.log("launch(mode,dataFile)", mode, dataFile)
 
+        if (!acqLoaded.existFile(dataFile)){
+            return
+        }
+
         if(mode === "acq")
         {
             console.log("Start new acq")

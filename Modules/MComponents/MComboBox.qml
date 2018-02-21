@@ -16,6 +16,7 @@ Rectangle {
     property var lastSelected: []
     property bool opened: false
     property int numElementiMax: 5
+    property bool notPutOn: false
     readonly property bool modelOk: (model.length != 0) && (model[0] !== undefined)
     clip: true
     Behavior on height { NumberAnimation { duration:300; easing.type: Easing.OutExpo}}
@@ -36,10 +37,13 @@ Rectangle {
 
     function openBox()
     {
-        if(model.length == 0 || opened)
+        //per aprire il combo è necessario:
+        //che ci sono elementi nel modello da visualizzare
+        //che non sia già aperto
+        //che sia tornato alle sue dimensioni originali, cioè che non sia in fase di chiusura con l'animazione
+        if(model.length == 0 || opened || oriH !== rootComboBox.height)
             return
-        //console.log("open box")
-        oriH = height
+        oriH = rootComboBox.height
         //se è ancorato si espanderà dove può
         if(model.length > numElementiMax)
             rootComboBox.height *= numElementiMax
@@ -49,8 +53,8 @@ Rectangle {
         view.model = rootComboBox.model
         view.visible = true
         curEle.visible = false
-        DataEngine.putItemOnTop(rootComboBox)
         opened = true
+        if (!notPutOn) DataEngine.putItemOnTop(rootComboBox)
         rootComboBox.clicked()
     }
 
@@ -58,15 +62,15 @@ Rectangle {
     {
         if(!opened)
             return
+        opened =false
         currentIndex = index
         currentText = text
         curEle.text = text
         view.visible = false
         view.model = []
-        rootComboBox.height = oriH
         arrow.visible = true
         curEle.visible = true
-        opened =false
+        rootComboBox.height = oriH
     }
 
     Timer {
@@ -96,7 +100,7 @@ Rectangle {
             width:parent.width
             labelSize: rootComboBox.labelSize
             text:modelData
-            horizontalAlignment: text.length>10?Text.AlignLeft:Text.AlignHCenter
+            horizontalAlignment: Text.AlignHCenter
             BuzzMouseArea {
                 hoverEnabled: true
                 anchors.fill: parent
