@@ -158,9 +158,24 @@ void printermanager::pri_rep_review()
                 qDebug() << "n:" << n << "m_realDots:" << m_realDots;
                 m_dfm->GetChVal(c, 0, n, vtmp, 0);
                 qDebug("got it");
+                int ilast = -1; // indice su cui accumula la media, riferito a NUMOF_X_PRINT_DOTS
+                int icnt  = 0;
+                double isum = 0.0;
                 for(int i = 0; i < (m_realDots*10); i++) {
                     double v = vtmp[i];
-                    buffer_emg[(int)(i*xscale / 10)] = (v < 0.0) ? -v : v;
+                    v = (v < 0.0) ? -v : v;
+                    int ivirt = (int)(i*xscale / 10);   // virtual index
+                    if(ilast < 0)
+                        ilast = ivirt;
+                    if(ivirt != ilast) {    // nuova posizione: scaricare la media in [ilast]
+                        buffer_emg[ilast] = isum / icnt;    // scarica valore precedente
+                        isum = 0.0;     // nuova posizione: media a 0.0
+                        icnt = 0;
+                        ilast = ivirt;
+                    }
+                    // ivirt == ilast
+                    isum += v;          // aggiorna la media
+                    icnt++;
                 }
                 m_emgPresent = true;
                 qDebug("fine get emg");
