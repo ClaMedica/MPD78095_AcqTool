@@ -163,7 +163,6 @@ void printermanager::pri_rep_review()
                 double isum = 0.0;
                 for(int i = 0; i < (m_realDots*10); i++) {
                     double v = vtmp[i];
-                    v = (v < 0.0) ? -v : v;
                     int ivirt = (int)(i*xscale / 10);   // virtual index
                     if(ilast < 0)
                         ilast = ivirt;

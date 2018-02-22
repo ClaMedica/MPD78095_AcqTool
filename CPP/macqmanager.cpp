@@ -895,8 +895,12 @@ void MAcqManager::applyOperations()
             if(name == "none") {    //non devo fare nulla per cui copio un frame nei channel giusti
                 foreach (QString hwc, m_HWChansMap[type]) {
                     int index = m_HWChansMap[type].indexOf(hwc);
-                    for(int i = 0; i < m_frameMap[hwc]; i++)
-                        m_channelMap[type].at(index)->append(m_bufferMap[hwc]->at(i));
+                    for(int i = 0; i < m_frameMap[hwc]; i++){
+                        double v = m_bufferMap[hwc]->at(i);
+                        if (type == "EMG")
+                            v = (v < 0.0) ? -v : v;
+                        m_channelMap[type].at(index)->append(v);
+                    }
                     qDebug() << "Canale" << type << "Copiato" << m_frameMap[hwc] << "campioni su" << index;
                 }
             }
