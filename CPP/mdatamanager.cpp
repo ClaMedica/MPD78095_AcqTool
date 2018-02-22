@@ -105,7 +105,6 @@ void MDataManager::loadFile(QString __fileName)
 
     if( ! QFile::exists(__fileName)) {
         qDebug() << __fileName << MEX_FILE_NOT_EXISTS;
-        //g_mainAppBridge->sendSwitch(); //poi dovra tornare al modulo database
         return;
     }
 
