@@ -152,7 +152,7 @@ CONFIG += link_pkgconfig
 #}
 
 LINUXDESKTOP {
-QMAKE_CXXFLAGS += -Wno-psabi
+    QMAKE_CXXFLAGS += -Wno-psabi
     DEFINES += LINUXDESKTOP
     DEFINES += LINUX
     TARGET = PicoAcq
@@ -172,7 +172,7 @@ QMAKE_CXXFLAGS += -Wno-psabi
 }
 
 PICOFLOW {
-QMAKE_CXXFLAGS += -Wno-psabi
+    QMAKE_CXXFLAGS += -Wno-psabi
     DEFINES += PICOFLOW
     TARGET = PicoAcq
 

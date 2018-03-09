@@ -1,4 +1,4 @@
-#include "printermanager.h"
+﻿#include "printermanager.h"
 
 
 printermanager::printermanager(QString __namefile, QObject *parent) : QObject(parent)
@@ -2548,7 +2548,8 @@ void printermanager::getImage(QImage __img, QString __nome)
     int32_t pale_indx[NCOLORS];     // da colore decimato a n.progressivo
     int     pale_revindx[NCOLORS];  // da n.progressivo a colore decimato
     int     pale_seq = 0;
-    bzero((void *) & pale_cnt, sizeof(pale_cnt));
+
+    memset((void *) & pale_cnt,0,sizeof(pale_cnt));
     for(int i = 0; i < NCOLORS; i++)
         pale_indx[i] = -1;
 

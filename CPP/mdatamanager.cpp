@@ -1,4 +1,4 @@
-#include "mdatamanager.h"
+﻿#include "mdatamanager.h"
 #include "systemmanager.h"
 
 extern bool DebugAcqTool;
@@ -57,7 +57,9 @@ MDataManager::~MDataManager()
 
 void MDataManager::getGrabbedImage(QObject *gi, QString nome)
 {
+#ifdef PICOFLOW
     m_mngPrint->getGrabbedImage(gi,nome);
+#endif
 }
 
 void MDataManager::setInfoList(QVariantList __list)
@@ -439,8 +441,9 @@ void MDataManager::loadFile(QString __fileName)
         //libreria di analisi: creo oggetto.
         m_ana = new Analyze();
         //creo oggetto per stampare
+#ifdef PICOFLOW
         m_mngPrint = new printermanager(m_copyFileName);
-
+#endif
         m_mng->Close();
         break;
     }
@@ -1242,6 +1245,7 @@ qDebug() << "INIZIO";
 
 void MDataManager::startPrint()
 {
+#ifdef PICOFLOW
     m_mngPrint->setTempoAttesa(m_aflwdatas.at(0)->getWaitingTime());
     m_mngPrint->setFlussoMax(m_aflwdatas.at(0)->getQMax());
     m_mngPrint->setFlussoMedio(m_aflwdatas.at(0)->getQAve());
@@ -1265,7 +1269,7 @@ void MDataManager::startPrint()
     //stampo
     if (m_autoPrint || m_autoFlow == 0)
         sendToPrint();
-
+#endif
     //qml
     qDebug() << "FINE analisys";
 }
@@ -1724,7 +1728,9 @@ mflowdatas *MDataManager::getFlowDatas(int __i)
 void MDataManager::sendPrintTest()
 {
     qDebug() << "inizio stampa";
+#ifdef PICOFLOW
      m_mngPrint = new printermanager();
      m_mngPrint->printTest();
      m_mngPrint->closePrinter();
+#endif
 }
