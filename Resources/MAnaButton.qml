@@ -1,4 +1,4 @@
-import QtQuick 2.5
+﻿import QtQuick 2.5
 import QtQuick.Window 2.0
 import MComponents 1.0
 
@@ -7,7 +7,9 @@ Rectangle {
     width: 130
     height: 30
     color:"whitesmoke"
-    border.color: "gray"
+    border.width: anaBtn.activeFocus ? 3 : 1
+    border.color: DataEngine.TASKBAR_COLOR
+    radius: height*0.1
     property real labelSize:4
 
     //Since the buttons are created on the fly,

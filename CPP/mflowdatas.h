@@ -1,4 +1,4 @@
-#ifndef ANAFLWADV_H
+﻿#ifndef ANAFLWADV_H
 #define ANAFLWADV_H
 
 #include <QAbstractTableModel>
@@ -15,8 +15,8 @@ class mflowdatasModel: public MAnaTableModel
 public:
     mflowdatasModel() {
         //                            role     width     title
-        m_modelInfo["default"][0] << "descr" << 70 << tr("description");
-        m_modelInfo["default"][1] << "value" << 30 << tr("value");
+        m_modelInfo["default"][0] << "descr" << 70 << tr("DESCRIPTION");
+        m_modelInfo["default"][1] << "value" << 30 << tr("VALUE");
         m_roles[0] = "descr";
         m_roles[1] = "value";
     }

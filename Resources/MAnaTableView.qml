@@ -1,4 +1,4 @@
-import QtQuick 2.4
+﻿import QtQuick 2.4
 import QtQuick.Controls 1.2
 import QtQuick.Window 2.1
 
@@ -13,24 +13,45 @@ BuzzTableView{
     property string type:"default"
     height:300
     width:500
-    frameVisible: false
-    clip:true
-    selectionMode:SelectionMode.ExtendedSelection
+
     horizontalScrollBarPolicy: Qt.ScrollBarAlwaysOff
 
     itemDelegate: Item {
         anchors.leftMargin: 100
         Text {
             anchors.verticalCenter: parent.verticalCenter
-            color: styleData.textColor
+            color: styleData.selected ? "#000" : "#000"
             elide: styleData.elideMode
             text: styleData.value
             font.family:  (layout !== undefined) ? layout.value("FFamily") : "ubuntu"
             font.bold: false
-            font.pixelSize: 14
+            font.pixelSize: screenH * 0.015
         }
     }
 
+    rowDelegate: Rectangle{
+        color:styleData.row%2?"#E0E0E0":"#FFFFFF"
+        height:
+        {
+            var dim = screenH * 0.025
+            styleData.selected?dim*1.5:dim
+        }
+        Behavior on height {NumberAnimation {duration: 200}}
+    }
+
+    headerDelegate: Rectangle{
+        color: "#E0E0E0"
+        height: 35
+        Text {
+            anchors.verticalCenter: parent.verticalCenter
+            color: styleData.selected ? "#000" : "#000"
+            elide: styleData.elideMode
+            text: styleData.value
+            font.family:  (layout !== undefined) ? layout.value("FFamily") : "ubuntu"
+            font.bold: true
+            font.pixelSize:screenH * 0.02
+        }
+    }
     function populate(){//al caricamento della tabella popolo con le colonne
         if(model===undefined)
             return
@@ -51,30 +72,6 @@ BuzzTableView{
             column.movable = false
             column.resizable = false
         }
-        resize()
-    }
-    function resize()
-    {
-        var info = model.modelInfo(type)
-        var sizeUsed=0
-        for (var i=0; i<info.length; i++) {
-            var column = getColumn(i)
-            if(i<info.length-1)
-                column.width = Math.round(info[i][1]*rootTable.width/100)
-            else
-                column.width = rootTable.width-sizeUsed
-            sizeUsed+=column.width
-        }
-    }
-
-    Rectangle{
-        id:frame
-        anchors.fill:rootTable
-        width:rootTable.width-2
-        height:rootTable.height-2
-        border.width: 2
-        border.color: "blue"
-        color:"transparent"
     }
 }
 
