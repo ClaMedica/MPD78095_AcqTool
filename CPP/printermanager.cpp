@@ -1443,6 +1443,7 @@ void printermanager::Calc_Max_RealReport_rel2(short __num_sample)
             }
         m_max_emg = emg_max;
     }
+    qDebug("vmax:%d emgMax:%d", vol_max, emg_max);
 }
 
 /**
@@ -1465,22 +1466,24 @@ void printermanager::Report_Real_Time(short __num_sample)
     m_pos_gra_emg = 0;
     m_pos_gra_flw = 50;
     m_num_byte_x_gra_flw = 50;
-    m_num_dots_gra_flw = 400.0;
+    m_num_dots_gra_flw = 400;
     if(m_emgPresent) {
         m_pos_gra_vol = 20;
-        m_num_dots_gra_emg = 160.0;
-        m_num_dots_gra_vol = 240.0;
+        m_num_dots_gra_emg = 160;
+        m_num_dots_gra_vol = 240;
         m_num_byte_x_gra_emg = 20;
         m_num_byte_x_gra_vol = 30;
     }
     else {
         m_pos_gra_vol = 0;
         m_num_dots_gra_emg = 0;
-        m_num_dots_gra_vol = 400.0;
+        m_num_dots_gra_vol = 400;
         m_num_byte_x_gra_emg = 0;
         m_num_byte_x_gra_vol = 50;
     }
     m_num_byte_x_gra = 800;
+    guard_l = 0xa55a;
+    guard_h = 0x5aa5;
     Pri_Rep_Label();	// stampa label del flusso ed eventualmente anche l'emg nel caso di grafici sovrapposti
 
     // STAMPA DEI GRAFICI DI ACQUISIZIONE, 8 RIGHE PER SECONDO DI ACQUSIZIONE
@@ -1498,7 +1501,7 @@ void printermanager::Report_Real_Time(short __num_sample)
     Pri_Rep_asse_dx();
     m_port->Pri_mode(0x00);
     m_port->Pri_Font(1);
-    m_port->Pri_Str( 3, (char*)"\n \n", 0); // LINE"\x1", 0 );		// modifica per risparm carta e tempo: da riattivare
+    m_port->Pri_Str( 3, (char*)"\n \n", 0); // modifica per risparm carta e tempo: da riattivare
 }
 
 
@@ -2122,13 +2125,21 @@ void printermanager::Pri_Rep_Gra_Landscape(short __num_sample)
 
     if(m_emgPresent) {
         fattore_scala = m_num_dots_gra_emg / (m_max_emg);	// dove max_y = 10, 20, 40, 80, 160, quindi il rapporto = 4, 2, 1, 0.5, 0.25
-        qDebug("fattore scala EMG: %f", fattore_scala);
+        qDebug()<<"m_num_dots_gra_emg:"<<m_num_dots_gra_emg<<"m_max_emg:"<<m_max_emg;
+        qDebug("guards:%x %x",guard_l,guard_h);
+        qDebug("fattore scala EMG:%f m_max_emg:%f __num_sample:%d m_cursore:%d", fattore_scala, m_max_emg, __num_sample, m_cursore);
         for(int i = 0; i < NUM_POINTS; i++) {
             PriGraParam_OLD.uw8 = PriGraParam_EMG.uw8;
             PriGraParam_OLD.uw9 = PriGraParam_EMG.uw9;
-            PriGraParam_OLD.sample_adattato = PriGraParam_EMG.sample_adattato;				// salviamo il valore precedente
+            int absV = PriGraParam_EMG.sample_adattato;
+            PriGraParam_OLD.sample_adattato = absV;				// salviamo il valore precedente
             if((i+m_cursore) < __num_sample) {
-                PriGraParam_EMG.sample_adattato = (int)(m_emg_store[i + m_cursore] * fattore_scala);	// adattamento del valore corrente al fondoscala corrente
+                absV = (int)(m_emg_store[i + m_cursore]);	// adattamento del valore corrente al fondoscala corrente
+                absV = (int)(absV * fattore_scala);
+                absV = (absV < 0) ? -absV : absV;
+                if(absV >= m_num_dots_gra_emg)
+                    absV = m_num_dots_gra_emg - 1;
+                PriGraParam_EMG.sample_adattato = absV;
 
                 if(PriGraParam_EMG.sample_adattato > 0) {
                     PriGraParam_EMG.uw8 = PriGraParam_EMG.sample_adattato / 8;	// individuo di quanti byte mi devo spostare a destra, a partire dall'asse sinistro
@@ -2191,6 +2202,7 @@ void printermanager::Pri_Rep_Gra_Landscape(short __num_sample)
             else
                 break;
         }
+        qDebug("fattore scala EMG: FINE");
     }
 
     m_cursore += NUM_POINTS;	// incrementato di 40 punti (quindi sample) ogni giro
@@ -2213,6 +2225,7 @@ void printermanager::Pri_Rep_Gra_Landscape(short __num_sample)
 
     // finalmente stampa
     m_port->Pri_Str( (dim_string_gr), (char *)m_str_gr, 0);
+qDebug("dopo Pri_str");
 }
 
 /**
