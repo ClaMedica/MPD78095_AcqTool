@@ -1,4 +1,4 @@
-import QtQuick 2.0
+﻿import QtQuick 2.0
 import QtQuick.Controls 1.0
 import QtQuick.Dialogs 1.0
 import QtQuick.Controls.Styles 1.2
@@ -255,12 +255,14 @@ MForm{
     Rectangle{
         property string text: ""
         id: toolTip
-        width: toolTipText.width + 4
-        height: toolTipText.height + 4
-        anchors.horizontalCenter: gridComand.horizontalCenter
+        width: toolTipText.width *1.1
+        height: toolTipText.height *1.1
+        anchors.right: gridDefiners.left
         y: 0
         color: "whitesmoke"
         border.color: "blue"
+        border.width: 2
+        radius: 5
         visible:false
         Text{
             //@@@@@@@@@@    Properties      @@@@@@@@@@
@@ -268,10 +270,9 @@ MForm{
             color:"blue"
             font.family:  (layout !== undefined) ? layout.value("FFamily") : "ubuntu"
             font.bold: false
-            font.pixelSize:12
+            font.pixelSize:screenH * 0.02
             text:toolTip.text
-            horizontalAlignment : Text.AlignHCenter
-            verticalAlignment: Text.AlignVCenter
+            anchors.horizontalCenter: parent.horizontalCenter
         }
     }
 

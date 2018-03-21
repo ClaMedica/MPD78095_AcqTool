@@ -1,51 +1,43 @@
-import QtQuick 2.3
+﻿import QtQuick 2.3
 import QtQuick.Controls 1.2
 import QtQuick.Dialogs 1.2
 import MComponents 1.0
 
 Rectangle {
     id: exitDlg
-    color: "lightgrey"
-    implicitWidth: 350
-    implicitHeight: 150
-    visible: false
-
+    height:screenH*0.4
+    width:screenW*0.4
     anchors.centerIn: parent
+    visible: false
+    color : layout.value("BackgroundColor")
 
     Keys.onReturnPressed: {
         volResDlg.visible = false
     }
 
-    Rectangle {
-        color: "dodgerblue"
-        implicitWidth: 350
-        implicitHeight: 25
-        Text{
-            anchors.horizontalCenter: parent.horizontalCenter
-            anchors.verticalCenter: parent.verticalCenter
-            text:qsTr("close")
-        }
-        anchors.top: parent.top
+    MLabel {
+        id: lblMessage
+        anchors.top:parent.top
+        anchors.left:parent.left
+        anchors.right:parent.right
+        height:parent.height*0.7
+        text: qsTr("Do you want save changes?")
+        horizontalAlignment: Text.AlignHCenter
+        labelSize: layout.value("F4")
+        verticalAlignment: Text.AlignVCenter
+        color : "white"
+        wrapMode: Text.WordWrap
     }
 
-    Row {
-        spacing:20
-        anchors.centerIn: parent
-        focus: true
-        Text{
-            id: text
-            text:qsTr("Do you want save changes?")
-        }
-    }
-
-    BuzzButton {
+    MButton {
         id:btnYes
         text: qsTr("Yes")
+        anchors.top:lblMessage.bottom
         anchors.left: parent.left
         anchors.bottom: parent.bottom
-        anchors.bottomMargin: 10
-        anchors.leftMargin: 10
-        width: (parent.width - 4*10) / 3
+        width: parent.width/3.1
+        anchors.margins: parent.height*0.02
+        labelSize: layout.value("F4")
         onClicked: {
             exitDlg.visible = false
             mngData.toSave = "yes"
@@ -53,13 +45,15 @@ Rectangle {
         }
     }
 
-    BuzzButton {
+    MButton {
         id:btnNo
         text: qsTr("No")
+        anchors.top:lblMessage.bottom
         anchors.horizontalCenter: parent.horizontalCenter
         anchors.bottom: parent.bottom
-        anchors.bottomMargin: 10
-        width: (parent.width - 4*10) / 3
+        width: parent.width/3.1
+        anchors.margins: parent.height*0.02
+        labelSize: layout.value("F4")
         onClicked: {
             exitDlg.visible = false
             mngData.toSave = "no"
@@ -67,14 +61,15 @@ Rectangle {
         }
     }
 
-    BuzzButton {
+    MButton {
         id:btnCancel
         text: qsTr("Cancel")
+        anchors.top:lblMessage.bottom
         anchors.right: parent.right
         anchors.bottom: parent.bottom
-        anchors.bottomMargin: 10
-        anchors.rightMargin: 10
-        width: (parent.width - 4*10) / 3
+        width: parent.width/3.1
+        anchors.margins: parent.height*0.02
+        labelSize: layout.value("F4")
         onClicked: {
             exitDlg.visible = false
             mngData.toSave = ""
