@@ -382,8 +382,9 @@ private:
     int m_init_time_to_print;
     short m_num_byte_x_gra;
     short m_pos_gra_flw,m_pos_gra_emg, m_pos_gra_vol;
-    float m_num_dots_gra_vol, m_num_dots_gra_flw, m_num_dots_gra_emg;
+    short m_num_dots_gra_vol, m_num_dots_gra_flw  /*, m_num_dots_gra_emg*/;
     short m_num_byte_x_gra_emg, m_num_byte_x_gra_vol, m_num_byte_x_gra_flw;
+    short guard_l, m_num_dots_gra_emg, guard_h;
     unsigned short m_cursore;
 
     int         m_resultBm_w, m_resultBm_h;

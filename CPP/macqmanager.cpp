@@ -826,7 +826,7 @@ void MAcqManager::sendBuffersToPlot()
                 out << channels[i].takeFirst();
             }
         }
-        qDebug() << "block[" << block.size() << "]:" << block;
+//        qDebug() << "block[" << block.size() << "]:" << block;
         if(m_tcpChannels.keys().contains(plotName))
             m_tcpChannels[plotName]->sendData(block.data(), block.size());
         else
@@ -897,8 +897,8 @@ void MAcqManager::applyOperations()
                     int index = m_HWChansMap[type].indexOf(hwc);
                     for(int i = 0; i < m_frameMap[hwc]; i++){
                         double v = m_bufferMap[hwc]->at(i);
-                        if (type == "EMG")
-                            v = (v < 0.0) ? -v : v;
+//                        if (type == "EMG")
+//                            v = (v < 0.0) ? -v : v;
                         m_channelMap[type].at(index)->append(v);
                     }
                     qDebug() << "Canale" << type << "Copiato" << m_frameMap[hwc] << "campioni su" << index;
@@ -986,7 +986,7 @@ void MAcqManager::fillBuffers(QByteArray __block)
         for(int k = 0; k < numChan; k++) {
             in >> currChan;
             in >> numChanData;
-            qDebug() << "currChan:" << currChan;
+//            qDebug() << "currChan:" << currChan;
 
             if((currChan < maxNumChan) && (currChan >= 0)) {    //se e' un canale con del senso
                 if(m_bufferMap.keys().contains(QString::number(currChan))) {
@@ -1023,8 +1023,8 @@ bool MAcqManager::buffersReady()
         }
     }
 
-    foreach(QString hwchan, m_totalHWChan)
-        qDebug() << "buffers pronti" << m_bufferMap[hwchan]->size() << ">" << (m_bufSizeMap[hwchan] + m_frameMap[hwchan]);
+//    foreach(QString hwchan, m_totalHWChan)
+//        qDebug() << "buffers pronti" << m_bufferMap[hwchan]->size() << ">" << (m_bufSizeMap[hwchan] + m_frameMap[hwchan]);
 
     return true;
 }
