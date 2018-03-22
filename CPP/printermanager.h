@@ -98,14 +98,14 @@
 #define __POINT__
 
 //per stampare
-#define PRI_REP_INT     1   /* Flag Stampa Report : Intestazione          */
-#define PRI_REP_IDE     1   /* Flag Stampa Report : Identificativi Esame  */
-#define PRI_REP_MODAL	1   /* Flag stampa Report : modalita d'esame      */
-#define PRI_REP_GRA     1   /* Flag Stampa Report : Grafico               */
-#define PRI_REP_SRK     1   /* Flag Stampa Report : Siroky                */
-#define PRI_REP_RIS     1   /* Flag Stampa Report : Risultati             */
-#define PRI_REP_POS     0   /* Flag Stampa Report : Postfazione e indicazione calibrazione, per debug */
-#define PRI_REP_SPA     1	  /* Flag Stampa Report : Spazi per strappare   */
+//#define PRI_REP_INT     1   /* Flag Stampa Report : Intestazione          */
+//#define PRI_REP_IDE     1   /* Flag Stampa Report : Identificativi Esame  */
+//#define PRI_REP_MODAL	1   /* Flag stampa Report : modalita d'esame      */
+//#define PRI_REP_GRA     1   /* Flag Stampa Report : Grafico               */
+//#define PRI_REP_SRK     1   /* Flag Stampa Report : Siroky                */
+//#define PRI_REP_RIS     1   /* Flag Stampa Report : Risultati             */
+//#define PRI_REP_POS     0   /* Flag Stampa Report : Postfazione e indicazione calibrazione, per debug */
+//#define PRI_REP_SPA     1	  /* Flag Stampa Report : Spazi per strappare   */
 
 //per le stringhe
 //#define NON_SOTTLINEA   "\x1bU\x0"	// \x 1B U \x 0 che significa 1B = ESC; U = modo sottolineatura; 0 = stampa normale
@@ -376,15 +376,14 @@ private:
     unsigned short 	m_uw3; // dimensioni in byte della riga n-esima dell'area grafico
     char 	m_str_gr[dim_string_rel2];	// allocazione dinamica ma all'inizio dello stringone che sara usato per i label dei grafici
     char 	m_str_tr[dim_string_rel2];			// trasposizione stringa per ottenere matrice di punti per stampa grafica
-    QVector<unsigned short int> m_flow_store;
-    QVector<unsigned short int> m_vol_store;
-    QVector<unsigned short int> m_emg_store;
+    unsigned short * m_flow_store;
+    unsigned short * m_vol_store;
+    unsigned short * m_emg_store;
     int m_init_time_to_print;
     short m_num_byte_x_gra;
     short m_pos_gra_flw,m_pos_gra_emg, m_pos_gra_vol;
-    short m_num_dots_gra_vol, m_num_dots_gra_flw  /*, m_num_dots_gra_emg*/;
+    short m_num_dots_gra_vol, m_num_dots_gra_flw, m_num_dots_gra_emg;
     short m_num_byte_x_gra_emg, m_num_byte_x_gra_vol, m_num_byte_x_gra_flw;
-    short guard_l, m_num_dots_gra_emg, guard_h;
     unsigned short m_cursore;
 
     int         m_resultBm_w, m_resultBm_h;
@@ -394,18 +393,18 @@ private:
     void smooting_PRINT_flow();
     void pri_rep_review();
     //report
-    void Pri_Rep();
+    void Pri_Rep(double xscale);
     void Intest();
     void Report_data();
-    void Report_flw();
+    void Report_flw(double xscale);
     void Report_emg();
-    void Report_Real_Time(short __num_sample);
+    void Report_Real_Time(short __num_sample, double xscale);
 
     void Report_result();
     void Pri_Rep_Gra(int __num_riga);
     void Pri_Rep_Gra_Ini_Grid(int __n_riga);
     void Pri_Rep_Gra_EMG(unsigned char __num_riga);
-    void Pri_Rep_Gra_Landscape(short __num_sample);
+    void Pri_Rep_Gra_Landscape(short __num_sample, double xscale);
     void Pri_Rep_asse_dx();
     void Pri_Rep_Label();
     void Pri_Rep_Lin(char *__str_des, int __rep_dat, unsigned char __num_dec, char *__str_udm, unsigned char __flag_lf);
@@ -415,7 +414,7 @@ private:
     void Str_Trasposta(unsigned char __type, unsigned short __sx_byte, unsigned short __dx_byte); // crea la trasposta della stringa str_gr, ottenendo una matrice scritta per righe
     short adatta_buffer_dati(int __num_sample, long __fs_flw);
     void Calc_Max_RealReport_rel2(short __num_sample);
-    void Calc_Max();
+    void Calc_Max(double xscale);
     void Calc_Max_EMG();
     long Calc_Max_Flw();
     void print_char_left_label(short __value, int __pos_in_string, short int __num_char, bool __pri_decim, short int __pre_char);
