@@ -42,7 +42,8 @@ SOURCES += \
     ../AnaUro/anauro.cpp \
     ../AnaUro/analysis.cpp \
     ../AnaUro/anautils.cpp \
-    ../MGlobal/fileio.cpp
+    ../MGlobal/fileio.cpp \
+    CPP/graficmanager.cpp
 
 HEADERS += \
     CPP/alarmmanager.h \
@@ -76,7 +77,8 @@ HEADERS += \
     ../MGlobal/systemmanager.h \
     ../MGlobal/UdmImpl.h \
     ../MGlobal/fileio.h \
-    CPP/bitmapsv.h
+    CPP/bitmapsv.h \
+    CPP/graficmanager.h
 
 INCLUDEPATH +=  CPP \
                 CPP/TCP \

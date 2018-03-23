@@ -5,8 +5,8 @@ import MComponents 1.0
 
 Rectangle {
     id: exitDlg
-    height:screenH*0.4
-    width:screenW*0.4
+    height:screenH*grafic.valueOf("Dialog","height")
+    width:screenW*grafic.valueOf("Dialog","width")
     anchors.centerIn: parent
     visible: false
     color : layout.value("BackgroundColor")
@@ -20,10 +20,10 @@ Rectangle {
         anchors.top:parent.top
         anchors.left:parent.left
         anchors.right:parent.right
-        height:parent.height*0.7
+        height:parent.height*0.8
         text: qsTr("Do you want save changes?")
         horizontalAlignment: Text.AlignHCenter
-        labelSize: layout.value("F4")
+        labelSize: grafic.valueOf("Dialog","labelSize")
         verticalAlignment: Text.AlignVCenter
         color : "white"
         wrapMode: Text.WordWrap
@@ -37,7 +37,7 @@ Rectangle {
         anchors.bottom: parent.bottom
         width: parent.width/3.1
         anchors.margins: parent.height*0.02
-        labelSize: layout.value("F4")
+        labelSize: grafic.valueOf("Button","labelSize")
         onClicked: {
             exitDlg.visible = false
             mngData.toSave = "yes"
@@ -53,7 +53,7 @@ Rectangle {
         anchors.bottom: parent.bottom
         width: parent.width/3.1
         anchors.margins: parent.height*0.02
-        labelSize: layout.value("F4")
+        labelSize: grafic.valueOf("Button","labelSize")
         onClicked: {
             exitDlg.visible = false
             mngData.toSave = "no"
@@ -69,7 +69,7 @@ Rectangle {
         anchors.bottom: parent.bottom
         width: parent.width/3.1
         anchors.margins: parent.height*0.02
-        labelSize: layout.value("F4")
+        labelSize: grafic.valueOf("Button","labelSize")
         onClicked: {
             exitDlg.visible = false
             mngData.toSave = ""

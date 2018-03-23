@@ -5,8 +5,8 @@ import MComponents 1.0
 
 MForm {
     id:volResDlg
-    height:screenH*0.5
-    width:screenW*0.5
+    height:screenH*grafic.valueOf("Dialog","height")
+    width:screenW*grafic.valueOf("Dialog","width")
     anchors.centerIn: parent
     visible: false
     color : layout.value("BackgroundColor")
@@ -26,26 +26,29 @@ MForm {
         color:"dodgerblue"
         width: parent.width
         height: parent.height/5
-        Text{
+        anchors.top: parent.top
+        MLabel {
+            id: lblMessage
             anchors.horizontalCenter: parent.horizontalCenter
             anchors.verticalCenter: parent.verticalCenter
-            text:titleDlg
-            font.family: (layout !== undefined) ? layout.value("FFamily") : "ubuntu"
-            font.bold: true
-            font.pixelSize: screenH * 0.04
+            text: titleDlg
+            horizontalAlignment: Text.AlignHCenter
+            labelSize: grafic.valueOf("Dialog","labelSize")
+            verticalAlignment: Text.AlignVCenter
+            color : "white"
         }
-        anchors.top: parent.top
     }
 
     MParameterEdit{
         id:parVolResVal
         anchors.verticalCenter: parent.verticalCenter
-        height:parent.height*0.2
-        width: parent.width*0.5
+        height:screenH*grafic.valueOf("Button","height")
+        width: screenW*grafic.valueOf("Button","width")
         anchors.horizontalCenter: parent.horizontalCenter
         anchors.margins: layout.value("Margin")
         type:typTextField
-        labelSize: layout.value("F4")
+        labelColor: "white"
+        labelSize: grafic.valueOf("Dialog","labelSize")
         viewPerc:0.75
         role:qsTr("Insert Residual Volume")
         keyboardAlfaNum: false
@@ -57,10 +60,10 @@ MForm {
         //anchors.top:parVolResVal.bottom
         anchors.horizontalCenter: parent.horizontalCenter
         anchors.bottom: parent.bottom
-        height:parent.height*0.2
-        width: parent.width*0.2
+        height:screenH*grafic.valueOf("Button","height")
+        width: screenW*grafic.valueOf("Button","width")
         anchors.margins: parent.height*0.02
-        labelSize: layout.value("F4")
+        labelSize: grafic.valueOf("Button","labelSize")
         onClicked: {
             var volResVal = parVolResVal.info
             volResDlg.visible = false
