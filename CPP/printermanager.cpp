@@ -486,7 +486,7 @@ void printermanager::Pri_Rep(double xscale)
          Report_BitMap(true);
 
     // 	Risultati dell'esame ricavati dall'analisi semplificata, implementata nel firmware
-//    Report_result();		// scrive in elenco i dati calcolati dall'analisi dell'esame
+    Report_result();		// scrive in elenco i dati calcolati dall'analisi dell'esame
     m_port->status();
     m_port->Pri_Str(3, (char*)"\n \n", 0); // LINE"\x3",0);
 
