@@ -1,6 +1,124 @@
 
-#define INPRINTERMANAGER
 #include "printermanager.h"
+
+//const char str_label_time_old[29][68]={
+//    "   0    3     6     9    12    15    18    21    24    27   30s",
+//    "   0    6     12   18    24    30    36    42    48    54   60s",
+//    "   0    9     18   27    36    45    54    63    72    81   90s",
+//    "   0    12    24   36    48    60    72    84    96   108  120s",
+//    "   0    15    30   45    60    75    90   105   120   135  150s",
+//    "   0    18    36   54    72    90   108   126   144   162  180s",
+//    "   0    21    42   63    84   105   126   147   168   189  210s",
+//    "   0    24    48   72    96   120   144   168   192   216  240s",
+//    "   0    27    54   81   108   135   162   189   216   243  270s",
+//    "   0    30    60   90   120   150   180   210   240   270  300s",
+//    "   0    36    72  108   144   180   216   252   288   324  360s",
+//    "   0    42    84  126   168   210   252   294   336   378  420s",
+//    "   0    48    96  144   192   240   288   336   384   432  480s",
+//    "   0    54   108  162   216   260   314   368   422   476  540s",
+//    "   0    60   120  180   240   300   360   420   480   540  600s",
+//    "   0    66   132  198   264   330   396   462   528   594  660s",
+//    "   0    72   144  216   288   360   432   504   586   658  720s",
+//    "   0    78   156  234   312   390   468   546   624   702  780s",
+//    "   0    84   168  252   336   420   504   588   668   752  840s",
+//    "   0    90   180  270   360   450   540   630   720   810  900s",/* 15*60=900*/
+//    "   0    96   192  288   384   480   576   672   768   864  960s",
+//    "   0   102   204  306   408   510   612   714   816   918 1020s",
+//    "   0   108   216  324   432   540   648   756   864   972 1080s",
+//    "   0   114   228  342   456   570   684   798   912  1026 1140s",
+//    "   0    2m    4m   6m    8m   10m   12m   14m   16m   18m   20m",
+//    "   0          9          18          27          36         45s",
+//    "   0          15         30          45          60         75s",
+//    "   0          21         42          63          84        105s",
+//    "   0          27         54          81         108        135s"
+//};
+
+const char *str_label_time[] = {
+//    "   0          6          12          18          24         30s",
+//    "   0          9          18          27          36         45s",
+//    "   0         12          24          36          48         60s",
+    "   0         0:15       0:30        1:45        1:00       1:15",
+    "   0         0:18       0:36        0:54        1:12       1:30",
+    "   0         0:21       0:42        1:03        1:24       1:45",
+    "   0         0:24       0:48        1:12        1:36       2:00",
+    "   0         0:27       0:54        1:21        1:48       2:15",
+    "   0         0:30       1:00        1:30        2:00       2:30",
+    "   0         0:36       1:12        1:48        2:24       3:00",
+    "   0         0:42       1:24        2:06        2:48       3:30",
+    "   0         0:48       1:36        2:24        3:12       4:00",
+    "   0         0:54       1:48        2:42        3:36       4:30",
+    "   0         1:00       2:00        3:00        4:00       5:00",
+    "   0         1:12       1:24        3:36        4:48       6:00",
+    "   0         1:24       2:48        4:12        5:36       7:00",
+    "   0         1:36       3:12        4:48        6:24       8:00",
+    "   0         1:48       3:36        5:24        7:12       9:00",
+    "   0         2:00       4:00        6:00        8:00      10:00",
+    "   0         2:12       4:24        6:36        8:48      11:00",
+    "   0         2:24       4:48        7:12        9:36      12:00",
+    "   0         2:36       5:12        7:48       10:24      13:00",
+    "   0         2:48       5:36        8:24       11:12      14:00",
+    "   0         3:00       6:00        9:00       12:00      15:00",/* 15*60=900*/
+    "   0         3:12       6:24        9:36       12:48      16:00",
+    "   0         3:24       6:48       10:12       13:36      17:00",
+    "   0         3:36       7:12       10:48       14:24      18:00",
+    "   0         3:48       7:36       11:24       15:12      19:00",
+    "   0         4:00       8:00       12:00       16:00      20:00",
+    "xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx"
+};
+
+// numeri ruotati di 90? in senso orario
+const unsigned char  print8x8Set[] = {
+    0x3C, 0x7E, 0x81, 0x81, 0x7E, 0x3C, 0x00, 0x00,      /*   0 - 30 - 0 */
+    0x84, 0x82, 0xFF, 0xFF, 0x80, 0x80, 0x00, 0x00,      /*   1 - 31 - 1 */
+    0xC2, 0xE3, 0xB1, 0x99, 0x8F, 0x86, 0x00, 0x00,      /*   2 - 32 - 2 */
+    0x42, 0xC3, 0x81, 0x99, 0xFF, 0x66, 0x00, 0x00,      /*   3 - 33 - 3 */
+    0x30, 0x28, 0x24, 0x23, 0xFF, 0x20, 0x00, 0x00,      /*   4 - 34 - 4 */
+    0x8F, 0x89, 0x89, 0xD9, 0x71, 0x00, 0x00, 0x00,     /*   5 - 35 - 5 */
+    0x7E, 0x8B, 0x89, 0x89, 0xDB, 0x72, 0x00, 0x00,      /*   6 - 36 - 6 */
+    0x81, 0xD1, 0x71, 0x39, 0x1D, 0x17, 0x03, 0x00,      /*   7 - 37 - 7 */
+    0x66, 0x7E, 0x99, 0x99, 0x7E, 0x66, 0x00, 0x00,     /*   8 - 38 - 8 */
+    0x4E, 0xDB, 0x91, 0x91, 0xDB, 0x7E, 0x00, 0x00,     /*   9 - 39 - 9 */
+    0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0xC0, 0xC0,     /*  .   	10 */
+    0xF8, 0x1C, 0x1C, 0xF8, 0xF8, 0x1C, 0x1C, 0xF8,	/* m 	11 */
+    0x00, 0x00, 0xFF, 0xFF, 0xC0, 0xC0, 0x00, 0x00,	/* L 	12 */ /* mL/s*/
+    0xC0, 0xE0, 0x70, 0x38, 0x1C, 0x0E, 0x07, 0x0C,	/* / 	13 */
+    0x00, 0x98, 0x9C, 0xB4, 0xB4, 0xE4, 0x64, 0x00,	/* s		14 */
+    0x80, 0xFC, 0x7C, 0xE0, 0xC0, 0xE0, 0x7C, 0x3C,	/* u		15 */
+    0x07, 0x1E, 0x70, 0xC0, 0xC0, 0x70, 0x1E, 0x07,	/* V 	16 */
+    0x00, 0x20, 0x78, 0xa4, 0xa4, 0xa4, 0x18, 0x00,	/* e		17 */
+    0x00, 0x00, 0x78, 0x84, 0x84, 0x84, 0x84, 0x00,	/* c		18 */
+};
+
+const unsigned char  print7x13Set[]  = {
+        0x00, 0x00, 0x30, 0x48, 0xCC, 0xCC, 0xCC, 0xCC, 0xCC, 0x48, 0x30, 0x00, 0x00,      /*   0 - 30 - 0 */
+        0x00, 0x00, 0x30, 0x70, 0xB0, 0x30, 0x30, 0x30, 0x30, 0x30, 0xFC, 0x00, 0x00,      /*   1 - 31 - 1 */
+        0x00, 0x00, 0x78, 0xCC, 0xCC, 0x0C, 0x38, 0x60, 0xC0, 0xC0, 0xFC, 0x00, 0x00,      /*   2 - 32 - 2 */
+        0x00, 0x00, 0x78, 0xCC, 0x0C, 0x0C, 0x38, 0x0C, 0x0C, 0xCC, 0x78, 0x00, 0x00,      /*   3 - 33 - 3 */
+        0x00, 0x00, 0x0C, 0x1C, 0x3C, 0x6C, 0xCC, 0xCC, 0xFC, 0x0C, 0x0C, 0x00, 0x00,      /*   4 - 34 - 4 */
+        0x00, 0x00, 0xFC, 0xC0, 0xC0, 0xF8, 0xCC, 0x0C, 0x0C, 0xCC, 0x78, 0x00, 0x00,      /*   5 - 35 - 5 */
+        0x00, 0x00, 0x78, 0xCC, 0xC0, 0xC0, 0xF8, 0xCC, 0xCC, 0xCC, 0x78, 0x00, 0x00,      /*   6 - 36 - 6 */
+        0x00, 0x00, 0xFC, 0x0C, 0x0C, 0x18, 0x18, 0x30, 0x30, 0x60, 0x60, 0x00, 0x00,      /*   7 - 37 - 7 */
+        0x00, 0x00, 0x78, 0xCC, 0xCC, 0xCC, 0x78, 0xCC, 0xCC, 0xCC, 0x78, 0x00, 0x00,      /*   8 - 38 - 8 */
+        0x00, 0x00, 0x78, 0xCC, 0xCC, 0xCC, 0x7C, 0x0C, 0x0C, 0xCC, 0x78, 0x00, 0x00,      /*   9 - 39 - 9 */
+        };
+
+const unsigned char  print8x10SetSD[]  = {
+        0x00, 0x0E, 0x11, 0x11, 0x11, 0x11, 0x11, 0x11, 0x11, 0x0E,	/* " 0" */
+        0x00, 0x02, 0x06, 0x0A, 0x02, 0xF2, 0x02, 0x02, 0x02, 0x07,	/* "-1" */
+        0x00, 0x06, 0x09, 0x01, 0x01, 0x72, 0x04, 0x08, 0x08, 0x0F,	/* "-2" */
+        0x00, 0x06, 0x09, 0x01, 0x01, 0x77, 0x01, 0x01, 0x09, 0x06,	/* "-3" */
+};
+
+const unsigned char  SD[2][4][20] = {
+        {{50, 63, 74, 84, 95,105,114,123,132,140,147,154,160,166,170,174,176,178,178,179},
+         {34, 44, 54, 62, 70, 78, 84, 91, 98,104,110,116,121,126,130,133,136,139,141,141},
+         {10, 19, 26, 34, 40, 46, 52, 58, 64, 70, 75, 79, 84, 88, 93, 98,102,104,106,106},
+         { 0,  0, 10, 16, 21, 26, 30, 34, 37, 40, 43, 47, 50, 53, 55, 58, 60, 62, 64, 66}},
+        {{ 0, 96,110,122,134,145,156,166,176,186,195,204,211,217,223,228,231,233,234,234},
+         { 0, 80, 91,101,110,119,127,135,143,150,156,162,166,171,174,176,177,178,179,179},
+         { 0, 59, 67, 74, 80, 86, 91, 96,100,104,108,111,114,116,118,119,120,121,122,122},
+         { 0, 41, 48, 51, 54, 55, 57, 58, 59, 60, 62, 62, 63, 64, 64, 64, 64, 65, 65, 66}}
+    };
 
 
 printermanager::printermanager(QString __namefile, QObject *parent) : QObject(parent)
@@ -19,7 +137,6 @@ printermanager::printermanager(QString __namefile, QObject *parent) : QObject(pa
     m_modal_e = 0;
     m_numTest = -1;
     m_test_type = false;
-    m_correct = false;
     m_emgPresent = false;
     m_i_max_x = -1;
     m_max_y = -1;
@@ -114,25 +231,8 @@ void printermanager::print()
     m_realDots = m_num_sam;
     qDebug("m_num_sam: %d",m_num_sam);
 
-    // Dati relativi alla stampa
-//    if (m_num_sam >= NUMOF_X_PRINT_DOTS) {
-//        if(m_printMode == PORTRAIT_MODE)
-//            m_realDots = NUMOF_X_PRINT_DOTS;
-//        else	// cioe nel caso di Report_Print_Mode = Landscape
-//        {
-//            if(m_num_sam > NUMOFMAX_LEGHT_PORTRAIT_REP)	// esame troppo lungo per la modalita di stampa LANDSCAPE (5minuti)
-//            {
-//                m_printMode = PORTRAIT_MODE;
-//                m_realDots = NUMOF_X_PRINT_DOTS;
-//            }
-//        }
-//    }
-
     m_dfm->Close();
 
-    m_printMode = PORTRAIT_MODE;
-    pri_rep_review();	// qui va subito in stampa
-    m_printMode = LANDSCAPE_MODE;
     pri_rep_review();	// qui va subito in stampa
 }
 
@@ -156,6 +256,7 @@ void printermanager::pri_rep_review()
         delete buffer_vol;
     buffer_emg = buffer_flw = buffer_vol = NULL;
 
+    // caricamento dati dei canali
     for (int c = 0; c < numCh; c++) {
         QString chName = m_dfm->GetChanName(c);
         if(chName.startsWith("EMG")) {
@@ -326,24 +427,15 @@ questa funzione gestisce tutta la stampa del report, sia in modalita portrait ch
 void printermanager::Pri_Rep(double xscale)
 {
     //      Intestazione
-//    Intest();
+    Intest();
 
     //     Identificativi Esame
-//    Report_data();		// scrive i dati del paziente e lo spazio per le note manuali
-//    m_port->Pri_Str(3, (char*)"\n \n", 0);
+    Report_data();		// scrive i dati del paziente e lo spazio per le note manuali
+    m_port->Pri_Str(3, (char*)"\n \n", 0);
 
     // Grafico FLW + VOL ed eventualmente EMG
     if(m_printMode == PORTRAIT_MODE)			// grafico trasversale con numero di punti fisso
     {
-        m_correct = false;
-#if 0
-        m_PointsToPrintout = m_num_sam;			//Deve stampare solo quelli necessari, quelli calcolati nella funzione review
-        // il numero di campioni da stampare e il numero di blocchi scritti su card; il -1 e perche per qualche motivo i campioni buoni nel buffer_vol vanno dallo 0 allo realDots-2
-        if( m_PointsToPrintout > NUMOF_X_PRINT_DOTS ) {
-            m_PointsToPrintout = NUMOF_X_PRINT_DOTS;
-            m_correct = true;
-        }
-#endif
         m_max_vol = buffer_vol[0];
         m_max_emg = 0;
 
@@ -551,8 +643,8 @@ void printermanager::Report_flw(double xscale)
     m_port->Pri_Str( strlen(str), str, 1 );
 
     // label solo su righe pari
-    for(int ub = 0; ub < 10; ub++ ) {                       /* scompone la griglia in 10 righe*/
-        Pri_Rep_Gra(ub);
+    for(int i = 0; i < 10; i++ ) {                       /* scompone la griglia in 10 righe*/
+        Pri_Rep_Gra(i);
     }
 
     m_port->Pri_mode(0x00);
@@ -594,20 +686,18 @@ void printermanager::Calc_Max(double xscale)
     int decina = m_flu_max / 10;
     m_max_y = (decina + 1) * 10;			// trovo la decina minima superiore al valore max
 
-    while (1) {
-        if (m_max_y <=  10) { m_max_y =  10; break; }
-        if (m_max_y <=  15) { m_max_y =  15; break; }
-        if (m_max_y <=  20) { m_max_y =  20; break; }
-        if (m_max_y <=  25) { m_max_y =  25; break; }
-        if (m_max_y <=  30) { m_max_y =  30; break; }
-        if (m_max_y <=  40) { m_max_y =  40; break; }
-        if (m_max_y <=  50) { m_max_y =  50; break; }
-        if (m_max_y <=  65) { m_max_y =  65; break; }
-        if (m_max_y <=  80) { m_max_y =  80; break; }
-        if (m_max_y <= 100) { m_max_y = 100; break; }
-        if (m_max_y <= 120) { m_max_y = 120; break; }
-        m_max_y = 150; break;
-    }
+    if (m_max_y <=  10) m_max_y =  10; else
+    if (m_max_y <=  15) m_max_y =  15; else
+    if (m_max_y <=  20) m_max_y =  20; else
+    if (m_max_y <=  25) m_max_y =  25; else
+    if (m_max_y <=  30) m_max_y =  30; else
+    if (m_max_y <=  40) m_max_y =  40; else
+    if (m_max_y <=  50) m_max_y =  50; else
+    if (m_max_y <=  65) m_max_y =  65; else
+    if (m_max_y <=  80) m_max_y =  80; else
+    if (m_max_y <= 100) m_max_y = 100; else
+    if (m_max_y <= 120) m_max_y = 120; else
+    m_max_y = 150;
 
     m_max_y_gr2 = ((long) ((m_max_vol + 10) / 100) + 1) * 100;	// 05 dicembre
 }
@@ -699,12 +789,7 @@ void printermanager::Pri_Rep_Gra(int __num_riga)
             int x_pt_prec = x_pt;                    /*94*8=752 punti x  i2=x1 della retta*/
             m_x1 = x_pt;
 
-            if (m_correct) {
-                x_pt = (int)((m_num_sam * uw6) / graf_g_x); // correzione nel caso di esami + lunghi di 752 campioni
-            }
-            else {
-                x_pt = (int) ((752 * uw6) / graf_g_x);             /*x_pt=x2 retta */
-            }
+            x_pt = (int) ((752 * uw6) / graf_g_x);             /*x_pt=x2 retta */
             m_y1 = flow_pt;
 
             flow_pt = 239 - (int) ((239 * buffer_flw[uw6]) / graf_g_fl); /*y2*/
@@ -1163,11 +1248,7 @@ void printermanager::Pri_Rep_Gra_EMG(int __num_riga)
         for (int ix = 1; ix < (m_num_sam - 1); ix++ ) 	     /*trovo estremi della retta passante per il campione uw6 uw6+1*/
         {
             m_x1 = x_pt;
-            if( m_correct )	{
-                x_pt = (int)(m_num_sam * ix / graf_g_x); // correzione nel caso di esami + lunghi di 752 campioni
-            } else {
-                x_pt = (int)((752 * ix) / graf_g_x);                     /*x_pt=x2 retta */
-            }
+            x_pt = (int)((752 * ix) / graf_g_x);                     /*x_pt=x2 retta */
             m_y1 = flow_pt;
 
             flow_pt = 239 - (int)(239 * fabs(buffer_emg[ix]) / graf_g_fl); /*y2*/
@@ -1584,8 +1665,8 @@ void printermanager::Pri_Rep_Label()
             print_udm_label(m_chVol, pos_4_this_string, dim_label);	// scritta dell'unita di misura dell'emg, cioe uV, scritta a fianco di ogni label numerica
         }
     }
-    // aggiungo la linea dell''asse  delle ordinate, in ogni colonna l'ultimo bit viene acceso
-    for(int i = 1; i < 101; i++) {
+    // aggiungo la linea dell'asse  delle ordinate, in ogni colonna l'ultimo bit viene acceso
+    for(int i = 3; i < 105; i++) {
         m_str_gr[_NUM_BYTE_CMD + i*(dots3D) - 2] = (char)0xFF;
         m_str_gr[_NUM_BYTE_CMD + i*(dots3D) - 1] = (char)0xFF;
     }
@@ -1813,45 +1894,18 @@ void printermanager::Pri_Rep_Gra_Landscape(short __num_sample, double xscale)
         int t_init_time_to_print = m_init_time_to_print;
 
         if(stamp_x_label == true) {
-            int first_char, second_char, third_char, num_char_label; //short fourth_char;
-            if(t_init_time_to_print > 99) {
-                num_char_label = 3;
-                first_char = t_init_time_to_print / 100;
-                init_pos_in_string = _NUM_BYTE_CMD + (num_char_label -3)*_HEIGHT_CHAR_LABEL;
-                for(int i = 0; i < _HEIGHT_CHAR_LABEL; i++ )    // scrivo il carattere delle centinaia per colonne come 1Bx13righe
-                    m_str_gr[ init_pos_in_string + i ] = (char)print8x8Set[ first_char*_WEIGHT_CHAR_LABEL + i];
-
-                init_pos_in_string = _NUM_BYTE_CMD + (num_char_label -2)*_HEIGHT_CHAR_LABEL;
-                second_char = ( t_init_time_to_print - ( first_char * 100 ) ) / 10;
-                for(int i = 0; i < _HEIGHT_CHAR_LABEL; i++ )    // scrivo il carattere delle decine per colonne come 1Bx13righe
-                    m_str_gr[init_pos_in_string + i ] = (char)print8x8Set[ second_char*_WEIGHT_CHAR_LABEL + i];
-
-                init_pos_in_string = _NUM_BYTE_CMD + (num_char_label - 1)*_HEIGHT_CHAR_LABEL;
-                third_char = ( t_init_time_to_print - ( first_char * 100 ) - ( second_char * 10 ) );
-                for(int i = 0; i < _HEIGHT_CHAR_LABEL; i++ )    // scrivo il carattere delle unita per colonne come 1Bx13righe
-                    m_str_gr[ init_pos_in_string + i ] = (char)print8x8Set[ third_char*_WEIGHT_CHAR_LABEL + i];
-            }
-            else {
-                if(t_init_time_to_print > 9) { 	// da 10 a 99 quindi 2 char
-                    num_char_label = 2;
-                    init_pos_in_string = _NUM_BYTE_CMD + (num_char_label-2)*_HEIGHT_CHAR_LABEL;
-                    second_char =  t_init_time_to_print / 10;
-                    for(int i = 0; i < _HEIGHT_CHAR_LABEL; i++) // scrivo il carattere delle decine per colonne come 1Bx13righe
-                        m_str_gr[ init_pos_in_string + i ] = (char)print8x8Set[ second_char*_WEIGHT_CHAR_LABEL + i];
-
-                    init_pos_in_string = _NUM_BYTE_CMD + (num_char_label-1)*_HEIGHT_CHAR_LABEL;
-                    third_char = t_init_time_to_print - ( second_char * 10 );
-                    for(int i = 0; i < _HEIGHT_CHAR_LABEL; i++) // scrivo il carattere delle unita per colonne come 1Bx13righe
-                        m_str_gr[ init_pos_in_string + i ] = (char)print8x8Set[ third_char*_WEIGHT_CHAR_LABEL + i];
+            bool doit = false;
+            int dig[3];
+            dig[0] = t_init_time_to_print / 100;
+            dig[1] = (t_init_time_to_print - (dig[0] * 100)) / 10;
+            dig[2] = t_init_time_to_print - (dig[0] * 100) - (dig[1] * 10);
+            for(int d = 0; d < 3; d++)
+                if((dig[d] > 0) || doit || (d == 2)) {
+                    doit = true;
+                    init_pos_in_string = _NUM_BYTE_CMD + d*_HEIGHT_CHAR_LABEL;
+                    for(int i = 0; i < _HEIGHT_CHAR_LABEL; i++ )
+                        m_str_gr[ init_pos_in_string + i ] = (char)print8x8Set[ dig[d]*_WEIGHT_CHAR_LABEL + i];
                 }
-                else {		// < 10 cioe un char
-                    num_char_label = 1;
-                    init_pos_in_string = _NUM_BYTE_CMD + (num_char_label-1)*_HEIGHT_CHAR_LABEL;
-                    third_char = t_init_time_to_print;
-                    for(int i = 0; i < _HEIGHT_CHAR_LABEL; i++) // scrivo il carattere delle unita per colonne come 1Bx13righe
-                        m_str_gr[ init_pos_in_string + i ] = (char)print8x8Set[ third_char*_WEIGHT_CHAR_LABEL + i];
-                }
-            }
         }
     }
 
@@ -2258,10 +2312,10 @@ void printermanager::Pri_Rep_asse_dx()
     m_str_gr[6]=0x00;	// n5	scrive a n5 byte dal bordo
     m_str_gr[7]=0x66;	// n6	larghezza 816dots=102 byte
 
-    // aggiungo la linea dell''asse  delle ordinate, in ogni colonna il primo bit viene acceso
+    // aggiungo la linea dell'asse  delle ordinate, in ogni colonna il primo bit viene acceso
     m_str_gr[_NUM_BYTE_CMD] = (char)0x01;
     m_str_gr[_NUM_BYTE_CMD + 1] = (char)0x01;
-    for(int i = 1; i < 101; i++)
+    for(int i = 2; i < 105; i++)
     {	// riga doppia
         m_str_gr[_NUM_BYTE_CMD + i*(_NUM_CHAR_X_AXES_DX * _HEIGHT_CHAR_LABEL)] = (char)0xFF;
         m_str_gr[_NUM_BYTE_CMD + i*(_NUM_CHAR_X_AXES_DX * _HEIGHT_CHAR_LABEL) + 1] = (char)0xFF;
@@ -2616,7 +2670,6 @@ void printermanager::printTest()
     m_modal_e = 0;
     m_numTest = -1;
     m_test_type = false;
-    m_correct = false;
     m_emgPresent = false;
     m_i_max_x = -1;
     m_max_y = -1;
