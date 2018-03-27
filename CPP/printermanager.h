@@ -91,21 +91,20 @@
 #define __ZERO_ASSE_EMG__
 #define __ZERO_ASSE_SIROKY__
 #define __DATI_GRAF_FLUSSO__
-#define __DATI_GRAF_EMG__
 
 #define __DEV_STD__
 #define __LABEL_SD__
 #define __POINT__
 
 //per stampare
-#define PRI_REP_INT     1   /* Flag Stampa Report : Intestazione          */
-#define PRI_REP_IDE     1   /* Flag Stampa Report : Identificativi Esame  */
-#define PRI_REP_MODAL	1   /* Flag stampa Report : modalita d'esame      */
-#define PRI_REP_GRA     1   /* Flag Stampa Report : Grafico               */
-#define PRI_REP_SRK     1   /* Flag Stampa Report : Siroky                */
-#define PRI_REP_RIS     1   /* Flag Stampa Report : Risultati             */
-#define PRI_REP_POS     0   /* Flag Stampa Report : Postfazione e indicazione calibrazione, per debug */
-#define PRI_REP_SPA     1	  /* Flag Stampa Report : Spazi per strappare   */
+//#define PRI_REP_INT     1   /* Flag Stampa Report : Intestazione          */
+//#define PRI_REP_IDE     1   /* Flag Stampa Report : Identificativi Esame  */
+//#define PRI_REP_MODAL	1   /* Flag stampa Report : modalita d'esame      */
+//#define PRI_REP_GRA     1   /* Flag Stampa Report : Grafico               */
+//#define PRI_REP_SRK     1   /* Flag Stampa Report : Siroky                */
+//#define PRI_REP_RIS     1   /* Flag Stampa Report : Risultati             */
+//#define PRI_REP_POS     0   /* Flag Stampa Report : Postfazione e indicazione calibrazione, per debug */
+//#define PRI_REP_SPA     1	  /* Flag Stampa Report : Spazi per strappare   */
 
 //per le stringhe
 //#define NON_SOTTLINEA   "\x1bU\x0"	// \x 1B U \x 0 che significa 1B = ESC; U = modo sottolineatura; 0 = stampa normale
@@ -142,121 +141,7 @@
 #define	LOBYTE(x)             ((unsigned char) ((x) & 0xff))
 #define	HIBYTE(x)             ((unsigned char) ((x) >> 8))
 
-const char str_label_time_old[29][68]={
-    "   0    3     6     9    12    15    18    21    24    27   30s",
-    "   0    6     12   18    24    30    36    42    48    54   60s",
-    "   0    9     18   27    36    45    54    63    72    81   90s",
-    "   0    12    24   36    48    60    72    84    96   108  120s",
-    "   0    15    30   45    60    75    90   105   120   135  150s",
-    "   0    18    36   54    72    90   108   126   144   162  180s",
-    "   0    21    42   63    84   105   126   147   168   189  210s",
-    "   0    24    48   72    96   120   144   168   192   216  240s",
-    "   0    27    54   81   108   135   162   189   216   243  270s",
-    "   0    30    60   90   120   150   180   210   240   270  300s",
-    "   0    36    72  108   144   180   216   252   288   324  360s",
-    "   0    42    84  126   168   210   252   294   336   378  420s",
-    "   0    48    96  144   192   240   288   336   384   432  480s",
-    "   0    54   108  162   216   260   314   368   422   476  540s",
-    "   0    60   120  180   240   300   360   420   480   540  600s",
-    "   0    66   132  198   264   330   396   462   528   594  660s",
-    "   0    72   144  216   288   360   432   504   586   658  720s",
-    "   0    78   156  234   312   390   468   546   624   702  780s",
-    "   0    84   168  252   336   420   504   588   668   752  840s",
-    "   0    90   180  270   360   450   540   630   720   810  900s",/* 15*60=900*/
-    "   0    96   192  288   384   480   576   672   768   864  960s",
-    "   0   102   204  306   408   510   612   714   816   918 1020s",
-    "   0   108   216  324   432   540   648   756   864   972 1080s",
-    "   0   114   228  342   456   570   684   798   912  1026 1140s",
-    "   0    2m    4m   6m    8m   10m   12m   14m   16m   18m   20m",
-    "   0          9          18          27          36         45s",
-    "   0          15         30          45          60         75s",
-    "   0          21         42          63          84        105s",
-    "   0          27         54          81         108        135s"
-};
 
-const char str_label_time[29][68]={
-    "   0          6          12          18          24         30s",
-    "   0          12         24          36          48         60s",
-    "   0          18         36          54          72         90s",
-    "   0        00:24      00:48       01:12       01:36      02:00",
-    "   0        00:30      01:00       01:30       02:00      02:30",
-    "   0        00:36      01:12       01:48       02:24      03:00",
-    "   0        00:42      01:24       02:06       02:48      03:30",
-    "   0        00:48      01:36       02:24       03:12      04:00",
-    "   0        00:54      01:48       02:42       03:36      04:30",
-    "   0        01:00      02:00       03:00       04:00      05:00",
-    "   0        01:12      01:24       03:36       04:48      06:00",
-    "   0        01:24      02:48       04:12       05:36      07:00",
-    "   0        01:36      03:12       04:48       06:24      08:00",
-    "   0        01:48      03:36       05:24       07:12      09:00",
-    "   0        02:00      04:00       06:00       08:00      10:00",
-    "   0        02:12      04:24       06:36       08:48      11:00",
-    "   0        02:24      04:48       07:12       09:36      12:00",
-    "   0        02:36      05:12       07:48       10:24      13:00",
-    "   0        02:48      05:36       08:24       11:12      14:00",
-    "   0        03:00      06:00       09:00       12:00      15:00",/* 15*60=900*/
-    "   0        03:12      06:24       09:36       12:48      16:00",
-    "   0        03:24      06:48       10:12       13:36      17:00",
-    "   0        03:36      07:12       10:48       14:24      18:00",
-    "   0        03:48      07:36       11:24       15:12      19:00",
-    "   0        04:00      08:00       12:00       16:00      20:00",
-    "   0          9          18          27          36         45s",
-    "   0        00:15      00:30       01:45       01:00      01:15",
-    "   0        00:21      00:42       01:03       01:24      01:45",
-    "   0        00:27      00:54       01:21       01:48      02:15"
-};
-
-// numeri ruotati di 90? in senso orario
-const unsigned char  print8x8Set[] = {
-    0x3C, 0x7E, 0x81, 0x81, 0x7E, 0x3C, 0x00, 0x00,      /*   0 - 30 - 0 */
-    0x84, 0x82, 0xFF, 0xFF, 0x80, 0x80, 0x00, 0x00,      /*   1 - 31 - 1 */
-    0xC2, 0xE3, 0xB1, 0x99, 0x8F, 0x86, 0x00, 0x00,      /*   2 - 32 - 2 */
-    0x42, 0xC3, 0x81, 0x99, 0xFF, 0x66, 0x00, 0x00,      /*   3 - 33 - 3 */
-    0x30, 0x28, 0x24, 0x23, 0xFF, 0x20, 0x00, 0x00,      /*   4 - 34 - 4 */
-    0x8F, 0x89, 0x89, 0xD9, 0x71, 0x00, 0x00, 0x00,     /*   5 - 35 - 5 */
-    0x7E, 0x8B, 0x89, 0x89, 0xDB, 0x72, 0x00, 0x00,      /*   6 - 36 - 6 */
-    0x81, 0xD1, 0x71, 0x39, 0x1D, 0x17, 0x03, 0x00,      /*   7 - 37 - 7 */
-    0x66, 0x7E, 0x99, 0x99, 0x7E, 0x66, 0x00, 0x00,     /*   8 - 38 - 8 */
-    0x4E, 0xDB, 0x91, 0x91, 0xDB, 0x7E, 0x00, 0x00,     /*   9 - 39 - 9 */
-    0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0xC0, 0xC0,     /*  .   	10 */
-    0xF8, 0x1C, 0x1C, 0xF8, 0xF8, 0x1C, 0x1C, 0xF8,	/* m 	11 */
-    0x00, 0x00, 0xFF, 0xFF, 0xC0, 0xC0, 0x00, 0x00,	/* L 	12 */ /* mL/s*/
-    0xC0, 0xE0, 0x70, 0x38, 0x1C, 0x0E, 0x07, 0x0C,	/* / 	13 */
-    0x00, 0x98, 0x9C, 0xB4, 0xB4, 0xE4, 0x64, 0x00,	/* s		14 */
-    0x80, 0xFC, 0x7C, 0xE0, 0xC0, 0xE0, 0x7C, 0x3C,	/* u		15 */
-    0x07, 0x1E, 0x70, 0xC0, 0xC0, 0x70, 0x1E, 0x07,	/* V 	16 */
-    0x00, 0x20, 0x78, 0xa4, 0xa4, 0xa4, 0x18, 0x00,	/* e		17 */
-    0x00, 0x00, 0x78, 0x84, 0x84, 0x84, 0x84, 0x00,	/* c		18 */
-};
-const unsigned char  print7x13Set[]  = {
-        0x00, 0x00, 0x30, 0x48, 0xCC, 0xCC, 0xCC, 0xCC, 0xCC, 0x48, 0x30, 0x00, 0x00,      /*   0 - 30 - 0 */
-        0x00, 0x00, 0x30, 0x70, 0xB0, 0x30, 0x30, 0x30, 0x30, 0x30, 0xFC, 0x00, 0x00,      /*   1 - 31 - 1 */
-        0x00, 0x00, 0x78, 0xCC, 0xCC, 0x0C, 0x38, 0x60, 0xC0, 0xC0, 0xFC, 0x00, 0x00,      /*   2 - 32 - 2 */
-        0x00, 0x00, 0x78, 0xCC, 0x0C, 0x0C, 0x38, 0x0C, 0x0C, 0xCC, 0x78, 0x00, 0x00,      /*   3 - 33 - 3 */
-        0x00, 0x00, 0x0C, 0x1C, 0x3C, 0x6C, 0xCC, 0xCC, 0xFC, 0x0C, 0x0C, 0x00, 0x00,      /*   4 - 34 - 4 */
-        0x00, 0x00, 0xFC, 0xC0, 0xC0, 0xF8, 0xCC, 0x0C, 0x0C, 0xCC, 0x78, 0x00, 0x00,      /*   5 - 35 - 5 */
-        0x00, 0x00, 0x78, 0xCC, 0xC0, 0xC0, 0xF8, 0xCC, 0xCC, 0xCC, 0x78, 0x00, 0x00,      /*   6 - 36 - 6 */
-        0x00, 0x00, 0xFC, 0x0C, 0x0C, 0x18, 0x18, 0x30, 0x30, 0x60, 0x60, 0x00, 0x00,      /*   7 - 37 - 7 */
-        0x00, 0x00, 0x78, 0xCC, 0xCC, 0xCC, 0x78, 0xCC, 0xCC, 0xCC, 0x78, 0x00, 0x00,      /*   8 - 38 - 8 */
-        0x00, 0x00, 0x78, 0xCC, 0xCC, 0xCC, 0x7C, 0x0C, 0x0C, 0xCC, 0x78, 0x00, 0x00,      /*   9 - 39 - 9 */
-        };
-const unsigned char  print8x10SetSD[]  = {
-        0x00, 0x0E, 0x11, 0x11, 0x11, 0x11, 0x11, 0x11, 0x11, 0x0E,	/* " 0" */
-        0x00, 0x02, 0x06, 0x0A, 0x02, 0xF2, 0x02, 0x02, 0x02, 0x07,	/* "-1" */
-        0x00, 0x06, 0x09, 0x01, 0x01, 0x72, 0x04, 0x08, 0x08, 0x0F,	/* "-2" */
-        0x00, 0x06, 0x09, 0x01, 0x01, 0x77, 0x01, 0x01, 0x09, 0x06,	/* "-3" */
-};
-
-const unsigned char  SD[2][4][20] =
-{{{50, 63, 74, 84, 95,105,114,123,132,140,147,154,160,166,170,174,176,178,178,179},
-  {34, 44, 54, 62, 70, 78, 84, 91, 98,104,110,116,121,126,130,133,136,139,141,141},
-  {10, 19, 26, 34, 40, 46, 52, 58, 64, 70, 75, 79, 84, 88, 93, 98,102,104,106,106},
-  { 0,  0, 10, 16, 21, 26, 30, 34, 37, 40, 43, 47, 50, 53, 55, 58, 60, 62, 64, 66}},
- {{ 0, 96,110,122,134,145,156,166,176,186,195,204,211,217,223,228,231,233,234,234},
-  { 0, 80, 91,101,110,119,127,135,143,150,156,162,166,171,174,176,177,178,179,179},
-  { 0, 59, 67, 74, 80, 86, 91, 96,100,104,108,111,114,116,118,119,120,121,122,122},
-  { 0, 41, 48, 51, 54, 55, 57, 58, 59, 60, 62, 62, 63, 64, 64, 64, 64, 65, 65, 66}}
-};
 
 typedef struct{
     int uw8;
@@ -271,7 +156,7 @@ class printermanager : public QObject
     Q_OBJECT
 public:
     explicit printermanager(QString __namefile, QObject *parent = 0);
-    explicit printermanager(QObject *parent = 0) {}
+    explicit printermanager(/*QObject *parent = 0*/) {}
     ~printermanager();
 
     void print();
@@ -363,12 +248,11 @@ private:
 
     //report
     unsigned short m_realDots;
-    bool m_correct;
     unsigned short 	m_PointsToPrintout; //Numero di campioni da stampare ottenuto lanciando a fine esame SamplesToPrint
     double m_max_vol, m_max_emg;
     bool m_emgPresent;
-    unsigned char	m_i_max_x;
-    long  			m_max_x,m_max_y,m_max_y_gr2;
+    int         	m_i_max_x;
+    long  			m_max_y,m_max_y_gr2;
     int             m_x1,m_y1,m_x2,m_y2;
     int   			m_num_xy;
     int   	m_x[25];
@@ -376,15 +260,11 @@ private:
     unsigned short 	m_uw3; // dimensioni in byte della riga n-esima dell'area grafico
     char 	m_str_gr[dim_string_rel2];	// allocazione dinamica ma all'inizio dello stringone che sara usato per i label dei grafici
     char 	m_str_tr[dim_string_rel2];			// trasposizione stringa per ottenere matrice di punti per stampa grafica
-    QVector<unsigned short int> m_flow_store;
-    QVector<unsigned short int> m_vol_store;
-    QVector<unsigned short int> m_emg_store;
     int m_init_time_to_print;
     short m_num_byte_x_gra;
     short m_pos_gra_flw,m_pos_gra_emg, m_pos_gra_vol;
-    short m_num_dots_gra_vol, m_num_dots_gra_flw  /*, m_num_dots_gra_emg*/;
+    short m_num_dots_gra_vol, m_num_dots_gra_flw, m_num_dots_gra_emg;
     short m_num_byte_x_gra_emg, m_num_byte_x_gra_vol, m_num_byte_x_gra_flw;
-    short guard_l, m_num_dots_gra_emg, guard_h;
     unsigned short m_cursore;
 
     int         m_resultBm_w, m_resultBm_h;
@@ -394,18 +274,18 @@ private:
     void smooting_PRINT_flow();
     void pri_rep_review();
     //report
-    void Pri_Rep();
+    void Pri_Rep(double xscale);
     void Intest();
     void Report_data();
-    void Report_flw();
+    void Report_flw(double xscale);
     void Report_emg();
-    void Report_Real_Time(short __num_sample);
+    void Report_Real_Time(short __num_sample, double xscale);
 
     void Report_result();
     void Pri_Rep_Gra(int __num_riga);
     void Pri_Rep_Gra_Ini_Grid(int __n_riga);
-    void Pri_Rep_Gra_EMG(unsigned char __num_riga);
-    void Pri_Rep_Gra_Landscape(short __num_sample);
+    void Pri_Rep_Gra_EMG(int __num_riga);
+    void Pri_Rep_Gra_Landscape(short __num_sample, double xscale);
     void Pri_Rep_asse_dx();
     void Pri_Rep_Label();
     void Pri_Rep_Lin(char *__str_des, int __rep_dat, unsigned char __num_dec, char *__str_udm, unsigned char __flag_lf);
@@ -415,7 +295,7 @@ private:
     void Str_Trasposta(unsigned char __type, unsigned short __sx_byte, unsigned short __dx_byte); // crea la trasposta della stringa str_gr, ottenendo una matrice scritta per righe
     short adatta_buffer_dati(int __num_sample, long __fs_flw);
     void Calc_Max_RealReport_rel2(short __num_sample);
-    void Calc_Max();
+    void Calc_Max(double xscale);
     void Calc_Max_EMG();
     long Calc_Max_Flw();
     void print_char_left_label(short __value, int __pos_in_string, short int __num_char, bool __pri_decim, short int __pre_char);

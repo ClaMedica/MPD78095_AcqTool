@@ -1,4 +1,124 @@
-﻿#include "printermanager.h"
+﻿
+#include "printermanager.h"
+
+//const char str_label_time_old[29][68]={
+//    "   0    3     6     9    12    15    18    21    24    27   30s",
+//    "   0    6     12   18    24    30    36    42    48    54   60s",
+//    "   0    9     18   27    36    45    54    63    72    81   90s",
+//    "   0    12    24   36    48    60    72    84    96   108  120s",
+//    "   0    15    30   45    60    75    90   105   120   135  150s",
+//    "   0    18    36   54    72    90   108   126   144   162  180s",
+//    "   0    21    42   63    84   105   126   147   168   189  210s",
+//    "   0    24    48   72    96   120   144   168   192   216  240s",
+//    "   0    27    54   81   108   135   162   189   216   243  270s",
+//    "   0    30    60   90   120   150   180   210   240   270  300s",
+//    "   0    36    72  108   144   180   216   252   288   324  360s",
+//    "   0    42    84  126   168   210   252   294   336   378  420s",
+//    "   0    48    96  144   192   240   288   336   384   432  480s",
+//    "   0    54   108  162   216   260   314   368   422   476  540s",
+//    "   0    60   120  180   240   300   360   420   480   540  600s",
+//    "   0    66   132  198   264   330   396   462   528   594  660s",
+//    "   0    72   144  216   288   360   432   504   586   658  720s",
+//    "   0    78   156  234   312   390   468   546   624   702  780s",
+//    "   0    84   168  252   336   420   504   588   668   752  840s",
+//    "   0    90   180  270   360   450   540   630   720   810  900s",/* 15*60=900*/
+//    "   0    96   192  288   384   480   576   672   768   864  960s",
+//    "   0   102   204  306   408   510   612   714   816   918 1020s",
+//    "   0   108   216  324   432   540   648   756   864   972 1080s",
+//    "   0   114   228  342   456   570   684   798   912  1026 1140s",
+//    "   0    2m    4m   6m    8m   10m   12m   14m   16m   18m   20m",
+//    "   0          9          18          27          36         45s",
+//    "   0          15         30          45          60         75s",
+//    "   0          21         42          63          84        105s",
+//    "   0          27         54          81         108        135s"
+//};
+
+const char *str_label_time[] = {
+//    "   0          6          12          18          24         30s",
+//    "   0          9          18          27          36         45s",
+//    "   0         12          24          36          48         60s",
+    "   0         0:15       0:30        1:45        1:00       1:15",
+    "   0         0:18       0:36        0:54        1:12       1:30",
+    "   0         0:21       0:42        1:03        1:24       1:45",
+    "   0         0:24       0:48        1:12        1:36       2:00",
+    "   0         0:27       0:54        1:21        1:48       2:15",
+    "   0         0:30       1:00        1:30        2:00       2:30",
+    "   0         0:36       1:12        1:48        2:24       3:00",
+    "   0         0:42       1:24        2:06        2:48       3:30",
+    "   0         0:48       1:36        2:24        3:12       4:00",
+    "   0         0:54       1:48        2:42        3:36       4:30",
+    "   0         1:00       2:00        3:00        4:00       5:00",
+    "   0         1:12       1:24        3:36        4:48       6:00",
+    "   0         1:24       2:48        4:12        5:36       7:00",
+    "   0         1:36       3:12        4:48        6:24       8:00",
+    "   0         1:48       3:36        5:24        7:12       9:00",
+    "   0         2:00       4:00        6:00        8:00      10:00",
+    "   0         2:12       4:24        6:36        8:48      11:00",
+    "   0         2:24       4:48        7:12        9:36      12:00",
+    "   0         2:36       5:12        7:48       10:24      13:00",
+    "   0         2:48       5:36        8:24       11:12      14:00",
+    "   0         3:00       6:00        9:00       12:00      15:00",/* 15*60=900*/
+    "   0         3:12       6:24        9:36       12:48      16:00",
+    "   0         3:24       6:48       10:12       13:36      17:00",
+    "   0         3:36       7:12       10:48       14:24      18:00",
+    "   0         3:48       7:36       11:24       15:12      19:00",
+    "   0         4:00       8:00       12:00       16:00      20:00",
+    "xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx"
+};
+
+// numeri ruotati di 90? in senso orario
+const unsigned char  print8x8Set[] = {
+    0x3C, 0x7E, 0x81, 0x81, 0x7E, 0x3C, 0x00, 0x00,      /*   0 - 30 - 0 */
+    0x84, 0x82, 0xFF, 0xFF, 0x80, 0x80, 0x00, 0x00,      /*   1 - 31 - 1 */
+    0xC2, 0xE3, 0xB1, 0x99, 0x8F, 0x86, 0x00, 0x00,      /*   2 - 32 - 2 */
+    0x42, 0xC3, 0x81, 0x99, 0xFF, 0x66, 0x00, 0x00,      /*   3 - 33 - 3 */
+    0x30, 0x28, 0x24, 0x23, 0xFF, 0x20, 0x00, 0x00,      /*   4 - 34 - 4 */
+    0x8F, 0x89, 0x89, 0xD9, 0x71, 0x00, 0x00, 0x00,     /*   5 - 35 - 5 */
+    0x7E, 0x8B, 0x89, 0x89, 0xDB, 0x72, 0x00, 0x00,      /*   6 - 36 - 6 */
+    0x81, 0xD1, 0x71, 0x39, 0x1D, 0x17, 0x03, 0x00,      /*   7 - 37 - 7 */
+    0x66, 0x7E, 0x99, 0x99, 0x7E, 0x66, 0x00, 0x00,     /*   8 - 38 - 8 */
+    0x4E, 0xDB, 0x91, 0x91, 0xDB, 0x7E, 0x00, 0x00,     /*   9 - 39 - 9 */
+    0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0xC0, 0xC0,     /*  .   	10 */
+    0xF8, 0x1C, 0x1C, 0xF8, 0xF8, 0x1C, 0x1C, 0xF8,	/* m 	11 */
+    0x00, 0x00, 0xFF, 0xFF, 0xC0, 0xC0, 0x00, 0x00,	/* L 	12 */ /* mL/s*/
+    0xC0, 0xE0, 0x70, 0x38, 0x1C, 0x0E, 0x07, 0x0C,	/* / 	13 */
+    0x00, 0x98, 0x9C, 0xB4, 0xB4, 0xE4, 0x64, 0x00,	/* s		14 */
+    0x80, 0xFC, 0x7C, 0xE0, 0xC0, 0xE0, 0x7C, 0x3C,	/* u		15 */
+    0x07, 0x1E, 0x70, 0xC0, 0xC0, 0x70, 0x1E, 0x07,	/* V 	16 */
+    0x00, 0x20, 0x78, 0xa4, 0xa4, 0xa4, 0x18, 0x00,	/* e		17 */
+    0x00, 0x00, 0x78, 0x84, 0x84, 0x84, 0x84, 0x00,	/* c		18 */
+};
+
+const unsigned char  print7x13Set[]  = {
+        0x00, 0x00, 0x30, 0x48, 0xCC, 0xCC, 0xCC, 0xCC, 0xCC, 0x48, 0x30, 0x00, 0x00,      /*   0 - 30 - 0 */
+        0x00, 0x00, 0x30, 0x70, 0xB0, 0x30, 0x30, 0x30, 0x30, 0x30, 0xFC, 0x00, 0x00,      /*   1 - 31 - 1 */
+        0x00, 0x00, 0x78, 0xCC, 0xCC, 0x0C, 0x38, 0x60, 0xC0, 0xC0, 0xFC, 0x00, 0x00,      /*   2 - 32 - 2 */
+        0x00, 0x00, 0x78, 0xCC, 0x0C, 0x0C, 0x38, 0x0C, 0x0C, 0xCC, 0x78, 0x00, 0x00,      /*   3 - 33 - 3 */
+        0x00, 0x00, 0x0C, 0x1C, 0x3C, 0x6C, 0xCC, 0xCC, 0xFC, 0x0C, 0x0C, 0x00, 0x00,      /*   4 - 34 - 4 */
+        0x00, 0x00, 0xFC, 0xC0, 0xC0, 0xF8, 0xCC, 0x0C, 0x0C, 0xCC, 0x78, 0x00, 0x00,      /*   5 - 35 - 5 */
+        0x00, 0x00, 0x78, 0xCC, 0xC0, 0xC0, 0xF8, 0xCC, 0xCC, 0xCC, 0x78, 0x00, 0x00,      /*   6 - 36 - 6 */
+        0x00, 0x00, 0xFC, 0x0C, 0x0C, 0x18, 0x18, 0x30, 0x30, 0x60, 0x60, 0x00, 0x00,      /*   7 - 37 - 7 */
+        0x00, 0x00, 0x78, 0xCC, 0xCC, 0xCC, 0x78, 0xCC, 0xCC, 0xCC, 0x78, 0x00, 0x00,      /*   8 - 38 - 8 */
+        0x00, 0x00, 0x78, 0xCC, 0xCC, 0xCC, 0x7C, 0x0C, 0x0C, 0xCC, 0x78, 0x00, 0x00,      /*   9 - 39 - 9 */
+        };
+
+const unsigned char  print8x10SetSD[]  = {
+        0x00, 0x0E, 0x11, 0x11, 0x11, 0x11, 0x11, 0x11, 0x11, 0x0E,	/* " 0" */
+        0x00, 0x02, 0x06, 0x0A, 0x02, 0xF2, 0x02, 0x02, 0x02, 0x07,	/* "-1" */
+        0x00, 0x06, 0x09, 0x01, 0x01, 0x72, 0x04, 0x08, 0x08, 0x0F,	/* "-2" */
+        0x00, 0x06, 0x09, 0x01, 0x01, 0x77, 0x01, 0x01, 0x09, 0x06,	/* "-3" */
+};
+
+const unsigned char  SD[2][4][20] = {
+        {{50, 63, 74, 84, 95,105,114,123,132,140,147,154,160,166,170,174,176,178,178,179},
+         {34, 44, 54, 62, 70, 78, 84, 91, 98,104,110,116,121,126,130,133,136,139,141,141},
+         {10, 19, 26, 34, 40, 46, 52, 58, 64, 70, 75, 79, 84, 88, 93, 98,102,104,106,106},
+         { 0,  0, 10, 16, 21, 26, 30, 34, 37, 40, 43, 47, 50, 53, 55, 58, 60, 62, 64, 66}},
+        {{ 0, 96,110,122,134,145,156,166,176,186,195,204,211,217,223,228,231,233,234,234},
+         { 0, 80, 91,101,110,119,127,135,143,150,156,162,166,171,174,176,177,178,179,179},
+         { 0, 59, 67, 74, 80, 86, 91, 96,100,104,108,111,114,116,118,119,120,121,122,122},
+         { 0, 41, 48, 51, 54, 55, 57, 58, 59, 60, 62, 62, 63, 64, 64, 64, 64, 65, 65, 66}}
+    };
 
 
 printermanager::printermanager(QString __namefile, QObject *parent) : QObject(parent)
@@ -17,10 +137,8 @@ printermanager::printermanager(QString __namefile, QObject *parent) : QObject(pa
     m_modal_e = 0;
     m_numTest = -1;
     m_test_type = false;
-    m_correct = false;
     m_emgPresent = false;
     m_i_max_x = -1;
-    m_max_x = -1;
     m_max_y = -1;
     m_uw3 = 1;
     m_cursore = 0;
@@ -43,6 +161,9 @@ printermanager::printermanager(QString __namefile, QObject *parent) : QObject(pa
     m_bitmapSiroky.fill(0);
     m_bitmapLiverpool.fill(0);
 
+//    m_flow_store = NULL;
+//    m_vol_store = NULL;
+//    m_emg_store = NULL;
     buffer_emg = NULL;
     buffer_flw = NULL;
     buffer_vol = NULL;
@@ -108,20 +229,7 @@ void printermanager::print()
     }
     m_num_sam = minNas * m_durata;
     m_realDots = m_num_sam;
-
-    // Dati relativi alla stampa
-//    if (m_num_sam >= NUMOF_X_PRINT_DOTS) {
-//        if(m_printMode == PORTRAIT_MODE)
-//            m_realDots = NUMOF_X_PRINT_DOTS;
-//        else	// cioe nel caso di Report_Print_Mode = Landscape
-//        {
-//            if(m_num_sam > NUMOFMAX_LEGHT_PORTRAIT_REP)	// esame troppo lungo per la modalita di stampa LANDSCAPE (5minuti)
-//            {
-//                m_printMode = PORTRAIT_MODE;
-//                m_realDots = NUMOF_X_PRINT_DOTS;
-//            }
-//        }
-//    }
+    qDebug("m_num_sam: %d",m_num_sam);
 
     m_dfm->Close();
 
@@ -131,44 +239,113 @@ void printermanager::print()
 void printermanager::pri_rep_review()
 {
     qDebug("pri_rep_review()");
+    int n_chEmg, n_chFlw, n_chVol;
 
     m_dfm->Open();
     m_dfm->GetParameters();
     int numCh = m_numchan;
 
-    if(buffer_emg == NULL)
-        buffer_emg = new double[NUMOF_X_PRINT_DOTS];
-    if(buffer_flw == NULL)
-        buffer_flw = new double[NUMOF_X_PRINT_DOTS];
-    if(buffer_vol == NULL)
-        buffer_vol = new double[NUMOF_X_PRINT_DOTS];
+    m_chEmg = m_chFlw = m_chVol = -1;
+    n_chEmg = n_chFlw = n_chVol = -1;
 
-//    if (m_printMode == PORTRAIT_MODE)
-    {
-        double    xscale = (double)(NUMOF_X_PRINT_DOTS) / m_realDots;
+    if(buffer_emg != NULL)
+        delete buffer_emg;
+    if(buffer_flw != NULL)
+        delete buffer_flw;
+    if(buffer_vol != NULL)
+        delete buffer_vol;
+    buffer_emg = buffer_flw = buffer_vol = NULL;
+
+    // caricamento dati dei canali
+    for (int c = 0; c < numCh; c++) {
+        QString chName = m_dfm->GetChanName(c);
+        if(chName.startsWith("EMG")) {
+            m_chEmg = c;
+            n_chEmg = m_dfm->GetSamplesNumber(c);
+            buffer_emg = new double[n_chEmg];
+            m_dfm->GetChVal(c, 0, n_chEmg, buffer_emg, 0);
+            qDebug("emg: %d", n_chEmg);
+        }
+        if (chName.startsWith("Q")) {
+            m_chFlw = c;
+            n_chFlw = m_dfm->GetSamplesNumber(c);
+            buffer_flw = new double[n_chFlw];
+            m_dfm->GetChVal(c, 0, n_chFlw, buffer_flw, 0);
+            qDebug("Flw: %d", n_chFlw);
+        }
+        if (chName.startsWith("VV") || chName ==  "VLMv" ) {
+            m_chVol = c;
+            n_chVol = m_dfm->GetSamplesNumber(c);
+            buffer_vol = new double[n_chVol];
+            m_dfm->GetChVal(c, 0, n_chVol, buffer_vol, 0);
+            qDebug("vol: %d", n_chVol);
+        }
+    }
+
+    // allineamento lunghezze tra canali
+    int real_lenght = (n_chVol > n_chFlw) ? n_chFlw : n_chVol;
+    if(real_lenght > 20*60*10)
+        real_lenght = 20*60*10;
+    qDebug("real_lenght: %d", real_lenght);
+
+    // emg: allineamento lunghezze e decimazione valori
+    if(m_chEmg >= 0) {
+        int lim = real_lenght * 10;
+
+        if(lim > n_chEmg) {                     // allineamento lunghezze
+            double * p = new double[lim];
+            for(int i = 0; i < n_chEmg; i++)
+                p[i] = buffer_emg[i];
+            for(int i = n_chEmg; i < lim; i++)  // azzeramento valori mancanti
+                p[i] = 0.0;
+            delete buffer_emg;
+            buffer_emg = p;
+        }
+
+        double * p = new double[real_lenght];   // decimazione
+        for(int i = 0; i < real_lenght; i++) {
+            double v = 0.0;
+            for(int m = i*10; m < (i+1)*10; m++)
+                v += fabs(buffer_emg[m]);
+            p[i] = v / 10.0;
+        }
+        delete buffer_emg;
+        buffer_emg = p;
+
+        n_chEmg = real_lenght;
+        m_emgPresent = true;
+    }
+
+    double  xscale;
+    if(m_printMode == PORTRAIT_MODE) {
+        xscale = ((double) NUMOF_X_PRINT_DOTS) / real_lenght;
         if(xscale > 1.0)
-                xscale = 1.0;
-        for (int c = 0; c < numCh; c++) {
-            QString chName = m_dfm->GetChanName(c);
-            qDebug() << "getChanName()" << c << chName;
-            if(chName.startsWith("EMG")) {
-                m_chEmg = c;
-                int n = m_dfm->GetSamplesNumber(c);
-                double  * vtmp = new double[n];
-                qDebug() << "n:" << n << "m_realDots:" << m_realDots;
-                m_dfm->GetChVal(c, 0, n, vtmp, 0);
-                qDebug("got it");
-                int ilast = -1; // indice su cui accumula la media, riferito a NUMOF_X_PRINT_DOTS
+            xscale = 1.0;
+    }
+    else
+        xscale = 0.8;   // 1mm = 1sec, 1mm = 8 linee, 10 campioni --> 8 linee
+    qDebug("real_lenght:%d xscale:%.6f", real_lenght, xscale);
+
+    // compressione asse X con fattore xscale per i 3 buffer
+    if(xscale != 1.0) {
+        double *bufp[3];
+        bufp[0] = buffer_emg;
+        bufp[1] = buffer_flw;
+        bufp[2] = buffer_vol;
+        for(int ibuf = 0; ibuf < 3; ibuf++) {
+            double * bufX = bufp[ibuf];
+            if(bufX != NULL) {
+                int ilast = -1; // indice destinazione su cui accumula la media, riferito a nsample
                 int icnt  = 0;
                 double isum = 0.0;
-                for(int i = 0; i < (m_realDots*10); i++) {
-                    double v = vtmp[i];
-                    int ivirt = (int)(i*xscale / 10);   // virtual index
+                for(int i = 0; i < real_lenght; i++) {
+                    double v = bufX[i];
+                    int ivirt = (int)(i*xscale);        // virtual destination index
                     if(ilast < 0)
                         ilast = ivirt;
-                    if(ivirt != ilast) {    // nuova posizione: scaricare la media in [ilast]
-                        buffer_emg[ilast] = isum / icnt;    // scarica valore precedente
-                        isum = 0.0;     // nuova posizione: media a 0.0
+                    if(ivirt != ilast) {                // nuova posizione: scaricare la media in [ilast]
+                        bufX[ilast] = isum / icnt;      // scarica valore precedente
+                        isum = 0.0;                     // nuova posizione: media a 0.0
                         icnt = 0;
                         ilast = ivirt;
                     }
@@ -176,83 +353,34 @@ void printermanager::pri_rep_review()
                     isum += v;          // aggiorna la media
                     icnt++;
                 }
-                m_emgPresent = true;
-                qDebug("fine get emg");
-            }
-            if (chName.startsWith("Q")) {
-                m_chFlw = c;
-                int n = m_dfm->GetSamplesNumber(c);
-                double  * vtmp = new double[n];
-                m_dfm->GetChVal(c, 0, n, vtmp, 0);
-                int ilast = -1; // indice su cui accumula la media, riferito a NUMOF_X_PRINT_DOTS
-                int icnt  = 0;
-                double isum = 0.0;
-                for(int i = 0; i < m_realDots; i++) {   // decimazione campioni
-                    double v = vtmp[i];
-                    int ivirt = (int)(i*xscale);   // virtual index
-                    if(ilast < 0)
-                        ilast = ivirt;
-                    if(ivirt != ilast) {    // nuova posizione: scaricare la media in [ilast]
-                        buffer_flw[ilast] = isum / icnt;    // scarica valore precedente
-                        isum = 0.0;     // nuova posizione: media a 0.0
-                        icnt = 0;
-                        ilast = ivirt;
-                    }
-                    // ivirt == ilast
-                    isum += v;          // aggiorna la media
-                    icnt++;
-                }
-                qDebug("fine get flw");
-            }
-            if (chName.startsWith("VV") || chName ==  "VLMv" ) {
-                m_chVol = c;
-                int n = m_dfm->GetSamplesNumber(c);
-                double  * vtmp = new double[n];
-                m_dfm->GetChVal(c, 0, n, vtmp, 0);
-                int ilast = -1; // indice su cui accumula la media, riferito a NUMOF_X_PRINT_DOTS
-                int icnt  = 0;
-                double isum = 0.0;
-                for(int i = 0; i < m_realDots; i++) {   // decimazione campioni
-                    double v = vtmp[i];
-                    int ivirt = (int)(i*xscale);   // virtual index
-                    if(ilast < 0)
-                        ilast = ivirt;
-                    if(ivirt != ilast) {    // nuova posizione: scaricare la media in [ilast]
-                        buffer_vol[ilast] = isum / icnt;    // scarica valore precedente
-                        isum = 0.0;     // nuova posizione: media a 0.0
-                        icnt = 0;
-                        ilast = ivirt;
-                    }
-                    // ivirt == ilast
-                    isum += v;          // aggiorna la media
-                    icnt++;
-                }
-                qDebug("fine get vol");
             }
         }
-        m_realDots = NUMOF_X_PRINT_DOTS;
-        smooting_PRINT_flow(); // qui riempe il buffer di stampa con il set mediato dei campioni di flusso
-        qDebug("dopo smooting_PRINT_flow()");
-        int max_volume = 0;
-        for (int i = 0; i < NUMOF_X_PRINT_DOTS; i++)	// cerco il massimo del buffer volume
-            if (buffer_vol[i] > max_volume)
-                max_volume = buffer_vol[i];
+    }
 
-        for (int i = (m_realDots - 1); i < NUMOF_X_PRINT_DOTS; i++) {       // usare realDots
-            buffer_vol[i] = max_volume;
-            buffer_flw[i] = 0;
-        }
+    m_num_sam = m_realDots = real_lenght * xscale;
 
-        if (m_emgPresent) {
-            for (int i = (m_realDots - 1); i < NUMOF_X_PRINT_DOTS; i++) {   // usare realDots
-                buffer_emg[i] = buffer_emg[m_realDots - 2];
-            }
+    smooting_PRINT_flow(); // qui riempie il buffer di stampa con il set mediato dei campioni di flusso
+    qDebug("dopo smooting_PRINT_flow()");
+    
+    int max_volume = 0;
+    for (int i = 0; i < m_realDots; i++)	// cerco il massimo del buffer volume
+        if (buffer_vol[i] > max_volume)
+            max_volume = buffer_vol[i];
+
+    for (int i = (m_realDots - 1); i < m_realDots; i++) {       // usare realDots
+        buffer_vol[i] = max_volume;
+        buffer_flw[i] = 0;
+    }
+
+    if (m_emgPresent) {
+        for (int i = (m_realDots - 1); i < m_realDots; i++) {   // usare realDots
+            buffer_emg[i] = buffer_emg[m_realDots - 2];
         }
     }
 
     m_dfm->Close();
 
-    Pri_Rep();
+    Pri_Rep(xscale);
 //    Report_BitMap();
 }
 
@@ -296,34 +424,22 @@ gli stessi comandi sia che ci si trovi a fine esame, sia che sia un review di es
 Allora al posto della struttura Patient_Data, ci metiamo DatiPaziente.
 questa funzione gestisce tutta la stampa del report, sia in modalita portrait che landscape
 */
-void printermanager::Pri_Rep()
+void printermanager::Pri_Rep(double xscale)
 {
     //      Intestazione
-#if PRI_REP_INT
     Intest();
-#endif
 
     //     Identificativi Esame
-#if PRI_REP_IDE
     Report_data();		// scrive i dati del paziente e lo spazio per le note manuali
     m_port->Pri_Str(3, (char*)"\n \n", 0);
-#endif
 
     // Grafico FLW + VOL ed eventualmente EMG
-#if PRI_REP_GRA
     if(m_printMode == PORTRAIT_MODE)			// grafico trasversale con numero di punti fisso
     {
-        m_correct = false;
-        m_PointsToPrintout = m_num_sam;			//Deve stampare solo quelli necessari, quelli calcolati nella funzione review
-        // il numero di campioni da stampare e il numero di blocchi scritti su card; il -1 e perche per qualche motivo i campioni buoni nel buffer_vol vanno dallo 0 allo realDots-2
-        if( m_PointsToPrintout > NUMOF_X_PRINT_DOTS ) {
-            m_PointsToPrintout = NUMOF_X_PRINT_DOTS;
-            m_correct = true;
-        }
         m_max_vol = buffer_vol[0];
         m_max_emg = 0;
 
-        for (int i = 0; i < m_PointsToPrintout; i++)	{	// cerco il massimo del buffer volume
+        for (int i = 0; i < m_num_sam; i++)	{	// cerco il massimo del buffer volume
             if (buffer_vol[i] > m_max_vol)
                 m_max_vol = buffer_vol[i];
             if (m_emgPresent) {
@@ -334,6 +450,7 @@ void printermanager::Pri_Rep()
         }
         qDebug() << "m_max_emg:"<<m_max_emg;
 
+#if 0
         if (m_printModeUser)	// e settata la stampa in landscape ma l'esame e troppo lungo
         {
             m_port->Pri_justif(0);
@@ -344,51 +461,42 @@ void printermanager::Pri_Rep()
             m_port->Pri_Str( strlen(str), str, 1 );
             m_port->Pri_justif(2);	// bandiera a sinistra
         }
+#endif
 
-        Report_flw();	// finalmente stampiamo i grafici di volume e flusso
+        Report_flw(xscale);	// finalmente stampiamo i grafici di volume e flusso
         if(m_emgPresent)
             Report_emg();						// EMG
     }
     else {              // print_mode = LANDSCAPE_MODE - grafico longitudinale, con lunghezza legata alla lunghezza dell'esame
         m_max_y = Calc_Max_Flw();			// fondo scala del flusso
         qDebug("dopo Calc_Max_Flw()");
-        short samples_to_print = adatta_buffer_dati(m_realDots, m_max_y);
-        qDebug("dopo adatta_buffer_dati()");
-        Calc_Max_RealReport_rel2(samples_to_print);
+//        short samples_to_print = adatta_buffer_dati(/*m_realDots*/ m_num_sam, m_max_y);
+//        qDebug("dopo adatta_buffer_dati()");
+        Calc_Max_RealReport_rel2(m_num_sam);
         qDebug("dopo Calc_Max_RealReport_rel2()");
-        Report_Real_Time(samples_to_print);		// finalmente stampa
+        Report_Real_Time(m_num_sam, xscale);		// finalmente stampa
         qDebug("dopo Report_Real_Time()");
     }
-#endif
 
     // Grafico Liverpool
     if(m_printLiverpool)
         Report_BitMap();
-#if PRI_REP_SRK
     // Grafico Siroky, stampato solo se paziente maschio oppure generico (cioe dove non indicato il sesso)
-    unsigned char f = QString("F").data()->toLatin1();
-     if(m_printSiroky && m_sex != f)
+     if(m_printSiroky && m_sex != 'F')
          Report_BitMap(true);
-#endif
 
     // 	Risultati dell'esame ricavati dall'analisi semplificata, implementata nel firmware
-#if PRI_REP_RIS
     Report_result();		// scrive in elenco i dati calcolati dall'analisi dell'esame
     m_port->status();
     m_port->Pri_Str(3, (char*)"\n \n", 0); // LINE"\x3",0);
-#endif
 
     //	Scrive i dati riguardanti versione firmware e date/ora ultima calibrazione
-#if PRI_REP_POS
        //m_port->Pri_justif(F_center);
        //Report_dati_macchina(numCurve);	// scrive data e ora della stampa e la versione attuale del FW
-#endif
 
     // fa avanzare la carta per consentire lo strappo
-#if PRI_REP_SPA
     int npix = (int) (25 / 0.125);
     m_port->Pri_forward(npix);
-#endif
 
 //    m_port->Pri_Reset();	// resetta RAM della stampante: equivale ad un reset HW
 }
@@ -503,7 +611,7 @@ void printermanager::Report_data()
 
     m_port->Pri_Str(3,(char*)"\n \n", 0); //riga vuota
 
-#if PRI_REP_MODAL		// scritta relativa al tipo di modalita
+    // scritta relativa al tipo di modalita
     if(m_modal_e == 2) {
         strToWrite = tr("MANUAL   MODALITY");
         sprintf( str, " %s\n", strToWrite.toLatin1().data());
@@ -514,7 +622,6 @@ void printermanager::Report_data()
             sprintf( str, " %s\n", strToWrite.toLatin1().data() );
         }
     m_port->Pri_Str( strlen(str), str, 0 );
-#endif
 
     m_port->Pri_Intensity(0x80);		// intensita di default
 }
@@ -523,9 +630,9 @@ void printermanager::Report_data()
 /**
 stampa del grafico di flusso/volume nella versione a grafici in portrait mode
 */
-void printermanager::Report_flw()
+void printermanager::Report_flw(double xscale)
 {
-    Calc_Max();	// calcolo FC curva di flusso (max_y) e FC curva di volume (max_x) cosi da individuare il giusto fondoscala
+    Calc_Max(xscale);	// calcolo FC curva di flusso (max_y) e FC curva di volume (max_x) cosi da individuare il giusto fondoscala
 
     m_port->Pri_Font(1);		// altezza carattere 20 punti (righe) 0x18 in HEX
     m_port->Pri_mode(0x10);
@@ -536,8 +643,8 @@ void printermanager::Report_flw()
     m_port->Pri_Str( strlen(str), str, 1 );
 
     // label solo su righe pari
-    for(int ub = 0; ub < 10; ub++ ) {                       /* scompone la griglia in 10 righe*/
-        Pri_Rep_Gra(ub);
+    for(int i = 0; i < 10; i++ ) {                       /* scompone la griglia in 10 righe*/
+        Pri_Rep_Gra(i);
     }
 
     m_port->Pri_mode(0x00);
@@ -550,60 +657,47 @@ void printermanager::Report_flw()
 /**
 Calcola "i_max_x" , "max_x" e "max_y"
 */
-void printermanager::Calc_Max()
+void printermanager::Calc_Max(double xscale)
 {
-    m_max_x = m_durata;
+    static int v_max_x[] = {
+                                // 30, 45, 60,
+                                75, 90, 105, 120, 135, 150, 180,
+                                210, 240, 270, 300, 360, 420, 480, 540, 600, 660,
+                                720, 780, 840, 900, 960, 1020, 1080, 1140, 1200,
+                                -1
+                            };
+    int max_x = (m_num_sam / xscale) / 10;
+    m_i_max_x = 0;
+    qDebug("m_num_sam:%d m_max_x:%d",m_num_sam,max_x);
 
-    while (1) {
-        if (m_max_x <    30) { m_i_max_x =  0; m_max_x =   30; break; }
-        if (m_max_x <    45) { m_i_max_x = 25; m_max_x =   45; break; }
-        if (m_max_x <    60) { m_i_max_x =  1; m_max_x =   60; break; }
-        if (m_max_x <    75) { m_i_max_x = 26; m_max_x =   75; break; }
-        if (m_max_x <=   90) { m_i_max_x =  2; m_max_x =   90; break; }
-        if (m_max_x <=  105) { m_i_max_x = 27; m_max_x =  105; break; }
-        if (m_max_x <=  120) { m_i_max_x =  3; m_max_x =  120; break; }
-        if (m_max_x <=  135) { m_i_max_x = 28; m_max_x =  135; break; }
-        if (m_max_x <=  150) { m_i_max_x =  4; m_max_x =  150; break; }
-        if (m_max_x <=  180) { m_i_max_x =  5; m_max_x =  180; break; }
-        if (m_max_x <=  210) { m_i_max_x =  6; m_max_x =  210; break; }
-        if (m_max_x <=  240) { m_i_max_x =  7; m_max_x =  240; break; }
-        if (m_max_x <=  270) { m_i_max_x =  8; m_max_x =  270; break; }
-        if (m_max_x <=  300) { m_i_max_x =  9; m_max_x =  300; break; }
-        if (m_max_x <=  360) { m_i_max_x = 10; m_max_x =  360; break; }	// 6 minuti
-        if (m_max_x <=  420) { m_i_max_x = 11; m_max_x =  420; break; } // 7 minuti
-        if (m_max_x <=  480) { m_i_max_x = 12; m_max_x =  480; break; }	// 8 min
-        if (m_max_x <=  540) { m_i_max_x = 13; m_max_x =  540; break; }	// 9 min
-        if (m_max_x <=  600) { m_i_max_x = 14; m_max_x =  600; break; }	// 10 min
-        if (m_max_x <=  660) { m_i_max_x = 15; m_max_x =  660; break; }	// 11 min
-        if (m_max_x <=  720) { m_i_max_x = 16; m_max_x =  720; break; }	// 12 min
-        if (m_max_x <=  780) { m_i_max_x = 17; m_max_x =  780; break; }	// 13 min
-     // if (m_max_x <=  840) { m_i_max_x = 18; m_max_x =  840; break; }	// 14 min
-        if (m_max_x <=  900) { m_i_max_x = 19; m_max_x =  900; break; }	// 15 min
-        if (m_max_x <=  960) { m_i_max_x = 20; m_max_x =  960; break; }	// 16 min
-     // if (m_max_x <= 1020) { m_i_max_x = 21; m_max_x = 1020; break; }	// 17 min
-        if (m_max_x <= 1080) { m_i_max_x = 22; m_max_x = 1080; break; }	// 18 min
-     // if (m_max_x <= 1140) { m_i_max_x = 23; m_max_x = 1140; break; }	// 19 min
-        if (m_max_x <= 1200) { m_i_max_x = 24; m_max_x = 1240; break; }	// 20 min
-        break;
-    }
+    if(max_x < 0)
+        max_x = 1;
+    if(max_x > 1200)
+        max_x = 1200;
+    for(int i = 0; v_max_x[i] > 0; i++)
+        if(max_x <= v_max_x[i]) {
+            max_x = v_max_x[i];
+            m_i_max_x = i;
+            break;
+        }
+    qDebug("m_max_x:%d m_i_max_x:%d",max_x,m_i_max_x);
+    qDebug("label time >>%s<<",str_label_time[m_i_max_x]);
 
     int decina = m_flu_max / 10;
     m_max_y = (decina + 1) * 10;			// trovo la decina minima superiore al valore max
 
-    while (1) {
-        if (m_max_y <=  10) { m_max_y =  10; break; }
-        if (m_max_y <=  15) { m_max_y =  15; break; }
-        if (m_max_y <=  20) { m_max_y =  20; break; }
-        if (m_max_y <=  25) { m_max_y =  25; break; }
-        if (m_max_y <=  30) { m_max_y =  30; break; }
-        if (m_max_y <=  40) { m_max_y =  40; break; }
-        if (m_max_y <=  50) { m_max_y =  50; break; }
-        if (m_max_y <=  65) { m_max_y =  65; break; }
-        if (m_max_y <=  80) { m_max_y =  80; break; }
-        if (m_max_y <= 100) { m_max_y = 100; break; }
-        if (m_max_y <= 120) { m_max_y = 120; break; }
-        m_max_y = 150; break;
-    }
+    if (m_max_y <=  10) m_max_y =  10; else
+    if (m_max_y <=  15) m_max_y =  15; else
+    if (m_max_y <=  20) m_max_y =  20; else
+    if (m_max_y <=  25) m_max_y =  25; else
+    if (m_max_y <=  30) m_max_y =  30; else
+    if (m_max_y <=  40) m_max_y =  40; else
+    if (m_max_y <=  50) m_max_y =  50; else
+    if (m_max_y <=  65) m_max_y =  65; else
+    if (m_max_y <=  80) m_max_y =  80; else
+    if (m_max_y <= 100) m_max_y = 100; else
+    if (m_max_y <= 120) m_max_y = 120; else
+    m_max_y = 150;
 
     m_max_y_gr2 = ((long) ((m_max_vol + 10) / 100) + 1) * 100;	// 05 dicembre
 }
@@ -680,10 +774,10 @@ void printermanager::Pri_Rep_Gra(int __num_riga)
         int x_pt	=	0;
         int flow_pt	= 240;
         int vol_pt	= 240;
-        int uw5		= m_PointsToPrintout-1;		// correzione per evitare l'andata azero // 23-03
+        int uw5		= m_num_sam-1;		// correzione per evitare l'andata azero // 23-03
         int i4		= __num_riga*24;
 
-        int graf_g_x	=(10*m_max_x);			//asse dei tempi in funzione della durata dell'esame
+        int graf_g_x	=752/*(10*m_max_x)*/;			//asse dei tempi in funzione della durata dell'esame
         int graf_g_fl	=(m_max_y);
         int graf_g_vl	=(m_max_y_gr2);
 
@@ -695,12 +789,7 @@ void printermanager::Pri_Rep_Gra(int __num_riga)
             int x_pt_prec = x_pt;                    /*94*8=752 punti x  i2=x1 della retta*/
             m_x1 = x_pt;
 
-            if (m_correct) {
-                x_pt = (int)((m_num_sam * uw6) / graf_g_x); // correzione nel caso di esami + lunghi di 752 campioni
-            }
-            else {
-                x_pt = (int) ((752 * uw6) / graf_g_x);             /*x_pt=x2 retta */
-            }
+            x_pt = (int) ((752 * uw6) / graf_g_x);             /*x_pt=x2 retta */
             m_y1 = flow_pt;
 
             flow_pt = 239 - (int) ((239 * buffer_flw[uw6]) / graf_g_fl); /*y2*/
@@ -1055,10 +1144,10 @@ void printermanager::Report_emg()
     QString emg_title = tr(" EMG Diagram ");
     sprintf(str,"   EMG ( uV )              %s\n",emg_title.toLatin1().data());
     m_port->Pri_Str(strlen(str), str, 0);
+
     for(int i = 0; i < 10; i++)          /*scompone la griglia in 10 righe*/
-    {
         Pri_Rep_Gra_EMG( i );
-    }
+
     m_port->Pri_mode(0);
     m_port->Pri_Font(1);
     m_port->Pri_Str( strlen(str_label_time[m_i_max_x]), (char *) str_label_time[m_i_max_x], 1);
@@ -1081,48 +1170,10 @@ void printermanager::Calc_Max_EMG()
         }
     m_max_y = 3250;
     return;
-
-//    while (1) {
-//        if (m_max_emg <=   50) { m_max_y =   50; break; }
-//        if (m_max_emg <=  100) { m_max_y =  100; break; }
-//        if (m_max_emg <=  150) { m_max_y =  150; break; }
-//        if (m_max_emg <=  200) { m_max_y =  200; break; }
-//        if (m_max_emg <=  250) { m_max_y =  250; break; }
-//        if (m_max_emg <=  300) { m_max_y =  300; break; }
-//        if (m_max_emg <=  350) { m_max_y =  350; break; }
-//        if (m_max_emg <=  400) { m_max_y =  400; break; }
-//        if (m_max_emg <=  450) { m_max_y =  450; break; }
-//        if (m_max_emg <=  500) { m_max_y =  500; break; }
-//        if (m_max_emg <=  550) { m_max_y =  550; break; }
-//        if (m_max_emg <=  600) { m_max_y =  600; break; }
-//        if (m_max_emg <=  650) { m_max_y =  650; break; }
-//        if (m_max_emg <=  700) { m_max_y =  700; break; }
-//        if (m_max_emg <=  750) { m_max_y =  750; break; }
-//        if (m_max_emg <=  800) { m_max_y =  800; break; }
-//        if (m_max_emg <=  850) { m_max_y =  850; break; }
-//        if (m_max_emg <=  900) { m_max_y =  900; break; }
-//        if (m_max_emg <=  950) { m_max_y =  950; break; }
-//        if (m_max_emg <= 1000) { m_max_y = 1000; break; }
-//        if (m_max_emg <= 1100) { m_max_y = 1100; break; }
-//        if (m_max_emg <= 1200) { m_max_y = 1200; break; }
-//        if (m_max_emg <= 1300) { m_max_y = 1300; break; }
-//        if (m_max_emg <= 1400) { m_max_y = 1400; break; }
-//        if (m_max_emg <= 1500) { m_max_y = 1500; break; }
-//        if (m_max_emg <= 1600) { m_max_y = 1600; break; }
-//        if (m_max_emg <= 1700) { m_max_y = 1700; break; }
-//        if (m_max_emg <= 1800) { m_max_y = 1800; break; }
-//        if (m_max_emg <= 1900) { m_max_y = 1900; break; }
-//        if (m_max_emg <= 2000) { m_max_y = 2000; break; }
-//        if (m_max_emg <= 2250) { m_max_y = 2250; break; }
-//        if (m_max_emg <= 2500) { m_max_y = 2500; break; }
-//        if (m_max_emg <= 2750) { m_max_y = 2750; break; }
-//        if (m_max_emg <= 3000) { m_max_y = 3000; break; }
-//        m_max_y = 3250L; break;
-//    }
 }
 
 
-void printermanager::Pri_Rep_Gra_EMG(unsigned char __num_riga)
+void printermanager::Pri_Rep_Gra_EMG(int __num_riga)
 {
     qDebug() << "Pri_Rep_Gra_EMG(" << __num_riga << ")";
     bool label = false;
@@ -1131,12 +1182,9 @@ void printermanager::Pri_Rep_Gra_EMG(unsigned char __num_riga)
     for(int i = 0; i < ( LCMD + a_emg); i++ )
         m_str_gr[ i ] = 0;
 
+    int sz = 96 + 2256 + 96;    // 	num_byte = 96 + 2256 + 96 = 2448 = ( 65536 * n3 ) + ( 256 * n2 ) + n1
     m_str_gr[0] = ESC;	//0x1B;	// ESC
     m_str_gr[1] = '*';	//0x2A;	// *
-//    m_str_gr[2] = 0x90;	// n1	num_byte = 96 + 2256 = 2328 = ( 65536 * n3 ) + ( 256 * n2 ) + n1 // larghezza fissa tipo grafico flusso
-//    m_str_gr[3] = 0x09;	// n2
-//    m_str_gr[4] = 0x00;	// n3
-    int sz = 96 + 2256 + 96;    // 	num_byte = 96 + 2256 + 96 = 2448 = ( 65536 * n3 ) + ( 256 * n2 ) + n1
     m_str_gr[2] = sz % 256         ;	// n1
     m_str_gr[3] = (sz >>  8) & 0xff;	// n2
     m_str_gr[4] = (sz >> 16) & 0xff;	// n3
@@ -1188,27 +1236,22 @@ void printermanager::Pri_Rep_Gra_EMG(unsigned char __num_riga)
     // inserimento pixel curve
     m_str_gr[ pos_gra + 2255 ] = (char)0xFF;
 
-#ifdef __DATI_GRAF_EMG__
     /*      Grafico   */
     if( m_tem_svu )
     {
         int x_pt = 0;
         int flow_pt = 240;
         int i4 = __num_riga * 24;
-        int graf_g_x = ( 10 * m_max_x );
+        int graf_g_x = 752/*( 10 * m_max_x )*/;
         int graf_g_fl = ( m_max_y );
 
-        for (int uw6 = 1; uw6 < (m_PointsToPrintout - 1); uw6++ ) 	     /*trovo estremi della retta passante per il campione uw6 uw6+1*/
+        for (int ix = 1; ix < (m_num_sam - 1); ix++ ) 	     /*trovo estremi della retta passante per il campione uw6 uw6+1*/
         {
             m_x1 = x_pt;
-            if( m_correct )	{
-                x_pt = (int)(m_num_sam * uw6 / graf_g_x); // correzione nel caso di esami + lunghi di 752 campioni
-            } else {
-                x_pt = (int)((752 * uw6) / graf_g_x);                     /*x_pt=x2 retta */
-            }
+            x_pt = (int)((752 * ix) / graf_g_x);                     /*x_pt=x2 retta */
             m_y1 = flow_pt;
 
-            flow_pt = 239 - (int)(239 * fabs(buffer_emg[uw6]) / graf_g_fl); /*y2*/
+            flow_pt = 239 - (int)(239 * fabs(buffer_emg[ix]) / graf_g_fl); /*y2*/
             if( flow_pt > 239 )
                 flow_pt = 239;
             /*ogni riga composta da 1 linee di stampa str_gr*/
@@ -1228,7 +1271,7 @@ void printermanager::Pri_Rep_Gra_EMG(unsigned char __num_riga)
             }
         }
     }
-#endif
+
     // spazi vuoti dove invece nel grafic del flw ci andavano i label del vol
     // niente label quattro caratteri vuoti dalla posizione xxx
 
@@ -1239,7 +1282,8 @@ void printermanager::Pri_Rep_Gra_EMG(unsigned char __num_riga)
 
 
 /**
-Nella stampa del report tipo reale, individuo il fondoscala del flusso, parametro che serve per adattare i valori degli array dati volume e emg (e anche flusso)
+Nella stampa del report tipo reale, individuo il fondoscala del flusso, parametro che serve per adattare i valori
+degli array dati volume e emg (e anche flusso)
 */
 long printermanager::Calc_Max_Flw()
 {
@@ -1255,10 +1299,10 @@ long printermanager::Calc_Max_Flw()
         flw_max = 75;
     else //if(flw_max <= 160)
         flw_max = 100;
-    return flw_max;	// mi servira per la grafica zione dei dati
+    return flw_max;	// mi servira per la graficazione dei dati
 }
 
-
+#if 0
 /**
 In stampa devo avere una distribuzione dell'asse del tempo dipendente dalla scala della curva
 del flusso1sec/mm; ho 8 punti/mm e per ogni risoluzione dipendente
@@ -1273,27 +1317,25 @@ short printermanager::adatta_buffer_dati(int __num_sample, long __fs_flw)
     unsigned short j, k;		// valore massimo = 20min*60sec*10sample/sec = 12000
     unsigned short num_max_sample = __num_sample;
 
-    for(int i = 0; i < (FREQ_ACQ * MAX_DURATA_ESAME * 60); i++) {
-        m_vol_store.append(0);
-        m_flow_store.append(0);
-        m_emg_store.append(0);
-    }
-
-//    for (int i = 0; i < (FREQ_ACQ * MAX_DURATA_ESAME * 60); i++)
-//        m_emg_store.append(0);
+//    if(m_vol_store == NULL)
+//        m_vol_store  = new unsigned short [FREQ_ACQ * MAX_DURATA_ESAME * 60];
+//    if(m_flow_store == NULL)
+//        m_flow_store = new unsigned short [FREQ_ACQ * MAX_DURATA_ESAME * 60];
+//    if(m_emg_store == NULL)
+//        m_emg_store  = new unsigned short [FREQ_ACQ * MAX_DURATA_ESAME * 60];
 
     j = 0;
     k = 0;
     switch(__fs_flw)
     {
-    case 25:		// 5 sample al mm, cioe 5 sample effettivi per 8 punti: ne devo aggiungrere 3 fittizi
+    case 25:		// 5 sample al mm, cioe 5 sample effettivi per 8 punti: ne devo aggiungere 3 fittizi
         for(int i = 0; i < (2*__num_sample); i++) {
             if(k < __num_sample) {
                 j++;
-                m_vol_store[i] = buffer_vol[k];
+                m_vol_store[i]  = (unsigned short)buffer_vol[k];
                 m_flow_store[i] = (unsigned short)buffer_flw[k];
                 if (m_emgPresent)
-                    m_emg_store[i] = buffer_emg[k];
+                    m_emg_store[i] = (unsigned short)buffer_emg[k];
 
                 if((j == 2) || (j == 4) || (j == 5) || (j == 7))
                     k++;
@@ -1392,6 +1434,7 @@ short printermanager::adatta_buffer_dati(int __num_sample, long __fs_flw)
 
     return num_max_sample;
 }
+#endif
 
 /**
 Nella stampa del report tipo reale, qui si cercano i massimi dei vari array per settare i fondoscala dei grafici
@@ -1399,51 +1442,48 @@ Nella stampa del report tipo reale, qui si cercano i massimi dei vari array per 
 void printermanager::Calc_Max_RealReport_rel2(short __num_sample)
 {
     short vol_max = 0;
-    short emg_max = 0;
 
     for(int j = 0; j < __num_sample; j++)		// calcolo FC curva di flusso (max_y) e FC curva di volume (max_x) cosi da individuare il giusto fondoscala
-    {
-        if(m_vol_store[j] > vol_max)
-            vol_max = m_vol_store[j];
-
-        if(m_emgPresent)
-        {
-            if(m_emg_store[j] > emg_max)
-                emg_max = m_emg_store[j];
-        }
-    }
-    vol_max = ((vol_max/10)+1)*10;	// trovo la decina minima superiore al valore max
-    emg_max = ((emg_max/10)+1)*10;	// trovo la decina minima superiore al valore max
+        if(buffer_vol[j] > vol_max)
+            vol_max = buffer_vol[j];
     // FS del grafico volume
-    if( vol_max <= 250)	// puo assumere i valori della decina superiore al valore massimo: se 135 -> val_max = 140
+    if( vol_max <= 250)
         vol_max = 250;
-    else if( vol_max <=500)	// puo assumere i valori della decina superiore al valore massimo: se 135 -> val_max = 140
+    else if( vol_max <= 500)
         vol_max = 500;
-    else if( vol_max <= 750)	// puo assumere i valori della decina superiore al valore massimo: se 135 -> val_max = 140
+    else if( vol_max <= 750)
         vol_max = 750;
     else
         vol_max = 1000;
     m_max_vol = vol_max;
-    // FS del grafico dell'EMG
-    if(m_emgPresent)
-    {
-        if(emg_max <= 250)	// puo assumere i valori 500, 1000, 2000, 2500
+    qDebug("vmax:%d", vol_max);
+
+    if(m_emgPresent) {
+        short emg_max = 0;
+        for(int j = 0; j < __num_sample; j++) {
+            short v = buffer_emg[j];
+            if(v < 0)
+                v = -v;
+            if(v > emg_max)
+                emg_max = v;
+        }
+        if(emg_max <= 250)
             emg_max = 250;
-        else
-            if(emg_max <= 500)	// puo assumere i valori 500, 1000, 2000, 2500
-                emg_max = 500;
-            else
-            {
-                if(emg_max <= 1000)
-                    emg_max = 1000;
-                else if(emg_max <= 2000)
-                    emg_max = 2000;
-                else //if(emg_max <= 2500)
-                    emg_max = 2500;
-            }
+        else if(emg_max <= 500)
+            emg_max = 500;
+        else if(emg_max <= 1000)
+            emg_max = 1000;
+        else if(emg_max <= 2000)
+            emg_max = 2000;
+        else if(emg_max <= 2500)
+            emg_max = 2500;
+        else if(emg_max <= 3000)
+            emg_max = 3000;
+        else if(emg_max <= 3500)
+            emg_max = 3500;
         m_max_emg = emg_max;
+        qDebug("emgMax:%d", emg_max);
     }
-    qDebug("vmax:%d emgMax:%d", vol_max, emg_max);
 }
 
 /**
@@ -1452,7 +1492,7 @@ con 3 valori intermedi (1/4 FS, 1/2 FS, 3/4 FS).
 poi viene costruito il grafico a pezzi di 5secondi ciascuno (40righe)
 infine e cotruito l'asse delle ordinate destro, dove appare l'udm del volume e ik suo fs
 */
-void printermanager::Report_Real_Time(short __num_sample)
+void printermanager::Report_Real_Time(short __num_sample, double xscale)
 {
     int num_righe;
     m_init_time_to_print = 0;
@@ -1482,8 +1522,6 @@ void printermanager::Report_Real_Time(short __num_sample)
         m_num_byte_x_gra_vol = 50;
     }
     m_num_byte_x_gra = 800;
-    guard_l = 0xa55a;
-    guard_h = 0x5aa5;
     Pri_Rep_Label();	// stampa label del flusso ed eventualmente anche l'emg nel caso di grafici sovrapposti
 
     // STAMPA DEI GRAFICI DI ACQUISIZIONE, 8 RIGHE PER SECONDO DI ACQUSIZIONE
@@ -1493,9 +1531,9 @@ void printermanager::Report_Real_Time(short __num_sample)
 
     // SCOMPONGO LA STAMPA DEL GRAFICO IN TANTE STAMPE DA 5 SECONDI CIASCUNA
     num_righe = (int)(__num_sample / NUM_POINTS) + 1;	// numero intero di blocchi da 40 righe (5sec), il restante e stampato in un altro blocco da 40
-    Pri_Rep_Gra_Landscape(-1);      // forza init delle variabili
+    Pri_Rep_Gra_Landscape(-1, xscale);      // forza init delle variabili
     for(int riga = 0; riga < num_righe; riga++ )                        // scompone la griglia in tante righe
-        Pri_Rep_Gra_Landscape(__num_sample); // scrive label di tempo ad ogni accesso
+        Pri_Rep_Gra_Landscape(__num_sample, xscale); // scrive label di tempo ad ogni accesso
 
     // ora stampo l'asse destro del grafico
     Pri_Rep_asse_dx();
@@ -1627,8 +1665,8 @@ void printermanager::Pri_Rep_Label()
             print_udm_label(m_chVol, pos_4_this_string, dim_label);	// scritta dell'unita di misura dell'emg, cioe uV, scritta a fianco di ogni label numerica
         }
     }
-    // aggiungo la linea dell''asse  delle ordinate, in ogni colonna l'ultimo bit viene acceso
-    for(int i = 1; i < 101; i++) {
+    // aggiungo la linea dell'asse  delle ordinate, in ogni colonna l'ultimo bit viene acceso
+    for(int i = 3; i < 105; i++) {
         m_str_gr[_NUM_BYTE_CMD + i*(dots3D) - 2] = (char)0xFF;
         m_str_gr[_NUM_BYTE_CMD + i*(dots3D) - 1] = (char)0xFF;
     }
@@ -1791,8 +1829,9 @@ dei tempi si adegua al fondoscala.
 funzione chiamata ciclicamente per stampare le righe in cui e' suddiviso il grafico del flusso/volume
 a seconda del parametro num_rig si stampano o meno i label degli assi di flusso e volume
 */
-void printermanager::Pri_Rep_Gra_Landscape(short __num_sample)
+void printermanager::Pri_Rep_Gra_Landscape(short __num_sample, double xscale)
 {
+    (void) xscale;
     static Print_Graph_Parameters PriGraParam_FLW;
     static Print_Graph_Parameters PriGraParam_VOL;
     static Print_Graph_Parameters PriGraParam_EMG;
@@ -1846,48 +1885,27 @@ void printermanager::Pri_Rep_Gra_Landscape(short __num_sample)
         }
     }
     else {
-        stamp_x_label = check_stamp_label();	// verifica se si deve stampare il label e ne definisce il valore a seconda della scala adottata
+//        stamp_x_label = check_stamp_label();	// verifica se si deve stampare il label e ne definisce il valore a seconda della scala adottata
+        int num_sec = (m_cursore / 8);          // 1 secondo ogni 8 punti
+        if((num_sec % 10) == 0) {           // e numero divisibile per 10sec quindi e uno dei label da stampare
+            m_init_time_to_print = num_sec; // puo assumere i valori 10,20,30,40....
+            stamp_x_label = true;
+        }
+        int t_init_time_to_print = m_init_time_to_print;
 
         if(stamp_x_label == true) {
-            int first_char, second_char, third_char, num_char_label; //short fourth_char;
-            if(m_init_time_to_print > 99) {
-                num_char_label = 3;
-                first_char = m_init_time_to_print / 100;
-                init_pos_in_string = _NUM_BYTE_CMD + (num_char_label -3)*_HEIGHT_CHAR_LABEL;
-                for(int i = 0; i < _HEIGHT_CHAR_LABEL; i++ )    // scrivo il carattere delle centinaia per colonne come 1Bx13righe
-                    m_str_gr[ init_pos_in_string + i ] = (char)print8x8Set[ first_char*_WEIGHT_CHAR_LABEL + i];
-
-                init_pos_in_string = _NUM_BYTE_CMD + (num_char_label -2)*_HEIGHT_CHAR_LABEL;
-                second_char = ( m_init_time_to_print - ( first_char * 100 ) ) / 10;
-                for(int i = 0; i < _HEIGHT_CHAR_LABEL; i++ )    // scrivo il carattere delle decine per colonne come 1Bx13righe
-                    m_str_gr[init_pos_in_string + i ] = (char)print8x8Set[ second_char*_WEIGHT_CHAR_LABEL + i];
-
-                init_pos_in_string = _NUM_BYTE_CMD + (num_char_label - 1)*_HEIGHT_CHAR_LABEL;
-                third_char = ( m_init_time_to_print - ( first_char * 100 ) - ( second_char * 10 ) );
-                for(int i = 0; i < _HEIGHT_CHAR_LABEL; i++ )    // scrivo il carattere delle unita per colonne come 1Bx13righe
-                    m_str_gr[ init_pos_in_string + i ] = (char)print8x8Set[ third_char*_WEIGHT_CHAR_LABEL + i];
-            }
-            else {
-                if(m_init_time_to_print > 9) { 	// da 10 a 99 quindi 2 char
-                    num_char_label = 2;
-                    init_pos_in_string = _NUM_BYTE_CMD + (num_char_label-2)*_HEIGHT_CHAR_LABEL;
-                    second_char =  m_init_time_to_print / 10;
-                    for(int i = 0; i < _HEIGHT_CHAR_LABEL; i++) // scrivo il carattere delle decine per colonne come 1Bx13righe
-                        m_str_gr[ init_pos_in_string + i ] = (char)print8x8Set[ second_char*_WEIGHT_CHAR_LABEL + i];
-
-                    init_pos_in_string = _NUM_BYTE_CMD + (num_char_label-1)*_HEIGHT_CHAR_LABEL;
-                    third_char = m_init_time_to_print - ( second_char * 10 );
-                    for(int i = 0; i < _HEIGHT_CHAR_LABEL; i++) // scrivo il carattere delle unita per colonne come 1Bx13righe
-                        m_str_gr[ init_pos_in_string + i ] = (char)print8x8Set[ third_char*_WEIGHT_CHAR_LABEL + i];
+            bool doit = false;
+            int dig[3];
+            dig[0] = t_init_time_to_print / 100;
+            dig[1] = (t_init_time_to_print - (dig[0] * 100)) / 10;
+            dig[2] = t_init_time_to_print - (dig[0] * 100) - (dig[1] * 10);
+            for(int d = 0; d < 3; d++)
+                if((dig[d] > 0) || doit || (d == 2)) {
+                    doit = true;
+                    init_pos_in_string = _NUM_BYTE_CMD + d*_HEIGHT_CHAR_LABEL;
+                    for(int i = 0; i < _HEIGHT_CHAR_LABEL; i++ )
+                        m_str_gr[ init_pos_in_string + i ] = (char)print8x8Set[ dig[d]*_WEIGHT_CHAR_LABEL + i];
                 }
-                else {		// < 10 cioe un char
-                    num_char_label = 1;
-                    init_pos_in_string = _NUM_BYTE_CMD + (num_char_label-1)*_HEIGHT_CHAR_LABEL;
-                    third_char = m_init_time_to_print;
-                    for(int i = 0; i < _HEIGHT_CHAR_LABEL; i++) // scrivo il carattere delle unita per colonne come 1Bx13righe
-                        m_str_gr[ init_pos_in_string + i ] = (char)print8x8Set[ third_char*_WEIGHT_CHAR_LABEL + i];
-                }
-            }
         }
     }
 
@@ -1981,13 +1999,13 @@ void printermanager::Pri_Rep_Gra_Landscape(short __num_sample)
     //cursore = init_time_to_print*NUM_DOTS_X_SEC;
 
     fattore_scala = m_num_dots_gra_flw/(float)(10*m_max_y);	// dove max_y = 25, 50, 75, 100, quindi il rapporto = 4, 2, 1, 0.5, 0.25
-    qDebug("fattore scala FLW: %d, %f", __num_sample, fattore_scala);
+//    qDebug("fattore scala FLW: %d, %f", __num_sample, fattore_scala);
     for(int i = 0; i < NUM_POINTS; i++) {
         PriGraParam_OLD.uw8 = PriGraParam_FLW.uw8;
         PriGraParam_OLD.uw9 = PriGraParam_FLW.uw9;
         PriGraParam_OLD.sample_adattato = PriGraParam_FLW.sample_adattato;				// salviamo il valore precedente
         if((i+m_cursore) < __num_sample) {
-            PriGraParam_FLW.sample_adattato = (int)(m_flow_store[i + m_cursore] * fattore_scala);	// adattamento del valore corrente al fondoscala corrente
+            PriGraParam_FLW.sample_adattato = (int)(buffer_flw[i + m_cursore] * fattore_scala);	// adattamento del valore corrente al fondoscala corrente
 
             if(PriGraParam_FLW.sample_adattato > 0) {
                 PriGraParam_FLW.uw8 = PriGraParam_FLW.sample_adattato / 8;	// individuo di quanti byte mi devo spostare a destra, a partire dall'asse sinistro
@@ -2053,13 +2071,13 @@ void printermanager::Pri_Rep_Gra_Landscape(short __num_sample)
     }
 
     fattore_scala = m_num_dots_gra_vol / (m_max_vol);	// dove max_vol = 250, 500, 750, 1000
-    qDebug("fattore scala VOL: %f", fattore_scala);
+//    qDebug("fattore scala VOL: %f", fattore_scala);
     for(int i = 0; i < NUM_POINTS; i++) {
         PriGraParam_OLD.uw8 = PriGraParam_VOL.uw8;
         PriGraParam_OLD.uw9 = PriGraParam_VOL.uw9;
         PriGraParam_OLD.sample_adattato = PriGraParam_VOL.sample_adattato;				// salviamo il valore precedente
         if((i+m_cursore) < __num_sample) {
-            PriGraParam_VOL.sample_adattato = (int)(m_vol_store[i + m_cursore] * fattore_scala);	// adattamento del valore corrente al fondoscala corrente
+            PriGraParam_VOL.sample_adattato = (int)(buffer_vol[i + m_cursore] * fattore_scala);	// adattamento del valore corrente al fondoscala corrente
 
             if(PriGraParam_VOL.sample_adattato > 0) {
                 PriGraParam_VOL.uw8 = PriGraParam_VOL.sample_adattato / 8;	// individuo di quanti byte mi devo spostare a destra, a partire dall'asse sinistro
@@ -2125,16 +2143,15 @@ void printermanager::Pri_Rep_Gra_Landscape(short __num_sample)
 
     if(m_emgPresent) {
         fattore_scala = m_num_dots_gra_emg / (m_max_emg);	// dove max_y = 10, 20, 40, 80, 160, quindi il rapporto = 4, 2, 1, 0.5, 0.25
-        qDebug()<<"m_num_dots_gra_emg:"<<m_num_dots_gra_emg<<"m_max_emg:"<<m_max_emg;
-        qDebug("guards:%x %x",guard_l,guard_h);
-        qDebug("fattore scala EMG:%f m_max_emg:%f __num_sample:%d m_cursore:%d", fattore_scala, m_max_emg, __num_sample, m_cursore);
+//        qDebug()<<"m_num_dots_gra_emg:"<<m_num_dots_gra_emg<<"m_max_emg:"<<m_max_emg;
+//        qDebug("fattore scala EMG:%f m_max_emg:%f __num_sample:%d m_cursore:%d", fattore_scala, m_max_emg, __num_sample, m_cursore);
         for(int i = 0; i < NUM_POINTS; i++) {
             PriGraParam_OLD.uw8 = PriGraParam_EMG.uw8;
             PriGraParam_OLD.uw9 = PriGraParam_EMG.uw9;
             int absV = PriGraParam_EMG.sample_adattato;
             PriGraParam_OLD.sample_adattato = absV;				// salviamo il valore precedente
             if((i+m_cursore) < __num_sample) {
-                absV = (int)(m_emg_store[i + m_cursore]);	// adattamento del valore corrente al fondoscala corrente
+                absV = (int)(buffer_emg[i + m_cursore]);	// adattamento del valore corrente al fondoscala corrente
                 absV = (int)(absV * fattore_scala);
                 absV = (absV < 0) ? -absV : absV;
                 if(absV >= m_num_dots_gra_emg)
@@ -2202,7 +2219,7 @@ void printermanager::Pri_Rep_Gra_Landscape(short __num_sample)
             else
                 break;
         }
-        qDebug("fattore scala EMG: FINE");
+//        qDebug("fattore scala EMG: FINE");
     }
 
     m_cursore += NUM_POINTS;	// incrementato di 40 punti (quindi sample) ogni giro
@@ -2225,7 +2242,7 @@ void printermanager::Pri_Rep_Gra_Landscape(short __num_sample)
 
     // finalmente stampa
     m_port->Pri_Str( (dim_string_gr), (char *)m_str_gr, 0);
-qDebug("dopo Pri_str");
+//qDebug("dopo Pri_str");
 }
 
 /**
@@ -2295,10 +2312,10 @@ void printermanager::Pri_Rep_asse_dx()
     m_str_gr[6]=0x00;	// n5	scrive a n5 byte dal bordo
     m_str_gr[7]=0x66;	// n6	larghezza 816dots=102 byte
 
-    // aggiungo la linea dell''asse  delle ordinate, in ogni colonna il primo bit viene acceso
+    // aggiungo la linea dell'asse  delle ordinate, in ogni colonna il primo bit viene acceso
     m_str_gr[_NUM_BYTE_CMD] = (char)0x01;
     m_str_gr[_NUM_BYTE_CMD + 1] = (char)0x01;
-    for(int i = 1; i < 101; i++)
+    for(int i = 2; i < 105; i++)
     {	// riga doppia
         m_str_gr[_NUM_BYTE_CMD + i*(_NUM_CHAR_X_AXES_DX * _HEIGHT_CHAR_LABEL)] = (char)0xFF;
         m_str_gr[_NUM_BYTE_CMD + i*(_NUM_CHAR_X_AXES_DX * _HEIGHT_CHAR_LABEL) + 1] = (char)0xFF;
@@ -2654,10 +2671,8 @@ void printermanager::printTest()
     m_modal_e = 0;
     m_numTest = -1;
     m_test_type = false;
-    m_correct = false;
     m_emgPresent = false;
     m_i_max_x = -1;
-    m_max_x = -1;
     m_max_y = -1;
     m_uw3 = 1;
     m_cursore = 0;
