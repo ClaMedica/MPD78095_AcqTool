@@ -3,6 +3,7 @@
 
 extern bool DebugAcqTool;
 
+
 MDataManager::MDataManager(QObject *parent)
 {
     (void) parent;
@@ -219,8 +220,10 @@ void MDataManager::loadFile(QString __fileName)
             for(int i = 0; i < m_mng->GetSamplesNumber(h); i++)
                 sig->replace(i, m_mng->GetValue(h, i));
 
+            qDebug() << "sig:" << sig;
             sig->setName(m_mng->GetChanName(h));
             sig->setSamplingFrequency(m_mng->GetNAS(h));
+            sig->setSupLim(m_mng->GetSupLim(h));
 
             double M = sig->maximum();
             double m = sig->minimum();
@@ -244,6 +247,7 @@ void MDataManager::loadFile(QString __fileName)
                 else
                     break;
             }
+
             sig->setSupLim(supLim);
             while (m < infLim)
             {
