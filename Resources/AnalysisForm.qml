@@ -70,7 +70,6 @@ MForm{
 
     //@@@@@@@@@@    Objects     @@@@@@@@@@
 
-
     MPlot2DStack {
         //@@@@@@@@@@    Properties      @@@@@@@@@@
         id: plot
@@ -78,6 +77,7 @@ MForm{
         anchors.top: parent.top
         anchors.left: parent.left
         anchors.right: gridComand.left
+        anchors.bottom: parent.bottom
         height: PicoFlow?(rootAna.height - 15):(rootAna.height - 25)
         plotProp:mngCon.plotSetting
 
@@ -87,62 +87,7 @@ MForm{
             if(completed)
                 mngData.changeObject(curObj)
         }
-
-        onToZoomChanged:
-        {
-            if (!PicoFlow)
-            {
-                var startTime = mngData.getStartTime()
-                var endTime = mngData.getEndTime()
-                var numSec = (endTime - startTime)/2
-
-                var pageSize
-                if (toZoom > oldToZoom){
-                    pageSize = scroolBar.pageSize - (1/numSec)
-                    if (pageSize < 0)
-                        pageSize = 0
-                    scroolBar.pageSize = pageSize
-                }
-                if (toZoom < oldToZoom){
-                    pageSize = scroolBar.pageSize + (1/numSec)
-                    var LimitSx,LimitDx
-                    LimitSx = (scroolBar.position * (scroolBar.width-2) + 1 - scroolBar.barW/2)
-                    LimitDx = LimitSx + (scroolBar.pageSize * (scroolBar.width-2))
-                    if (LimitSx <= 0){
-                        scroolBar.position += (0-LimitSx)/(scroolBar.width-2)//0.0075
-                        pageSize = scroolBar.pageSize + (1/numSec)/2
-                    }
-
-                    if (LimitDx >= scroolBar.width-2){
-                        scroolBar.position -= (LimitDx - scroolBar.width-2)/(scroolBar.width-2)
-                        pageSize = scroolBar.pageSize + (1/numSec)/2//0.015
-                    }
-                    if (pageSize > 1)
-                        pageSize = 1
-                    scroolBar.pageSize = pageSize
-                }
-                if (toZoom === 0 && oldToZoom === 0){
-                    scroolBar.pageSize = 1.0
-                    scroolBar.position = 0.5
-                }
-            }
-        }
     }
-
-    MScroolBar{
-        id: scroolBar
-        clip:true
-        visible: PicoFlow? false:true
-        anchors.top:plot.bottom
-        anchors.bottom: parent.bottom
-        anchors.right: gridComand.left
-        anchors.left: parent.left
-        onMoved: {
-            var moved = scroolBar.step
-            plot.movingZoom = moved
-        }
-    }
-
     MLabel{
         id: lbNamePat
         clip:true
@@ -220,21 +165,17 @@ MForm{
                 if (value === "112")
                     mngData.exitFromReview()
 
-                if (value === "113"){
+                if (value === "113")
                     //zoom in
-                    plot.oldToZoom = plot.toZoom
-                    plot.toZoom = plot.toZoom + 1
-                }
-                if (value === "114"){
+                    plot.zoomFromButton("zoomIn")
+
+                if (value === "114")
                     //zoom out
-                    plot.oldToZoom = plot.toZoom
-                    plot.toZoom = plot.toZoom - 1
-                }
-                if (value === "115"){
+                    plot.zoomFromButton("zoomOut")
+
+                if (value === "115")
                     //zoom none
-                    plot.oldToZoom = 0
-                    plot.toZoom = 0
-                }
+                    plot.zoomFromButton("zoomReset")
             }
             onTooltipActive: {
                 if (testo === "")
