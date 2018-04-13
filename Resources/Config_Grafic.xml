@@ -1,13 +1,9 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <Desktop>
   <Button height="0.06" width="0.15" labelSize="3"/>
-  <Nomogrammi height="0.75" width="0.75" labelSize="2" margin="60"/>
+  <Nomogrammi height="0.75" width="0.75" labelSize="2" margin="60" dimPoint="2"/>
   <TableRis height="0.6" width="0.5"/>
   <Dialog height="0.4" width="0.4" labelSize="3"/>
+  <Parameter height="0.06" width="0.3" />
 </Desktop>
-<PicoFlow>
-  <Button height="0.08" width="0.2" labelSize="4"/>
-  <Nomogrammi height="0.75" width="0.75" labelSize="3" margin="60"/>
-  <TableRis height="0.6" width="0.5"/>
-  <Dialog height="0.4" width="0.4" labelSize="4"/>
-</PicoFlow>
+

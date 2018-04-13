@@ -1,4 +1,4 @@
-import QtQuick 2.5
+﻿import QtQuick 2.5
 import QtQuick.Controls 1.1
 import QtQuick.Window 2.2
 import QtQuick.Layouts 1.1
@@ -16,7 +16,7 @@ Rectangle{
     }
     //Component.onCompleted:console.log(rootInfoBox.title,"Creato header",this,l,img,itemData.column,itemData.value,"#")
     //Component.onDestruction: console.log(rootInfoBox.title,"Distrutto header",this,l,img,itemData.column,itemData.value,"#")
-    height:layout.dimensionOf("THF")
+    height:isTouch?layout.dimensionOf("THF"):layout.dimensionOf("THF")/2
     color:itemData.column%2?layout.value("THC1"):layout.value("THC2")
     onSortColChanged: updateArrow()
     onSortDirChanged:updateArrow()

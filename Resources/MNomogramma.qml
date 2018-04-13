@@ -33,6 +33,7 @@ Rectangle {
     property int numBande: 1
 
     property int labelSize: grafic.valueOf("Nomogrammi","labelSize")
+    property int dimPoint: grafic.valueOf("Nomogrammi","dimPoint")
     border.width: 1
 
     color: "lightgrey"
@@ -379,8 +380,8 @@ Rectangle {
             id: point
             color: "blue"
             border.color: "darkblue"
-            height: labelSize*10
-            width: labelSize*10
+            height: dimPoint*10
+            width: dimPoint*10
         }
 
 

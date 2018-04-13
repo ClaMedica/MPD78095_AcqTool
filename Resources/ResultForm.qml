@@ -79,7 +79,7 @@ MForm {
                     buttonfn.anchors.top = rectf.top
                     buttonfn.anchors.topMargin = btnTopMargin
                     buttonfn.anchors.rightMargin = 20
-                    buttonfn.height=rectdata.height*0.06
+                    buttonfn.height=rectf.height*0.06
                     buttonfn.myText = namePage
                     buttonfn.clicked.connect(clickButtonSameAna)
 
@@ -112,7 +112,7 @@ MForm {
                 buttonT.buttonId = pagesLocal.length
                 buttonT.anchors.bottom = rectdata.bottom
                 buttonT.anchors.left = rectdata.left
-                buttonT.anchors.bottomMargin = rectf.height/6
+                buttonT.anchors.bottomMargin = rectf.height/5
                 buttonT.anchors.leftMargin = btnLeftMargin
                 buttonT.width = screenW*grafic.valueOf("Button","width")
                 buttonT.height = screenH*grafic.valueOf("Button","height")
@@ -154,7 +154,7 @@ MForm {
                 buttonLQM.buttonId = pagesLocal.length
                 buttonLQM.anchors.bottom = rectdata.bottom
                 buttonLQM.anchors.left = rectdata.left
-                buttonLQM.anchors.bottomMargin = rectf.height/10
+                buttonLQM.anchors.bottomMargin = rectf.height/9
                 buttonLQM.anchors.leftMargin = btnLeftMargin
                 buttonLQM.width = screenW*grafic.valueOf("Button","width")
                 buttonLQM.height = screenH*grafic.valueOf("Button","height")
@@ -194,7 +194,7 @@ MForm {
                 buttonLQA.buttonId = pagesLocal.length
                 buttonLQA.anchors.bottom = rectdata.bottom
                 buttonLQA.anchors.left = rectdata.left
-                buttonLQA.anchors.bottomMargin = rectf.height/10
+                buttonLQA.anchors.bottomMargin = rectf.height/9
                 buttonLQA.anchors.leftMargin = btnLeftMargin
                 buttonLQA.height = screenH*grafic.valueOf("Button","height")
                 buttonLQA.width = screenW*grafic.valueOf("Button","width")
@@ -241,7 +241,7 @@ MForm {
                     buttonSQM.buttonId = pagesLocal.length
                     buttonSQM.anchors.bottom = rectdata.bottom
                     buttonSQM.anchors.left = rectdata.left
-                    buttonSQM.anchors.bottomMargin = rectf.height/10
+                    buttonSQM.anchors.bottomMargin = rectf.height/9
                     buttonSQM.anchors.leftMargin = btnLeftMargin
                     buttonSQM.width = screenW*grafic.valueOf("Button","width")
                     buttonSQM.height = screenH*grafic.valueOf("Button","height")
@@ -286,7 +286,7 @@ MForm {
                     buttonSQA.buttonId = pagesLocal.length
                     buttonSQA.anchors.bottom = rectdata.bottom
                     buttonSQA.anchors.left = rectdata.left
-                    buttonSQA.anchors.bottomMargin = rectdata.height/10
+                    buttonSQA.anchors.bottomMargin = rectdata.height/9
                     buttonSQA.anchors.leftMargin = btnLeftMargin
                     buttonSQA.width = screenW*grafic.valueOf("Button","width")
                     buttonSQA.height = screenH*grafic.valueOf("Button","height")

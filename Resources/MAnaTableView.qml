@@ -25,7 +25,7 @@ BuzzTableView{
             text: styleData.value
             font.family:  (layout !== undefined) ? layout.value("FFamily") : "ubuntu"
             font.bold: false
-            font.pixelSize: rootTable.height * 0.025
+            font.pixelSize: rootTable.height * grafic.valueOf("TableRis","size")
         }
     }
 
@@ -48,7 +48,7 @@ BuzzTableView{
             text: styleData.value
             font.family:  (layout !== undefined) ? layout.value("FFamily") : "ubuntu"
             font.bold: true
-            font.pixelSize:rootTable.height *0.04
+            font.pixelSize:rootTable.height *0.045
         }
     }
     function populate(){//al caricamento della tabella popolo con le colonne

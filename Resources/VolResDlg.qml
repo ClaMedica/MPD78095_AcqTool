@@ -42,8 +42,8 @@ MForm {
     MParameterEdit{
         id:parVolResVal
         anchors.verticalCenter: parent.verticalCenter
-        height:screenH*grafic.valueOf("Button","height")
-        width: screenW*grafic.valueOf("Button","width")
+        height:screenH*grafic.valueOf("Parameter","height")
+        width: screenW*grafic.valueOf("Parameter","width")
         anchors.horizontalCenter: parent.horizontalCenter
         anchors.margins: layout.value("Margin")
         type:typTextField

@@ -55,6 +55,7 @@
         <file>ParAna.xml</file>
         <file>Config_User_pico.xml</file>
         <file>Config_Grafic.xml</file>
+        <file>Config_Grafic_pico.xml</file>
     </qresource>
     <qresource prefix="/Dialog">
         <file>VolResDlg.qml</file>
