@@ -1,4 +1,4 @@
-﻿import QtQuick 2.4
+import QtQuick 2.4
 import QtQuick.Controls 1.2
 import QtQuick.Dialogs 1.2
 import "qrc:/GeneralData.js" as DataEngine
@@ -10,7 +10,6 @@ import MComponents 1.0
 Rectangle {
     id: rootTree
     property real labelSize: 4
-    property int divH: 10
     color: "transparent"
     clip: true
 
@@ -46,7 +45,7 @@ Rectangle {
             id:anctree
             width:rootTree.width
             labelSize: rootTree.labelSize
-            itemHeight: rootTree.height/divH
+            itemHeight: rootTree.height/10
         }
     }
 

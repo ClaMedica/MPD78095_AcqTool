@@ -1,4 +1,4 @@
-﻿import QtQuick 2.5
+import QtQuick 2.5
 import QtQuick.Window 2.2
 import QtQuick.Controls 1.2
 import MComponents 1.0
@@ -33,7 +33,6 @@ Rectangle {
         horizontalAlignment: Text.AlignHCenter
         labelSize: layout.value("F4")
         verticalAlignment: Text.AlignVCenter
-        color : "white"
         wrapMode: Text.WordWrap
     }
 
@@ -43,7 +42,7 @@ Rectangle {
         anchors.left:parent.left
         anchors.bottom: parent.bottom
         width: parent.width/2.1
-        anchors.margins: parent.height*0.02
+        anchors.margins: parent.height*0.01
         text: qsTr("Yes")
         labelSize: layout.value("F4")
         onClicked:accepted()
@@ -55,7 +54,7 @@ Rectangle {
         anchors.right:parent.right
         anchors.bottom: parent.bottom
         width: parent.width/2.1
-        anchors.margins: parent.height*0.02
+        anchors.margins: parent.height*0.01
         text: qsTr("No")
         labelSize: layout.value("F4")
         onClicked:rejected()
