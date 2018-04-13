@@ -1,5 +1,5 @@
 TEMPLATE = app
-VERSION = 1.0.0.1
+VERSION = 1.0.0.2
 
 QT += qml quick widgets sql network multimedia xml core serialport
 
@@ -42,7 +42,8 @@ SOURCES += \
     ../AnaUro/anauro.cpp \
     ../AnaUro/analysis.cpp \
     ../AnaUro/anautils.cpp \
-    ../MGlobal/fileio.cpp
+    ../MGlobal/fileio.cpp \
+    CPP/graficmanager.cpp
 
 HEADERS += \
     CPP/alarmmanager.h \
@@ -76,7 +77,8 @@ HEADERS += \
     ../MGlobal/systemmanager.h \
     ../MGlobal/UdmImpl.h \
     ../MGlobal/fileio.h \
-    CPP/bitmapsv.h
+    CPP/bitmapsv.h \
+    CPP/graficmanager.h
 
 INCLUDEPATH +=  CPP \
                 CPP/TCP \

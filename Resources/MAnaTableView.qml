@@ -25,7 +25,7 @@ BuzzTableView{
             text: styleData.value
             font.family:  (layout !== undefined) ? layout.value("FFamily") : "ubuntu"
             font.bold: false
-            font.pixelSize: screenH * 0.015
+            font.pixelSize: rootTable.height * 0.025
         }
     }
 
@@ -33,7 +33,7 @@ BuzzTableView{
         color:styleData.row%2?"#E0E0E0":"#FFFFFF"
         height:
         {
-            var dim = screenH * 0.025
+            var dim = rootTable.height *0.06
             styleData.selected?dim*1.5:dim
         }
         Behavior on height {NumberAnimation {duration: 200}}
@@ -41,14 +41,14 @@ BuzzTableView{
 
     headerDelegate: Rectangle{
         color: "#E0E0E0"
-        height: 35
+        height: rootTable.height*0.1
         Text {
             anchors.verticalCenter: parent.verticalCenter
             color: styleData.selected ? "#000" : "#000"
             text: styleData.value
             font.family:  (layout !== undefined) ? layout.value("FFamily") : "ubuntu"
             font.bold: true
-            font.pixelSize:screenH * 0.02
+            font.pixelSize:rootTable.height *0.04
         }
     }
     function populate(){//al caricamento della tabella popolo con le colonne

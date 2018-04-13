@@ -1,4 +1,4 @@
-#include <QGuiApplication>
+﻿#include <QGuiApplication>
 #include <QQmlApplicationEngine>
 
 #include "qqml.h"
@@ -24,6 +24,7 @@
 #include <QApplication>
 #include <QQuickWindow>
 #include "layoutmanager.h"
+#include "graficmanager.h"
 #include <QSplashScreen>
 #include <fileio.h>
 #include <systemmanager.h>
@@ -95,7 +96,6 @@ int main(int argc, char *argv[])
     qmlRegisterType<ModelManager>("Managers", 1, 0, "ModelManager");
     qmlRegisterType<MAcqManager>("Managers", 1, 0, "MAcqManager");
     qmlRegisterType<MDataManager>("Managers", 1, 0, "MDataManager");
-    qmlRegisterType<P7Settings>("Managers", 1, 0, "MSettings");
     qmlRegisterType<fileIO>("FileIO", 1, 0, "FileIO");
 
     qmlRegisterUncreatableType<mflowdatas>("Managers", 1, 0, "mflowdata", "error on anaFlwAdv creation");
@@ -106,6 +106,7 @@ int main(int argc, char *argv[])
 
     //Carico il layout di default del programma
     LayoutManager mngLayout;
+    GraficManager mngGrafic;
 
     engine.addImportPath("qrc:/Modules/");
     //engine.addImportPath("../standalone");
@@ -149,6 +150,7 @@ int main(int argc, char *argv[])
 #endif
 
     engine.rootContext()->setContextProperty("layout", &mngLayout);
+    engine.rootContext()->setContextProperty("grafic", &mngGrafic);
     engine.rootContext()->setContextProperty("settings", &g_P7SettingsManager);
     engine.rootContext()->setContextProperty("bridgeMain", g_mainAppBridge);    
     engine.rootContext()->setContextProperty("mngSys", &g_systemManager);

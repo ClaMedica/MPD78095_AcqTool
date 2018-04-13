@@ -137,13 +137,13 @@ void MDataManager::loadFile(QString __fileName)
     QString descr;
     unsigned char chEn[20];
 
-    switch(fileType(__fileName)) {
+    switch(fileType(m_copyFileName)) {
     case PIC:
     {
        if(m_mng != NULL)
             delete m_mng;
         m_mng = new DatafileManager;
-        m_mng->SetFileName(__fileName);
+        m_mng->SetFileName(m_copyFileName);
         m_mng->SetFileType(7);
         bool res = m_mng->Open();
         qDebug() << "File Aperto?" << res;
@@ -528,10 +528,12 @@ void MDataManager::saveChanges()
         m_copy->AddOpMarkerAn(start, end, enCh, curMap->value("key").toInt(), curMap->value("descr").toString());
         qDebug() << "Fine salvataggio definer";
     }
-    //oltre questi due if non ci si dovrebbe arrivare a meno che non sia un segnale e nel caso si prosegue
 
     qDebug() << "Commit markers?" << m_copy->CommitMarkers();
     qDebug() << "Chiudo il file?" << m_copy->Close();
+
+    delete m_copy;
+    m_copy = NULL;
 }
 
 
@@ -940,9 +942,7 @@ void MDataManager::exitFromReview()
     else
     {
         if (m_mngPrint != NULL) m_mngPrint->closePrinter();
-        if (m_copy != NULL)
-            delete m_copy;
-        m_copy = NULL;
+
         if (getToSave() == "yes")
         {        //copio il file copy nell'originale
             if (QFile::exists(m_copyFileName))
@@ -1064,7 +1064,7 @@ qDebug() << "INIZIO";
         int anaType = m_mng->GetAnalysis(i).toInt();
 
         if (anaType == FLW_AVD_STUDY) {
-            //verifica se c'A? un definitore per questa analisi.
+            //verifica se c'e' un definitore per questa analisi.
             VarMap mkOpAnIn;
             bool found = false;
             VarMapVec* elements = m_storage.getAll(CAT_DEFINER);
@@ -1090,7 +1090,7 @@ qDebug() << "INIZIO";
                 }
 
                 if ((m_numAna == 1) || (posQ > -1)) {
-                    //se non c'A? il defintore, ma questa A? l'unica analisi,
+                    //se non c'e' il defintore, ma questa e' l'unica analisi,
                     //viene inserito automaticamente sul canale del flusso.
                     for (int i = 0; i < m_mng->GetChanNum(); i++)
                         En << 0;
@@ -1356,7 +1356,7 @@ void MDataManager::InitPageGraphs(int __anaType)
                 foreach (VarMap *curMarker, (*eleAnMarkers)) {
 //                    int ff = evMarkOpIn->value("name").toInt();
                     if ((curMarker->value("type") == TYPE_ANALYTICAL) &&
-                        (curMarker->value("defCode") == evMarkOpIn->value("whoAmI").toInt()))
+                        (curMarker->value("defCode").toInt() == evMarkOpIn->value("whoAmI").toInt()))
                     {
                         evAuto = 0;
                         break;

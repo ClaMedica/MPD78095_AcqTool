@@ -1,4 +1,4 @@
-import QtQuick 2.4
+﻿import QtQuick 2.4
 import Managers 1.0
 import MPlotModule 1.0
 
@@ -32,7 +32,7 @@ Rectangle {
     property var bandeColore: ["lightgreen", "peachpuff"]
     property int numBande: 1
 
-    property int fontSize: 15
+    property int labelSize: grafic.valueOf("Nomogrammi","labelSize")
     border.width: 1
 
     color: "lightgrey"
@@ -135,7 +135,7 @@ Rectangle {
     Rectangle{
         id: rRightMargin
         color: colorEsterno
-        width: 20
+        width: grafic.valueOf("Nomogrammi","margin")/3
         anchors.top: rootPlot.top
         anchors.bottom: rootPlot.bottom
         anchors.right: rootPlot.right
@@ -145,7 +145,7 @@ Rectangle {
     Rectangle{
         id: rTopMargin
         color: colorEsterno
-        height: 30
+        height: grafic.valueOf("Nomogrammi","margin")
         anchors.top: rootPlot.top
         anchors.left: rootPlot.left
         anchors.right: rootPlot.right
@@ -156,14 +156,14 @@ Rectangle {
             x: rootPlot.width/2 - nome.length*4
             y: 10
             font.family:  (layout !== undefined) ? layout.value("FFamily") : "ubuntu"
-            font.pixelSize: fontSize
+            font.pixelSize: screenH * 0.01 * labelSize
         }
     }
 
     Rectangle{
         id: rLeftMargin
         color: colorEsterno
-        width: 50
+        width: grafic.valueOf("Nomogrammi","margin")
         anchors.bottom: rootPlot.bottom
         anchors.top: rootPlot.top
         anchors.left: rootPlot.left
@@ -173,7 +173,7 @@ Rectangle {
             x: 5
             y: rootPlot.height/2 + udmY.length*4
             font.family:  (layout !== undefined) ? layout.value("FFamily") : "ubuntu"
-            font.pixelSize: fontSize
+            font.pixelSize: screenH * 0.01 * labelSize
             transform: Rotation {
                 angle: -90
             }
@@ -183,7 +183,7 @@ Rectangle {
     Rectangle{
         id: rBottomMargin
         color: colorEsterno
-        height: 50
+        height: grafic.valueOf("Nomogrammi","margin")
         anchors.bottom: rootPlot.bottom
         anchors.left: rootPlot.left
         anchors.right: rootPlot.right
@@ -193,19 +193,19 @@ Rectangle {
             x: rootPlot.width/2 - udmX.length*4
             y: 30
             font.family:  (layout !== undefined) ? layout.value("FFamily") : "ubuntu"
-            font.pixelSize: fontSize
+            font.pixelSize: screenH * 0.01 * labelSize
         }
     }
 
 
     DVAxes{ //Y AXIS LABELS
         id: yAxisLabels
-        anchors.bottom: rootPlot.bottom
-        anchors.top: rootPlot.top
+        anchors.bottom: parent.bottom
+        anchors.top: parent.top
         anchors.right: yAxisNotches.left
         anchors.left: rLeftMargin.right
-        topMargin: 30
-        bottomMargin: 50
+        topMargin: rTopMargin.height// 40//30
+        bottomMargin: rBottomMargin.height//45//50
         major:rootPlot.yMax/10 +1
         minor:0
         max:rootPlot.yMax
@@ -263,8 +263,8 @@ Rectangle {
         anchors.top: xAxisNotches.bottom
         anchors.right: rootPlot.right
         anchors.left: rootPlot.left
-        leftMargin:50
-        rightMargin:20
+        leftMargin: rLeftMargin.width//50
+        rightMargin: rRightMargin.width//20
         major: rootPlot.xMax/100 +1
         minor: 0
         max: plotter.xMax
@@ -377,10 +377,10 @@ Rectangle {
 
         Rectangle{
             id: point
-            color: "skyblue"
-            border.color: "slateblue"
-            height: 10
-            width: 10
+            color: "blue"
+            border.color: "darkblue"
+            height: labelSize*10
+            width: labelSize*10
         }
 
 
