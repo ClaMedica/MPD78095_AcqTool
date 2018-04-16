@@ -1,8 +1,8 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <Desktop>
   <Button height="0.06" width="0.15" labelSize="3"/>
-  <Nomogrammi height="0.75" width="0.75" labelSize="2" margin="60" dimPoint="2"/>
-  <TableRis height="0.6" width="0.5"/>
+  <Nomogrammi height="0.7" width="0.7" labelSize="3" margin="70" dimPoint="2"/>
+  <TableRis height="0.6" width="0.5" size="0.04"/>
   <Dialog height="0.4" width="0.4" labelSize="3"/>
   <Parameter height="0.06" width="0.3" />
 </Desktop>
