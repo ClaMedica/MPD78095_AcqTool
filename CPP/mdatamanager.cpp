@@ -1713,6 +1713,23 @@ int MDataManager::ReadResult(int & __numEv)
             m_aflwdatas.at(0)->addVDetMax(m_aflwdatas.at(i)->getVDetMax());
             m_aflwdatas.at(0)->addCQ(m_aflwdatas.at(i)->getCQ());
         }
+        m_aflwdatas.at(0)->setWaitingTime(m_aflwdatas.at(0)->getWaitingTime()/__numEv);
+        m_aflwdatas.at(0)->setQMax(m_aflwdatas.at(0)->getQMax()/__numEv);
+        m_aflwdatas.at(0)->setQAve(m_aflwdatas.at(0)->getQAve()/__numEv);
+        m_aflwdatas.at(0)->setTimeAtV3(m_aflwdatas.at(0)->getTimeAtV3()/__numEv);
+        m_aflwdatas.at(0)->setTimeAtV2(m_aflwdatas.at(0)->getTimeAtV2()/__numEv);
+        m_aflwdatas.at(0)->setTime90(m_aflwdatas.at(0)->getTimeAtQmax()/__numEv);
+        m_aflwdatas.at(0)->setTimeAtQmax(m_aflwdatas.at(0)->getTime90()/__numEv);
+        m_aflwdatas.at(0)->setFlowTime(m_aflwdatas.at(0)->getFlowTime()/__numEv);
+        m_aflwdatas.at(0)->setDescTime(m_aflwdatas.at(0)->getDescTime()/__numEv);
+        m_aflwdatas.at(0)->setVoidingTime(m_aflwdatas.at(0)->getVoidingTime()/__numEv);
+        m_aflwdatas.at(0)->setVolAtQqmax(m_aflwdatas.at(0)->getVolAtQqmax()/__numEv);
+        m_aflwdatas.at(0)->setVoidedVolume(m_aflwdatas.at(0)->getVoidedVolume()/__numEv);
+        m_aflwdatas.at(0)->setAcceleration(m_aflwdatas.at(0)->getAcceleration()/__numEv);
+        m_aflwdatas.at(0)->setResidualVolume(m_aflwdatas.at(0)->getResidualVolume()/__numEv);
+        m_aflwdatas.at(0)->setVDetMax(m_aflwdatas.at(0)->getVDetMax()/__numEv);
+        m_aflwdatas.at(0)->setCQ(m_aflwdatas.at(0)->getCQ()/__numEv);
+
         m_aflwdatas.at(0)->buildTable();
         free(strTemp);
         break;
