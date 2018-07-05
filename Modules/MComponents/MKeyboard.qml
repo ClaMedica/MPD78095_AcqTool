@@ -94,7 +94,7 @@ Rectangle {
                 [100,[["",15,"shift.png"],"z","x","c","v","b","n","m",["",15,"backspace.png"]],
                  [["",15,"shift.png"],"|","à","è","é","ì","ò","ù",["",15,"backspace.png"]]],
 
-                [100,[["1@#",15],[" ",55,"space.png"],["OK",15],["CANC",15]],[["1@#",15],[" ",55,"space.png"],["OK",15],["CANC",15]]]
+                [100,[["1@#",15],[" ",55,"space.png"],["OK",15],["BACK",15]],[["1@#",15],[" ",55,"space.png"],["OK",15],["CANC",15]]]
             ]
             delegate:
                 Row{
@@ -154,7 +154,7 @@ Rectangle {
                                     target.focus=false
                                 }
                                 break;
-                            case "CANC":
+                            case "BACK":
                                 txtField.text = oldTesto
                                 if(destroyWhenOK)
                                     rootKeyboard.destroy()

@@ -520,10 +520,14 @@ void MAcqManager::handleTCP(SimpleTCPClient *__client, QByteArray __block)
             if(__block[4] == '5') {
                 if(!m_saving) {
                     //parte immediatamnte l'acquisizione
-                    //effetto buffer tengo solo gli ultimi 5 secondi
+                    int secToSave = 0.0;
+                    //in caso di flussimetria manuale non devo tenermi buffer di dati:
+                    //i dati salvati partono dal momento dello start acquisizione da parte dell'utente
+                    if (m_autoStartStop)  //effetto buffer tengo solo gli ultimi 5 secondi
+                        secToSave = 5.0;
                     foreach(QString type, m_channelMap.keys())
                         foreach(MSignal *sig, m_channelMap[type])
-                            sig->saveLastSec(5.0);
+                            sig->saveLastSec(secToSave);
 
                     m_saving = true;    //posso iniziare a salvare i dati
                     emit acquisitionStarted();
@@ -897,8 +901,6 @@ void MAcqManager::applyOperations()
                     int index = m_HWChansMap[type].indexOf(hwc);
                     for(int i = 0; i < m_frameMap[hwc]; i++){
                         double v = m_bufferMap[hwc]->at(i);
-//                        if (type == "EMG")
-//                            v = (v < 0.0) ? -v : v;
                         m_channelMap[type].at(index)->append(v);
                     }
                     qDebug() << "Canale" << type << "Copiato" << m_frameMap[hwc] << "campioni su" << index;
