@@ -33,6 +33,7 @@ MDataManager::MDataManager(QObject *parent)
 
     m_firstHead = "Medica S.p.A - Menfis Divisione";
     m_secondHead = "Pico Flow 2";
+    m_etaPatient = -1;
 
     setValVolRes(-999);
 }
@@ -159,9 +160,14 @@ void MDataManager::loadFile(QString __fileName)
         m_patientInfo = m_mng->GetPatient().section(";",0,1);
         m_patientInfo.replace(";", " ");
 
+        QString dataNascita = m_mng->GetPatient().section(";",2,2);
+        QDate datD = QDate::fromString(dataNascita,"dd/MM/yyyy");
+        QDate dateExam = QDate(1899, 12, 30).addDays(m_mng->GetDataEsame());
+        m_etaPatient = dateExam.year() - datD.year();
+        qDebug()<<"Eta' paziente"<< m_etaPatient;
+
         if (!m_patientInfo.contains("Anonymous"))
         {
-            QDate dateExam = QDate(1899, 12, 30).addDays(m_mng->GetDataEsame());
             QString dateofexam = dateExam.toString("dd/MM/yyyy");
             m_patientInfo = m_patientInfo + " - " + dateofexam;
         }
@@ -988,6 +994,9 @@ bool MDataManager::checkForVolRes()
         setValVolRes(0);
         m_mng->SetOther(otherString);
         m_mng->CommitParameters();
+        //se è la prima volta che apro un esame di flussimetria automatica la stampa anche è automatica
+        if (m_autoFlow == 0)
+            m_autoPrint =  true;
     }
     else
     {
@@ -1271,7 +1280,7 @@ void MDataManager::startPrint()
     m_mngPrint->setPrintHeaders(m_firstHead,m_secondHead);
 
     //stampo
-    if (m_autoPrint || m_autoFlow == 0)
+    if (m_autoPrint)
         sendToPrint();
 #endif
     //qml
@@ -1651,6 +1660,7 @@ int MDataManager::ReadResult(int & __numEv)
         m_aflwdatas.append(new mflowdatas());
         unsigned char * strTemp = (unsigned char *) malloc (sizeof(FLWAdvRepStruct));
         m_aflwdatas.at(0)->setParent(this);
+        m_aflwdatas.at(0)->setAutoFlow(m_autoFlow == 0);
         m_aflwdatas.at(0)->setWaitingTime(0);
         m_aflwdatas.at(0)->setQMax(0);
         m_aflwdatas.at(0)->setQAve(0);
@@ -1690,8 +1700,9 @@ int MDataManager::ReadResult(int & __numEv)
             m_aflwdatas.last()->setResidualVolume(structureFlow->residual_volume);
             m_aflwdatas.last()->setVDetMax(structureFlow->v_det_max);
             m_aflwdatas.last()->setCQ(structureFlow->cQ);
+            m_aflwdatas.last()->setAutoFlow(m_autoFlow == 0);
             m_aflwdatas.last()->buildTable();
-            m_aflwdatas.last()->buildNomogrammi(m_sexPatient, 45);
+            m_aflwdatas.last()->buildNomogrammi(m_sexPatient, m_etaPatient);
         }
 
         //calcolo la media
@@ -1713,6 +1724,7 @@ int MDataManager::ReadResult(int & __numEv)
             m_aflwdatas.at(0)->addVDetMax(m_aflwdatas.at(i)->getVDetMax());
             m_aflwdatas.at(0)->addCQ(m_aflwdatas.at(i)->getCQ());
         }
+
         m_aflwdatas.at(0)->buildTable();
         free(strTemp);
         break;
