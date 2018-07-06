@@ -2455,36 +2455,39 @@ void printermanager::Report_result()
 
     QString message;
     if (m_modal_e == 2) {   // il tempo di attesa e' graficato solo se esame manuale
-        message = tr("Waiting Time ..............");
+        message = tr("Waiting time ................");
         Pri_Rep_Lin(message.toLatin1().data(), (int)((m_tem_att)*Fc_FLW), 1, (char *)"s\n", 0);
     }
     if (m_flu_med > m_flu_max) // piccolo controllo per gestire flussi abnormali, tipici di prove da laboratorio
         if (m_tem_flu < 30) // se la flussata e molto breve e intensa, l'algoritmo sbaglia e puo risultare flu_med > flu_max
             m_flu_med = m_flu_max;
 
-    message = tr("Maximum Flow Rate .........");
+    message = tr("Maximum flow rate ...........");
     Pri_Rep_Lin(message.toLatin1().data(), (int)(m_flu_max * Fc_FLW), 1, (char *)"ml/s\n", 0);
-    message = tr("Average Flow Rate .........");
+    message = tr("Average flow rate ...........");
     Pri_Rep_Lin(message.toLatin1().data(), (int)(m_flu_med * Fc_FLW), 1, (char *)"ml/s\n", 0);
-    message = tr("Time to Maximum Flow ......");
+    message = tr("Time to mximum flow .........");
     Pri_Rep_Lin(message.toLatin1().data(), (int)(m_tem_max * Fc_FLW), 1, (char *)"s\n",    0);
-    message = tr( "Time between 5% and 95% ...");
+    message = tr("Time between 5% and 95% .....");
     Pri_Rep_Lin(message.toLatin1().data(), (int)(m_tem_595 * Fc_FLW), 1, (char *)"s\n",    0);
-    message = tr("Flow Time .................");
+    message = tr("Flow time ...................");
     Pri_Rep_Lin(message.toLatin1().data(), (int)(m_tem_flu * Fc_FLW), 1, (char *)"s\n",    0);
-    message = tr("Descent Time ..............");
+    message = tr("Descent time ................");
     Pri_Rep_Lin(message.toLatin1().data(), (int)(m_tem_dis * Fc_FLW), 1, (char *)"s\n",    0);
-    message = tr("Voiding Time ..............");
+    message = tr("Voiding time ................");
     Pri_Rep_Lin(message.toLatin1().data(), (int)(m_tem_svu * Fc_FLW), 1, (char *)"s\n",    0);
-    message = tr("Volume to Maximum Flow ....");
-    Pri_Rep_Lin(message.toLatin1().data(), (int) m_vol_max,           0, (char *)"ml\n",   0);
-    message = tr("Voided Volume .............");
-    Pri_Rep_Lin(message.toLatin1().data(),m_vol_vuo,                  0, (char *)"ml\n",   0);
-    // per ora il flus max corretto non lo metto perche non ho la funzione radice quadrata
-    // message = tr("Corrected Maximum Flow ....";
-    //Pri_Rep_Lin((char *)msg_flu_cor[Language_selected],(rep.flu_cor)*Fc_FLW,1,"ml 1/2 /s",1);    // 1/2 =1/2 apice
-    message = tr( "Flow Acceleration .........");
-    Pri_Rep_Lin(message.toLatin1().data(), (int)((m_flu_acc)*Fc_FLW*10),2,(char *)"ml/s^2\n",0);    //?=2 apice
+    message = tr("Volume to maximum flow ......");
+    Pri_Rep_Lin(message.toLatin1().data(), (int)(m_vol_max * Fc_FLW), 1, (char *)"ml\n",   0);
+    message = tr("Voided Volume ...............");
+    Pri_Rep_Lin(message.toLatin1().data(), (int)(m_vol_vuo * Fc_FLW), 1, (char *)"ml\n",   0);
+    message = tr("Corrected maximum flow ......");
+    Pri_Rep_Lin(message.toLatin1().data(), (int)(m_cQ * Fc_FLW),      1, (char *)"ml\n",   0);
+    message = tr("Flow acceleration ...........");
+    Pri_Rep_Lin(message.toLatin1().data(), (int)(m_flu_acc * Fc_FLW), 1,(char *)"ml/s^2\n",0);    //?=2 apice
+    message = tr("Maximun contraction speed ...");
+    Pri_Rep_Lin(message.toLatin1().data(), (int)(m_vDetMax * Fc_FLW), 1, (char *)"ml/s\n", 0);
+    message = tr("Residual volume .............");
+    Pri_Rep_Lin(message.toLatin1().data(), (int)(m_resVol * Fc_FLW),  1, (char *)"ml\n",   0);
 }
 
 /**

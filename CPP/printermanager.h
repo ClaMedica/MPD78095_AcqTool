@@ -162,17 +162,21 @@ public:
     void print();
     void closePrinter();
 
-    void setTempoAttesa(float __val)        {m_tem_att = __val;}
-    void setFlussoMax(float __val)          {m_flu_max = __val;}
-    void setFlussoMedio(float __val)        {m_flu_med = __val;}
-    void setTempoMax(float __val)           {m_tem_max = __val;}
-    void setTempo595(float __val)           {m_tem_595 = __val;}
-    void setTempoSvuot(float __val)         {m_tem_svu = __val;}
-    void setTempoFlusso(float __val)        {m_tem_flu = __val;}
-    void setTempoDisc(float __val)          {m_tem_dis = __val;}
-    void setAccelerazione(float __val)      {m_flu_acc = __val;}
-    void setVolFlussoMax(unsigned int __val)   {m_vol_max = __val;}
-    void setVolVuotato(unsigned int  __val) {m_vol_vuo = __val;}
+    void setTempoAttesa(float __val)            {m_tem_att = __val;}
+    void setFlussoMax(float __val)              {m_flu_max = __val;}
+    void setFlussoMedio(float __val)            {m_flu_med = __val;}
+    void setTempoMax(float __val)               {m_tem_max = __val;}
+    void setTempo595(float __val)               {m_tem_595 = __val;}
+    void setTempoSvuot(float __val)             {m_tem_svu = __val;}
+    void setTempoFlusso(float __val)            {m_tem_flu = __val;}
+    void setTempoDisc(float __val)              {m_tem_dis = __val;}
+    void setAccelerazione(float __val)          {m_flu_acc = __val;}
+    void setVolFlussoMax(float __val)           {m_vol_max = __val;}
+    void setVolVuotato(unsigned int  __val)     {m_vol_vuo = __val;}
+    void setFlussoCor(float  __val)             {m_cQ = __val;}
+    void setVolRes(unsigned int  __val)         {m_resVol = __val;}
+    void setDetContrMax(float  __val)           {m_vDetMax = __val;}
+
     void setMode(unsigned char   __val)     {m_modal_e = __val;}
     void setPrintSiroky(bool __val)         {m_printSiroky = __val;}
     void setPrintLiverpool(bool __val)      {m_printLiverpool = __val;}
@@ -225,6 +229,10 @@ private:
     int m_num_sam; //numero campioni minimo nas (vol)
 
     //dati risultati analisi
+
+
+
+
     float  m_tem_att;              /* Tempo di Attesa          (Decimi di Sec) */
     float  m_flu_max;              /* Flusso Massimo           (ml/sec)        */
     float  m_flu_med;              /* Flusso Medio             (ml/sec)        */
@@ -233,9 +241,13 @@ private:
     float  m_tem_flu;              /* Tempo di Flusso          (Decimi di Sec) */
     float  m_tem_dis;              /* Tempo di Discesa         (Decimi di Sec) */
     float  m_tem_svu;              /* Tempo di Svuotamento     (Decimi di Sec) */
-    unsigned int  m_vol_max;              /* Volume al Flusso Massimo (ml)            */
+    float  m_vol_max;              /* Volume al Flusso Massimo (ml)            */
+    float  m_cQ;                   /* Flow corrective factor  */
     unsigned int  m_vol_vuo;              /* Volume Vuotato           (ml)            */
     float  m_flu_acc;              /* Accelerazione Flusso     (ml/sec2/10)    */
+    unsigned int    m_resVol;                /*residual volume inserted by the user (ml) */
+    float m_vDetMax;              /* detrusor contraction maximum speed  */
+
     unsigned char   m_modal_e;				 /* Modalita dell'esame 0=auto; 2=manual	 */
 
     double *buffer_vol;		// da questo buffer la vengono raccolti i dati poi stampati nel report modalita vecchio Picoflow

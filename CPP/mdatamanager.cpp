@@ -994,7 +994,7 @@ bool MDataManager::checkForVolRes()
         setValVolRes(0);
         m_mng->SetOther(otherString);
         m_mng->CommitParameters();
-        //se è la prima volta che apro un esame di flussimetria automatica la stampa anche è automatica
+        //se è la prima volta che apro un esame di flussimetria automatica la stampa è automatica
         if (m_autoFlow == 0)
             m_autoPrint =  true;
     }
@@ -1010,7 +1010,7 @@ bool MDataManager::checkForVolRes()
     {
         int anaType = m_mng->GetAnalysis(i).toInt();
         if (anaType == FLW_AVD_STUDY) {
-            if (m_autoPrint || m_autoFlow == 0)
+            if (m_autoPrint)
                 setValVolRes(0);//-1?;
             else {
                 volRes = true;
@@ -1259,17 +1259,20 @@ qDebug() << "INIZIO";
 void MDataManager::startPrint()
 {
 #ifdef PICOFLOW
-    m_mngPrint->setTempoAttesa(m_aflwdatas.at(0)->getWaitingTime());
-    m_mngPrint->setFlussoMax(m_aflwdatas.at(0)->getQMax());
-    m_mngPrint->setFlussoMedio(m_aflwdatas.at(0)->getQAve());
-    m_mngPrint->setTempoMax(m_aflwdatas.at(0)->getTimeAtQmax());
-    m_mngPrint->setTempo595(m_aflwdatas.at(0)->getTime90());
-    m_mngPrint->setTempoFlusso(m_aflwdatas.at(0)->getFlowTime());
-    m_mngPrint->setTempoDisc(m_aflwdatas.at(0)->getDescTime());
-    m_mngPrint->setTempoSvuot(m_aflwdatas.at(0)->getVoidingTime());
-    m_mngPrint->setVolFlussoMax(m_aflwdatas.at(0)->getVolAtQqmax());
-    m_mngPrint->setVolVuotato(m_aflwdatas.at(0)->getVoidedVolume());
-    m_mngPrint->setAccelerazione(m_aflwdatas.at(0)->getAcceleration());
+    m_mngPrint->setTempoAttesa((float)(qRound(m_aflwdatas.at(0)->getWaitingTime()*10))/10);
+    m_mngPrint->setFlussoMax((float)(qRound(m_aflwdatas.at(0)->getQMax()*10))/10);
+    m_mngPrint->setFlussoMedio((float)(qRound(m_aflwdatas.at(0)->getQAve()*10))/10);
+    m_mngPrint->setTempoMax((float)(qRound(m_aflwdatas.at(0)->getTimeAtQmax()*10))/10);
+    m_mngPrint->setTempo595((float)(qRound(m_aflwdatas.at(0)->getTime90()*10))/10);
+    m_mngPrint->setTempoFlusso((float)(qRound(m_aflwdatas.at(0)->getFlowTime()*10))/10);
+    m_mngPrint->setTempoDisc((float)(qRound(m_aflwdatas.at(0)->getDescTime()*10))/10);
+    m_mngPrint->setTempoSvuot((float)(qRound(m_aflwdatas.at(0)->getVoidingTime()*10))/10);
+    m_mngPrint->setVolFlussoMax((float)(qRound(m_aflwdatas.at(0)->getVolAtQqmax()*10))/10);
+    m_mngPrint->setVolVuotato((float)(qRound(m_aflwdatas.at(0)->getVoidedVolume()*10))/10);
+    m_mngPrint->setAccelerazione((float)(qRound(m_aflwdatas.at(0)->getAcceleration()*10))/10);
+    m_mngPrint->setFlussoCor((float)(qRound(m_aflwdatas.at(0)->getCQ()*10))/10);
+    m_mngPrint->setVolRes((float)(qRound(m_aflwdatas.at(0)->getResidualVolume()*10))/10);
+    m_mngPrint->setDetContrMax((float)(qRound(m_aflwdatas.at(0)->getVDetMax()*10))/10);
 
     //letto dai setting
     //mi dice se la flussimetria automatica o manuale

@@ -47,50 +47,48 @@ void mflowdatas::buildTable()
     int count = -1;
     if (!m_autoflow) {
         count++;
-        m_datasInfo->setData(count,"descr",tr(" Waiting Time (sec)"));
-        m_datasInfo->setData(count,"value",QString::number(getWaitingTime(), 'f', 1));
+        m_datasInfo->setData(count,"descr",tr(" Waiting time (sec)"));
+        m_datasInfo->setData(count,"value",QString::number((float)(qRound(getWaitingTime()*10))/10, 'f', 1));
     }
 
     m_datasInfo->setData(count+1,"descr",tr(" Maximum flow rate (ml/sec)"));
-    m_datasInfo->setData(count+1,"value",QString::number(getQMax(), 'f', 1));
+    m_datasInfo->setData(count+1,"value",QString::number((float)(qRound(getQMax()*10))/10, 'f', 1));
 
     m_datasInfo->setData(count+2,"descr",tr(" Average flow rate (ml/sec)"));
-    m_datasInfo->setData(count+2,"value",QString::number(getQAve(), 'f', 1));
+    m_datasInfo->setData(count+2,"value",QString::number((float)(qRound(getQAve()*10))/10, 'f', 1));
 
     m_datasInfo->setData(count+3,"descr",tr(" Time to maximun flow (sec)"));
-    m_datasInfo->setData(count+3,"value",QString::number(getTimeAtQmax(), 'f', 1));
+    m_datasInfo->setData(count+3,"value",QString::number((float)(qRound(getTimeAtQmax()*10))/10, 'f', 1));
 
     m_datasInfo->setData(count+4,"descr",tr(" Time between 5% and 95% (sec)"));
-    m_datasInfo->setData(count+4,"value",QString::number(getTime90(), 'f', 1));
+    m_datasInfo->setData(count+4,"value",QString::number((float)(qRound(getTime90()*10))/10, 'f', 1));
 
     m_datasInfo->setData(count+5,"descr",tr(" Flow time (sec)"));
-    m_datasInfo->setData(count+5,"value",QString::number(getFlowTime(), 'f', 1));
+    m_datasInfo->setData(count+5,"value",QString::number((float)(qRound(getFlowTime()*10))/10, 'f', 1));
 
     m_datasInfo->setData(count+6,"descr",tr(" Descent time (sec"));
-    m_datasInfo->setData(count+6,"value",QString::number(getDescTime(), 'f', 1));
+    m_datasInfo->setData(count+6,"value",QString::number((float)(qRound(getDescTime()*10))/10, 'f', 1));
 
     m_datasInfo->setData(count+7,"descr",tr(" Voiding time (sec)"));
-    m_datasInfo->setData(count+7,"value",QString::number(getVoidingTime(), 'f', 1));
+    m_datasInfo->setData(count+7,"value",QString::number((float)(qRound(getVoidingTime()*10))/10, 'f', 1));
 
     m_datasInfo->setData(count+8,"descr",tr(" Volume to maxinum flow (ml)"));
-    m_datasInfo->setData(count+8,"value",QString::number(getVolAtQqmax(), 'f', 1));
+    m_datasInfo->setData(count+8,"value",QString::number((float)(qRound(getVolAtQqmax()*10))/10, 'f', 1));
 
     m_datasInfo->setData(count+9,"descr",tr(" Voided volume (ml)"));
     m_datasInfo->setData(count+9,"value",QString::number(getVoidedVolume(), 'f', 1));
 
     m_datasInfo->setData(count+10,"descr",tr(" Corrected maximun flow (ml)"));
-    m_datasInfo->setData(count+10,"value",QString::number(getCQ(), 'f', 1));
+    m_datasInfo->setData(count+10,"value",QString::number((float)(qRound(getCQ()*10))/10, 'f', 1));
 
     m_datasInfo->setData(count+11,"descr",tr(" Flow acceleration (ml/sec^2))"));
-    m_datasInfo->setData(count+11,"value",QString::number(getAcceleration(), 'f', 1));
+    m_datasInfo->setData(count+11,"value",QString::number((float)(qRound(getAcceleration()*10))/10, 'f', 1));
 
     m_datasInfo->setData(count+12,"descr",tr(" Maximun contraction speed (mm/sec)"));
-    m_datasInfo->setData(count+12,"value",QString::number(getVDetMax(), 'f', 1));
+    m_datasInfo->setData(count+12,"value",QString::number((float)(qRound(getVDetMax()*10))/10, 'f', 1));
 
-    if (!m_autoflow) {
-        m_datasInfo->setData(count+13,"descr",tr(" Residual volume (ml)"));
-        m_datasInfo->setData(count+13,"value",QString::number(getResidualVolume(), 'f', 1));
-    }
+    m_datasInfo->setData(count+13,"descr",tr(" Residual volume (ml)"));
+    m_datasInfo->setData(count+13,"value",QString::number(getResidualVolume(), 'f', 1));
 
 }
 
