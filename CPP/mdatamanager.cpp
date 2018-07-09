@@ -1044,7 +1044,6 @@ qDebug() << "INIZIO";
         return;
 
     saveChanges();
-    setToSave("");  //necessario chiedere se salvare
 
     m_mng = new DatafileManager;
     m_mng->SetFileName(m_copyFileName);
@@ -1057,12 +1056,17 @@ qDebug() << "INIZIO";
     QString other = m_mng->GetOther();
     QStringList otherList = other.split(";");
     other.clear();
-    otherList[0] = QString::number(getValVolRes());
-    for (int j=0; j<otherList.length()-1;j++)
-        other += otherList.at(j) + ";";
+    int valResOld = otherList.at(0).toInt();
+    int valResNew = getValVolRes();
+    if (valResNew != valResOld) {
+        otherList[0] = QString::number(valResNew);
+        for (int j=0; j<otherList.length()-1;j++)
+            other += otherList.at(j) + ";";
 
-    m_mng->SetOther(other);
-    m_mng->CommitParameters();
+        m_mng->SetOther(other);
+        m_mng->CommitParameters();
+        setToSave("");  //necessario chiedere se salvare
+    }
 
     m_ana->SetData(m_mng);
 
@@ -1087,6 +1091,10 @@ qDebug() << "INIZIO";
             }
 
             if (!found) {
+
+                //in caso di PICOFLOW2REV3, da controllare in caso desktop
+                setToSave("");  //necessario chiedere se salvare
+
                 int posQ = -1, posV = -1;
                 int i = 0;
                 foreach(MSignal *sig, m_signalVector) {
@@ -1217,7 +1225,7 @@ qDebug() << "INIZIO";
             if (found) {
                 //                                        'Salva l'immagine dei tracciati all'interno del definitore
                 //                                        myGraphPlot.RedrawGraphForPrint("GR200", MarkerUtils.getOpMarkerAn(mkOpAnIn - 1).myNumStart(myGraphPlot.GetTruePosChannel(myGraphPlot.MaxNASCh)), MarkerUtils.getOpMarkerAn(mkOpAnIn - 1).myNumEnd(myGraphPlot.GetTruePosChannel(myGraphPlot.MaxNASCh)))
-                m_analized = True;
+                m_analized = true;
                 //                                            UpdateTestOther()
                 //Lancia analisi e Inizializza nomogrammi
                 InitPageGraphs(FLW_AVD_STUDY);
