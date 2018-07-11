@@ -57,10 +57,10 @@ MDataManager::~MDataManager()
 }
 
 
-void MDataManager::getGrabbedImage(QObject *gi, QString nome)
+void MDataManager::getGrabbedImage(QObject *gi, QString __nome)
 {
 #ifdef PICOFLOW
-    m_mngPrint->getGrabbedImage(gi,nome);
+    m_mngPrint->getGrabbedImage(gi,__nome);
 #endif
 }
 
@@ -453,6 +453,12 @@ void MDataManager::loadFile(QString __fileName)
         //creo oggetto per stampare
 #ifdef PICOFLOW
         m_mngPrint = new printermanager(m_copyFileName);
+        //mi dice se la flussimetria automatica o manuale
+        m_mngPrint->setMode(m_autoFlow);
+        m_mngPrint->setPrintSiroky(m_Siroky);
+        m_mngPrint->setPrintLiverpool(m_Liverpool);
+        m_mngPrint->setPrintModeUser(m_landscape);
+        m_mngPrint->setPrintHeaders(m_firstHead,m_secondHead);
 #endif
         m_mng->Close();
         break;
@@ -1282,14 +1288,6 @@ void MDataManager::startPrint()
     m_mngPrint->setVolRes((float)(qRound(m_aflwdatas.at(0)->getResidualVolume()*10))/10);
     m_mngPrint->setDetContrMax((float)(qRound(m_aflwdatas.at(0)->getVDetMax()*10))/10);
 
-    //letto dai setting
-    //mi dice se la flussimetria automatica o manuale
-    m_mngPrint->setMode(m_autoFlow);
-    m_mngPrint->setPrintSiroky(m_Siroky);
-    m_mngPrint->setPrintLiverpool(m_Liverpool);
-    m_mngPrint->setPrintModeUser(m_landscape);
-    m_mngPrint->setPrintHeaders(m_firstHead,m_secondHead);
-
     //stampo
     if (m_autoPrint)
         sendToPrint();
@@ -1777,3 +1775,4 @@ void MDataManager::sendPrintTest()
      m_mngPrint->closePrinter();
 #endif
 }
+

@@ -18,7 +18,6 @@ Rectangle {
     property bool opened: false
     property int numElementiMax: 5
     property bool notPutOn: false
-    property int visArrow: height
     readonly property bool modelOk: (model.length != 0) && (model[0] !== undefined)
     clip: true
     Behavior on height { NumberAnimation { duration:300; easing.type: Easing.OutExpo}}
@@ -47,7 +46,6 @@ Rectangle {
         //che non sia già aperto
         //che sia tornato alle sue dimensioni originali, cioè che non sia in fase di chiusura con l'animazione
         tmph = rootComboBox.height  // variabile tipo int per forzare a int
-        // console.log("openBox start",model.length,opened,oriH,tmph)
         if(model.length == 0 || opened || oriH !== tmph)
             return
         oriH = rootComboBox.height
@@ -140,7 +138,7 @@ Rectangle {
         anchors.right:parent.right
         anchors.top:parent.top
         anchors.bottom: parent.bottom
-        width:visArrow
+        width:height
         color: "transparent"
         anchors.margins: rootComboBox.border.width-1
         Image{

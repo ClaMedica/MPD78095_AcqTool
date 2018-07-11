@@ -17,6 +17,7 @@ ApplicationWindow {
     //property var keyboard:appKey
     property string examFolder:settings.datafilePath
     property string configFolder:settings.appPath()
+    property bool vis: false
 
     //@@@@@@@@@@    Properties      @@@@@@@@@@
     id: root
@@ -106,7 +107,6 @@ ApplicationWindow {
         console.log("Application Ready!")
         if (mode !== "sta")
             bridgeMain.sendSwitch()
-
     }
 
     //@@@@@@@@@@    Objects         @@@@@@@@@@
@@ -123,16 +123,25 @@ ApplicationWindow {
         {
             console.log(datafile);
             launch("acq", datafile)
+            vis = false
         }
         onNewVisualization:
         {
             console.log(datafile);
             launch("vis", datafile)
+            vis = true
         }
         onStampaProva:
         {
             console.log("Stampa di prova");
             launch("sta","")
+        }
+        onAnaAutomatica:
+        {
+            if (vis && mngData.getAutoFlow() === 0){
+                console.log("analisi automatica");
+                mngData.analysis()
+            }
         }
     }
 
@@ -165,9 +174,6 @@ ApplicationWindow {
             forAna.loadConfigurationFile(mngData.plotConfigFileName())
             forAna.populate()
             forHome.whoIsVisible = forAna.name
-            if (mngData.getAutoFlow() === 0)
-                mngData.analysis()
-
         }
 
         onReloadingCompleted: forAna.populate()

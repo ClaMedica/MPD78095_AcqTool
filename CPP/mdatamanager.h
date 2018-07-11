@@ -46,7 +46,7 @@ public:
     Q_PROPERTY(int numAnaFlwAdv READ getNumAnaFlwAdv)
     Q_INVOKABLE int getNumAnaFlwAdv(){return m_aflwdatas.length();}
 
-    Q_INVOKABLE void getGrabbedImage(QObject *gi, QString nome);
+    Q_INVOKABLE void getGrabbedImage(QObject *gi, QString __nome);
     Q_INVOKABLE bool getAutoPrint(){return m_autoPrint;}
     Q_INVOKABLE int getAutoFlow(){return m_autoFlow;}
 

@@ -91,9 +91,13 @@ INCLUDEPATH +=  CPP \
 # Default rules for deployment.
 include(deployment.pri)
 
-TRANSLATIONS += acqtool_it.ts
+
+TRANSLATIONS += acqtool.xlf \
+                acqtool_en.xlf \
+                acqtool_it.xlf
+
 lupdate_only{
-    SOURCES = Resources/*.qml \
+    SOURCES += Resources/*.qml \
              ../MGlobal/MComponents/*.qml
 }
 

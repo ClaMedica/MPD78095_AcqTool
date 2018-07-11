@@ -22,6 +22,7 @@ Rectangle {
     property bool keyboardAlfaNum: true
     property int comboNumMaxEle:5
     property string containerBorderColor: "transparent"
+    property bool virtualKeyOpen: false
     readonly property int currentIndex:type===typComboBox && component!=undefined?component.currentIndex:-1
     readonly property string typTextField:"TextField"
     readonly property string typComboBox: "ComboBox"
@@ -43,6 +44,7 @@ Rectangle {
     // has clicked. The id must be unique
     property int parameterId: 0
     signal clicked()
+    signal virtualKeyClosed()
     onComponentChanged: if(component !== undefined) connection.target = component
 
     function reload()
@@ -82,8 +84,14 @@ Rectangle {
                     if (rootParEdit.type === typTextField)
                         c.testo = connection.target.text
                     c.show()
+                    rootParEdit.virtualKeyOpen = true;
                 }
                 rootParEdit.clicked()
+            }
+            else if (rootParEdit.virtualKeyOpen && isTouch)
+            {
+                rootParEdit.virtualKeyOpen = false
+                rootParEdit.virtualKeyClosed()
             }
         }
     }
