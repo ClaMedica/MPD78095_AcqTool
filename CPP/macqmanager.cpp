@@ -17,6 +17,7 @@ MAcqManager::MAcqManager(QObject *parent)
     m_itsok = "              &";
     OutFile = NULL;
 
+    m_startAcqManuale = false; //non ancora premuto tasto start
 #ifdef PICOFLOW
 
 #endif
@@ -484,34 +485,36 @@ void MAcqManager::handleTCP(SimpleTCPClient *__client, QByteArray __block)
         }
         else if(who == "VAL")
         {
-            // riempo i buffer
-            fillBuffers(__block);
+            if (m_autoStartStop || m_startAcqManuale) {
+                // riempo i buffer
+                fillBuffers(__block);
 
-            // finche' i buffer hanno abbastanza campioni
-            // faccio le mie operazioni e rimuovo i primi campioni
-            while(buffersReady()) {
-                qDebug() << "BUFFER ready";
-                applyOperations();
-                foreach(QString hwc, m_totalHWChan)
-                    m_bufferMap[hwc]->remove(0, m_frameMap[hwc]);
-            }
+                // finche' i buffer hanno abbastanza campioni
+                // faccio le mie operazioni e rimuovo i primi campioni
+                while(buffersReady()) {
+                    qDebug() << "BUFFER ready";
+                    applyOperations();
+                    foreach(QString hwc, m_totalHWChan)
+                        m_bufferMap[hwc]->remove(0, m_frameMap[hwc]);
+                }
 
-            qDebug() << "m_saving:" << m_saving << "m_autoStartStop:" << m_autoStartStop;
-            if(m_autoStartStop) {
-                if(!m_saving)
-                    checkAutomaticStartStop("Start");   //finche' non devo salvare riempo il buffer e controllo
+                qDebug() << "m_saving:" << m_saving << "m_autoStartStop:" << m_autoStartStop;
+                if(m_autoStartStop) {
+                    if(!m_saving)
+                        checkAutomaticStartStop("Start");   //finche' non devo salvare riempo il buffer e controllo
+                    else {
+                        checkAutomaticStartStop("Stop");
+                        if(!m_acqFinished) {
+                            sendBuffersToPlot();
+                            saveBuffersToFile();
+                        }
+                    }
+                }
                 else {
-                    checkAutomaticStartStop("Stop");
-                    if(!m_acqFinished) {
+                    if(m_saving && !m_acqFinished) {
                         sendBuffersToPlot();
                         saveBuffersToFile();
                     }
-                }
-            }
-            else {
-                if(m_saving && !m_acqFinished) {
-                    sendBuffersToPlot();
-                    saveBuffersToFile();
                 }
             }
         }
@@ -520,6 +523,9 @@ void MAcqManager::handleTCP(SimpleTCPClient *__client, QByteArray __block)
             if(__block[4] == '5') {
                 if(!m_saving) {
                     //parte immediatamnte l'acquisizione
+                    //azzero
+                    sendStartAcq();
+                    m_startAcqManuale = true;
                     int secToSave = 0.0;
                     //in caso di flussimetria manuale non devo tenermi buffer di dati:
                     //i dati salvati partono dal momento dello start acquisizione da parte dell'utente
@@ -538,6 +544,7 @@ void MAcqManager::handleTCP(SimpleTCPClient *__client, QByteArray __block)
                     //ferma immediatamente l'acquisizione
                     qDebug() << "Stop acquiring";
                     endAcquisitionSave();
+                    m_startAcqManuale = false;
                     m_acqFinished = true;
                 }
             }
