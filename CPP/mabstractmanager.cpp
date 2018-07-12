@@ -234,12 +234,12 @@ QVariantList MAbstractManager::commandsInfo()
     list << "visible" << true;
     list << "&GridElement";
 
-    //salva e chiudi
+    //spazio vuoto
     list << "$GridElement";
-    list << "descr" << tr("save&exit");
-    list << "img" << "qrc:/salvaChiudi";
-    list << "key" << 112;
-    list << "visible" << true;
+    list << "descr" << "";
+    list << "img" << "";
+    list << "key" << 0;
+    list << "visible" << false;
     list << "&GridElement";
 
     //zoom in
@@ -263,6 +263,30 @@ QVariantList MAbstractManager::commandsInfo()
     list << "descr" << tr("zoom none");
     list << "img" << "qrc:/zoom_none";
     list << "key" << 115;
+    list << "visible" << true;
+    list << "&GridElement";
+
+     //spazio vuoto
+    list << "$GridElement";
+    list << "descr" << "";
+    list << "img" << "";
+    list << "key" << 0;
+    list << "visible" << false;
+    list << "&GridElement";
+
+    //spazio vuoto
+    list << "$GridElement";
+    list << "descr" << "";
+    list << "img" << "";
+    list << "key" << 0;
+    list << "visible" << false;
+    list << "&GridElement";
+
+    //salva e chiudi
+    list << "$GridElement";
+    list << "descr" << tr("save&exit");
+    list << "img" << "qrc:/salvaChiudi";
+    list << "key" << 112;
     list << "visible" << true;
     list << "&GridElement";
 
