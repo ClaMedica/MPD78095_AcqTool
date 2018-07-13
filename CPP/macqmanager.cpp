@@ -674,12 +674,14 @@ void MAcqManager::checkAutomaticStartStop(QString __which)
             Ancestry *childAmp = condition->getSafeChild(XML_AMPLITUDE);
 
             //per prima cosa controlliamo quanti campioni
-            int      min = childDur->getSafeChild(ATT_MIN)->getSafeAttribute(ATT_VALUE).toUInt();
+            int      minSec = childDur->getSafeChild(ATT_MIN)->getSafeAttribute(ATT_VALUE).toUInt();
             qreal ampMin = childAmp->getSafeChild(ATT_MIN)->getSafeAttribute(ATT_VALUE).toInt();
             qreal ampMax = childAmp->getSafeChild(ATT_MAX)->getSafeAttribute(ATT_VALUE).toInt();
 
-            if (!(m_channelMap[chanType].at(num)->size() < min)) //se non ho ancora abbastanza campioni per decidere non vado avanti
-            { // continue;
+            int min = minSec*m_channelMap[chanType].at(num)->getSamplingFrequency();
+            //se non ho ancora abbastanza campioni per decidere non vado avanti
+            if (!(m_channelMap[chanType].at(num)->size() < min))
+            {
                 //ora quindi sono sicuro che arrivo qui solo quando ho abbastanza campioni
 
                 //controllo se c'e' un gradino
@@ -710,7 +712,6 @@ void MAcqManager::checkAutomaticStartStop(QString __which)
             }
         }
 
-        //if(condition->name() == XML_STATIONARY) {   //statio
         if (__which == "Stop")
         {
             Ancestry *childDur = condition->getSafeChild(XML_DURATION);
@@ -721,10 +722,13 @@ void MAcqManager::checkAutomaticStartStop(QString __which)
 
             qreal valMin = childVal->getSafeChild(ATT_MIN)->getSafeAttribute(ATT_VALUE).toDouble();
             qreal valMax = childVal->getSafeChild(ATT_MAX)->getSafeAttribute(ATT_VALUE).toDouble();
-            //qDebug()<<"Buffer"<<chanType<<num<<"="<<*(m_channelMap[chanType].at(num));
+            //qDebug()<<"Buffer"<<chanType<<num<<"="<<*(m_channelMap[chanType].at(num))<<m_channelMap[chanType].at(num)->getSamplingPeriod();
 
-            m_stopBuffer << *m_channelMap[chanType].at(num);
+            m_stopBuffer.setSamplingPeriod(m_channelMap[chanType].at(num)->getSamplingPeriod());
+            m_stopBuffer << *(m_channelMap[chanType].at(num));
+            //qDebug()<<"StopBuffer Len"<<m_stopBuffer.getDuration()<<m_stopBuffer.size();
             m_stopBuffer.saveLastSec(min);
+
             if (!(m_stopBuffer.getDuration() < min))
             {//   continue;
                 //ora quindi sono sicuro che arrivo qui solo quando ho abbastanza campioni
@@ -732,8 +736,7 @@ void MAcqManager::checkAutomaticStartStop(QString __which)
                 //controllo gli ultimi min campioni
                 qreal smin = m_stopBuffer.minimum();
                 qreal smax = m_stopBuffer.maximum();
-                //qDebug()<<smin<<valMin<<smax<<valMax;
-
+                //qDebug()<<"STOP flowauto"<<smin<<valMin<<smax<<valMax;
                 if((smin > valMin) && (smax < valMax)) {
                     qDebug() << "Stop acquiring";
                     endAcquisitionSave();
