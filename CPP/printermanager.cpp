@@ -487,7 +487,7 @@ void printermanager::Pri_Rep(double xscale)
 
     // 	Risultati dell'esame ricavati dall'analisi semplificata, implementata nel firmware
     Report_result();		// scrive in elenco i dati calcolati dall'analisi dell'esame
-    m_port->status();
+    //m_port->status();
     m_port->Pri_Str(3, (char*)"\n \n", 0); // LINE"\x3",0);
 
     //	Scrive i dati riguardanti versione firmware e date/ora ultima calibrazione
@@ -2422,7 +2422,7 @@ void printermanager::Report_BitMap(bool __isSiro)
 
     for(int s = 0; s < sz; ) {
         //for(int n = 0; (n < 1000) && (m_port->status(false) & (1 << 3)); n++);
-        m_port->status(false);
+        //m_port->status(false);
         m_port->Pri_Str(8, head, 0);
         m_port->Pri_Str(szchunk, p, 0);
         p += szchunk;
@@ -2466,7 +2466,7 @@ void printermanager::Report_result()
     Pri_Rep_Lin(message.toLatin1().data(), (int)(m_flu_max * Fc_FLW), 1, (char *)"ml/s\n", 0);
     message = tr("Average flow rate ...........");
     Pri_Rep_Lin(message.toLatin1().data(), (int)(m_flu_med * Fc_FLW), 1, (char *)"ml/s\n", 0);
-    message = tr("Time to mximum flow .........");
+    message = tr("Time to maximum flow .........");
     Pri_Rep_Lin(message.toLatin1().data(), (int)(m_tem_max * Fc_FLW), 1, (char *)"s\n",    0);
     message = tr("Time between 5% and 95% .....");
     Pri_Rep_Lin(message.toLatin1().data(), (int)(m_tem_595 * Fc_FLW), 1, (char *)"s\n",    0);

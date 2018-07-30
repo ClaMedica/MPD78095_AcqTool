@@ -93,7 +93,7 @@ include(deployment.pri)
 
 
 TRANSLATIONS += acqtool.xlf \
-                acqtool_en.xlf \
+               # acqtool_en.xlf \
                 acqtool_it.xlf
 
 lupdate_only{

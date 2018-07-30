@@ -268,9 +268,10 @@ void MDataManager::loadFile(QString __fileName)
         }
 
         //------Aggiungo i definer
-        qDebug() << "Definer = " << m_mng->GetNumDefiners();
+        int numDefinitori = m_mng->GetNumDefiners();
+        qDebug() << "Definer = " << numDefinitori;
 
-        for(int i = 0; i < m_mng->GetNumDefiners(); i++) {
+        for(int i = 0; i < numDefinitori; i++) {
             VarMap *def = new VarMap;
             m_mng->GetOpMarkerAn(i, &key, tStart, tEnd, chEn, &descr);
             for(int nc = 0; nc < m_mng->GetChanNum(); nc++)
@@ -312,51 +313,56 @@ void MDataManager::loadFile(QString __fileName)
         }*/
 
         //------ Aggiungo i markers analitici, sono associati ad un definitore
-        qDebug() << "Marker Analitici = " << m_mng->GetNumAnalyticalMarkers();
+        //con questo controllo evitiamo i problemi dovuti ad un salvataggio errato del file,
+        //dove risulta nessun definitore ma markers analitici salvati
+        if (numDefinitori > 0)
+        {
+            qDebug() << "Marker Analitici = " << m_mng->GetNumAnalyticalMarkers();
 
-        //mrkAnVec->clear();
-        QVector<int32_t> numChVec;
-        for(int i = 0; i < m_mng->GetNumAnalyticalMarkers(); i++) {
-            VarMap *mrk = new VarMap;
-            m_mng->GetAnMarker(i, &key, &numCh, &numSamp[0], &numDef);
-            numChVec << numCh;
+            //mrkAnVec->clear();
+            QVector<int32_t> numChVec;
+            for(int i = 0; i < m_mng->GetNumAnalyticalMarkers(); i++) {
+                VarMap *mrk = new VarMap;
+                m_mng->GetAnMarker(i, &key, &numCh, &numSamp[0], &numDef);
+                numChVec << numCh;
 
-            QVariantList valuesY;
-            foreach(MSignal *sig, m_signalVector)
-                if(sig->getName() == m_mng->GetChanName(numCh)) {
-                    qDebug("%s: %d", sig->getName().toLatin1().constData(), sig->size());
-                    for (int i = 0; i < sig->size(); i++)
-                        valuesY.append(sig->at(i));
-                }
+                QVariantList valuesY;
+                foreach(MSignal *sig, m_signalVector)
+                    if(sig->getName() == m_mng->GetChanName(numCh)) {
+                        qDebug("%s: %d", sig->getName().toLatin1().constData(), sig->size());
+                        for (int i = 0; i < sig->size(); i++)
+                            valuesY.append(sig->at(i));
+                    }
 
-            double val = (double) numSamp[0] / m_mng->GetNAS(numCh);
-            (*mrk)["val"] = val;
-            (*mrk)["type"] = TYPE_ANALYTICAL;
-            (*mrk)["name"] = "Analitical";
-            (*mrk)["family"] = "Markers";
-            (*mrk)["nas"] =  m_mng->GetNAS(numCh);
-            (*mrk)["valuesY"] = valuesY;
-            (*mrk)["graph"] = m_mng->GetGraph(numCh)-1;
-            (*mrk)["code"] =  "f" + QString::number(key);
-            (*mrk)["descr"] = descr;
-            (*mrk)["lock"] = false;
-            (*mrk)["channel"] = numCh;
-            (*mrk)["defCode"] = (qulonglong)defVec->value(numDef);
-            (*mrk)["key"] = key;
-            (*mrk)["color"] = COLOR_ANALYTICAL;
-            (*mrk)["visible"] = true;
-            (*mrk)["category"] = CAT_MARKER;
-            mrkAnVec->append(mrk);
-            //lo associo al suo definitore
-            QList<QVariant> anM  =  defVec->value(numDef)->value("anMarkers").toList();
-            anM.append((qulonglong)mrk);
-            (*defVec->value(numDef))["anMarkers"] = anM;
-        }
+                double val = (double) numSamp[0] / m_mng->GetNAS(numCh);
+                (*mrk)["val"] = val;
+                (*mrk)["type"] = TYPE_ANALYTICAL;
+                (*mrk)["name"] = "Analitical";
+                (*mrk)["family"] = "Markers";
+                (*mrk)["nas"] =  m_mng->GetNAS(numCh);
+                (*mrk)["valuesY"] = valuesY;
+                (*mrk)["graph"] = m_mng->GetGraph(numCh)-1;
+                (*mrk)["code"] =  "f" + QString::number(key);
+                (*mrk)["descr"] = descr;
+                (*mrk)["lock"] = false;
+                (*mrk)["channel"] = numCh;
+                (*mrk)["defCode"] = (qulonglong)defVec->value(numDef);
+                (*mrk)["key"] = key;
+                (*mrk)["color"] = COLOR_ANALYTICAL;
+                (*mrk)["visible"] = true;
+                (*mrk)["category"] = CAT_MARKER;
+                mrkAnVec->append(mrk);
+                //lo associo al suo definitore
+                QList<QVariant> anM  =  defVec->value(numDef)->value("anMarkers").toList();
+                anM.append((qulonglong)mrk);
+                (*defVec->value(numDef))["anMarkers"] = anM;
+            }
 
-        if(!mrkAnVec->isEmpty()) {
-            QString family = "Markers";
-            QString name = "Analitical";
-            saveDataAndUpdate(family, name, mrkAnVec);
+            if(!mrkAnVec->isEmpty()) {
+                QString family = "Markers";
+                QString name = "Analitical";
+                saveDataAndUpdate(family, name, mrkAnVec);
+            }
         }
 
         //        for(int32_t nc=0;nc<m_mng->GetChanNum();nc++)
