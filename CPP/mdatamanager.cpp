@@ -116,8 +116,11 @@ void MDataManager::loadFile(QString __fileName)
     //la prima volta che salvo mi faccio la copia del file originale
     m_copyFileName = m_fileName;
     m_copyFileName.insert(m_copyFileName.length() - 4, "_copy");
-    if (!QFile(m_copyFileName).exists())
-        QFile::copy(m_fileName, m_copyFileName);
+    //se è rimasta per sbaglio una copia di aperture precedenti del file, la cancelliamo prima di ricrearla
+    if (QFile(m_copyFileName).exists()) {
+        QFile::remove(m_copyFileName);
+    }
+    QFile::copy(m_fileName, m_copyFileName);
 
     //devo pulire tutti i vettori utilizzati
     resetAll();
