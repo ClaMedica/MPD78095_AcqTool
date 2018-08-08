@@ -15,6 +15,7 @@ Rectangle {
         anchors.left:parent.left
         anchors.right:btnDialog.left
         anchors.bottom:parent.bottom
+        enabled: false
         text:""
     }
 

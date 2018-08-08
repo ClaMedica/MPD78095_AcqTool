@@ -460,13 +460,16 @@ void MAcqManager::handleTCP(SimpleTCPClient *__client, QByteArray __block)
                 picoFlow_states_t pf;
             } currState;
             uint i = 0;
+            qDebug("blk.sz:%d sz(alarms_t):%d sz(flowBT_status_t):%d sz(picoFlow_status_t):%d",__block.size(), sizeof(alarms_t),sizeof(flowBT_status_t),sizeof(picoFlow_status_t));
             if((__block.size() - sizeof(alarms_t)) == sizeof(flowBT_status_t)) {
+                qDebug(" --> currState.bt = stBT.currState");
                 qint8  * d = (qint8 *) &stBT;
                 for(i = 0; i < sizeof(flowBT_status_t); i++)
                     *d++ = __block.at(i);
                 currState.bt = stBT.currState;
             }
             else {
+                qDebug(" --> currState.pf = stPico.currState");
                 qint8  * d = (qint8 *) &stPico;
                 for(i = 0; i < sizeof(picoFlow_status_t); i++)
                     *d++ = __block.at(i);
@@ -480,7 +483,7 @@ void MAcqManager::handleTCP(SimpleTCPClient *__client, QByteArray __block)
 
             analyzeStatus(currState.pf);
             analyzeAlarms(alarms);
-            //qDebug() << "Supervisore connesso"<<sizeof(flowBT_status_t)<<sizeof(picoFlow_status_t)<<sizeof(alarms_t)<<__block.size();
+            qDebug() << "Supervisore connesso"<<sizeof(flowBT_status_t)<<sizeof(picoFlow_status_t)<<sizeof(alarms_t)<<__block.size();
         }
         else if(who == "VAL")
         {
