@@ -424,8 +424,37 @@ gli stessi comandi sia che ci si trovi a fine esame, sia che sia un review di es
 Allora al posto della struttura Patient_Data, ci metiamo DatiPaziente.
 questa funzione gestisce tutta la stampa del report, sia in modalita portrait che landscape
 */
+#include "QApplication"
 void printermanager::Pri_Rep(double xscale)
 {
+    //test velocità stampa con n letto da file di testo
+    QString name = QApplication::applicationDirPath()+"/numdots";
+    QFile readSpeed(name);
+    bool read = readSpeed.open(QIODevice::ReadOnly);
+    if (read)
+    {
+        QTextStream in(&readSpeed);
+        QString line = in.readLine();
+        int n = line.toInt();
+        m_port->Pri_Speed(n);
+        readSpeed.close();
+    }
+    //test max velocità stampa con n letto da file di testo
+    name = QApplication::applicationDirPath()+"/maxspeed";
+    QFile readMaxSpeed(name);
+    read = readMaxSpeed.open(QIODevice::ReadOnly);
+    if (read)
+    {
+        QTextStream inM(&readMaxSpeed);
+        QString line = inM.readLine();
+        int num = line.toInt();
+        uint8_t  a = (num /256);
+        uint8_t  b = num & 0xff;
+        m_port->Pri_Max_Speed(a,b);
+        readMaxSpeed.close();
+    }
+
+
     //      Intestazione
     Intest();
 
@@ -637,9 +666,15 @@ void printermanager::Report_flw(double xscale)
     m_port->Pri_Font(1);		// altezza carattere 20 punti (righe) 0x18 in HEX
     m_port->Pri_mode(0x10);
 
-    QString strToWrite = tr("Flowmetry   ");
+//    QString strToWrite = tr("- Flowmetry  -");
+//    QString strToWrite = tr("Flowmetry   ");
+//    char str[90];
+//    sprintf( str, "   Q ( ml/s )             %s              Vol ( ml )", strToWrite.toLatin1().data());
+
+    QString strToWrite = tr("  Q ( ml/s )              Flowmetry               Vol ( ml )");
     char str[90];
-    sprintf( str, "   Q ( ml/s )              %s              Vol ( ml )", strToWrite.toLatin1().data());
+    sprintf( str,strToWrite.toLatin1().data());
+
     m_port->Pri_Str( strlen(str), str, 1 );
 
     // label solo su righe pari

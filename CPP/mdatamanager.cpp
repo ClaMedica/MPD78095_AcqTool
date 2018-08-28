@@ -1029,7 +1029,8 @@ bool MDataManager::checkForVolRes()
                 setValVolRes(0);//-1?;
             else {
                 volRes = true;
-                emit sg_openVolResDlg("Flowmetry");
+                QString tipoAna = tr("Flowmetry");
+                emit sg_openVolResDlg(tipoAna);
                 break;
             }
         }

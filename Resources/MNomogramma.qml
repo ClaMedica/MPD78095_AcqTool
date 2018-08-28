@@ -352,8 +352,8 @@ Rectangle {
 
             numXlines:   rootPlot.xMax/100 + 1
             numYlines:   rootPlot.yMax/10 + 1
-            numXlinesSub:2
-            numYlinesSub:1
+            numXlinesSub:0// 2
+            numYlinesSub:0// 1
         }
 
         //tracce
