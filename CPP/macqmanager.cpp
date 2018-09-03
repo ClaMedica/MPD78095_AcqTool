@@ -125,6 +125,7 @@ bool MAcqManager::newAcquisition(QString __dataFile)
         m_bufSizeMap.clear();
 
         //inizializzazione media mobile e filtro digitale per flusso
+        m_valPrecVolume = 0;
         m_sommaMMobileF = 0;
         m_sommaMMobileV = 0;
         m_buffer_MMobileV.clear();
