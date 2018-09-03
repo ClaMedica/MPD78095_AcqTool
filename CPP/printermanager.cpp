@@ -246,7 +246,6 @@ void printermanager::pri_rep_review()
     int numCh = m_numchan;
 
     m_chEmg = m_chFlw = m_chVol = -1;
-    n_chEmg = n_chFlw = n_chVol = -1;
 
     if(buffer_emg != NULL)
         delete buffer_emg;
@@ -2726,6 +2725,10 @@ void printermanager::printTest()
     m_bitmapLiverpool.resize((m_resultBm_w * m_resultBm_h) / 8);
     m_bitmapSiroky.fill(0);
     m_bitmapLiverpool.fill(0);
+
+    buffer_emg = NULL;
+    buffer_flw = NULL;
+    buffer_vol = NULL;
 
     m_port = new printerserialport(this);
     m_port->init_printer();

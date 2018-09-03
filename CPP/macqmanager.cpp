@@ -17,6 +17,20 @@ MAcqManager::MAcqManager(QObject *parent)
     m_itsok = "              &";
     OutFile = NULL;
 
+    //media mobile flusso e volume
+    m_lenMMobile = 10;
+    m_sommaMMobileF = 0;
+    m_sommaMMobileV = 0;
+
+    //filtro digitale
+    m_lenDifFilter = 6;
+    m_sommaCoef = 0;
+    for (int i=0; i<m_lenDifFilter;i++)
+       m_sommaCoef += COEFDigFilter[i];
+
+    m_valPrecVolume = -1;
+
+
     m_startAcqManuale = false; //non ancora premuto tasto start
 #ifdef PICOFLOW
 
@@ -109,6 +123,20 @@ bool MAcqManager::newAcquisition(QString __dataFile)
         m_sampleFreqMap.clear();
         m_frameMap.clear();
         m_bufSizeMap.clear();
+
+        //inizializzazione media mobile e filtro digitale per flusso
+        m_sommaMMobileF = 0;
+        m_sommaMMobileV = 0;
+        m_buffer_MMobileV.clear();
+        m_buffer_MMobileF.clear();
+        for (int i=0; i<m_lenMMobile;i++){
+            m_buffer_MMobileV.append(0);
+            m_buffer_MMobileF.append(0);
+        }
+        m_buffer_DigFilter.clear();
+        for (int i=0; i<m_lenDifFilter;i++)
+            m_buffer_DigFilter.append(0);
+
 
         /* non sono in acquisizione e quindi posso lanciarne una nuova aprendo il file e leggendo le info
          * oppure pescandole dal file di configurazione
@@ -446,7 +474,7 @@ void MAcqManager::handleTCP(SimpleTCPClient *__client, QByteArray __block)
 {
     if(m_tcpClients.values().contains(__client)) {
         QString who = m_tcpClients.key(__client);
-        qDebug() << who ;//<< __block;
+        //qDebug() << who ;//<< __block;
 
         if(who == "STA") {      //allora e' uno stato
             m_supeConnected = true;
@@ -917,14 +945,34 @@ void MAcqManager::applyOperations()
                 }
             }
 
-            if(name == "derive") {      //derivo
+            if(name == "derive") {      //derivo flusso
                 MSignal der;
                 foreach (QString hwc, m_HWChansMap[type]) {
                     int index = m_HWChansMap[type].indexOf(hwc);
                     der = m_bufferMap[hwc]->derive(bufferSize);
 
-                    for(int i = 0; i < m_frameMap[hwc]; i++)
-                        m_channelMap[type].at(index)->append(der.at(i));
+                    for(int i = 0; i < m_frameMap[hwc]; i++){
+                        double deri = der.at(i);
+                        if (deri < 0)
+                            deri = 0;
+                        //media mobile
+                        m_sommaMMobileF = m_sommaMMobileF - m_buffer_MMobileF.at(0) + deri;
+                        m_buffer_MMobileF.remove(0);
+                        m_buffer_MMobileF.append(deri);
+                        double mediato = m_sommaMMobileF/m_lenMMobile;
+                        qDebug()<<"media applicata in "<<deri<<"ris "<<mediato;
+
+                        //filtro digitale
+                        m_buffer_DigFilter.remove(0);
+                        m_buffer_DigFilter.append(mediato);
+                        double somma = 0;
+                        for (int i=0; i<m_lenDifFilter; i++)
+                            somma += m_buffer_DigFilter.at(i)*COEFDigFilter[i];
+                        double flusso = somma/m_sommaCoef;
+                        qDebug()<<"FILTRO applicato in "<<mediato<<"ris "<<flusso;
+                        m_channelMap[type].at(index)->append(flusso);
+
+                    }
                 }
             }
 
@@ -1004,7 +1052,22 @@ void MAcqManager::fillBuffers(QByteArray __block)
                 if(m_bufferMap.keys().contains(QString::number(currChan))) {
                     for(int i = 0; i < numChanData; i++) {
                         in >> sample;
-                        m_bufferMap[QString::number(currChan)]->append(sample);
+                        if (sample < 0 )
+                            sample = 0;
+                        //media mobile
+                        m_sommaMMobileV = m_sommaMMobileV - m_buffer_MMobileV.at(0) + sample;
+                        m_buffer_MMobileV.remove(0);
+                        m_buffer_MMobileV.append(sample);
+                        double mediato = m_sommaMMobileV/m_lenMMobile;
+                        //controllo valori monotoni, i valori di volume non devono decrescere
+                        if (m_valPrecVolume < 0) //impostiamo la prima volta il valore precedente
+                            m_valPrecVolume = mediato;
+                        if (m_valPrecVolume > mediato)
+                            mediato = m_valPrecVolume;
+                        qDebug()<<"media volume applicata in "<<sample<<"ris "<<mediato;
+
+                        m_bufferMap[QString::number(currChan)]->append(mediato);
+                        m_valPrecVolume = mediato;
                         //qDebug("samples(ch:%d, nd:%d):%f",currChan,numChanData,sample);
                     }
 

@@ -3,6 +3,11 @@
 
 #include "mabstractmanager.h"
 
+
+const double COEFDigFilter[6] = {
+    0.06667948314423,   0.1945929082815,   0.2888590053723,   0.2888590053723,
+     0.1945929082815,  0.06667948314423};//somma = 1,1002627935295
+
 class MAcqManager : public MAbstractManager
 {
     Q_OBJECT
@@ -77,6 +82,16 @@ private:
                                 m_HWChansMap; //ho l'elenco dei  canali hw coinvolti per ogni tipo di canale
 
     QVector<VarMap> m_acqMarker;
+
+    int m_lenMMobile;                       //lunghezza vettore per media mobile
+    QVector<double> m_buffer_MMobileF;      //buffer per il calcolo della media mobile sulla derivata del flusso
+    QVector<double> m_buffer_MMobileV;      //buffer per il calcolo della media mobile sul volume
+    double m_sommaMMobileF;                 //somma valori media mobile flusso
+    double m_sommaMMobileV;                 //somma valori media mobile volume
+    int m_lenDifFilter;                     //lunghezza vettore filtro digitale
+    QVector<double> m_buffer_DigFilter;     //buffer per il calcolo del filtro digitale sulla derivata del flusso
+    double m_sommaCoef;                     //somma valori dei coefficenti
+    double m_valPrecVolume;                 //valore precedente di volume
 
     Ancestry m_configAcq;                //contiene le info per l'acquisizione
 
