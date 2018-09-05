@@ -1,16 +1,15 @@
-import QtQuick 2.3
+﻿import QtQuick 2.3
 import QtQuick.Controls 1.2
 import QtQuick.Dialogs 1.2
 import MComponents 1.0
 
 MForm {
     id:volResDlg
-    color: "lightgrey"
-    width: parent.width - parent.width/4
-    height: parent.height - parent.height/4
-    visible:false
-
+    height:screenH*grafic.valueOf("Dialog","height")
+    width:screenW*grafic.valueOf("Dialog","width")
     anchors.centerIn: parent
+    visible: false
+    color : layout.value("BackgroundColor")
 
     property string titleDlg: ""
 
@@ -27,37 +26,44 @@ MForm {
         color:"dodgerblue"
         width: parent.width
         height: parent.height/5
-        Text{
+        anchors.top: parent.top
+        MLabel {
+            id: lblMessage
             anchors.horizontalCenter: parent.horizontalCenter
             anchors.verticalCenter: parent.verticalCenter
-            text:titleDlg
+            text: titleDlg
+            horizontalAlignment: Text.AlignHCenter
+            labelSize: grafic.valueOf("Dialog","labelSize")
+            verticalAlignment: Text.AlignVCenter
+            color : "white"
         }
-        anchors.top: parent.top
     }
 
     MParameterEdit{
         id:parVolResVal
         anchors.verticalCenter: parent.verticalCenter
-        height:parent.height*0.2
+        height:screenH*grafic.valueOf("Parameter","height")
+        width: screenW*grafic.valueOf("Parameter","width")
         anchors.horizontalCenter: parent.horizontalCenter
-        //anchors.right:parent.right
         anchors.margins: layout.value("Margin")
         type:typTextField
-        labelSize: 5
+        labelColor: "white"
+        labelSize: grafic.valueOf("Dialog","labelSize")
         viewPerc:0.75
         role:qsTr("Insert Residual Volume")
         keyboardAlfaNum: false
     }
 
-    BuzzButton {
+    MButton {
         id:btnOK
-        text: "Ok"
-        anchors.right: parent.right
+        text: qsTr("Ok")
+        //anchors.top:parVolResVal.bottom
+        anchors.horizontalCenter: parent.horizontalCenter
         anchors.bottom: parent.bottom
-        anchors.bottomMargin: 10
-        anchors.rightMargin: 10
-        width:parent.width*0.3
-        height:parent.height*0.15
+        height:screenH*grafic.valueOf("Button","height")
+        width: screenW*grafic.valueOf("Button","width")
+        anchors.margins: parent.height*0.02
+        labelSize: grafic.valueOf("Button","labelSize")
         onClicked: {
             var volResVal = parVolResVal.info
             volResDlg.visible = false
@@ -66,6 +72,7 @@ MForm {
             mngData.analysis()
         }
     }
+
 
 }
 

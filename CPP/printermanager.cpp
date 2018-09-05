@@ -1,4 +1,4 @@
-
+﻿
 #include "printermanager.h"
 
 //const char str_label_time_old[29][68]={
@@ -246,7 +246,6 @@ void printermanager::pri_rep_review()
     int numCh = m_numchan;
 
     m_chEmg = m_chFlw = m_chVol = -1;
-    n_chEmg = n_chFlw = n_chVol = -1;
 
     if(buffer_emg != NULL)
         delete buffer_emg;
@@ -424,8 +423,37 @@ gli stessi comandi sia che ci si trovi a fine esame, sia che sia un review di es
 Allora al posto della struttura Patient_Data, ci metiamo DatiPaziente.
 questa funzione gestisce tutta la stampa del report, sia in modalita portrait che landscape
 */
+#include "QApplication"
 void printermanager::Pri_Rep(double xscale)
 {
+    //test velocità stampa con n letto da file di testo
+    QString name = QApplication::applicationDirPath()+"/numdots";
+    QFile readSpeed(name);
+    bool read = readSpeed.open(QIODevice::ReadOnly);
+    if (read)
+    {
+        QTextStream in(&readSpeed);
+        QString line = in.readLine();
+        int n = line.toInt();
+        m_port->Pri_Speed(n);
+        readSpeed.close();
+    }
+    //test max velocità stampa con n letto da file di testo
+    name = QApplication::applicationDirPath()+"/maxspeed";
+    QFile readMaxSpeed(name);
+    read = readMaxSpeed.open(QIODevice::ReadOnly);
+    if (read)
+    {
+        QTextStream inM(&readMaxSpeed);
+        QString line = inM.readLine();
+        int num = line.toInt();
+        uint8_t  a = (num /256);
+        uint8_t  b = num & 0xff;
+        m_port->Pri_Max_Speed(a,b);
+        readMaxSpeed.close();
+    }
+
+
     //      Intestazione
     Intest();
 
@@ -487,7 +515,7 @@ void printermanager::Pri_Rep(double xscale)
 
     // 	Risultati dell'esame ricavati dall'analisi semplificata, implementata nel firmware
     Report_result();		// scrive in elenco i dati calcolati dall'analisi dell'esame
-    m_port->status();
+    //m_port->status();
     m_port->Pri_Str(3, (char*)"\n \n", 0); // LINE"\x3",0);
 
     //	Scrive i dati riguardanti versione firmware e date/ora ultima calibrazione
@@ -637,9 +665,15 @@ void printermanager::Report_flw(double xscale)
     m_port->Pri_Font(1);		// altezza carattere 20 punti (righe) 0x18 in HEX
     m_port->Pri_mode(0x10);
 
-    QString strToWrite = tr("Flowmetry   ");
+//    QString strToWrite = tr("- Flowmetry  -");
+//    QString strToWrite = tr("Flowmetry   ");
+//    char str[90];
+//    sprintf( str, "   Q ( ml/s )             %s              Vol ( ml )", strToWrite.toLatin1().data());
+
+    QString strToWrite = tr("  Q ( ml/s )              Flowmetry               Vol ( ml )");
     char str[90];
-    sprintf( str, "   Q ( ml/s )              %s              Vol ( ml )", strToWrite.toLatin1().data());
+    sprintf( str,strToWrite.toLatin1().data());
+
     m_port->Pri_Str( strlen(str), str, 1 );
 
     // label solo su righe pari
@@ -2422,7 +2456,7 @@ void printermanager::Report_BitMap(bool __isSiro)
 
     for(int s = 0; s < sz; ) {
         //for(int n = 0; (n < 1000) && (m_port->status(false) & (1 << 3)); n++);
-        m_port->status(false);
+        //m_port->status(false);
         m_port->Pri_Str(8, head, 0);
         m_port->Pri_Str(szchunk, p, 0);
         p += szchunk;
@@ -2455,36 +2489,39 @@ void printermanager::Report_result()
 
     QString message;
     if (m_modal_e == 2) {   // il tempo di attesa e' graficato solo se esame manuale
-        message = tr("Waiting Time ..............");
+        message = tr("Waiting time ................");
         Pri_Rep_Lin(message.toLatin1().data(), (int)((m_tem_att)*Fc_FLW), 1, (char *)"s\n", 0);
     }
     if (m_flu_med > m_flu_max) // piccolo controllo per gestire flussi abnormali, tipici di prove da laboratorio
         if (m_tem_flu < 30) // se la flussata e molto breve e intensa, l'algoritmo sbaglia e puo risultare flu_med > flu_max
             m_flu_med = m_flu_max;
 
-    message = tr("Maximum Flow Rate .........");
+    message = tr("Maximum flow rate ...........");
     Pri_Rep_Lin(message.toLatin1().data(), (int)(m_flu_max * Fc_FLW), 1, (char *)"ml/s\n", 0);
-    message = tr("Average Flow Rate .........");
+    message = tr("Average flow rate ...........");
     Pri_Rep_Lin(message.toLatin1().data(), (int)(m_flu_med * Fc_FLW), 1, (char *)"ml/s\n", 0);
-    message = tr("Time to Maximum Flow ......");
+    message = tr("Time to maximum flow .........");
     Pri_Rep_Lin(message.toLatin1().data(), (int)(m_tem_max * Fc_FLW), 1, (char *)"s\n",    0);
-    message = tr( "Time between 5% and 95% ...");
+    message = tr("Time between 5% and 95% .....");
     Pri_Rep_Lin(message.toLatin1().data(), (int)(m_tem_595 * Fc_FLW), 1, (char *)"s\n",    0);
-    message = tr("Flow Time .................");
+    message = tr("Flow time ...................");
     Pri_Rep_Lin(message.toLatin1().data(), (int)(m_tem_flu * Fc_FLW), 1, (char *)"s\n",    0);
-    message = tr("Descent Time ..............");
+    message = tr("Descent time ................");
     Pri_Rep_Lin(message.toLatin1().data(), (int)(m_tem_dis * Fc_FLW), 1, (char *)"s\n",    0);
-    message = tr("Voiding Time ..............");
+    message = tr("Voiding time ................");
     Pri_Rep_Lin(message.toLatin1().data(), (int)(m_tem_svu * Fc_FLW), 1, (char *)"s\n",    0);
-    message = tr("Volume to Maximum Flow ....");
-    Pri_Rep_Lin(message.toLatin1().data(), (int) m_vol_max,           0, (char *)"ml\n",   0);
-    message = tr("Voided Volume .............");
-    Pri_Rep_Lin(message.toLatin1().data(),m_vol_vuo,                  0, (char *)"ml\n",   0);
-    // per ora il flus max corretto non lo metto perche non ho la funzione radice quadrata
-    // message = tr("Corrected Maximum Flow ....";
-    //Pri_Rep_Lin((char *)msg_flu_cor[Language_selected],(rep.flu_cor)*Fc_FLW,1,"ml 1/2 /s",1);    // 1/2 =1/2 apice
-    message = tr( "Flow Acceleration .........");
-    Pri_Rep_Lin(message.toLatin1().data(), (int)((m_flu_acc)*Fc_FLW*10),2,(char *)"ml/s^2\n",0);    //?=2 apice
+    message = tr("Volume to maximum flow ......");
+    Pri_Rep_Lin(message.toLatin1().data(), (int)(m_vol_max * Fc_FLW), 1, (char *)"ml\n",   0);
+    message = tr("Voided Volume ...............");
+    Pri_Rep_Lin(message.toLatin1().data(), (int)(m_vol_vuo * Fc_FLW), 1, (char *)"ml\n",   0);
+    message = tr("Corrected maximum flow ......");
+    Pri_Rep_Lin(message.toLatin1().data(), (int)(m_cQ * Fc_FLW),      1, (char *)"ml\n",   0);
+    message = tr("Flow acceleration ...........");
+    Pri_Rep_Lin(message.toLatin1().data(), (int)(m_flu_acc * Fc_FLW), 1,(char *)"ml/s^2\n",0);    //?=2 apice
+    message = tr("Maximun contraction speed ...");
+    Pri_Rep_Lin(message.toLatin1().data(), (int)(m_vDetMax * Fc_FLW), 1, (char *)"ml/s\n", 0);
+    message = tr("Residual volume .............");
+    Pri_Rep_Lin(message.toLatin1().data(), (int)(m_resVol * Fc_FLW),  1, (char *)"ml\n",   0);
 }
 
 /**
@@ -2578,7 +2615,8 @@ void printermanager::getImage(QImage __img, QString __nome)
     int32_t pale_indx[NCOLORS];     // da colore decimato a n.progressivo
     int     pale_revindx[NCOLORS];  // da n.progressivo a colore decimato
     int     pale_seq = 0;
-    bzero((void *) & pale_cnt, sizeof(pale_cnt));
+
+    memset((void *) & pale_cnt,0,sizeof(pale_cnt));
     for(int i = 0; i < NCOLORS; i++)
         pale_indx[i] = -1;
 
@@ -2687,6 +2725,10 @@ void printermanager::printTest()
     m_bitmapLiverpool.resize((m_resultBm_w * m_resultBm_h) / 8);
     m_bitmapSiroky.fill(0);
     m_bitmapLiverpool.fill(0);
+
+    buffer_emg = NULL;
+    buffer_flw = NULL;
+    buffer_vol = NULL;
 
     m_port = new printerserialport(this);
     m_port->init_printer();

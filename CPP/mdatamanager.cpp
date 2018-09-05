@@ -1,7 +1,8 @@
-#include "mdatamanager.h"
+﻿#include "mdatamanager.h"
 #include "systemmanager.h"
 
 extern bool DebugAcqTool;
+
 
 MDataManager::MDataManager(QObject *parent)
 {
@@ -32,6 +33,7 @@ MDataManager::MDataManager(QObject *parent)
 
     m_firstHead = "Medica S.p.A - Menfis Divisione";
     m_secondHead = "Pico Flow 2";
+    m_etaPatient = -1;
 
     setValVolRes(-999);
 }
@@ -55,9 +57,11 @@ MDataManager::~MDataManager()
 }
 
 
-void MDataManager::getGrabbedImage(QObject *gi, QString nome)
+void MDataManager::getGrabbedImage(QObject *gi, QString __nome)
 {
-    m_mngPrint->getGrabbedImage(gi,nome);
+#ifdef PICOFLOW
+    m_mngPrint->getGrabbedImage(gi,__nome);
+#endif
 }
 
 void MDataManager::setInfoList(QVariantList __list)
@@ -112,8 +116,11 @@ void MDataManager::loadFile(QString __fileName)
     //la prima volta che salvo mi faccio la copia del file originale
     m_copyFileName = m_fileName;
     m_copyFileName.insert(m_copyFileName.length() - 4, "_copy");
-    if (!QFile(m_copyFileName).exists())
-        QFile::copy(m_fileName, m_copyFileName);
+    //se è rimasta per sbaglio una copia di aperture precedenti del file, la cancelliamo prima di ricrearla
+    if (QFile(m_copyFileName).exists()) {
+        QFile::remove(m_copyFileName);
+    }
+    QFile::copy(m_fileName, m_copyFileName);
 
     //devo pulire tutti i vettori utilizzati
     resetAll();
@@ -134,13 +141,13 @@ void MDataManager::loadFile(QString __fileName)
     QString descr;
     unsigned char chEn[20];
 
-    switch(fileType(__fileName)) {
+    switch(fileType(m_copyFileName)) {
     case PIC:
     {
        if(m_mng != NULL)
             delete m_mng;
         m_mng = new DatafileManager;
-        m_mng->SetFileName(__fileName);
+        m_mng->SetFileName(m_copyFileName);
         m_mng->SetFileType(7);
         bool res = m_mng->Open();
         qDebug() << "File Aperto?" << res;
@@ -156,9 +163,14 @@ void MDataManager::loadFile(QString __fileName)
         m_patientInfo = m_mng->GetPatient().section(";",0,1);
         m_patientInfo.replace(";", " ");
 
+        QString dataNascita = m_mng->GetPatient().section(";",2,2);
+        QDate datD = QDate::fromString(dataNascita,"dd/MM/yyyy");
+        QDate dateExam = QDate(1899, 12, 30).addDays(m_mng->GetDataEsame());
+        m_etaPatient = dateExam.year() - datD.year();
+        qDebug()<<"Eta' paziente"<< m_etaPatient;
+
         if (!m_patientInfo.contains("Anonymous"))
         {
-            QDate dateExam = QDate(1899, 12, 30).addDays(m_mng->GetDataEsame());
             QString dateofexam = dateExam.toString("dd/MM/yyyy");
             m_patientInfo = m_patientInfo + " - " + dateofexam;
         }
@@ -217,8 +229,10 @@ void MDataManager::loadFile(QString __fileName)
             for(int i = 0; i < m_mng->GetSamplesNumber(h); i++)
                 sig->replace(i, m_mng->GetValue(h, i));
 
+            qDebug() << "sig:" << sig;
             sig->setName(m_mng->GetChanName(h));
             sig->setSamplingFrequency(m_mng->GetNAS(h));
+            sig->setSupLim(m_mng->GetSupLim(h));
 
             double M = sig->maximum();
             double m = sig->minimum();
@@ -242,6 +256,7 @@ void MDataManager::loadFile(QString __fileName)
                 else
                     break;
             }
+
             sig->setSupLim(supLim);
             while (m < infLim)
             {
@@ -256,9 +271,10 @@ void MDataManager::loadFile(QString __fileName)
         }
 
         //------Aggiungo i definer
-        qDebug() << "Definer = " << m_mng->GetNumDefiners();
+        int numDefinitori = m_mng->GetNumDefiners();
+        qDebug() << "Definer = " << numDefinitori;
 
-        for(int i = 0; i < m_mng->GetNumDefiners(); i++) {
+        for(int i = 0; i < numDefinitori; i++) {
             VarMap *def = new VarMap;
             m_mng->GetOpMarkerAn(i, &key, tStart, tEnd, chEn, &descr);
             for(int nc = 0; nc < m_mng->GetChanNum(); nc++)
@@ -300,51 +316,56 @@ void MDataManager::loadFile(QString __fileName)
         }*/
 
         //------ Aggiungo i markers analitici, sono associati ad un definitore
-        qDebug() << "Marker Analitici = " << m_mng->GetNumAnalyticalMarkers();
+        //con questo controllo evitiamo i problemi dovuti ad un salvataggio errato del file,
+        //dove risulta nessun definitore ma markers analitici salvati
+        if (numDefinitori > 0)
+        {
+            qDebug() << "Marker Analitici = " << m_mng->GetNumAnalyticalMarkers();
 
-        //mrkAnVec->clear();
-        QVector<int32_t> numChVec;
-        for(int i = 0; i < m_mng->GetNumAnalyticalMarkers(); i++) {
-            VarMap *mrk = new VarMap;
-            m_mng->GetAnMarker(i, &key, &numCh, &numSamp[0], &numDef);
-            numChVec << numCh;
+            //mrkAnVec->clear();
+            QVector<int32_t> numChVec;
+            for(int i = 0; i < m_mng->GetNumAnalyticalMarkers(); i++) {
+                VarMap *mrk = new VarMap;
+                m_mng->GetAnMarker(i, &key, &numCh, &numSamp[0], &numDef);
+                numChVec << numCh;
 
-            QVariantList valuesY;
-            foreach(MSignal *sig, m_signalVector)
-                if(sig->getName() == m_mng->GetChanName(numCh)) {
-                    qDebug("%s: %d", sig->getName().toLatin1().constData(), sig->size());
-                    for (int i = 0; i < sig->size(); i++)
-                        valuesY.append(sig->at(i));
-                }
+                QVariantList valuesY;
+                foreach(MSignal *sig, m_signalVector)
+                    if(sig->getName() == m_mng->GetChanName(numCh)) {
+                        qDebug("%s: %d", sig->getName().toLatin1().constData(), sig->size());
+                        for (int i = 0; i < sig->size(); i++)
+                            valuesY.append(sig->at(i));
+                    }
 
-            double val = (double) numSamp[0] / m_mng->GetNAS(numCh);
-            (*mrk)["val"] = val;
-            (*mrk)["type"] = TYPE_ANALYTICAL;
-            (*mrk)["name"] = "Analitical";
-            (*mrk)["family"] = "Markers";
-            (*mrk)["nas"] =  m_mng->GetNAS(numCh);
-            (*mrk)["valuesY"] = valuesY;
-            (*mrk)["graph"] = m_mng->GetGraph(numCh)-1;
-            (*mrk)["code"] =  "f" + QString::number(key);
-            (*mrk)["descr"] = descr;
-            (*mrk)["lock"] = false;
-            (*mrk)["channel"] = numCh;
-            (*mrk)["defCode"] = (qulonglong)defVec->value(numDef);
-            (*mrk)["key"] = key;
-            (*mrk)["color"] = COLOR_ANALYTICAL;
-            (*mrk)["visible"] = true;
-            (*mrk)["category"] = CAT_MARKER;
-            mrkAnVec->append(mrk);
-            //lo associo al suo definitore
-            QList<QVariant> anM  =  defVec->value(numDef)->value("anMarkers").toList();
-            anM.append((qulonglong)mrk);
-            (*defVec->value(numDef))["anMarkers"] = anM;
-        }
+                double val = (double) numSamp[0] / m_mng->GetNAS(numCh);
+                (*mrk)["val"] = val;
+                (*mrk)["type"] = TYPE_ANALYTICAL;
+                (*mrk)["name"] = "Analitical";
+                (*mrk)["family"] = "Markers";
+                (*mrk)["nas"] =  m_mng->GetNAS(numCh);
+                (*mrk)["valuesY"] = valuesY;
+                (*mrk)["graph"] = m_mng->GetGraph(numCh)-1;
+                (*mrk)["code"] =  "f" + QString::number(key);
+                (*mrk)["descr"] = descr;
+                (*mrk)["lock"] = false;
+                (*mrk)["channel"] = numCh;
+                (*mrk)["defCode"] = (qulonglong)defVec->value(numDef);
+                (*mrk)["key"] = key;
+                (*mrk)["color"] = COLOR_ANALYTICAL;
+                (*mrk)["visible"] = true;
+                (*mrk)["category"] = CAT_MARKER;
+                mrkAnVec->append(mrk);
+                //lo associo al suo definitore
+                QList<QVariant> anM  =  defVec->value(numDef)->value("anMarkers").toList();
+                anM.append((qulonglong)mrk);
+                (*defVec->value(numDef))["anMarkers"] = anM;
+            }
 
-        if(!mrkAnVec->isEmpty()) {
-            QString family = "Markers";
-            QString name = "Analitical";
-            saveDataAndUpdate(family, name, mrkAnVec);
+            if(!mrkAnVec->isEmpty()) {
+                QString family = "Markers";
+                QString name = "Analitical";
+                saveDataAndUpdate(family, name, mrkAnVec);
+            }
         }
 
         //        for(int32_t nc=0;nc<m_mng->GetChanNum();nc++)
@@ -439,8 +460,15 @@ void MDataManager::loadFile(QString __fileName)
         //libreria di analisi: creo oggetto.
         m_ana = new Analyze();
         //creo oggetto per stampare
+#ifdef PICOFLOW
         m_mngPrint = new printermanager(m_copyFileName);
-
+        //mi dice se la flussimetria automatica o manuale
+        m_mngPrint->setMode(m_autoFlow);
+        m_mngPrint->setPrintSiroky(m_Siroky);
+        m_mngPrint->setPrintLiverpool(m_Liverpool);
+        m_mngPrint->setPrintModeUser(m_landscape);
+        m_mngPrint->setPrintHeaders(m_firstHead,m_secondHead);
+#endif
         m_mng->Close();
         break;
     }
@@ -521,10 +549,12 @@ void MDataManager::saveChanges()
         m_copy->AddOpMarkerAn(start, end, enCh, curMap->value("key").toInt(), curMap->value("descr").toString());
         qDebug() << "Fine salvataggio definer";
     }
-    //oltre questi due if non ci si dovrebbe arrivare a meno che non sia un segnale e nel caso si prosegue
 
     qDebug() << "Commit markers?" << m_copy->CommitMarkers();
     qDebug() << "Chiudo il file?" << m_copy->Close();
+
+    delete m_copy;
+    m_copy = NULL;
 }
 
 
@@ -933,9 +963,7 @@ void MDataManager::exitFromReview()
     else
     {
         if (m_mngPrint != NULL) m_mngPrint->closePrinter();
-        if (m_copy != NULL)
-            delete m_copy;
-        m_copy = NULL;
+
         if (getToSave() == "yes")
         {        //copio il file copy nell'originale
             if (QFile::exists(m_copyFileName))
@@ -981,6 +1009,9 @@ bool MDataManager::checkForVolRes()
         setValVolRes(0);
         m_mng->SetOther(otherString);
         m_mng->CommitParameters();
+        //se è la prima volta che apro un esame di flussimetria automatica la stampa è automatica
+        if (m_autoFlow == 0)
+            m_autoPrint =  true;
     }
     else
     {
@@ -994,11 +1025,12 @@ bool MDataManager::checkForVolRes()
     {
         int anaType = m_mng->GetAnalysis(i).toInt();
         if (anaType == FLW_AVD_STUDY) {
-            if (m_autoPrint || m_autoFlow == 0)
+            if (m_autoPrint)
                 setValVolRes(0);//-1?;
             else {
                 volRes = true;
-                emit sg_openVolResDlg("Flowmetry");
+                QString tipoAna = tr("Flowmetry");
+                emit sg_openVolResDlg(tipoAna);
                 break;
             }
         }
@@ -1028,7 +1060,6 @@ qDebug() << "INIZIO";
         return;
 
     saveChanges();
-    setToSave("");  //necessario chiedere se salvare
 
     m_mng = new DatafileManager;
     m_mng->SetFileName(m_copyFileName);
@@ -1041,12 +1072,17 @@ qDebug() << "INIZIO";
     QString other = m_mng->GetOther();
     QStringList otherList = other.split(";");
     other.clear();
-    otherList[0] = QString::number(getValVolRes());
-    for (int j=0; j<otherList.length()-1;j++)
-        other += otherList.at(j) + ";";
+    int valResOld = otherList.at(0).toInt();
+    int valResNew = getValVolRes();
+    if (valResNew != valResOld) {
+        otherList[0] = QString::number(valResNew);
+        for (int j=0; j<otherList.length()-1;j++)
+            other += otherList.at(j) + ";";
 
-    m_mng->SetOther(other);
-    m_mng->CommitParameters();
+        m_mng->SetOther(other);
+        m_mng->CommitParameters();
+        setToSave("");  //necessario chiedere se salvare
+    }
 
     m_ana->SetData(m_mng);
 
@@ -1057,7 +1093,7 @@ qDebug() << "INIZIO";
         int anaType = m_mng->GetAnalysis(i).toInt();
 
         if (anaType == FLW_AVD_STUDY) {
-            //verifica se c'A? un definitore per questa analisi.
+            //verifica se c'e' un definitore per questa analisi.
             VarMap mkOpAnIn;
             bool found = false;
             VarMapVec* elements = m_storage.getAll(CAT_DEFINER);
@@ -1071,6 +1107,10 @@ qDebug() << "INIZIO";
             }
 
             if (!found) {
+
+                //in caso di PICOFLOW2REV3, da controllare in caso desktop
+                setToSave("");  //necessario chiedere se salvare
+
                 int posQ = -1, posV = -1;
                 int i = 0;
                 foreach(MSignal *sig, m_signalVector) {
@@ -1083,7 +1123,7 @@ qDebug() << "INIZIO";
                 }
 
                 if ((m_numAna == 1) || (posQ > -1)) {
-                    //se non c'A? il defintore, ma questa A? l'unica analisi,
+                    //se non c'e' il defintore, ma questa e' l'unica analisi,
                     //viene inserito automaticamente sul canale del flusso.
                     for (int i = 0; i < m_mng->GetChanNum(); i++)
                         En << 0;
@@ -1201,7 +1241,7 @@ qDebug() << "INIZIO";
             if (found) {
                 //                                        'Salva l'immagine dei tracciati all'interno del definitore
                 //                                        myGraphPlot.RedrawGraphForPrint("GR200", MarkerUtils.getOpMarkerAn(mkOpAnIn - 1).myNumStart(myGraphPlot.GetTruePosChannel(myGraphPlot.MaxNASCh)), MarkerUtils.getOpMarkerAn(mkOpAnIn - 1).myNumEnd(myGraphPlot.GetTruePosChannel(myGraphPlot.MaxNASCh)))
-                m_analized = True;
+                m_analized = true;
                 //                                            UpdateTestOther()
                 //Lancia analisi e Inizializza nomogrammi
                 InitPageGraphs(FLW_AVD_STUDY);
@@ -1242,30 +1282,26 @@ qDebug() << "INIZIO";
 
 void MDataManager::startPrint()
 {
-    m_mngPrint->setTempoAttesa(m_aflwdatas.at(0)->getWaitingTime());
-    m_mngPrint->setFlussoMax(m_aflwdatas.at(0)->getQMax());
-    m_mngPrint->setFlussoMedio(m_aflwdatas.at(0)->getQAve());
-    m_mngPrint->setTempoMax(m_aflwdatas.at(0)->getTimeAtQmax());
-    m_mngPrint->setTempo595(m_aflwdatas.at(0)->getTime90());
-    m_mngPrint->setTempoFlusso(m_aflwdatas.at(0)->getFlowTime());
-    m_mngPrint->setTempoDisc(m_aflwdatas.at(0)->getDescTime());
-    m_mngPrint->setTempoSvuot(m_aflwdatas.at(0)->getVoidingTime());
-    m_mngPrint->setVolFlussoMax(m_aflwdatas.at(0)->getVolAtQqmax());
-    m_mngPrint->setVolVuotato(m_aflwdatas.at(0)->getVoidedVolume());
-    m_mngPrint->setAccelerazione(m_aflwdatas.at(0)->getAcceleration());
-
-    //letto dai setting
-    //mi dice se la flussimetria automatica o manuale
-    m_mngPrint->setMode(m_autoFlow);
-    m_mngPrint->setPrintSiroky(m_Siroky);
-    m_mngPrint->setPrintLiverpool(m_Liverpool);
-    m_mngPrint->setPrintModeUser(m_landscape);
-    m_mngPrint->setPrintHeaders(m_firstHead,m_secondHead);
+#ifdef PICOFLOW
+    m_mngPrint->setTempoAttesa((float)(qRound(m_aflwdatas.at(0)->getWaitingTime()*10))/10);
+    m_mngPrint->setFlussoMax((float)(qRound(m_aflwdatas.at(0)->getQMax()*10))/10);
+    m_mngPrint->setFlussoMedio((float)(qRound(m_aflwdatas.at(0)->getQAve()*10))/10);
+    m_mngPrint->setTempoMax((float)(qRound(m_aflwdatas.at(0)->getTimeAtQmax()*10))/10);
+    m_mngPrint->setTempo595((float)(qRound(m_aflwdatas.at(0)->getTime90()*10))/10);
+    m_mngPrint->setTempoFlusso((float)(qRound(m_aflwdatas.at(0)->getFlowTime()*10))/10);
+    m_mngPrint->setTempoDisc((float)(qRound(m_aflwdatas.at(0)->getDescTime()*10))/10);
+    m_mngPrint->setTempoSvuot((float)(qRound(m_aflwdatas.at(0)->getVoidingTime()*10))/10);
+    m_mngPrint->setVolFlussoMax((float)(qRound(m_aflwdatas.at(0)->getVolAtQqmax()*10))/10);
+    m_mngPrint->setVolVuotato((float)(qRound(m_aflwdatas.at(0)->getVoidedVolume()*10))/10);
+    m_mngPrint->setAccelerazione((float)(qRound(m_aflwdatas.at(0)->getAcceleration()*10))/10);
+    m_mngPrint->setFlussoCor((float)(qRound(m_aflwdatas.at(0)->getCQ()*10))/10);
+    m_mngPrint->setVolRes((float)(qRound(m_aflwdatas.at(0)->getResidualVolume()*10))/10);
+    m_mngPrint->setDetContrMax((float)(qRound(m_aflwdatas.at(0)->getVDetMax()*10))/10);
 
     //stampo
-    if (m_autoPrint || m_autoFlow == 0)
+    if (m_autoPrint)
         sendToPrint();
-
+#endif
     //qml
     qDebug() << "FINE analisys";
 }
@@ -1348,7 +1384,7 @@ void MDataManager::InitPageGraphs(int __anaType)
                 foreach (VarMap *curMarker, (*eleAnMarkers)) {
 //                    int ff = evMarkOpIn->value("name").toInt();
                     if ((curMarker->value("type") == TYPE_ANALYTICAL) &&
-                        (curMarker->value("defCode") == evMarkOpIn->value("whoAmI").toInt()))
+                        (curMarker->value("defCode").toInt() == evMarkOpIn->value("whoAmI").toInt()))
                     {
                         evAuto = 0;
                         break;
@@ -1643,6 +1679,7 @@ int MDataManager::ReadResult(int & __numEv)
         m_aflwdatas.append(new mflowdatas());
         unsigned char * strTemp = (unsigned char *) malloc (sizeof(FLWAdvRepStruct));
         m_aflwdatas.at(0)->setParent(this);
+        m_aflwdatas.at(0)->setAutoFlow(m_autoFlow == 0);
         m_aflwdatas.at(0)->setWaitingTime(0);
         m_aflwdatas.at(0)->setQMax(0);
         m_aflwdatas.at(0)->setQAve(0);
@@ -1682,8 +1719,9 @@ int MDataManager::ReadResult(int & __numEv)
             m_aflwdatas.last()->setResidualVolume(structureFlow->residual_volume);
             m_aflwdatas.last()->setVDetMax(structureFlow->v_det_max);
             m_aflwdatas.last()->setCQ(structureFlow->cQ);
+            m_aflwdatas.last()->setAutoFlow(m_autoFlow == 0);
             m_aflwdatas.last()->buildTable();
-            m_aflwdatas.last()->buildNomogrammi(m_sexPatient, 45);
+            m_aflwdatas.last()->buildNomogrammi(m_sexPatient, m_etaPatient);
         }
 
         //calcolo la media
@@ -1705,6 +1743,23 @@ int MDataManager::ReadResult(int & __numEv)
             m_aflwdatas.at(0)->addVDetMax(m_aflwdatas.at(i)->getVDetMax());
             m_aflwdatas.at(0)->addCQ(m_aflwdatas.at(i)->getCQ());
         }
+        m_aflwdatas.at(0)->setWaitingTime(m_aflwdatas.at(0)->getWaitingTime()/__numEv);
+        m_aflwdatas.at(0)->setQMax(m_aflwdatas.at(0)->getQMax()/__numEv);
+        m_aflwdatas.at(0)->setQAve(m_aflwdatas.at(0)->getQAve()/__numEv);
+        m_aflwdatas.at(0)->setTimeAtV3(m_aflwdatas.at(0)->getTimeAtV3()/__numEv);
+        m_aflwdatas.at(0)->setTimeAtV2(m_aflwdatas.at(0)->getTimeAtV2()/__numEv);
+        m_aflwdatas.at(0)->setTime90(m_aflwdatas.at(0)->getTimeAtQmax()/__numEv);
+        m_aflwdatas.at(0)->setTimeAtQmax(m_aflwdatas.at(0)->getTime90()/__numEv);
+        m_aflwdatas.at(0)->setFlowTime(m_aflwdatas.at(0)->getFlowTime()/__numEv);
+        m_aflwdatas.at(0)->setDescTime(m_aflwdatas.at(0)->getDescTime()/__numEv);
+        m_aflwdatas.at(0)->setVoidingTime(m_aflwdatas.at(0)->getVoidingTime()/__numEv);
+        m_aflwdatas.at(0)->setVolAtQqmax(m_aflwdatas.at(0)->getVolAtQqmax()/__numEv);
+        m_aflwdatas.at(0)->setVoidedVolume(m_aflwdatas.at(0)->getVoidedVolume()/__numEv);
+        m_aflwdatas.at(0)->setAcceleration(m_aflwdatas.at(0)->getAcceleration()/__numEv);
+        m_aflwdatas.at(0)->setResidualVolume(m_aflwdatas.at(0)->getResidualVolume()/__numEv);
+        m_aflwdatas.at(0)->setVDetMax(m_aflwdatas.at(0)->getVDetMax()/__numEv);
+        m_aflwdatas.at(0)->setCQ(m_aflwdatas.at(0)->getCQ()/__numEv);
+
         m_aflwdatas.at(0)->buildTable();
         free(strTemp);
         break;
@@ -1724,7 +1779,10 @@ mflowdatas *MDataManager::getFlowDatas(int __i)
 void MDataManager::sendPrintTest()
 {
     qDebug() << "inizio stampa";
+#ifdef PICOFLOW
      m_mngPrint = new printermanager();
      m_mngPrint->printTest();
      m_mngPrint->closePrinter();
+#endif
 }
+

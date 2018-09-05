@@ -1,4 +1,4 @@
-import QtQuick 2.3
+﻿import QtQuick 2.3
 import QtQuick.Controls 1.0
 import QtQuick.Dialogs 1.2
 import QtQuick.Controls.Styles 1.2
@@ -17,8 +17,7 @@ MForm {
 
     property int buttonTable:0
     id : resultForm
-    width : forAna.width
-    height : forAna.height
+    anchors.fill: parent
     color : "steelblue"
     visible: false
 
@@ -47,13 +46,14 @@ MForm {
             var rectf = Qt.createQmlObject('import QtQuick 2.5; Rectangle {}',this)
             rectf.width = forAna.width
             rectf.height = forAna.height
+            rectf.anchors.fill = parent
             rectf.color = "transparent"
             rectf.border.color = "blue"
             rectf.border.width = 2
-            rectf.anchors.right = resultForm.right
-            rectf.anchors.top = resultForm.top
+            //rectf.anchors.right = resultForm.right
+            //rectf.anchors.top = resultForm.top
            // rectf.anchors.topMargin = 5
-            rectf.anchors.rightMargin = resultForm.width/2 - rectf.width/2
+            //rectf.anchors.rightMargin = resultForm.width/2 - rectf.width/2
 
             var namePage = ""
             var nameNomo = ""
@@ -79,6 +79,7 @@ MForm {
                     buttonfn.anchors.top = rectf.top
                     buttonfn.anchors.topMargin = btnTopMargin
                     buttonfn.anchors.rightMargin = 20
+                    buttonfn.height=rectf.height*0.06
                     buttonfn.myText = namePage
                     buttonfn.clicked.connect(clickButtonSameAna)
 
@@ -86,8 +87,8 @@ MForm {
                 }
 
                 var rectdata = Qt.createQmlObject('import QtQuick 2.5; Rectangle {}',rectf)
-                rectdata.width = forAna.width - 200
-                rectdata.height = forAna.height
+                rectdata.width = rectf.width - rectf.width/10
+                rectdata.height = rectf.height
                 rectdata.color = "transparent"
                 rectdata.border.color = "transparent"
                 rectdata.border.width = 2
@@ -97,7 +98,8 @@ MForm {
                 pagesSameAna[pagesSameAna.length] = rectdata
 
                 var tablefn =  Qt.createQmlObject('import "qrc:/Components"; MAnaTableView {}', rectdata)
-                tablefn.width = 350
+                tablefn.height = rectf.height*grafic.valueOf("TableRis","height")
+                tablefn.width = rectf.width*grafic.valueOf("TableRis","width")
                 tablefn.anchors.left = rectdata.left
                 tablefn.anchors.top = rectdata.top
                 tablefn.anchors.topMargin = 20
@@ -110,8 +112,11 @@ MForm {
                 buttonT.buttonId = pagesLocal.length
                 buttonT.anchors.bottom = rectdata.bottom
                 buttonT.anchors.left = rectdata.left
-                buttonT.anchors.bottomMargin = 100
+                buttonT.anchors.bottomMargin = rectf.height/5
                 buttonT.anchors.leftMargin = btnLeftMargin
+                buttonT.width = screenW*grafic.valueOf("Button","width")
+                buttonT.height = screenH*grafic.valueOf("Button","height")
+                buttonT.labelSize= layout.value("F3")
                 buttonT.myText = qsTr("Table")
                 buttonT.clicked.connect(clickButton)
                 resultForm.buttonTable = buttonT.buttonId
@@ -123,8 +128,8 @@ MForm {
                 nameNomo = mngData.getFlowDatas(i).getLiverpoolMax().getTitle()
                 var LQM =  Qt.createQmlObject('import "qrc:/Components"; MNomogramma {}', rectdata)
                 LQM.clip = true
-                LQM.height = 300
-                LQM.width = 450
+                LQM.height = screenH*grafic.valueOf("Nomogrammi","height")
+                LQM.width = screenW*grafic.valueOf("Nomogrammi","width")
                 LQM.anchors.left = rectdata.left
                 LQM.anchors.top = rectdata.top
                 LQM.anchors.topMargin = 20
@@ -149,8 +154,11 @@ MForm {
                 buttonLQM.buttonId = pagesLocal.length
                 buttonLQM.anchors.bottom = rectdata.bottom
                 buttonLQM.anchors.left = rectdata.left
-                buttonLQM.anchors.bottomMargin = 60
+                buttonLQM.anchors.bottomMargin = rectf.height/9
                 buttonLQM.anchors.leftMargin = btnLeftMargin
+                buttonLQM.width = screenW*grafic.valueOf("Button","width")
+                buttonLQM.height = screenH*grafic.valueOf("Button","height")
+                buttonLQM.labelSize= grafic.valueOf("Button","labelSize")
                 buttonLQM.myText = nameNomo
                 buttonLQM.clicked.connect(clickButton)
                 btnLeftMargin += buttonLQM.width + 5
@@ -160,8 +168,8 @@ MForm {
                 nameNomo = mngData.getFlowDatas(1).getLiverpoolAve().getTitle()
                 var LQA =  Qt.createQmlObject('import "qrc:/Components"; MNomogramma {}', rectdata)
                 LQA.clip = true
-                LQA.height = 300
-                LQA.width = 450
+                LQA.height = screenH*grafic.valueOf("Nomogrammi","height")
+                LQA.width = screenW*grafic.valueOf("Nomogrammi","width")
                 LQA.anchors.left = rectdata.left
                 LQA.anchors.top = rectdata.top
                 LQA.anchors.topMargin = 20
@@ -186,8 +194,11 @@ MForm {
                 buttonLQA.buttonId = pagesLocal.length
                 buttonLQA.anchors.bottom = rectdata.bottom
                 buttonLQA.anchors.left = rectdata.left
-                buttonLQA.anchors.bottomMargin = 60
+                buttonLQA.anchors.bottomMargin = rectf.height/9
                 buttonLQA.anchors.leftMargin = btnLeftMargin
+                buttonLQA.height = screenH*grafic.valueOf("Button","height")
+                buttonLQA.width = screenW*grafic.valueOf("Button","width")
+                buttonLQA.labelSize= grafic.valueOf("Button","labelSize")
                 buttonLQA.myText = nameNomo
                 buttonLQA.clicked.connect(clickButton)
                 btnLeftMargin += buttonLQA.width + 5
@@ -199,8 +210,8 @@ MForm {
                 {
                     var SQM =  Qt.createQmlObject('import "qrc:/Components"; MNomogramma {}', rectdata)
                     SQM.clip = true
-                    SQM.height = 300
-                    SQM.width = 450
+                    SQM.height = screenH*grafic.valueOf("Nomogrammi","height")
+                    SQM.width = screenW*grafic.valueOf("Nomogrammi","width")
                     SQM.anchors.left = rectdata.left
                     SQM.anchors.top = rectdata.top
                     SQM.anchors.topMargin = 20
@@ -230,8 +241,11 @@ MForm {
                     buttonSQM.buttonId = pagesLocal.length
                     buttonSQM.anchors.bottom = rectdata.bottom
                     buttonSQM.anchors.left = rectdata.left
-                    buttonSQM.anchors.bottomMargin = 60
+                    buttonSQM.anchors.bottomMargin = rectf.height/9
                     buttonSQM.anchors.leftMargin = btnLeftMargin
+                    buttonSQM.width = screenW*grafic.valueOf("Button","width")
+                    buttonSQM.height = screenH*grafic.valueOf("Button","height")
+                    buttonSQM.labelSize= grafic.valueOf("Button","labelSize")
                     buttonSQM.myText = nameNomo
                     buttonSQM.clicked.connect(clickButton)
                     btnLeftMargin += buttonSQM.width + 5
@@ -242,8 +256,8 @@ MForm {
 
                     var SQA =  Qt.createQmlObject('import "qrc:/Components"; MNomogramma {}', rectdata)
                     SQA.clip = true
-                    SQA.height = 300
-                    SQA.width = 450
+                    SQA.height = screenH*grafic.valueOf("Nomogrammi","height")
+                    SQA.width = screenW*grafic.valueOf("Nomogrammi","width")
                     SQA.anchors.left = rectdata.left
                     SQA.anchors.top = rectdata.top
                     SQA.anchors.topMargin = 20
@@ -272,8 +286,11 @@ MForm {
                     buttonSQA.buttonId = pagesLocal.length
                     buttonSQA.anchors.bottom = rectdata.bottom
                     buttonSQA.anchors.left = rectdata.left
-                    buttonSQA.anchors.bottomMargin = 60
+                    buttonSQA.anchors.bottomMargin = rectdata.height/9
                     buttonSQA.anchors.leftMargin = btnLeftMargin
+                    buttonSQA.width = screenW*grafic.valueOf("Button","width")
+                    buttonSQA.height = screenH*grafic.valueOf("Button","height")
+                    buttonSQA.labelSize= grafic.valueOf("Button","labelSize")
                     buttonSQA.myText = nameNomo
                     buttonSQA.clicked.connect(clickButton)
                     //btnLeftMargin += 110
@@ -303,9 +320,12 @@ MForm {
         anchors.bottom: parent.bottom
         anchors.bottomMargin: 10
         anchors.leftMargin: 10
-        width:parent.width*0.2
-        height:parent.height*0.08
-        labelSize: layout.value("F4")
+//        width:PicoFlow ? parent.width*0.2 : parent.width*0.15
+//        height:PicoFlow ? parent.height*0.08 : parent.height*0.06
+        width: screenW*grafic.valueOf("Button","width")
+        height: screenH*grafic.valueOf("Button","height")
+        labelSize: grafic.valueOf("Button","labelSize")
+//        labelSize: PicoFlow ? layout.value("F4") : layout.value("F3")
         onClicked: {
             mngData.sendToPrint()
         }
@@ -318,9 +338,9 @@ MForm {
         anchors.bottom: parent.bottom
         anchors.bottomMargin: 10
         anchors.rightMargin: 10
-        width:parent.width*0.2
-        height:parent.height*0.08
-        labelSize: layout.value("F4")
+        width:  screenW*grafic.valueOf("Button","width")
+        height: screenH*grafic.valueOf("Button","height")
+        labelSize: grafic.valueOf("Button","labelSize")//layout.value("F4")
         onClicked: {            
             for (var i = 0; i < pagesLocal.length; i++) {
                 if (pagesLocal[i].visible)

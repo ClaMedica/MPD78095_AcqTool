@@ -1,5 +1,5 @@
 TEMPLATE = app
-VERSION = 1.0.0.2
+VERSION = 1.0.0.5
 
 QT += qml quick widgets sql network multimedia xml core serialport
 
@@ -42,7 +42,8 @@ SOURCES += \
     ../AnaUro/anauro.cpp \
     ../AnaUro/analysis.cpp \
     ../AnaUro/anautils.cpp \
-    ../MGlobal/fileio.cpp
+    ../MGlobal/fileio.cpp \
+    CPP/graficmanager.cpp
 
 HEADERS += \
     CPP/alarmmanager.h \
@@ -76,7 +77,8 @@ HEADERS += \
     ../MGlobal/systemmanager.h \
     ../MGlobal/UdmImpl.h \
     ../MGlobal/fileio.h \
-    CPP/bitmapsv.h
+    CPP/bitmapsv.h \
+    CPP/graficmanager.h
 
 INCLUDEPATH +=  CPP \
                 CPP/TCP \
@@ -89,9 +91,13 @@ INCLUDEPATH +=  CPP \
 # Default rules for deployment.
 include(deployment.pri)
 
-TRANSLATIONS += acqtool_it.ts
+
+TRANSLATIONS += acqtool.xlf \
+               # acqtool_en.xlf \
+                acqtool_it.xlf
+
 lupdate_only{
-    SOURCES = Resources/*.qml \
+    SOURCES += Resources/*.qml \
              ../MGlobal/MComponents/*.qml
 }
 
@@ -152,7 +158,7 @@ CONFIG += link_pkgconfig
 #}
 
 LINUXDESKTOP {
-QMAKE_CXXFLAGS += -Wno-psabi
+    QMAKE_CXXFLAGS += -Wno-psabi
     DEFINES += LINUXDESKTOP
     DEFINES += LINUX
     TARGET = PicoAcq
@@ -172,7 +178,7 @@ QMAKE_CXXFLAGS += -Wno-psabi
 }
 
 PICOFLOW {
-QMAKE_CXXFLAGS += -Wno-psabi
+    QMAKE_CXXFLAGS += -Wno-psabi
     DEFINES += PICOFLOW
     TARGET = PicoAcq
 

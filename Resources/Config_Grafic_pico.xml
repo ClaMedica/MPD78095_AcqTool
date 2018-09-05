@@ -1,0 +1,8 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<PicoFlow>
+  <Button height="0.08" width="0.2" labelSize="4"/>
+  <Nomogrammi height="0.65" width="0.65" labelSize="3" margin="50" dimPoint="1"/>
+  <TableRis height="0.65" width="0.7" size="0.05"/>
+  <Dialog height="0.6" width="0.6" labelSize="4"/>
+  <Parameter height="0.1" width="0.4" />
+</PicoFlow>

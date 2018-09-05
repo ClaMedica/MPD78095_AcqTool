@@ -17,6 +17,21 @@ MAcqManager::MAcqManager(QObject *parent)
     m_itsok = "              &";
     OutFile = NULL;
 
+    //media mobile flusso e volume
+    m_lenMMobile = 10;
+    m_sommaMMobileF = 0;
+    m_sommaMMobileV = 0;
+
+    //filtro digitale
+    m_lenDifFilter = 6;
+    m_sommaCoef = 0;
+    for (int i=0; i<m_lenDifFilter;i++)
+       m_sommaCoef += COEFDigFilter[i];
+
+    m_valPrecVolume = -1;
+
+
+    m_startAcqManuale = false; //non ancora premuto tasto start
 #ifdef PICOFLOW
 
 #endif
@@ -108,6 +123,21 @@ bool MAcqManager::newAcquisition(QString __dataFile)
         m_sampleFreqMap.clear();
         m_frameMap.clear();
         m_bufSizeMap.clear();
+
+        //inizializzazione media mobile e filtro digitale per flusso
+        m_valPrecVolume = 0;
+        m_sommaMMobileF = 0;
+        m_sommaMMobileV = 0;
+        m_buffer_MMobileV.clear();
+        m_buffer_MMobileF.clear();
+        for (int i=0; i<m_lenMMobile;i++){
+            m_buffer_MMobileV.append(0);
+            m_buffer_MMobileF.append(0);
+        }
+        m_buffer_DigFilter.clear();
+        for (int i=0; i<m_lenDifFilter;i++)
+            m_buffer_DigFilter.append(0);
+
 
         /* non sono in acquisizione e quindi posso lanciarne una nuova aprendo il file e leggendo le info
          * oppure pescandole dal file di configurazione
@@ -445,7 +475,7 @@ void MAcqManager::handleTCP(SimpleTCPClient *__client, QByteArray __block)
 {
     if(m_tcpClients.values().contains(__client)) {
         QString who = m_tcpClients.key(__client);
-        qDebug() << who ;//<< __block;
+        //qDebug() << who ;//<< __block;
 
         if(who == "STA") {      //allora e' uno stato
             m_supeConnected = true;
@@ -487,34 +517,36 @@ void MAcqManager::handleTCP(SimpleTCPClient *__client, QByteArray __block)
         }
         else if(who == "VAL")
         {
-            // riempo i buffer
-            fillBuffers(__block);
+            if (m_autoStartStop || m_startAcqManuale) {
+                // riempo i buffer
+                fillBuffers(__block);
 
-            // finche' i buffer hanno abbastanza campioni
-            // faccio le mie operazioni e rimuovo i primi campioni
-            while(buffersReady()) {
-                qDebug() << "BUFFER ready";
-                applyOperations();
-                foreach(QString hwc, m_totalHWChan)
-                    m_bufferMap[hwc]->remove(0, m_frameMap[hwc]);
-            }
+                // finche' i buffer hanno abbastanza campioni
+                // faccio le mie operazioni e rimuovo i primi campioni
+                while(buffersReady()) {
+                    qDebug() << "BUFFER ready";
+                    applyOperations();
+                    foreach(QString hwc, m_totalHWChan)
+                        m_bufferMap[hwc]->remove(0, m_frameMap[hwc]);
+                }
 
-            qDebug() << "m_saving:" << m_saving << "m_autoStartStop:" << m_autoStartStop;
-            if(m_autoStartStop) {
-                if(!m_saving)
-                    checkAutomaticStartStop("Start");   //finche' non devo salvare riempo il buffer e controllo
+                qDebug() << "m_saving:" << m_saving << "m_autoStartStop:" << m_autoStartStop;
+                if(m_autoStartStop) {
+                    if(!m_saving)
+                        checkAutomaticStartStop("Start");   //finche' non devo salvare riempo il buffer e controllo
+                    else {
+                        checkAutomaticStartStop("Stop");
+                        if(!m_acqFinished) {
+                            sendBuffersToPlot();
+                            saveBuffersToFile();
+                        }
+                    }
+                }
                 else {
-                    checkAutomaticStartStop("Stop");
-                    if(!m_acqFinished) {
+                    if(m_saving && !m_acqFinished) {
                         sendBuffersToPlot();
                         saveBuffersToFile();
                     }
-                }
-            }
-            else {
-                if(m_saving && !m_acqFinished) {
-                    sendBuffersToPlot();
-                    saveBuffersToFile();
                 }
             }
         }
@@ -523,10 +555,17 @@ void MAcqManager::handleTCP(SimpleTCPClient *__client, QByteArray __block)
             if(__block[4] == '5') {
                 if(!m_saving) {
                     //parte immediatamnte l'acquisizione
-                    //effetto buffer tengo solo gli ultimi 5 secondi
+                    //azzero
+                    sendStartAcq();
+                    m_startAcqManuale = true;
+                    int secToSave = 0.0;
+                    //in caso di flussimetria manuale non devo tenermi buffer di dati:
+                    //i dati salvati partono dal momento dello start acquisizione da parte dell'utente
+                    if (m_autoStartStop)  //effetto buffer tengo solo gli ultimi 5 secondi
+                        secToSave = 5.0;
                     foreach(QString type, m_channelMap.keys())
                         foreach(MSignal *sig, m_channelMap[type])
-                            sig->saveLastSec(5.0);
+                            sig->saveLastSec(secToSave);
 
                     m_saving = true;    //posso iniziare a salvare i dati
                     emit acquisitionStarted();
@@ -537,6 +576,7 @@ void MAcqManager::handleTCP(SimpleTCPClient *__client, QByteArray __block)
                     //ferma immediatamente l'acquisizione
                     qDebug() << "Stop acquiring";
                     endAcquisitionSave();
+                    m_startAcqManuale = false;
                     m_acqFinished = true;
                 }
             }
@@ -666,12 +706,14 @@ void MAcqManager::checkAutomaticStartStop(QString __which)
             Ancestry *childAmp = condition->getSafeChild(XML_AMPLITUDE);
 
             //per prima cosa controlliamo quanti campioni
-            int      min = childDur->getSafeChild(ATT_MIN)->getSafeAttribute(ATT_VALUE).toUInt();
+            int      minSec = childDur->getSafeChild(ATT_MIN)->getSafeAttribute(ATT_VALUE).toUInt();
             qreal ampMin = childAmp->getSafeChild(ATT_MIN)->getSafeAttribute(ATT_VALUE).toInt();
             qreal ampMax = childAmp->getSafeChild(ATT_MAX)->getSafeAttribute(ATT_VALUE).toInt();
 
-            if (!(m_channelMap[chanType].at(num)->size() < min)) //se non ho ancora abbastanza campioni per decidere non vado avanti
-            { // continue;
+            int min = minSec*m_channelMap[chanType].at(num)->getSamplingFrequency();
+            //se non ho ancora abbastanza campioni per decidere non vado avanti
+            if (!(m_channelMap[chanType].at(num)->size() < min))
+            {
                 //ora quindi sono sicuro che arrivo qui solo quando ho abbastanza campioni
 
                 //controllo se c'e' un gradino
@@ -702,7 +744,6 @@ void MAcqManager::checkAutomaticStartStop(QString __which)
             }
         }
 
-        //if(condition->name() == XML_STATIONARY) {   //statio
         if (__which == "Stop")
         {
             Ancestry *childDur = condition->getSafeChild(XML_DURATION);
@@ -713,10 +754,13 @@ void MAcqManager::checkAutomaticStartStop(QString __which)
 
             qreal valMin = childVal->getSafeChild(ATT_MIN)->getSafeAttribute(ATT_VALUE).toDouble();
             qreal valMax = childVal->getSafeChild(ATT_MAX)->getSafeAttribute(ATT_VALUE).toDouble();
-            //qDebug()<<"Buffer"<<chanType<<num<<"="<<*(m_channelMap[chanType].at(num));
+            //qDebug()<<"Buffer"<<chanType<<num<<"="<<*(m_channelMap[chanType].at(num))<<m_channelMap[chanType].at(num)->getSamplingPeriod();
 
-            m_stopBuffer << *m_channelMap[chanType].at(num);
+            m_stopBuffer.setSamplingPeriod(m_channelMap[chanType].at(num)->getSamplingPeriod());
+            m_stopBuffer << *(m_channelMap[chanType].at(num));
+            //qDebug()<<"StopBuffer Len"<<m_stopBuffer.getDuration()<<m_stopBuffer.size();
             m_stopBuffer.saveLastSec(min);
+
             if (!(m_stopBuffer.getDuration() < min))
             {//   continue;
                 //ora quindi sono sicuro che arrivo qui solo quando ho abbastanza campioni
@@ -724,8 +768,7 @@ void MAcqManager::checkAutomaticStartStop(QString __which)
                 //controllo gli ultimi min campioni
                 qreal smin = m_stopBuffer.minimum();
                 qreal smax = m_stopBuffer.maximum();
-                //qDebug()<<smin<<valMin<<smax<<valMax;
-
+                //qDebug()<<"STOP flowauto"<<smin<<valMin<<smax<<valMax;
                 if((smin > valMin) && (smax < valMax)) {
                     qDebug() << "Stop acquiring";
                     endAcquisitionSave();
@@ -900,22 +943,40 @@ void MAcqManager::applyOperations()
                     int index = m_HWChansMap[type].indexOf(hwc);
                     for(int i = 0; i < m_frameMap[hwc]; i++){
                         double v = m_bufferMap[hwc]->at(i);
-//                        if (type == "EMG")
-//                            v = (v < 0.0) ? -v : v;
                         m_channelMap[type].at(index)->append(v);
                     }
                     qDebug() << "Canale" << type << "Copiato" << m_frameMap[hwc] << "campioni su" << index;
                 }
             }
 
-            if(name == "derive") {      //derivo
+            if(name == "derive") {      //derivo flusso
                 MSignal der;
                 foreach (QString hwc, m_HWChansMap[type]) {
                     int index = m_HWChansMap[type].indexOf(hwc);
                     der = m_bufferMap[hwc]->derive(bufferSize);
 
-                    for(int i = 0; i < m_frameMap[hwc]; i++)
-                        m_channelMap[type].at(index)->append(der.at(i));
+                    for(int i = 0; i < m_frameMap[hwc]; i++){
+                        double deri = der.at(i);
+                        if (deri < 0)
+                            deri = 0;
+                        //media mobile
+                        m_sommaMMobileF = m_sommaMMobileF - m_buffer_MMobileF.at(0) + deri;
+                        m_buffer_MMobileF.remove(0);
+                        m_buffer_MMobileF.append(deri);
+                        double mediato = m_sommaMMobileF/m_lenMMobile;
+                        qDebug()<<"media applicata in "<<deri<<"ris "<<mediato;
+
+                        //filtro digitale
+                        m_buffer_DigFilter.remove(0);
+                        m_buffer_DigFilter.append(mediato);
+                        double somma = 0;
+                        for (int i=0; i<m_lenDifFilter; i++)
+                            somma += m_buffer_DigFilter.at(i)*COEFDigFilter[i];
+                        double flusso = somma/m_sommaCoef;
+                        qDebug()<<"FILTRO applicato in "<<mediato<<"ris "<<flusso;
+                        m_channelMap[type].at(index)->append(flusso);
+
+                    }
                 }
             }
 
@@ -995,7 +1056,22 @@ void MAcqManager::fillBuffers(QByteArray __block)
                 if(m_bufferMap.keys().contains(QString::number(currChan))) {
                     for(int i = 0; i < numChanData; i++) {
                         in >> sample;
-                        m_bufferMap[QString::number(currChan)]->append(sample);
+                        if (sample < 0 )
+                            sample = 0;
+                        //media mobile
+                        m_sommaMMobileV = m_sommaMMobileV - m_buffer_MMobileV.at(0) + sample;
+                        m_buffer_MMobileV.remove(0);
+                        m_buffer_MMobileV.append(sample);
+                        double mediato = m_sommaMMobileV/m_lenMMobile;
+                        //controllo valori monotoni, i valori di volume non devono decrescere
+                        if (m_valPrecVolume < 0) //impostiamo la prima volta il valore precedente
+                            m_valPrecVolume = mediato;
+                        if (m_valPrecVolume > mediato)
+                            mediato = m_valPrecVolume;
+                        qDebug()<<"media volume applicata in "<<sample<<"ris "<<mediato;
+
+                        m_bufferMap[QString::number(currChan)]->append(mediato);
+                        m_valPrecVolume = mediato;
                         //qDebug("samples(ch:%d, nd:%d):%f",currChan,numChanData,sample);
                     }
 

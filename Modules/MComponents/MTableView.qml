@@ -27,20 +27,18 @@ BuzzTableView{
 
     signal selected()
 
-    function selectTestFromPk(testPK)
+    function selectRowFromPK(pk)
     {
         rootTable.selection.clear()
-        if (testPK !== -1)
+        if (pk !== -1)
         {
-            var row = model.getIndexFromPK(testPK)
+            var row = model.indexOfPK(pk)
             rootTable.positionViewAtRow(row,ListView.Beginning)
             rootTable.selection.select(row)
             rootTable.currentRow = row
         }
-
         rootTable.selected()
     }
-
 
     function populate(){//al caricamento della tabella popolo con le colonne
       // sortIndicatorOrder=1

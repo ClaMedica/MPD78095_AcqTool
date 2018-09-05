@@ -1,4 +1,4 @@
-import QtQuick 2.4
+﻿import QtQuick 2.4
 import QtQuick.Controls 1.3
 import QtQuick.Dialogs 1.2
 //import Resources 1.0
@@ -17,6 +17,7 @@ ApplicationWindow {
     //property var keyboard:appKey
     property string examFolder:settings.datafilePath
     property string configFolder:settings.appPath()
+    property bool vis: false
 
     //@@@@@@@@@@    Properties      @@@@@@@@@@
     id: root
@@ -106,7 +107,6 @@ ApplicationWindow {
         console.log("Application Ready!")
         if (mode !== "sta")
             bridgeMain.sendSwitch()
-
     }
 
     //@@@@@@@@@@    Objects         @@@@@@@@@@
@@ -123,16 +123,25 @@ ApplicationWindow {
         {
             console.log(datafile);
             launch("acq", datafile)
+            vis = false
         }
         onNewVisualization:
         {
             console.log(datafile);
             launch("vis", datafile)
+            vis = true
         }
         onStampaProva:
         {
             console.log("Stampa di prova");
             launch("sta","")
+        }
+        onAnaAutomatica:
+        {
+            if (vis && mngData.getAutoFlow() === 0){
+                console.log("analisi automatica");
+                mngData.analysis()
+            }
         }
     }
 
@@ -165,9 +174,6 @@ ApplicationWindow {
             forAna.loadConfigurationFile(mngData.plotConfigFileName())
             forAna.populate()
             forHome.whoIsVisible = forAna.name
-            if (mngData.getAutoFlow() === 0)
-                mngData.analysis()
-
         }
 
         onReloadingCompleted: forAna.populate()
@@ -228,6 +234,7 @@ ApplicationWindow {
     ResultForm{
         //@@@@@@@@@@    Properties      @@@@@@@@@@
         id: forRes
+        visible: false
     }
 
     VolResDlg{

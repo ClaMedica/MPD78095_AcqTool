@@ -1,10 +1,10 @@
-<Configuration>
+﻿<Configuration>
         <AutomaticFlow>
         <Auto
             label="Automatic flow"
             type="CheckBox"
             unit=""
-            value="true"
+            value="false"
             visible="false"
         />
         <AutoStarts>
@@ -34,7 +34,7 @@
                             type="TextField"
                             unit=""
                             label="Channel Type"
-                            value="VBT"
+                            value="VV"
                             visible = "false"
                          />
                          <num
@@ -78,7 +78,7 @@
                               label="Channel Type"
                               type="TextField"
                               unit=""
-                              value="QBT"
+                              value="Q"
                               visible = "false"
                           />
                           <num
@@ -122,7 +122,7 @@
              </Type>
          </ChannelsAbilitation>
         <ChannelsProp>
-            <VBT>
+            <VV>
                 <width
                    label="width track"
                    type="TextField"
@@ -163,8 +163,8 @@
                     model="100#0#10#0#"
                     value="0"
                 />
-            </VBT>
-            <QBT>
+            </VV>
+            <Q>
                 <width
                    label="width track"
                    type="TextField"
@@ -205,7 +205,7 @@
                     model="100#0#10#0#"
                     value="0"
                 />
-            </QBT>
+            </Q>
             <EMG>
                 <width
                    label="width track"
