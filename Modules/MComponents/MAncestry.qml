@@ -99,7 +99,7 @@ Column {
             width: parent.width-image.width-header.spacing
             labelSize: rootAncestry.labelSize
             switchEnabled: false
-            text: childName
+            text: qsTr(childName)
             onClicked: {
                 btnOpen.opened = !btnOpen.opened
                 if(opened) {

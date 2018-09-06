@@ -34,7 +34,6 @@ public slots:
 
     bool newAcquisition(QString __dataFile = "");
     void connectToServers();
-    void startSupe(QString __mode);
     void endAcquisition(bool discard = false);
     void endAcquisitionSave();
     void endAcquisitionDiscard();
@@ -56,7 +55,6 @@ private:
                 m_totalHWChan,//lista dei canali hw che ci sono
                 m_superList;    //lista dei supervisori che dovrA? avviare
 
-    int m_tcpAttempts;//contiene il numero di tentativi che ci metto per connettermi ai server
     bool    m_acqFileOpened,
     m_supeConnected,    //mi indica quando il supervisore A? connesso
     m_serverReady,
@@ -95,9 +93,7 @@ private:
 
     Ancestry m_configAcq;                //contiene le info per l'acquisizione
 
-    QProcess *m_superProcess;
-
-    AlarmManager    m_alarmMng;         //gestore allarmi
+   AlarmManager    m_alarmMng;         //gestore allarmi
 
     uint8_t m_oldState;
 

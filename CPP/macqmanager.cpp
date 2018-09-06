@@ -9,9 +9,7 @@ MAcqManager::MAcqManager(QObject *parent)
     m_sendingToPlot = false;    //nessuno sta spedendo qualcosa per cui ci si puo scrivere sopra
     m_serverReady = false;      //i server non sono inizializzati quindi falso
     m_autoStartStop = false;
-    m_superProcess = NULL;      //nessun supervisore avviato
     m_saving = false;           //non sto salvando i dati
-    m_tcpAttempts = 0;
     m_supeConnected = 0;
     m_oldState = 0;
     m_itsok = "              &";
@@ -46,14 +44,6 @@ MAcqManager::~MAcqManager()
         m_mng->Close();
         delete m_mng;
         m_mng = NULL;
-    }
-
-    if(m_superProcess != NULL) {
-        m_superProcess->close();
-        if(m_superProcess->waitForFinished()) {
-            delete m_superProcess;
-            m_superProcess = NULL;
-        }
     }
 
     if(m_tcpClients.values().size() > 0) {
@@ -235,81 +225,12 @@ void MAcqManager::connectToServers()
         client->connectToHost();
     }
 
-    if(m_supeConnected == false)
-        QTimer::singleShot(2000, this, SLOT(connectToServers()));
-
-    if(m_tcpAttempts > 0)
+    if(m_supeConnected == false) {
         qDebug() << "Retrying to connect in 2 seconds...";
-
-    if(m_tcpAttempts >= 10) {
-        qDebug() << "Restarting supervisor...";
-
-        if(m_superProcess != NULL) {
-            m_superProcess->close();
-            if(m_superProcess->waitForFinished()) {
-                delete m_superProcess;
-                m_superProcess = NULL;
-            }
-        }
-        m_tcpAttempts = 0;
-        startSupe("hide");
-        QTimer::singleShot(5000, this, SLOT(connectToServers()));
+        QTimer::singleShot(2000, this, SLOT(connectToServers()));
     }
-
-    m_tcpAttempts++;
 }
 
-void MAcqManager::startSupe(QString __mode)
-{
-
-#ifdef WINDOWS
-    m_superProcess = new QProcess();
-    qDebug() << "Supervisor starting...";
-    QString path = g_P7SettingsManager.progPath();
-    m_superProcess->start(path + "/FlowBtSupe.exe", QStringList() << __mode);
-#endif
-
-#ifdef PICOFLOW
-    QString path = g_P7SettingsManager.progPath();
-    QString program = "run_PicoTarget.sh";
-
-    if(!QFile::exists(path + "/" + program))
-        qCritical() << "No path for" << path + "/" + program;
-    qDebug() << "Lancio l'applicativo" << path + "/" + program;
-    QStringList arguments;
-    arguments << "PicoFlowSupe" << __mode;
-
-    QString command = "cd ";
-    command += path + " && ./" + program + " " + arguments.join(" ");
-    //arguments<<"--platform eglfs"<<"-plugin tslib:/dev/input/event0";
-
-    qDebug() << "Running process " << command;
-    qDebug() << "Process returned:" << executeDetached(command);
-#endif
-
-#ifdef LINUXDESKTOP
-    m_superProcess = new QProcess();
-    qDebug() << "Supervisor starting...";
-    QString path = g_P7SettingsManager.progPath();
-    m_superProcess->start(path + "/FlowBtSupe.exe", QStringList() << __mode);
-    //    QString path = g_P7SettingsManager.progPath();
-    //    QString program = "run_PicoTarget.sh";
-
-    //    if(!QFile::exists(path + "/" + program))
-    //        qCritical() << "No path for" << path + "/" + program;
-    //    qDebug() << "Lancio l'applicativo" << path + "/" + program;
-    //    QStringList arguments;
-    //    arguments << "PicoFlowSupe" << __mode;
-
-    //    QString command = "cd ";
-    //    command += path + " && ./" + program + " " + arguments.join(" ");
-    //    //arguments<<"--platform eglfs"<<"-plugin tslib:/dev/input/event0";
-
-    //    qDebug() << "Running process " << command;
-    //    qDebug() << "Process returned:" << executeDetached(command);
-#endif
-
-}
 
 void MAcqManager::endAcquisitionSave()
 {
@@ -377,7 +298,6 @@ void MAcqManager::endAcquisition(bool discard)
     m_serverReady = false;      //i server non sono inizializzati quindi falso
     m_autoStartStop = false;
     m_saving = false;           //non sto salvando i dati
-    m_tcpAttempts = 0;
     m_supeConnected = 0;
     m_oldState = ESTATE_IDLE_NOT_CONNECTED;
     emit acquisitionEnded();
@@ -957,20 +877,18 @@ void MAcqManager::applyOperations()
                         if (deri < 0)
                             deri = 0;
                         //media mobile
-                        m_sommaMMobileF = m_sommaMMobileF - m_buffer_MMobileF.at(0) + deri;
-                        m_buffer_MMobileF.remove(0);
-                        m_buffer_MMobileF.append(deri);
-                        double mediato = m_sommaMMobileF/m_lenMMobile;
-                        qDebug()<<"media applicata in "<<deri<<"ris "<<mediato;
+//                        m_sommaMMobileF = m_sommaMMobileF - m_buffer_MMobileF.at(0) + deri;
+//                        m_buffer_MMobileF.remove(0);
+//                        m_buffer_MMobileF.append(deri);
+//                        double mediato = m_sommaMMobileF/m_lenMMobile;
 
                         //filtro digitale
                         m_buffer_DigFilter.remove(0);
-                        m_buffer_DigFilter.append(mediato);
+                        m_buffer_DigFilter.append(deri);
                         double somma = 0;
                         for (int i=0; i<m_lenDifFilter; i++)
                             somma += m_buffer_DigFilter.at(i)*COEFDigFilter[i];
                         double flusso = somma/m_sommaCoef;
-                        qDebug()<<"FILTRO applicato in "<<mediato<<"ris "<<flusso;
                         m_channelMap[type].at(index)->append(flusso);
 
                     }
