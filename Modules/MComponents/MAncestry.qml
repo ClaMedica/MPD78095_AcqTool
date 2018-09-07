@@ -3,6 +3,7 @@ import QtQuick.Controls 1.2
 import QtQuick.Dialogs 1.2
 import MComponents 1.0
 import Settings 1.0
+
 Column {
     id:rootAncestry
     property var ancestry//si suppone che sia una classe ancestry altrimenti non funziona
@@ -99,7 +100,7 @@ Column {
             width: parent.width-image.width-header.spacing
             labelSize: rootAncestry.labelSize
             switchEnabled: false
-            text: qsTr(childName)
+            text: qsTranslate("SettingsContext",childName)
             onClicked: {
                 btnOpen.opened = !btnOpen.opened
                 if(opened) {
@@ -181,7 +182,7 @@ Column {
                     var info = pchild.getAttribute("value")
                     //console.log(info,c.component)
                     c.setInfo(info)
-                    c.role = pchild.getAttribute("label")
+                    c.role = qsTranslate("SettingsContext",pchild.getAttribute("label"))
                     c.labelSize = rootAncestry.labelSize
 
                     if (pchild.getAttribute("alfanum") === "false")
