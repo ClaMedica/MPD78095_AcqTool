@@ -14,6 +14,7 @@ MAcqManager::MAcqManager(QObject *parent)
     m_oldState = 0;
     m_itsok = "              &";
     OutFile = NULL;
+    m_acquired = false;
 
     //media mobile flusso e volume
     m_lenMMobile = 10;
@@ -409,18 +410,27 @@ void MAcqManager::handleTCP(SimpleTCPClient *__client, QByteArray __block)
                 flowBT_states_t bt;
                 picoFlow_states_t pf;
             } currState;
+            uint8_t newState = 0;
+            bool isBT;
             uint i = 0;
+            qDebug("blk.sz:%d sz(alarms_t):%d sz(flowBT_status_t):%d sz(picoFlow_status_t):%d",__block.size(), sizeof(alarms_t),sizeof(flowBT_status_t),sizeof(picoFlow_status_t));
             if((__block.size() - sizeof(alarms_t)) == sizeof(flowBT_status_t)) {
+                qDebug(" --> currState.bt = stBT.currState");
                 qint8  * d = (qint8 *) &stBT;
                 for(i = 0; i < sizeof(flowBT_status_t); i++)
                     *d++ = __block.at(i);
-                currState.bt = stBT.currState;
+//                currState.bt = stBT.currState;
+                newState = stBT.currState;
+                isBT = true;
             }
             else {
+                qDebug(" --> currState.pf = stPico.currState");
                 qint8  * d = (qint8 *) &stPico;
                 for(i = 0; i < sizeof(picoFlow_status_t); i++)
                     *d++ = __block.at(i);
-                currState.pf = stPico.currState;
+//                currState.pf = stPico.currState;
+                newState = stPico.currState;
+                isBT = false;
             }
 //            for(i = 0; i < sizeof(flowBT_status_t); i++)
 //                ((qint8 *) (& status) )[i] = __block[i];
@@ -428,9 +438,9 @@ void MAcqManager::handleTCP(SimpleTCPClient *__client, QByteArray __block)
             for(uint j = i; j < sizeof(alarms_t) + i; j++)
                 ((qint8 *) (& alarms))[j-i] = __block[j];
 
-            analyzeStatus(currState.pf);
+            analyzeStatus(newState, isBT);
             analyzeAlarms(alarms);
-            //qDebug() << "Supervisore connesso"<<sizeof(flowBT_status_t)<<sizeof(picoFlow_status_t)<<sizeof(alarms_t)<<__block.size();
+            qDebug() << "Supervisore connesso"<<sizeof(flowBT_status_t)<<sizeof(picoFlow_status_t)<<sizeof(alarms_t)<<__block.size();
         }
         else if(who == "VAL")
         {
@@ -538,12 +548,62 @@ bool MAcqManager::loadConnectivityInfo(Ancestry *__info)
     return true;
 }
 
-void MAcqManager::analyzeStatus(picoFlow_states_t __currState)
+void MAcqManager::analyzeStatus(uint8_t __currState, bool __isBT)
 {
-    // m_alarmMng.stopTimeoutAlarm(ALA_TIMEOUT_STATUS);
-    qDebug() << "Stato " << __currState << m_oldState;
+    static const char * names[] = { "st_IDLE_NOT_CONNECTED", "st_IDLE_CONNECTED", "st_ACQUIRING" };
 
-    static bool acquired = false;
+    // m_alarmMng.stopTimeoutAlarm(ALA_TIMEOUT_STATUS);
+    qDebug("olstate:%s new:%s %s", names[m_oldState], names[__currState], __isBT ? "BT" : "Cavo");
+
+    // trasformato in  m_acquired
+    // static acquired ok SOLO per la prima volta dall'accensione
+//    static bool acquired = false;
+
+//    picoFlow_states_t inputEv = (picoFlow_states_t) __currState;
+//    switch(m_oldState)
+//    {
+//    case ESTATE_IDLE_NOT_CONNECTED:
+//        switch(inputEv) {
+//                        case ESTATE_IDLE_CONNECTED:
+//                                m_alarmMng.stopTimeoutAlarm(ALA_NOT_CONNECTED);
+//                                sendStartAcq ();
+//                                break;
+//                        case ESTATE_ACQUIRING:
+//                        case ESTATE_IDLE_NOT_CONNECTED:
+//                        default:break;
+//        }
+//        break;
+//    case ESTATE_IDLE_CONNECTED:
+//        switch(inputEv) {
+//                        case ESTATE_IDLE_NOT_CONNECTED:
+//                                m_alarmMng.startTimeoutAlarm(ALA_NOT_CONNECTED, 1000);
+//                                break;
+//                        case ESTATE_IDLE_CONNECTED:
+//                                if(acquired) { acquired = false; sendStartAcq(); } // re-start se il caso
+//                                break;
+//                        case ESTATE_ACQUIRING:
+//                                emit systemInAcqStatus();
+//                                acquired = true;
+//                                m_alarmMng.manageAlarm(ALA_NOT_ACQUIRING, ENABLE);
+//                                break;
+//                        default:break;
+//        }
+//        break;
+//    case ESTATE_ACQUIRING:
+//        switch(inputEv) {
+//                        case ESTATE_IDLE_NOT_CONNECTED:
+//                                m_alarmMng.addAlarm(ALA_NOT_CONNECTED);
+//                                break;
+//                        case ESTATE_IDLE_CONNECTED:
+//                                m_alarmMng.addAlarm(ALA_NOT_ACQUIRING);
+//                                break;
+//                        case ESTATE_ACQUIRING:
+//                        default:break;
+//        }
+//        break;
+//    default:break;
+//    }
+
     switch(__currState)
     {
     case ESTATE_IDLE_NOT_CONNECTED:
@@ -556,13 +616,13 @@ void MAcqManager::analyzeStatus(picoFlow_states_t __currState)
     case ESTATE_IDLE_CONNECTED:
         if(m_oldState == ESTATE_IDLE_NOT_CONNECTED) {
             m_alarmMng.stopTimeoutAlarm(ALA_NOT_CONNECTED);
-            sendStartAcq();
+            sendStartAcq ();
         }
         if(m_oldState == ESTATE_ACQUIRING) {
             m_alarmMng.addAlarm(ALA_NOT_ACQUIRING);
         }
-        if(m_oldState == ESTATE_IDLE_CONNECTED && acquired) {
-            acquired = false;
+        if(m_oldState == ESTATE_IDLE_CONNECTED && m_acquired) {
+            m_acquired = false;
             sendStartAcq();
         }
         break;
@@ -570,7 +630,7 @@ void MAcqManager::analyzeStatus(picoFlow_states_t __currState)
     case ESTATE_ACQUIRING:
         if(m_oldState == ESTATE_IDLE_CONNECTED) {
             emit systemInAcqStatus();
-            acquired = true;
+            m_acquired = true;
             m_alarmMng.manageAlarm(ALA_NOT_ACQUIRING, ENABLE);
         }
         break;
@@ -993,6 +1053,8 @@ void MAcqManager::fillBuffers(QByteArray __block)
                     for(int i = 0; i < numChanData; i++) {
                         in >> sample;
                         m_bufferMap[QString::number(currChan)]->append(sample);
+                        if (m_valPrecVolume > mediato)
+                            mediato = m_valPrecVolume;
 
 //                        if (sample < 0 )
 //                            sample = 0;

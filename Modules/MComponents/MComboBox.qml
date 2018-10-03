@@ -35,7 +35,7 @@ Rectangle {
             if(indx < 0)
                 indx = 0
         }
-        console.log(newpage + " = " + indx + " in " + model)
+//        console.log(newpage + " = " + indx + " in " + model)
         return indx
     }
 
@@ -67,9 +67,11 @@ Rectangle {
 
     function closeBox(index,text)
     {
+//        console.log("i:",index,"txt:",text)
         if(!opened)
             return
         opened = false
+//        console.log(index, text)
         currentIndex = index
         currentText = text
         curEle.text = text
@@ -121,7 +123,7 @@ Rectangle {
                     autoClose.start()
                     highlight.opacity=0
                 }
-                onClicked:closeBox(index,modelData)
+                onClicked:{/*console.log("click mlabel");*/closeBox(index,modelData)}
             }
             Rectangle {
                 id:highlight
