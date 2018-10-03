@@ -65,6 +65,7 @@ private:
     m_acqFinished,  //mi dice se ho finito di acquisire
     m_autoStartStop;//mi dice se il controllo A? abilitato o meno
     bool m_startAcqManuale; //tasto start
+    bool m_acquired;
 
     QByteArray m_sendingPack;
 
@@ -107,7 +108,7 @@ private:
     void handleTCP(SimpleTCPClient *__client, QByteArray __block);
     void initializeServers();
     bool loadConnectivityInfo(Ancestry *__info);
-    void analyzeStatus(picoFlow_states_t __currState);
+    void analyzeStatus(uint8_t __currState, bool __isBT);
     void analyzeAlarms(alarms_t __alarms);
     bool newAcqFromConfigFile();
     bool newAcqFromPIC();

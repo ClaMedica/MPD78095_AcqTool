@@ -35,6 +35,7 @@ Rectangle {
             if(indx < 0)
                 indx = 0
         }
+//        console.log(newpage + " = " + indx + " in " + model)
         return indx
     }
 

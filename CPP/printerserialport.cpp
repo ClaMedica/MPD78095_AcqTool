@@ -14,6 +14,21 @@ printerserialport::printerserialport(QObject *parent) : QObject(parent)
 
     if ( ! m_serialPort.open(QIODevice::ReadWrite))
         qWarning() << "Unable to open serial port";
+//    m_serialPort.pinoutSignals()
+////            bool getCTS(int fd)
+//            {
+//                int s;
+//                /* Read terminal status line: Clear To Send */
+//                ioctl(fd, TIOCMGET, &s);
+//                return (s & TIOCM_CTS) != 0;
+//            }
+////            bool getDSR(int fd)
+//            {
+//                int s;
+//                /* Read terminal status line: Data Set Ready */
+//                ioctl(fd, TIOCMGET, &s);
+//                return (s & TIOCM_DSR) != 0;
+//            }
 }
 
 void printerserialport::init_printer()
