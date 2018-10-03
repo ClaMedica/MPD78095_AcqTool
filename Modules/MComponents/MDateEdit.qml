@@ -12,7 +12,7 @@ Rectangle {
     property int labelSize:2
     readonly property int marginPerc:1
     property int offset:0
-    property bool yearCorrect: true
+    property string year: "1900"
     height:50
     width:200
     id:rootDateEdit
@@ -124,14 +124,9 @@ Rectangle {
             horizontalAlignment: Text.AlignHCenter
             labelSize:rootDateEdit.labelSize
             property string oldYear
-            onTextChanged: {
-                var curDate = new Date()
-                if (text > curDate.getFullYear()){
-                    edYear.text = edYear.oldYear
-                    yearCorrect = false
-                }
-                else
-                    uppa(cbMonth.currentIndex)
+            onTextChanged:{
+                year = text
+                uppa(cbMonth.currentIndex)
             }
             onFocusChanged:
             {
