@@ -9,9 +9,7 @@ MAcqManager::MAcqManager(QObject *parent)
     m_sendingToPlot = false;    //nessuno sta spedendo qualcosa per cui ci si puo scrivere sopra
     m_serverReady = false;      //i server non sono inizializzati quindi falso
     m_autoStartStop = false;
-    m_superProcess = NULL;      //nessun supervisore avviato
     m_saving = false;           //non sto salvando i dati
-    m_tcpAttempts = 0;
     m_supeConnected = 0;
     m_oldState = 0;
     m_itsok = "              &";
@@ -47,14 +45,6 @@ MAcqManager::~MAcqManager()
         m_mng->Close();
         delete m_mng;
         m_mng = NULL;
-    }
-
-    if(m_superProcess != NULL) {
-        m_superProcess->close();
-        if(m_superProcess->waitForFinished()) {
-            delete m_superProcess;
-            m_superProcess = NULL;
-        }
     }
 
     if(m_tcpClients.values().size() > 0) {
@@ -236,81 +226,12 @@ void MAcqManager::connectToServers()
         client->connectToHost();
     }
 
-    if(m_supeConnected == false)
-        QTimer::singleShot(2000, this, SLOT(connectToServers()));
-
-    if(m_tcpAttempts > 0)
+    if(m_supeConnected == false) {
         qDebug() << "Retrying to connect in 2 seconds...";
-
-    if(m_tcpAttempts >= 10) {
-        qDebug() << "Restarting supervisor...";
-
-        if(m_superProcess != NULL) {
-            m_superProcess->close();
-            if(m_superProcess->waitForFinished()) {
-                delete m_superProcess;
-                m_superProcess = NULL;
-            }
-        }
-        m_tcpAttempts = 0;
-        startSupe("hide");
-        QTimer::singleShot(5000, this, SLOT(connectToServers()));
+        QTimer::singleShot(2000, this, SLOT(connectToServers()));
     }
-
-    m_tcpAttempts++;
 }
 
-void MAcqManager::startSupe(QString __mode)
-{
-
-#ifdef WINDOWS
-    m_superProcess = new QProcess();
-    qDebug() << "Supervisor starting...";
-    QString path = g_P7SettingsManager.progPath();
-    m_superProcess->start(path + "/FlowBtSupe.exe", QStringList() << __mode);
-#endif
-
-#ifdef PICOFLOW
-    QString path = g_P7SettingsManager.progPath();
-    QString program = "run_PicoTarget.sh";
-
-    if(!QFile::exists(path + "/" + program))
-        qCritical() << "No path for" << path + "/" + program;
-    qDebug() << "Lancio l'applicativo" << path + "/" + program;
-    QStringList arguments;
-    arguments << "PicoFlowSupe" << __mode;
-
-    QString command = "cd ";
-    command += path + " && ./" + program + " " + arguments.join(" ");
-    //arguments<<"--platform eglfs"<<"-plugin tslib:/dev/input/event0";
-
-    qDebug() << "Running process " << command;
-    qDebug() << "Process returned:" << executeDetached(command);
-#endif
-
-#ifdef LINUXDESKTOP
-    m_superProcess = new QProcess();
-    qDebug() << "Supervisor starting...";
-    QString path = g_P7SettingsManager.progPath();
-    m_superProcess->start(path + "/FlowBtSupe.exe", QStringList() << __mode);
-    //    QString path = g_P7SettingsManager.progPath();
-    //    QString program = "run_PicoTarget.sh";
-
-    //    if(!QFile::exists(path + "/" + program))
-    //        qCritical() << "No path for" << path + "/" + program;
-    //    qDebug() << "Lancio l'applicativo" << path + "/" + program;
-    //    QStringList arguments;
-    //    arguments << "PicoFlowSupe" << __mode;
-
-    //    QString command = "cd ";
-    //    command += path + " && ./" + program + " " + arguments.join(" ");
-    //    //arguments<<"--platform eglfs"<<"-plugin tslib:/dev/input/event0";
-
-    //    qDebug() << "Running process " << command;
-    //    qDebug() << "Process returned:" << executeDetached(command);
-#endif
-
-}
 
 void MAcqManager::endAcquisitionSave()
 {
@@ -378,7 +299,6 @@ void MAcqManager::endAcquisition(bool discard)
     m_serverReady = false;      //i server non sono inizializzati quindi falso
     m_autoStartStop = false;
     m_saving = false;           //non sto salvando i dati
-    m_tcpAttempts = 0;
     m_supeConnected = 0;
     m_oldState = ESTATE_IDLE_NOT_CONNECTED;
     emit acquisitionEnded();
@@ -1000,7 +920,28 @@ void MAcqManager::applyOperations()
                     int index = m_HWChansMap[type].indexOf(hwc);
                     for(int i = 0; i < m_frameMap[hwc]; i++){
                         double v = m_bufferMap[hwc]->at(i);
-                        m_channelMap[type].at(index)->append(v);
+                        //se il canale è "VV" devo fare la media mobile
+                        if  (type == "VV")
+                        {
+                            if (v < 0 )
+                                v = 0;
+                            //media mobile
+                            m_sommaMMobileV = m_sommaMMobileV - m_buffer_MMobileV.at(0) + v;
+                            m_buffer_MMobileV.remove(0);
+                            m_buffer_MMobileV.append(v);
+                            double mediato = m_sommaMMobileV/m_lenMMobile;
+                            //controllo valori monotoni, i valori di volume non devono decrescere
+                            if (m_valPrecVolume < 0) //impostiamo la prima volta il valore precedente
+                                m_valPrecVolume = mediato;
+                            if (m_valPrecVolume > mediato)
+                                mediato = m_valPrecVolume;
+                            qDebug()<<"media volume applicata in "<<v<<"ris "<<mediato;
+
+                            m_channelMap[type].at(index)->append(mediato);
+                            m_valPrecVolume = mediato;
+                        }
+                        else
+                            m_channelMap[type].at(index)->append(v);
                     }
                     qDebug() << "Canale" << type << "Copiato" << m_frameMap[hwc] << "campioni su" << index;
                 }
@@ -1021,7 +962,6 @@ void MAcqManager::applyOperations()
                         m_buffer_MMobileF.remove(0);
                         m_buffer_MMobileF.append(deri);
                         double mediato = m_sommaMMobileF/m_lenMMobile;
-                        qDebug()<<"media applicata in "<<deri<<"ris "<<mediato;
 
                         //filtro digitale
                         m_buffer_DigFilter.remove(0);
@@ -1030,7 +970,6 @@ void MAcqManager::applyOperations()
                         for (int i=0; i<m_lenDifFilter; i++)
                             somma += m_buffer_DigFilter.at(i)*COEFDigFilter[i];
                         double flusso = somma/m_sommaCoef;
-                        qDebug()<<"FILTRO applicato in "<<mediato<<"ris "<<flusso;
                         m_channelMap[type].at(index)->append(flusso);
 
                     }
@@ -1113,22 +1052,26 @@ void MAcqManager::fillBuffers(QByteArray __block)
                 if(m_bufferMap.keys().contains(QString::number(currChan))) {
                     for(int i = 0; i < numChanData; i++) {
                         in >> sample;
-                        if (sample < 0 )
-                            sample = 0;
-                        //media mobile
-                        m_sommaMMobileV = m_sommaMMobileV - m_buffer_MMobileV.at(0) + sample;
-                        m_buffer_MMobileV.remove(0);
-                        m_buffer_MMobileV.append(sample);
-                        double mediato = m_sommaMMobileV/m_lenMMobile;
-                        //controllo valori monotoni, i valori di volume non devono decrescere
-                        if (m_valPrecVolume < 0) //impostiamo la prima volta il valore precedente
-                            m_valPrecVolume = mediato;
+                        m_bufferMap[QString::number(currChan)]->append(sample);
+                        if (m_valPrecVolume > mediato)
+                            mediato = m_valPrecVolume;
+
+//                        if (sample < 0 )
+//                            sample = 0;
+//                        //media mobile
+//                        m_sommaMMobileV = m_sommaMMobileV - m_buffer_MMobileV.at(0) + sample;
+//                        m_buffer_MMobileV.remove(0);
+//                        m_buffer_MMobileV.append(sample);
+//                        double mediato = m_sommaMMobileV/m_lenMMobile;
+//                        //controllo valori monotoni, i valori di volume non devono decrescere
+//                        if (m_valPrecVolume < 0) //impostiamo la prima volta il valore precedente
+//                            m_valPrecVolume = mediato;
 //                        if (m_valPrecVolume > mediato)
 //                            mediato = m_valPrecVolume;
-                        qDebug()<<"media volume applicata in "<<sample<<"ris "<<mediato;
+//                        qDebug()<<"media volume applicata in "<<sample<<"ris "<<mediato;
 
-                        m_bufferMap[QString::number(currChan)]->append(mediato);
-                        m_valPrecVolume = mediato;
+//                        m_bufferMap[QString::number(currChan)]->append(mediato);
+//                        m_valPrecVolume = mediato;
                         //qDebug("samples(ch:%d, nd:%d):%f",currChan,numChanData,sample);
                     }
 
