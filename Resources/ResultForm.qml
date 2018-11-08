@@ -311,6 +311,14 @@ MForm {
         }
     }
 
+    Timer{
+        id:timStopBT
+        interval:1000
+        onTriggered: {
+            mngData.sendToPrint()
+            mngAcq.send_Command(5)   // ETCP_CMD_STARTBT
+        }
+    }
     //@@@@@@@@@@    Graphics      @@@@@@@@@@
 
     MButton{
@@ -327,7 +335,8 @@ MForm {
         labelSize: grafic.valueOf("Button","labelSize")
 //        labelSize: PicoFlow ? layout.value("F4") : layout.value("F3")
         onClicked: {
-            mngData.sendToPrint()
+            mngAcq.send_Command(4)   // ETCP_CMD_STOPBT
+            timStopBT.start()
         }
     }
 

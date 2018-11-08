@@ -35,6 +35,25 @@ MAcqManager::MAcqManager(QObject *parent)
 
 #endif
 
+    if(!m_configAcq.loadFromXML(g_P7SettingsManager.progPath() + "/Config_Acq.xml"))
+        qCritical() << "Error on acq configuration file";
+    qDebug("qui");
+    //carico info di connettivitA
+    loadConnectivityInfo(m_configAcq.getSafeChild(XML_CONNECTIONS));
+    qDebug("qui");
+//    QString lang = m_configLocale.getChild(XML_LOCALE)->getSafeAttribute("value");
+//    qDebug("qui");
+//    QString configAlarms = m_applicationPath + "/Config_Alarms_" + lang + ".xml";
+//    qDebug("qui");
+//    if(!QFile::exists(configAlarms))
+//        configAlarms = ":/Config/Config_Alarms_"+ lang + ".xml";
+//    qDebug("qui");
+//    if(!m_alarmMng.load(configAlarms))
+//        qCritical() << "Error on alarm configuration file";
+    qDebug("tutto");
+
+    QTimer::singleShot(2000, this, SLOT(connectToServers()));
+
     //connetto il gestore degli allarmi alla proprietA  alarms
     connect(&m_alarmMng, SIGNAL(alarmsUpdated(QVariantList)), this, SLOT(setAlarms(QVariantList)));
 }
@@ -534,10 +553,14 @@ bool MAcqManager::loadConnectivityInfo(Ancestry *__info)
         QString address = child->getSafeAttribute(ATT_ADDRESS);
         int port = child->getSafeAttribute(ATT_PORT).toInt();
 
-        if(child->getSafeAttribute(ATT_TYPE) == "client")
-            m_tcpClients[name] = new SimpleTCPClient(QHostAddress(address), port, this);
-        else if(child->getSafeAttribute(ATT_TYPE) == "server")
-            m_tcpChannels[name] = new SimpleTCPChannel(QHostAddress(address), port, this);
+        if(child->getSafeAttribute(ATT_TYPE) == "client") {
+            if( ! m_tcpClients.keys().contains(name))
+                m_tcpClients[name] = new SimpleTCPClient(QHostAddress(address), port, this);
+        }
+        else if(child->getSafeAttribute(ATT_TYPE) == "server") {
+            if( ! m_tcpChannels.keys().contains(name))
+                m_tcpChannels[name] = new SimpleTCPChannel(QHostAddress(address), port, this);
+        }
         else
             qDebug() << "Skip" << name << address << port;
         qDebug() << name << address << port;
@@ -1053,8 +1076,8 @@ void MAcqManager::fillBuffers(QByteArray __block)
                     for(int i = 0; i < numChanData; i++) {
                         in >> sample;
                         m_bufferMap[QString::number(currChan)]->append(sample);
-                        if (m_valPrecVolume > mediato)
-                            mediato = m_valPrecVolume;
+//                        if (m_valPrecVolume > mediato)
+//                            mediato = m_valPrecVolume;
 
 //                        if (sample < 0 )
 //                            sample = 0;

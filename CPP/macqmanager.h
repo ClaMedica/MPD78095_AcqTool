@@ -22,6 +22,7 @@ public:
     QVariantList acqMarkers(){return m_acqMarkerList;}
 
     static void dataOnTCP(QObject *__pParent=NULL, SimpleTCPClient *__pTCP=NULL, QByteArray __block=QByteArray());
+    Q_INVOKABLE void send_Command(int __command) { sendCommand((tcp_flow_bt_cmd_t) __command); }
 
 signals:
     void alarmsChanged();
@@ -45,7 +46,7 @@ public slots:
     void setAlarms(QVariantList __list);
 
 
-private slots:
+//private slots:
     bool sendCommand(tcp_flow_bt_cmd_t __command);
     bool sendCommand(int __command) { return sendCommand((tcp_flow_bt_cmd_t) __command); }
 
