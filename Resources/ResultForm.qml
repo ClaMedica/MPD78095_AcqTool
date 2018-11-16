@@ -14,6 +14,8 @@ MForm {
     //@@@@@@@@@@    Properties      @@@@@@@@@@
     property var pagesLocal:[]
     property var pagesSameAna:[]
+    property bool timBtAvail: true
+    property bool btStopped: false
 
     property int buttonTable:0
     id : resultForm
@@ -312,11 +314,43 @@ MForm {
     }
 
     Timer{
-        id:timStopBT
-        interval:1000
+        id: timStopBT
+        interval: 500
+        repeat: true
         onTriggered: {
-            mngData.sendToPrint()
-            mngAcq.send_Command(5)   // ETCP_CMD_STARTBT
+            switch(btStatusUdp) {  // 0:don't care 1:stopping 2:stopped 3:restarting 4:restarted
+            case 0:
+                console.log("btStatus:", btStatusUdp)
+                btnPrint.text = "wait"
+                mngAcq.send_Command(4)   // STOPBT
+                btStatusUdp = 1
+                console.log("btStatus:", btStatusUdp)
+                btnPrint.text = "stop BT"
+                break
+            case 1: // da 1 a 2 alla ricezione di udpBtStopped
+                break
+            case 2:
+                console.log("btStatus:", btStatusUdp)
+                btnPrint.text = "printing"
+                console.log("do print")
+//                mngData.sendToPrint()
+                mngAcq.send_Command(5)   // STARTBT
+                btStatusUdp = 3
+                btnPrint.text = "reconn bt"
+                console.log("btStatus:", btStatusUdp)
+                break
+            case 3: // da 3 a 4 alla ricezione di udpBtRestarted
+                break
+            case 4:
+                btStatusUdp = 0
+                stop()
+//                btnPrint.enabled = true
+                timBtAvail = true
+                btnPrint.text = qsTr("print")
+                console.log("btStatus:", btStatusUdp)
+                break
+            }
+
         }
     }
     //@@@@@@@@@@    Graphics      @@@@@@@@@@
@@ -335,8 +369,15 @@ MForm {
         labelSize: grafic.valueOf("Button","labelSize")
 //        labelSize: PicoFlow ? layout.value("F4") : layout.value("F3")
         onClicked: {
-            mngAcq.send_Command(4)   // ETCP_CMD_STOPBT
-            timStopBT.start()
+            if(timBtAvail) {
+                timBtAvail = false
+//                enabled = false
+                if(btStopped == false) {
+                    btStopped = true
+
+                }
+                timStopBT.start()
+            }
         }
     }
 
@@ -357,6 +398,8 @@ MForm {
             }
             forAna.visible = true
             resultForm.visible = false
+            timBtAvail = true
+            btStopped = false
         }
     }
 }

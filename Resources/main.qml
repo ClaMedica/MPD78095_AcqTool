@@ -18,6 +18,7 @@ ApplicationWindow {
     property string examFolder:settings.datafilePath
     property string configFolder:settings.appPath()
     property bool vis: false
+    property int btStatusUdp: 0    // 0:don't care 1:stopping 2:stopped 3:restarting 4:restarted
 
     //@@@@@@@@@@    Properties      @@@@@@@@@@
     id: root
@@ -162,6 +163,17 @@ ApplicationWindow {
             console.log("ENDED")
             forReal.endAcq()
         }
+        onUdpBtStopped:
+        {
+            console.log("udp BtStopped")
+            btStatusUdp = 2
+        }
+        onUdpBtRestarted:
+        {
+            console.log("udp BtRestarted")
+            btStatusUdp = 4
+        }
+
 
     }
 

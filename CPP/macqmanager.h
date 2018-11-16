@@ -2,6 +2,7 @@
 #define MACQMANAGER_H
 
 #include "mabstractmanager.h"
+#include "udpmsgs.h"
 
 
 const double COEFDigFilter[6] = {
@@ -22,7 +23,7 @@ public:
     QVariantList acqMarkers(){return m_acqMarkerList;}
 
     static void dataOnTCP(QObject *__pParent=NULL, SimpleTCPClient *__pTCP=NULL, QByteArray __block=QByteArray());
-    Q_INVOKABLE void send_Command(int __command) { sendCommand((tcp_flow_bt_cmd_t) __command); }
+    Q_INVOKABLE void send_Command(int __command);
 
 signals:
     void alarmsChanged();
@@ -30,6 +31,8 @@ signals:
     void acquisitionStarted();
     void systemInAcqStatus();
     void acquisitionEnded();
+    void udpBtStopped();
+    void udpBtRestarted();
 
 public slots:
 
@@ -44,6 +47,7 @@ public slots:
     bool sendStopAcq (void);
     void resetAlarms();
     void setAlarms(QVariantList __list);
+    void udpBtDecode(enum WHO __from, QByteArray __msg);
 
 
 //private slots:

@@ -1,4 +1,5 @@
 #include "macqmanager.h"
+#include "udpmsgs.h"
 
 MAcqManager::MAcqManager(QObject *parent)
 {
@@ -56,6 +57,10 @@ MAcqManager::MAcqManager(QObject *parent)
 
     //connetto il gestore degli allarmi alla proprietA  alarms
     connect(&m_alarmMng, SIGNAL(alarmsUpdated(QVariantList)), this, SLOT(setAlarms(QVariantList)));
+
+    connect(&udpConn, SIGNAL(receivedUdp(enum WHO, QByteArray)), this, SLOT(udpBtDecode(WHO,QByteArray)));
+    udpConn.iAmAcq();
+    udpConn.sendSup("hello from acq");
 }
 
 MAcqManager::~MAcqManager()
@@ -91,10 +96,22 @@ MAcqManager::~MAcqManager()
     //            delete m_signalVector[i];
 }
 
+void MAcqManager::udpBtDecode(enum WHO __from, QByteArray __msg)
+{
+    qDebug() << __from << __msg;
+
+    if(__from == E_SUP) {
+        if(__msg == "Suspended") emit udpBtStopped();
+        if(__msg == "Restarted") emit udpBtRestarted();
+    }
+}
+
 void MAcqManager::dataOnTCP(QObject *__pParent, SimpleTCPClient *__pTCP, QByteArray __block)
 {//arriviamo qua dentro ogni volta che arriva qualcosa da uno dei server a cui siamo collegati
 
-    qDebug() << __pTCP->hostAddress() << __pTCP->hostPort() << __block;
+    int s = __block.size();  int sm = (s < 16) ? s : 16;
+    qDebug() << __pTCP->hostAddress() << __pTCP->hostPort() << s << QByteArray(__block.constData(),sm);
+
     if(__pParent != NULL) {     //punta a qualcosa andiamo avanti
         if(__pTCP != NULL) {    //punta a qualcosa proviamo a gestirlo
             ((MAcqManager *) __pParent)->handleTCP(__pTCP, __block);
@@ -368,6 +385,14 @@ void MAcqManager::setAlarms(QVariantList __list)
         m_alarmList = __list;
         emit alarmsChanged();
     }
+}
+
+void MAcqManager::send_Command(int __command)
+{
+//    sendCommand((tcp_flow_bt_cmd_t) __command);
+    QByteArray msg = (__command == 4) ? "suspBt" : "restartBt";
+
+    udpConn.sendSup(msg);
 }
 
 bool MAcqManager::sendCommand(tcp_flow_bt_cmd_t __command)

@@ -43,6 +43,7 @@ SOURCES += \
     ../AnaUro/analysis.cpp \
     ../AnaUro/anautils.cpp \
     ../MGlobal/fileio.cpp \
+    ../MGlobal/udpmsgs.cpp \
     CPP/graficmanager.cpp
 
 HEADERS += \
@@ -77,6 +78,7 @@ HEADERS += \
     ../MGlobal/systemmanager.h \
     ../MGlobal/UdmImpl.h \
     ../MGlobal/fileio.h \
+    ../MGlobal/udpmsgs.h \
     CPP/bitmapsv.h \
     CPP/graficmanager.h
 
