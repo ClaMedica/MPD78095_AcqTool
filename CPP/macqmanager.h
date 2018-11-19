@@ -33,6 +33,8 @@ signals:
     void acquisitionEnded();
     void udpBtStopped();
     void udpBtRestarted();
+    void udpBtUsable(bool);
+    void udpPrnStatus(char);
 
 public slots:
 

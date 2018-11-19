@@ -39,6 +39,7 @@ Rectangle {
         anchors.margins: parent.height*0.02
         labelSize: grafic.valueOf("Button","labelSize")
         onClicked: {
+            qui start bt
             exitDlg.visible = false
             mngData.toSave = "yes"
             mngData.exitFromReview()
@@ -55,6 +56,7 @@ Rectangle {
         anchors.margins: parent.height*0.02
         labelSize: grafic.valueOf("Button","labelSize")
         onClicked: {
+            qui start bt
             exitDlg.visible = false
             mngData.toSave = "no"
             mngData.exitFromReview()

@@ -100,9 +100,20 @@ void MAcqManager::udpBtDecode(enum WHO __from, QByteArray __msg)
 {
     qDebug() << __from << __msg;
 
-    if(__from == E_SUP) {
-        if(__msg == "Suspended") emit udpBtStopped();
-        if(__msg == "Restarted") emit udpBtRestarted();
+    switch(__from) {
+    case E_SUP:
+                if((__msg.at(0) == 'S') && (__msg == "Suspended")) emit udpBtStopped();
+                if((__msg.at(0) == 'R') && (__msg == "Restarted")) emit udpBtRestarted();
+                if((__msg.at(0) == 'U') && (__msg == "UseBt"))     emit udpBtUsable(true);
+                if((__msg.at(0) == 'N') && (__msg == "NoBt"))      emit udpBtUsable(false);
+                break;
+    case E_PRN:
+                if((__msg.at(0) == 'R') && (__msg == "Ready"))     emit udpPrnStatus(__msg.at(0));
+                if((__msg.at(0) == 'F') && (__msg == "Fail"))      emit udpPrnStatus(__msg.at(0));
+                if((__msg.at(0) == 'D') && (__msg == "Done"))      emit udpPrnStatus(__msg.at(0));
+                break;
+    default:
+        break;
     }
 }
 

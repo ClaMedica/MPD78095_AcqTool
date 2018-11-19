@@ -333,7 +333,7 @@ MForm {
                 console.log("btStatus:", btStatusUdp)
                 btnPrint.text = "printing"
                 console.log("do print")
-//                mngData.sendToPrint()
+                mngData.sendToPrint()
                 mngAcq.send_Command(5)   // STARTBT
                 btStatusUdp = 3
                 btnPrint.text = "reconn bt"

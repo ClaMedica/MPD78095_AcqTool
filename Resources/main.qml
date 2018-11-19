@@ -88,6 +88,7 @@ ApplicationWindow {
         }
         else if(mode === "vis")
         {
+            qui stop
             console.log("Start new vis")
             forAna.initialize()
             mngData.load()
@@ -101,6 +102,7 @@ ApplicationWindow {
         }
         else if (mode === "sta")
         {
+            qui stop
             console.log("Start stampa prova")
             mngData.sendPrintTest()
         }
