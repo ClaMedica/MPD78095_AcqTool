@@ -179,6 +179,24 @@ LINUXDESKTOP {
                  ../MGlobal/MComponents/Images/* \
 }
 
+CLAUDIA {
+    QMAKE_CXXFLAGS += -Wno-psabi
+    DEFINES += PICOFLOW
+    TARGET = PicoAcq
+
+    RESOURCES += modules_picoflow.qrc
+
+    LIBS        += -L/sviluppo/qt/Piattaforma70/Build-IMX6/DatafileManager/ -lDatafileManager
+    INCLUDEPATH +=   /sviluppo/qt/Piattaforma70/Build-IMX6/DatafileManager
+    DEPENDPATH  +=   /sviluppo/qt/Piattaforma70/Build-IMX6/DatafileManager
+
+    # Additional import path used to resolve QML modules in Qt Creator's code model
+    QML_IMPORT_PATH = ../MGlobal \
+                      /sviluppo/qt/Piattaforma70/Build-IMX6/CommonPlugin
+    DISTFILES += ../MGlobal/MComponents/* \
+                 ../MGlobal/MComponents/Images/*
+}
+
 PICOFLOW {
     QMAKE_CXXFLAGS += -Wno-psabi
     DEFINES += PICOFLOW
