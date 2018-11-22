@@ -1,4 +1,4 @@
-#ifndef MDATAMANAGER_H
+﻿#ifndef MDATAMANAGER_H
 #define MDATAMANAGER_H
 
 #include "mabstractmanager.h"
@@ -118,7 +118,8 @@ private:
 
     QString m_currentSignalName,
     m_fileName,
-    m_copyFileName;
+    m_copyFileName,
+    m_pathData;
 
     MSignal *m_pCurrentSignal;
 

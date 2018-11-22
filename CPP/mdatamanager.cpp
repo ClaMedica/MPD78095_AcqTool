@@ -16,7 +16,7 @@ MDataManager::MDataManager(QObject *parent)
     m_updateWhenNews = false;
     m_start = 0;
     m_end = 3600;   //fine esame di default a 1 ora
-    //m_applicationPath=applicationDirPath();
+
     m_configurationFileLoaded = false;  //nessun file di configurazione caricato
     m_changesToBeSaved = false;
 
@@ -33,6 +33,8 @@ MDataManager::MDataManager(QObject *parent)
 
     m_firstHead = "Medica S.p.A - Menfis Divisione";
     m_secondHead = "Pico Flow 2";
+
+    m_pathData = this->m_applicationPath;
 
     setValVolRes(-999);
 }
@@ -58,8 +60,32 @@ MDataManager::~MDataManager()
 
 void MDataManager::getGrabbedImage(QObject *gi, QString nome)
 {
+    qDebug()<<"Immagine"<<nome<<gi;
 #ifdef PICOFLOW
-    m_mngPrint->getGrabbedImage(gi,nome);
+    if (nome != "grafo")
+        m_mngPrint->getGrabbedImage(gi,nome);
+#elif WIN32
+    //grafo e nomogrammi
+    QQuickItemGrabResult *item = qobject_cast<QQuickItemGrabResult *>(gi);
+    qDebug()<<"Item"<<item;
+    QImage img = item->image();
+    QPixmap pix = QPixmap::fromImage(img);
+    QString imgName;
+    if (nome == "grafo")
+        imgName = "GR100";
+    else if (nome.startsWith("Live"))
+        if (nome.contains("Ave"))
+            imgName = "GR202";
+        else
+            imgName = "GR203";
+    else if (nome.startsWith("Siro"))
+        if (nome.contains("Ave"))
+            imgName = "GR204";
+        else
+            imgName = "GR210";
+
+    pix.save(m_pathData + imgName + ".jpg");
+
 #endif
 }
 
@@ -112,6 +138,8 @@ void MDataManager::loadFile(QString __fileName)
     }
 
     m_fileName = __fileName;
+    m_pathData = m_fileName.left(m_fileName.lastIndexOf("\\")+1);
+
     //la prima volta che salvo mi faccio la copia del file originale
     m_copyFileName = m_fileName;
     m_copyFileName.insert(m_copyFileName.length() - 4, "_copy");
