@@ -2,6 +2,12 @@
 #define MACQMANAGER_H
 
 #include "mabstractmanager.h"
+#include "udpmsgs.h"
+
+
+const double COEFDigFilter[6] = {
+    0.06667948314423,   0.1945929082815,   0.2888590053723,   0.2888590053723,
+     0.1945929082815,  0.06667948314423};//somma = 1,1002627935295
 
 class MAcqManager : public MAbstractManager
 {
@@ -17,6 +23,7 @@ public:
     QVariantList acqMarkers(){return m_acqMarkerList;}
 
     static void dataOnTCP(QObject *__pParent=NULL, SimpleTCPClient *__pTCP=NULL, QByteArray __block=QByteArray());
+    Q_INVOKABLE void send_Command(int __command);
 
 signals:
     void alarmsChanged();
@@ -24,12 +31,13 @@ signals:
     void acquisitionStarted();
     void systemInAcqStatus();
     void acquisitionEnded();
+    void udpBtStopped();
+    void udpBtRestarted();
 
 public slots:
 
     bool newAcquisition(QString __dataFile = "");
     void connectToServers();
-    void startSupe(QString __mode);
     void endAcquisition(bool discard = false);
     void endAcquisitionSave();
     void endAcquisitionDiscard();
@@ -39,9 +47,10 @@ public slots:
     bool sendStopAcq (void);
     void resetAlarms();
     void setAlarms(QVariantList __list);
+    void udpBtDecode(enum WHO __from, QByteArray __msg);
 
 
-private slots:
+//private slots:
     bool sendCommand(tcp_flow_bt_cmd_t __command);
     bool sendCommand(int __command) { return sendCommand((tcp_flow_bt_cmd_t) __command); }
 
@@ -51,7 +60,6 @@ private:
                 m_totalHWChan,//lista dei canali hw che ci sono
                 m_superList;    //lista dei supervisori che dovrA? avviare
 
-    int m_tcpAttempts;//contiene il numero di tentativi che ci metto per connettermi ai server
     bool    m_acqFileOpened,
     m_supeConnected,    //mi indica quando il supervisore A? connesso
     m_serverReady,
@@ -59,6 +67,8 @@ private:
     m_saving,
     m_acqFinished,  //mi dice se ho finito di acquisire
     m_autoStartStop;//mi dice se il controllo A? abilitato o meno
+    bool m_startAcqManuale; //tasto start
+    bool m_acquired;
 
     QByteArray m_sendingPack;
 
@@ -77,11 +87,19 @@ private:
 
     QVector<VarMap> m_acqMarker;
 
+    int m_lenMMobile;                       //lunghezza vettore per media mobile
+    QVector<double> m_buffer_MMobileF;      //buffer per il calcolo della media mobile sulla derivata del flusso
+    QVector<double> m_buffer_MMobileV;      //buffer per il calcolo della media mobile sul volume
+    double m_sommaMMobileF;                 //somma valori media mobile flusso
+    double m_sommaMMobileV;                 //somma valori media mobile volume
+    int m_lenDifFilter;                     //lunghezza vettore filtro digitale
+    QVector<double> m_buffer_DigFilter;     //buffer per il calcolo del filtro digitale sulla derivata del flusso
+    double m_sommaCoef;                     //somma valori dei coefficenti
+    double m_valPrecVolume;                 //valore precedente di volume
+
     Ancestry m_configAcq;                //contiene le info per l'acquisizione
 
-    QProcess *m_superProcess;
-
-    AlarmManager    m_alarmMng;         //gestore allarmi
+   AlarmManager    m_alarmMng;         //gestore allarmi
 
     uint8_t m_oldState;
 
@@ -91,7 +109,7 @@ private:
     void handleTCP(SimpleTCPClient *__client, QByteArray __block);
     void initializeServers();
     bool loadConnectivityInfo(Ancestry *__info);
-    void analyzeStatus(picoFlow_states_t __currState);
+    void analyzeStatus(uint8_t __currState, bool __isBT);
     void analyzeAlarms(alarms_t __alarms);
     bool newAcqFromConfigFile();
     bool newAcqFromPIC();

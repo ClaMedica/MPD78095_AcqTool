@@ -1,5 +1,5 @@
 TEMPLATE = app
-VERSION = 1.0.0.2
+VERSION = 1.0.0.5
 
 QT += qml quick widgets sql network multimedia xml core serialport
 
@@ -43,6 +43,7 @@ SOURCES += \
     ../AnaUro/analysis.cpp \
     ../AnaUro/anautils.cpp \
     ../MGlobal/fileio.cpp \
+    ../MGlobal/udpmsgs.cpp \
     CPP/graficmanager.cpp
 
 HEADERS += \
@@ -77,6 +78,7 @@ HEADERS += \
     ../MGlobal/systemmanager.h \
     ../MGlobal/UdmImpl.h \
     ../MGlobal/fileio.h \
+    ../MGlobal/udpmsgs.h \
     CPP/bitmapsv.h \
     CPP/graficmanager.h
 
@@ -92,9 +94,13 @@ INCLUDEPATH +=  CPP \
 # Default rules for deployment.
 include(deployment.pri)
 
-TRANSLATIONS += acqtool_it.ts
+
+TRANSLATIONS += acqtool.xlf \
+               # acqtool_en.xlf \
+                acqtool_it.xlf
+
 lupdate_only{
-    SOURCES = Resources/*.qml \
+    SOURCES += Resources/*.qml \
              ../MGlobal/MComponents/*.qml
 }
 
@@ -178,6 +184,24 @@ LINUXDESKTOP {
 
     DISTFILES += ../MGlobal/MComponents/* \
                  ../MGlobal/MComponents/Images/* \
+}
+
+CLAUDIA {
+    QMAKE_CXXFLAGS += -Wno-psabi
+    DEFINES += PICOFLOW
+    TARGET = PicoAcq
+
+    RESOURCES += modules_picoflow.qrc
+
+    LIBS        += -L/sviluppo/qt/Piattaforma70/Build-IMX6/DatafileManager/ -lDatafileManager
+    INCLUDEPATH +=   /sviluppo/qt/Piattaforma70/Build-IMX6/DatafileManager
+    DEPENDPATH  +=   /sviluppo/qt/Piattaforma70/Build-IMX6/DatafileManager
+
+    # Additional import path used to resolve QML modules in Qt Creator's code model
+    QML_IMPORT_PATH = ../MGlobal \
+                      /sviluppo/qt/Piattaforma70/Build-IMX6/CommonPlugin
+    DISTFILES += ../MGlobal/MComponents/* \
+                 ../MGlobal/MComponents/Images/*
 }
 
 PICOFLOW {

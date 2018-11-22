@@ -12,6 +12,7 @@ Rectangle {
     property int labelSize:2
     readonly property int marginPerc:1
     property int offset:0
+    property string year: "1900"
     height:50
     width:200
     id:rootDateEdit
@@ -122,7 +123,11 @@ Rectangle {
             verticalAlignment: Text.AlignVCenter
             horizontalAlignment: Text.AlignHCenter
             labelSize:rootDateEdit.labelSize
-            onTextChanged: uppa(cbMonth.currentIndex)
+            property string oldYear
+            onTextChanged:{
+                year = text
+                uppa(cbMonth.currentIndex)
+            }
             onFocusChanged:
             {
                 if(focus && isTouch)
@@ -130,6 +135,7 @@ Rectangle {
                     mngSys.startSound()
                     if (keyboardNum !== undefined)
                     {
+                        edYear.oldYear = edYear.text
                         keyboardNum.testo = edYear.text
                         keyboardNum.target = edYear
                         DataEngine.putItemOnTop(keyboardNum)

@@ -1,4 +1,5 @@
 #include "macqmanager.h"
+#include "udpmsgs.h"
 
 MAcqManager::MAcqManager(QObject *parent)
 {
@@ -9,20 +10,57 @@ MAcqManager::MAcqManager(QObject *parent)
     m_sendingToPlot = false;    //nessuno sta spedendo qualcosa per cui ci si puo scrivere sopra
     m_serverReady = false;      //i server non sono inizializzati quindi falso
     m_autoStartStop = false;
-    m_superProcess = NULL;      //nessun supervisore avviato
     m_saving = false;           //non sto salvando i dati
-    m_tcpAttempts = 0;
     m_supeConnected = 0;
     m_oldState = 0;
     m_itsok = "              &";
     OutFile = NULL;
+    m_acquired = false;
 
+    //media mobile flusso e volume
+    m_lenMMobile = 10;
+    m_sommaMMobileF = 0;
+    m_sommaMMobileV = 0;
+
+    //filtro digitale
+    m_lenDifFilter = 6;
+    m_sommaCoef = 0;
+    for (int i=0; i<m_lenDifFilter;i++)
+       m_sommaCoef += COEFDigFilter[i];
+
+    m_valPrecVolume = -1;
+
+
+    m_startAcqManuale = false; //non ancora premuto tasto start
 #ifdef PICOFLOW
 
 #endif
 
+    if(!m_configAcq.loadFromXML(g_P7SettingsManager.progPath() + "/Config_Acq.xml"))
+        qCritical() << "Error on acq configuration file";
+    qDebug("qui");
+    //carico info di connettivitA
+    loadConnectivityInfo(m_configAcq.getSafeChild(XML_CONNECTIONS));
+    qDebug("qui");
+//    QString lang = m_configLocale.getChild(XML_LOCALE)->getSafeAttribute("value");
+//    qDebug("qui");
+//    QString configAlarms = m_applicationPath + "/Config_Alarms_" + lang + ".xml";
+//    qDebug("qui");
+//    if(!QFile::exists(configAlarms))
+//        configAlarms = ":/Config/Config_Alarms_"+ lang + ".xml";
+//    qDebug("qui");
+//    if(!m_alarmMng.load(configAlarms))
+//        qCritical() << "Error on alarm configuration file";
+    qDebug("tutto");
+
+    QTimer::singleShot(2000, this, SLOT(connectToServers()));
+
     //connetto il gestore degli allarmi alla proprietA  alarms
     connect(&m_alarmMng, SIGNAL(alarmsUpdated(QVariantList)), this, SLOT(setAlarms(QVariantList)));
+
+    connect(&udpConn, SIGNAL(receivedUdp(enum WHO, QByteArray)), this, SLOT(udpBtDecode(WHO,QByteArray)));
+    udpConn.iAmAcq();
+    udpConn.sendSup("hello from acq");
 }
 
 MAcqManager::~MAcqManager()
@@ -31,14 +69,6 @@ MAcqManager::~MAcqManager()
         m_mng->Close();
         delete m_mng;
         m_mng = NULL;
-    }
-
-    if(m_superProcess != NULL) {
-        m_superProcess->close();
-        if(m_superProcess->waitForFinished()) {
-            delete m_superProcess;
-            m_superProcess = NULL;
-        }
     }
 
     if(m_tcpClients.values().size() > 0) {
@@ -66,10 +96,22 @@ MAcqManager::~MAcqManager()
     //            delete m_signalVector[i];
 }
 
+void MAcqManager::udpBtDecode(enum WHO __from, QByteArray __msg)
+{
+    qDebug() << __from << __msg;
+
+    if(__from == E_SUP) {
+        if(__msg == "Suspended") emit udpBtStopped();
+        if(__msg == "Restarted") emit udpBtRestarted();
+    }
+}
+
 void MAcqManager::dataOnTCP(QObject *__pParent, SimpleTCPClient *__pTCP, QByteArray __block)
 {//arriviamo qua dentro ogni volta che arriva qualcosa da uno dei server a cui siamo collegati
 
-    qDebug() << __pTCP->hostAddress() << __pTCP->hostPort() << __block;
+    int s = __block.size();  int sm = (s < 16) ? s : 16;
+    qDebug() << __pTCP->hostAddress() << __pTCP->hostPort() << s << QByteArray(__block.constData(),sm);
+
     if(__pParent != NULL) {     //punta a qualcosa andiamo avanti
         if(__pTCP != NULL) {    //punta a qualcosa proviamo a gestirlo
             ((MAcqManager *) __pParent)->handleTCP(__pTCP, __block);
@@ -108,6 +150,21 @@ bool MAcqManager::newAcquisition(QString __dataFile)
         m_sampleFreqMap.clear();
         m_frameMap.clear();
         m_bufSizeMap.clear();
+
+        //inizializzazione media mobile e filtro digitale per flusso
+        m_valPrecVolume = 0;
+        m_sommaMMobileF = 0;
+        m_sommaMMobileV = 0;
+        m_buffer_MMobileV.clear();
+        m_buffer_MMobileF.clear();
+        for (int i=0; i<m_lenMMobile;i++){
+            m_buffer_MMobileV.append(0);
+            m_buffer_MMobileF.append(0);
+        }
+        m_buffer_DigFilter.clear();
+        for (int i=0; i<m_lenDifFilter;i++)
+            m_buffer_DigFilter.append(0);
+
 
         /* non sono in acquisizione e quindi posso lanciarne una nuova aprendo il file e leggendo le info
          * oppure pescandole dal file di configurazione
@@ -205,81 +262,12 @@ void MAcqManager::connectToServers()
         client->connectToHost();
     }
 
-    if(m_supeConnected == false)
-        QTimer::singleShot(2000, this, SLOT(connectToServers()));
-
-    if(m_tcpAttempts > 0)
+    if(m_supeConnected == false) {
         qDebug() << "Retrying to connect in 2 seconds...";
-
-    if(m_tcpAttempts >= 10) {
-        qDebug() << "Restarting supervisor...";
-
-        if(m_superProcess != NULL) {
-            m_superProcess->close();
-            if(m_superProcess->waitForFinished()) {
-                delete m_superProcess;
-                m_superProcess = NULL;
-            }
-        }
-        m_tcpAttempts = 0;
-        startSupe("hide");
-        QTimer::singleShot(5000, this, SLOT(connectToServers()));
+        QTimer::singleShot(2000, this, SLOT(connectToServers()));
     }
-
-    m_tcpAttempts++;
 }
 
-void MAcqManager::startSupe(QString __mode)
-{
-
-#ifdef WINDOWS
-    m_superProcess = new QProcess();
-    qDebug() << "Supervisor starting...";
-    QString path = g_P7SettingsManager.progPath();
-    m_superProcess->start(path + "/FlowBtSupe.exe", QStringList() << __mode);
-#endif
-
-#ifdef PICOFLOW
-    QString path = g_P7SettingsManager.progPath();
-    QString program = "run_PicoTarget.sh";
-
-    if(!QFile::exists(path + "/" + program))
-        qCritical() << "No path for" << path + "/" + program;
-    qDebug() << "Lancio l'applicativo" << path + "/" + program;
-    QStringList arguments;
-    arguments << "PicoFlowSupe" << __mode;
-
-    QString command = "cd ";
-    command += path + " && ./" + program + " " + arguments.join(" ");
-    //arguments<<"--platform eglfs"<<"-plugin tslib:/dev/input/event0";
-
-    qDebug() << "Running process " << command;
-    qDebug() << "Process returned:" << executeDetached(command);
-#endif
-
-#ifdef LINUXDESKTOP
-    m_superProcess = new QProcess();
-    qDebug() << "Supervisor starting...";
-    QString path = g_P7SettingsManager.progPath();
-    m_superProcess->start(path + "/FlowBtSupe.exe", QStringList() << __mode);
-    //    QString path = g_P7SettingsManager.progPath();
-    //    QString program = "run_PicoTarget.sh";
-
-    //    if(!QFile::exists(path + "/" + program))
-    //        qCritical() << "No path for" << path + "/" + program;
-    //    qDebug() << "Lancio l'applicativo" << path + "/" + program;
-    //    QStringList arguments;
-    //    arguments << "PicoFlowSupe" << __mode;
-
-    //    QString command = "cd ";
-    //    command += path + " && ./" + program + " " + arguments.join(" ");
-    //    //arguments<<"--platform eglfs"<<"-plugin tslib:/dev/input/event0";
-
-    //    qDebug() << "Running process " << command;
-    //    qDebug() << "Process returned:" << executeDetached(command);
-#endif
-
-}
 
 void MAcqManager::endAcquisitionSave()
 {
@@ -347,7 +335,6 @@ void MAcqManager::endAcquisition(bool discard)
     m_serverReady = false;      //i server non sono inizializzati quindi falso
     m_autoStartStop = false;
     m_saving = false;           //non sto salvando i dati
-    m_tcpAttempts = 0;
     m_supeConnected = 0;
     m_oldState = ESTATE_IDLE_NOT_CONNECTED;
     emit acquisitionEnded();
@@ -400,6 +387,14 @@ void MAcqManager::setAlarms(QVariantList __list)
     }
 }
 
+void MAcqManager::send_Command(int __command)
+{
+//    sendCommand((tcp_flow_bt_cmd_t) __command);
+    QByteArray msg = (__command == 4) ? "suspBt" : "restartBt";
+
+    udpConn.sendSup(msg);
+}
+
 bool MAcqManager::sendCommand(tcp_flow_bt_cmd_t __command)
 {
     if(m_tcpClients.contains("CMD")) {
@@ -445,7 +440,7 @@ void MAcqManager::handleTCP(SimpleTCPClient *__client, QByteArray __block)
 {
     if(m_tcpClients.values().contains(__client)) {
         QString who = m_tcpClients.key(__client);
-        qDebug() << who ;//<< __block;
+        //qDebug() << who ;//<< __block;
 
         if(who == "STA") {      //allora e' uno stato
             m_supeConnected = true;
@@ -459,18 +454,27 @@ void MAcqManager::handleTCP(SimpleTCPClient *__client, QByteArray __block)
                 flowBT_states_t bt;
                 picoFlow_states_t pf;
             } currState;
+            uint8_t newState = 0;
+            bool isBT;
             uint i = 0;
+            qDebug("blk.sz:%d sz(alarms_t):%d sz(flowBT_status_t):%d sz(picoFlow_status_t):%d",__block.size(), sizeof(alarms_t),sizeof(flowBT_status_t),sizeof(picoFlow_status_t));
             if((__block.size() - sizeof(alarms_t)) == sizeof(flowBT_status_t)) {
+                qDebug(" --> currState.bt = stBT.currState");
                 qint8  * d = (qint8 *) &stBT;
                 for(i = 0; i < sizeof(flowBT_status_t); i++)
                     *d++ = __block.at(i);
-                currState.bt = stBT.currState;
+//                currState.bt = stBT.currState;
+                newState = stBT.currState;
+                isBT = true;
             }
             else {
+                qDebug(" --> currState.pf = stPico.currState");
                 qint8  * d = (qint8 *) &stPico;
                 for(i = 0; i < sizeof(picoFlow_status_t); i++)
                     *d++ = __block.at(i);
-                currState.pf = stPico.currState;
+//                currState.pf = stPico.currState;
+                newState = stPico.currState;
+                isBT = false;
             }
 //            for(i = 0; i < sizeof(flowBT_status_t); i++)
 //                ((qint8 *) (& status) )[i] = __block[i];
@@ -478,40 +482,42 @@ void MAcqManager::handleTCP(SimpleTCPClient *__client, QByteArray __block)
             for(uint j = i; j < sizeof(alarms_t) + i; j++)
                 ((qint8 *) (& alarms))[j-i] = __block[j];
 
-            analyzeStatus(currState.pf);
+            analyzeStatus(newState, isBT);
             analyzeAlarms(alarms);
-            //qDebug() << "Supervisore connesso"<<sizeof(flowBT_status_t)<<sizeof(picoFlow_status_t)<<sizeof(alarms_t)<<__block.size();
+            qDebug() << "Supervisore connesso"<<sizeof(flowBT_status_t)<<sizeof(picoFlow_status_t)<<sizeof(alarms_t)<<__block.size();
         }
         else if(who == "VAL")
         {
-            // riempo i buffer
-            fillBuffers(__block);
+            if (m_autoStartStop || m_startAcqManuale) {
+                // riempo i buffer
+                fillBuffers(__block);
 
-            // finche' i buffer hanno abbastanza campioni
-            // faccio le mie operazioni e rimuovo i primi campioni
-            while(buffersReady()) {
-                qDebug() << "BUFFER ready";
-                applyOperations();
-                foreach(QString hwc, m_totalHWChan)
-                    m_bufferMap[hwc]->remove(0, m_frameMap[hwc]);
-            }
+                // finche' i buffer hanno abbastanza campioni
+                // faccio le mie operazioni e rimuovo i primi campioni
+                while(buffersReady()) {
+                    qDebug() << "BUFFER ready";
+                    applyOperations();
+                    foreach(QString hwc, m_totalHWChan)
+                        m_bufferMap[hwc]->remove(0, m_frameMap[hwc]);
+                }
 
-            qDebug() << "m_saving:" << m_saving << "m_autoStartStop:" << m_autoStartStop;
-            if(m_autoStartStop) {
-                if(!m_saving)
-                    checkAutomaticStartStop("Start");   //finche' non devo salvare riempo il buffer e controllo
+                qDebug() << "m_saving:" << m_saving << "m_autoStartStop:" << m_autoStartStop;
+                if(m_autoStartStop) {
+                    if(!m_saving)
+                        checkAutomaticStartStop("Start");   //finche' non devo salvare riempo il buffer e controllo
+                    else {
+                        checkAutomaticStartStop("Stop");
+                        if(!m_acqFinished) {
+                            sendBuffersToPlot();
+                            saveBuffersToFile();
+                        }
+                    }
+                }
                 else {
-                    checkAutomaticStartStop("Stop");
-                    if(!m_acqFinished) {
+                    if(m_saving && !m_acqFinished) {
                         sendBuffersToPlot();
                         saveBuffersToFile();
                     }
-                }
-            }
-            else {
-                if(m_saving && !m_acqFinished) {
-                    sendBuffersToPlot();
-                    saveBuffersToFile();
                 }
             }
         }
@@ -520,10 +526,17 @@ void MAcqManager::handleTCP(SimpleTCPClient *__client, QByteArray __block)
             if(__block[4] == '5') {
                 if(!m_saving) {
                     //parte immediatamnte l'acquisizione
-                    //effetto buffer tengo solo gli ultimi 5 secondi
+                    //azzero
+                    sendStartAcq();
+                    m_startAcqManuale = true;
+                    int secToSave = 0.0;
+                    //in caso di flussimetria manuale non devo tenermi buffer di dati:
+                    //i dati salvati partono dal momento dello start acquisizione da parte dell'utente
+                    if (m_autoStartStop)  //effetto buffer tengo solo gli ultimi 5 secondi
+                        secToSave = 5.0;
                     foreach(QString type, m_channelMap.keys())
                         foreach(MSignal *sig, m_channelMap[type])
-                            sig->saveLastSec(5.0);
+                            sig->saveLastSec(secToSave);
 
                     m_saving = true;    //posso iniziare a salvare i dati
                     emit acquisitionStarted();
@@ -534,6 +547,7 @@ void MAcqManager::handleTCP(SimpleTCPClient *__client, QByteArray __block)
                     //ferma immediatamente l'acquisizione
                     qDebug() << "Stop acquiring";
                     endAcquisitionSave();
+                    m_startAcqManuale = false;
                     m_acqFinished = true;
                 }
             }
@@ -564,10 +578,14 @@ bool MAcqManager::loadConnectivityInfo(Ancestry *__info)
         QString address = child->getSafeAttribute(ATT_ADDRESS);
         int port = child->getSafeAttribute(ATT_PORT).toInt();
 
-        if(child->getSafeAttribute(ATT_TYPE) == "client")
-            m_tcpClients[name] = new SimpleTCPClient(QHostAddress(address), port, this);
-        else if(child->getSafeAttribute(ATT_TYPE) == "server")
-            m_tcpChannels[name] = new SimpleTCPChannel(QHostAddress(address), port, this);
+        if(child->getSafeAttribute(ATT_TYPE) == "client") {
+            if( ! m_tcpClients.keys().contains(name))
+                m_tcpClients[name] = new SimpleTCPClient(QHostAddress(address), port, this);
+        }
+        else if(child->getSafeAttribute(ATT_TYPE) == "server") {
+            if( ! m_tcpChannels.keys().contains(name))
+                m_tcpChannels[name] = new SimpleTCPChannel(QHostAddress(address), port, this);
+        }
         else
             qDebug() << "Skip" << name << address << port;
         qDebug() << name << address << port;
@@ -578,12 +596,62 @@ bool MAcqManager::loadConnectivityInfo(Ancestry *__info)
     return true;
 }
 
-void MAcqManager::analyzeStatus(picoFlow_states_t __currState)
+void MAcqManager::analyzeStatus(uint8_t __currState, bool __isBT)
 {
-    // m_alarmMng.stopTimeoutAlarm(ALA_TIMEOUT_STATUS);
-    qDebug() << "Stato " << __currState << m_oldState;
+    static const char * names[] = { "st_IDLE_NOT_CONNECTED", "st_IDLE_CONNECTED", "st_ACQUIRING" };
 
-    static bool acquired = false;
+    // m_alarmMng.stopTimeoutAlarm(ALA_TIMEOUT_STATUS);
+    qDebug("olstate:%s new:%s %s", names[m_oldState], names[__currState], __isBT ? "BT" : "Cavo");
+
+    // trasformato in  m_acquired
+    // static acquired ok SOLO per la prima volta dall'accensione
+//    static bool acquired = false;
+
+//    picoFlow_states_t inputEv = (picoFlow_states_t) __currState;
+//    switch(m_oldState)
+//    {
+//    case ESTATE_IDLE_NOT_CONNECTED:
+//        switch(inputEv) {
+//                        case ESTATE_IDLE_CONNECTED:
+//                                m_alarmMng.stopTimeoutAlarm(ALA_NOT_CONNECTED);
+//                                sendStartAcq ();
+//                                break;
+//                        case ESTATE_ACQUIRING:
+//                        case ESTATE_IDLE_NOT_CONNECTED:
+//                        default:break;
+//        }
+//        break;
+//    case ESTATE_IDLE_CONNECTED:
+//        switch(inputEv) {
+//                        case ESTATE_IDLE_NOT_CONNECTED:
+//                                m_alarmMng.startTimeoutAlarm(ALA_NOT_CONNECTED, 1000);
+//                                break;
+//                        case ESTATE_IDLE_CONNECTED:
+//                                if(acquired) { acquired = false; sendStartAcq(); } // re-start se il caso
+//                                break;
+//                        case ESTATE_ACQUIRING:
+//                                emit systemInAcqStatus();
+//                                acquired = true;
+//                                m_alarmMng.manageAlarm(ALA_NOT_ACQUIRING, ENABLE);
+//                                break;
+//                        default:break;
+//        }
+//        break;
+//    case ESTATE_ACQUIRING:
+//        switch(inputEv) {
+//                        case ESTATE_IDLE_NOT_CONNECTED:
+//                                m_alarmMng.addAlarm(ALA_NOT_CONNECTED);
+//                                break;
+//                        case ESTATE_IDLE_CONNECTED:
+//                                m_alarmMng.addAlarm(ALA_NOT_ACQUIRING);
+//                                break;
+//                        case ESTATE_ACQUIRING:
+//                        default:break;
+//        }
+//        break;
+//    default:break;
+//    }
+
     switch(__currState)
     {
     case ESTATE_IDLE_NOT_CONNECTED:
@@ -596,13 +664,13 @@ void MAcqManager::analyzeStatus(picoFlow_states_t __currState)
     case ESTATE_IDLE_CONNECTED:
         if(m_oldState == ESTATE_IDLE_NOT_CONNECTED) {
             m_alarmMng.stopTimeoutAlarm(ALA_NOT_CONNECTED);
-            sendStartAcq();
+            sendStartAcq ();
         }
         if(m_oldState == ESTATE_ACQUIRING) {
             m_alarmMng.addAlarm(ALA_NOT_ACQUIRING);
         }
-        if(m_oldState == ESTATE_IDLE_CONNECTED && acquired) {
-            acquired = false;
+        if(m_oldState == ESTATE_IDLE_CONNECTED && m_acquired) {
+            m_acquired = false;
             sendStartAcq();
         }
         break;
@@ -610,7 +678,7 @@ void MAcqManager::analyzeStatus(picoFlow_states_t __currState)
     case ESTATE_ACQUIRING:
         if(m_oldState == ESTATE_IDLE_CONNECTED) {
             emit systemInAcqStatus();
-            acquired = true;
+            m_acquired = true;
             m_alarmMng.manageAlarm(ALA_NOT_ACQUIRING, ENABLE);
         }
         break;
@@ -663,12 +731,14 @@ void MAcqManager::checkAutomaticStartStop(QString __which)
             Ancestry *childAmp = condition->getSafeChild(XML_AMPLITUDE);
 
             //per prima cosa controlliamo quanti campioni
-            int      min = childDur->getSafeChild(ATT_MIN)->getSafeAttribute(ATT_VALUE).toUInt();
+            int      minSec = childDur->getSafeChild(ATT_MIN)->getSafeAttribute(ATT_VALUE).toUInt();
             qreal ampMin = childAmp->getSafeChild(ATT_MIN)->getSafeAttribute(ATT_VALUE).toInt();
             qreal ampMax = childAmp->getSafeChild(ATT_MAX)->getSafeAttribute(ATT_VALUE).toInt();
 
-            if (!(m_channelMap[chanType].at(num)->size() < min)) //se non ho ancora abbastanza campioni per decidere non vado avanti
-            { // continue;
+            int min = minSec*m_channelMap[chanType].at(num)->getSamplingFrequency();
+            //se non ho ancora abbastanza campioni per decidere non vado avanti
+            if (!(m_channelMap[chanType].at(num)->size() < min))
+            {
                 //ora quindi sono sicuro che arrivo qui solo quando ho abbastanza campioni
 
                 //controllo se c'e' un gradino
@@ -699,7 +769,6 @@ void MAcqManager::checkAutomaticStartStop(QString __which)
             }
         }
 
-        //if(condition->name() == XML_STATIONARY) {   //statio
         if (__which == "Stop")
         {
             Ancestry *childDur = condition->getSafeChild(XML_DURATION);
@@ -710,10 +779,13 @@ void MAcqManager::checkAutomaticStartStop(QString __which)
 
             qreal valMin = childVal->getSafeChild(ATT_MIN)->getSafeAttribute(ATT_VALUE).toDouble();
             qreal valMax = childVal->getSafeChild(ATT_MAX)->getSafeAttribute(ATT_VALUE).toDouble();
-            //qDebug()<<"Buffer"<<chanType<<num<<"="<<*(m_channelMap[chanType].at(num));
+            //qDebug()<<"Buffer"<<chanType<<num<<"="<<*(m_channelMap[chanType].at(num))<<m_channelMap[chanType].at(num)->getSamplingPeriod();
 
-            m_stopBuffer << *m_channelMap[chanType].at(num);
+            m_stopBuffer.setSamplingPeriod(m_channelMap[chanType].at(num)->getSamplingPeriod());
+            m_stopBuffer << *(m_channelMap[chanType].at(num));
+            //qDebug()<<"StopBuffer Len"<<m_stopBuffer.getDuration()<<m_stopBuffer.size();
             m_stopBuffer.saveLastSec(min);
+
             if (!(m_stopBuffer.getDuration() < min))
             {//   continue;
                 //ora quindi sono sicuro che arrivo qui solo quando ho abbastanza campioni
@@ -721,8 +793,7 @@ void MAcqManager::checkAutomaticStartStop(QString __which)
                 //controllo gli ultimi min campioni
                 qreal smin = m_stopBuffer.minimum();
                 qreal smax = m_stopBuffer.maximum();
-                //qDebug()<<smin<<valMin<<smax<<valMax;
-
+                //qDebug()<<"STOP flowauto"<<smin<<valMin<<smax<<valMax;
                 if((smin > valMin) && (smax < valMax)) {
                     qDebug() << "Stop acquiring";
                     endAcquisitionSave();
@@ -897,22 +968,59 @@ void MAcqManager::applyOperations()
                     int index = m_HWChansMap[type].indexOf(hwc);
                     for(int i = 0; i < m_frameMap[hwc]; i++){
                         double v = m_bufferMap[hwc]->at(i);
-//                        if (type == "EMG")
-//                            v = (v < 0.0) ? -v : v;
-                        m_channelMap[type].at(index)->append(v);
+                        //se il canale è "VV" devo fare la media mobile
+                        if  (type == "VV")
+                        {
+                            if (v < 0 )
+                                v = 0;
+                            //media mobile
+                            m_sommaMMobileV = m_sommaMMobileV - m_buffer_MMobileV.at(0) + v;
+                            m_buffer_MMobileV.remove(0);
+                            m_buffer_MMobileV.append(v);
+                            double mediato = m_sommaMMobileV/m_lenMMobile;
+                            //controllo valori monotoni, i valori di volume non devono decrescere
+                            if (m_valPrecVolume < 0) //impostiamo la prima volta il valore precedente
+                                m_valPrecVolume = mediato;
+                            if (m_valPrecVolume > mediato)
+                                mediato = m_valPrecVolume;
+                            qDebug()<<"media volume applicata in "<<v<<"ris "<<mediato;
+
+                            m_channelMap[type].at(index)->append(mediato);
+                            m_valPrecVolume = mediato;
+                        }
+                        else
+                            m_channelMap[type].at(index)->append(v);
                     }
                     qDebug() << "Canale" << type << "Copiato" << m_frameMap[hwc] << "campioni su" << index;
                 }
             }
 
-            if(name == "derive") {      //derivo
+            if(name == "derive") {      //derivo flusso
                 MSignal der;
                 foreach (QString hwc, m_HWChansMap[type]) {
                     int index = m_HWChansMap[type].indexOf(hwc);
                     der = m_bufferMap[hwc]->derive(bufferSize);
 
-                    for(int i = 0; i < m_frameMap[hwc]; i++)
-                        m_channelMap[type].at(index)->append(der.at(i));
+                    for(int i = 0; i < m_frameMap[hwc]; i++){
+                        double deri = der.at(i);
+                        if (deri < 0)
+                            deri = 0;
+                        //media mobile
+                        m_sommaMMobileF = m_sommaMMobileF - m_buffer_MMobileF.at(0) + deri;
+                        m_buffer_MMobileF.remove(0);
+                        m_buffer_MMobileF.append(deri);
+                        double mediato = m_sommaMMobileF/m_lenMMobile;
+
+                        //filtro digitale
+                        m_buffer_DigFilter.remove(0);
+                        m_buffer_DigFilter.append(mediato);
+                        double somma = 0;
+                        for (int i=0; i<m_lenDifFilter; i++)
+                            somma += m_buffer_DigFilter.at(i)*COEFDigFilter[i];
+                        double flusso = somma/m_sommaCoef;
+                        m_channelMap[type].at(index)->append(flusso);
+
+                    }
                 }
             }
 
@@ -993,6 +1101,8 @@ void MAcqManager::fillBuffers(QByteArray __block)
                     for(int i = 0; i < numChanData; i++) {
                         in >> sample;
                         m_bufferMap[QString::number(currChan)]->append(sample);
+//                        if (m_valPrecVolume > mediato)
+//                            mediato = m_valPrecVolume;
                         //qDebug("samples(ch:%d, nd:%d):%f",currChan,numChanData,sample);
                     }
 

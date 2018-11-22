@@ -22,7 +22,7 @@ BuzzTableView{
             anchors.verticalCenter: parent.verticalCenter
             color: styleData.selected ? "#000" : "#000"
             elide: styleData.elideMode
-            text: styleData.value
+            text: (styleData.value !== undefined) ? styleData.value : ""
             font.family:  (layout !== undefined) ? layout.value("FFamily") : "ubuntu"
             font.bold: false
             font.pixelSize: rootTable.height * grafic.valueOf("TableRis","size")

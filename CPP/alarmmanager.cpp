@@ -54,7 +54,7 @@ void AlarmManager::addAlarm(int __code)
 {
 
     if(m_confAla == NULL) {
-        qCritical() << "No alarm configuration file loaded";
+        qDebug() /*qCritical()*/ << "No alarm configuration file loaded";
         return;
     }
 
@@ -123,7 +123,7 @@ bool AlarmManager::manageAlarm(int __code, bool __enable)
         return true;
     }
     else {
-        qCritical( )<< "Code " + QString::number(__code) + " not found";
+        qDebug() /*qCritical()*/ << "Code " + QString::number(__code) + " not found";
         return false;
     }
 }

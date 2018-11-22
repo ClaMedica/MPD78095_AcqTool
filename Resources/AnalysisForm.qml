@@ -170,8 +170,10 @@ MForm{
                 if (value === "111")
                     mngData.analysis();
 
-                if (value === "112")
+                if (value === "112") {
+                    restartBt()
                     mngData.exitFromReview()
+                }
 
                 if (value === "113")
                     //zoom in

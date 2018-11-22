@@ -307,7 +307,14 @@ MForm {
         id:timPrint
         interval:1000
         onTriggered: {
-            mngData.startPrint()
+            console.log("================ btStatusUdp (timPrint):",btStatusUdp,"btOkPrint",btOkPrint)
+            if(btOkPrint) {
+                console.log("startPrint()")
+                mngData.startPrint()
+                console.log("print completed")
+            }
+            else
+                timPrint.start()
         }
     }
 
@@ -326,8 +333,14 @@ MForm {
         height: screenH*grafic.valueOf("Button","height")
         labelSize: grafic.valueOf("Button","labelSize")
 //        labelSize: PicoFlow ? layout.value("F4") : layout.value("F3")
+        enabled: btOkPrint
         onClicked: {
-            mngData.sendToPrint()
+            console.log("================ btStatusUdp (btnPrint):",btStatusUdp,"btOkPrint",btOkPrint)
+            if(btOkPrint) {
+                console.log("start print")
+                mngData.sendToPrint()
+                console.log("print completed")
+            }
         }
     }
 

@@ -103,6 +103,8 @@ public:
     void buildTable();
     void buildNomogrammi(bool __sex, int __age);
 
+    void setAutoFlow(bool __auto)       {m_autoflow = __auto;}
+
 signals:
 
 public slots:
@@ -155,8 +157,7 @@ private:
     QVector<double> m_arrAve;
     QVector<double> m_arrMax;
 
-//    bool m_sex; //true donna
-//    int m_eta;
+    bool m_autoflow;
 
 
 

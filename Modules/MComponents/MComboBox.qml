@@ -12,6 +12,7 @@ Rectangle {
     property int currentIndex: -1
     property var model: []
     property int oriH: height
+    property int tmph:0
     property int labelSize: 2
     property var lastSelected: []
     property bool opened: false
@@ -21,18 +22,21 @@ Rectangle {
     clip: true
     Behavior on height { NumberAnimation { duration:300; easing.type: Easing.OutExpo}}
     border.width: screenH*0.005
-    onModelChanged:        if(modelOk) currentIndex = 0
+//    onModelChanged:        if(modelOk) currentIndex = 0
     onCurrentIndexChanged: if(modelOk && model[currentIndex] !== undefined) curEle.text = model[currentIndex]
 
     signal clicked
 
-    function find(text)
+    function find(newpage)
     {
-        if(model === undefined || model === null)
-            return 0
-        if(model.indexOf(text) < 0)
-            return 0
-        return model.indexOf(text)
+        var indx = 0;
+        if(model !== undefined && model !== null) {
+            indx = model.indexOf(newpage)
+            if(indx < 0)
+                indx = 0
+        }
+//        console.log(newpage + " = " + indx + " in " + model)
+        return indx
     }
 
     function openBox()
@@ -41,7 +45,8 @@ Rectangle {
         //che ci sono elementi nel modello da visualizzare
         //che non sia già aperto
         //che sia tornato alle sue dimensioni originali, cioè che non sia in fase di chiusura con l'animazione
-        if(model.length == 0 || opened || oriH !== rootComboBox.height)
+        tmph = rootComboBox.height  // variabile tipo int per forzare a int
+        if(model.length == 0 || opened || oriH !== tmph)
             return
         oriH = rootComboBox.height
         //se è ancorato si espanderà dove può
@@ -54,15 +59,19 @@ Rectangle {
         view.visible = true
         curEle.visible = false
         opened = true
-        if (!notPutOn) DataEngine.putItemOnTop(rootComboBox)
+        if (!notPutOn)
+            DataEngine.putItemOnTop(rootComboBox)
+
         rootComboBox.clicked()
     }
 
     function closeBox(index,text)
     {
+//        console.log("i:",index,"txt:",text)
         if(!opened)
             return
-        opened =false
+        opened = false
+//        console.log(index, text)
         currentIndex = index
         currentText = text
         curEle.text = text
@@ -114,7 +123,7 @@ Rectangle {
                     autoClose.start()
                     highlight.opacity=0
                 }
-                onClicked:closeBox(index,modelData)
+                onClicked:{/*console.log("click mlabel");*/closeBox(index,modelData)}
             }
             Rectangle {
                 id:highlight
@@ -134,7 +143,6 @@ Rectangle {
         width:height
         color: "transparent"
         anchors.margins: rootComboBox.border.width-1
-
         Image{
             Behavior on opacity{NumberAnimation{duration:200; easing.type: Easing.OutExpo}}
             opacity: arrow.visible
