@@ -100,9 +100,20 @@ void MAcqManager::udpBtDecode(enum WHO __from, QByteArray __msg)
 {
     qDebug() << __from << __msg;
 
-    if(__from == E_SUP) {
-        if(__msg == "Suspended") emit udpBtStopped();
-        if(__msg == "Restarted") emit udpBtRestarted();
+    switch(__from) {
+    case E_SUP:
+                if((__msg.at(0) == 'S') && (__msg == "Suspended")) emit udpBtStopped();
+                if((__msg.at(0) == 'R') && (__msg == "Restarted")) emit udpBtRestarted();
+                if((__msg.at(0) == 'U') && (__msg == "UseBt"))     emit udpBtUsable(true);
+                if((__msg.at(0) == 'N') && (__msg == "NoBt"))      emit udpBtUsable(false);
+                break;
+    case E_PRN:
+                if((__msg.at(0) == 'R') && (__msg == "Ready"))     emit udpPrnStatus(__msg.at(0));
+                if((__msg.at(0) == 'F') && (__msg == "Fail"))      emit udpPrnStatus(__msg.at(0));
+                if((__msg.at(0) == 'D') && (__msg == "Done"))      emit udpPrnStatus(__msg.at(0));
+                break;
+    default:
+        break;
     }
 }
 
@@ -1103,6 +1114,23 @@ void MAcqManager::fillBuffers(QByteArray __block)
                         m_bufferMap[QString::number(currChan)]->append(sample);
 //                        if (m_valPrecVolume > mediato)
 //                            mediato = m_valPrecVolume;
+
+//                        if (sample < 0 )
+//                            sample = 0;
+//                        //media mobile
+//                        m_sommaMMobileV = m_sommaMMobileV - m_buffer_MMobileV.at(0) + sample;
+//                        m_buffer_MMobileV.remove(0);
+//                        m_buffer_MMobileV.append(sample);
+//                        double mediato = m_sommaMMobileV/m_lenMMobile;
+//                        //controllo valori monotoni, i valori di volume non devono decrescere
+//                        if (m_valPrecVolume < 0) //impostiamo la prima volta il valore precedente
+//                            m_valPrecVolume = mediato;
+//                        if (m_valPrecVolume > mediato)
+//                            mediato = m_valPrecVolume;
+//                        qDebug()<<"media volume applicata in "<<sample<<"ris "<<mediato;
+
+//                        m_bufferMap[QString::number(currChan)]->append(mediato);
+//                        m_valPrecVolume = mediato;
                         //qDebug("samples(ch:%d, nd:%d):%f",currChan,numChanData,sample);
                     }
 

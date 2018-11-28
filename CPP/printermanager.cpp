@@ -151,7 +151,7 @@ printermanager::printermanager(QString __namefile, QObject *parent) : QObject(pa
     m_printSecondHeader = "";
 
     m_port = new printerserialport(this);
-    m_port->init_printer();
+//    m_port->init_printer();
 
     m_resultBm_w = 824; // 103 bytes * 8 bit
     m_resultBm_h = 300;
@@ -241,7 +241,7 @@ void printermanager::print()
 void printermanager::pri_rep_review()
 {
     qDebug("pri_rep_review()");
-    int n_chEmg, n_chFlw, n_chVol;
+    int n_chEmg = 0, n_chFlw = 0, n_chVol = 0;
 
     m_dfm->Open();
     m_dfm->GetParameters();
@@ -428,32 +428,32 @@ questa funzione gestisce tutta la stampa del report, sia in modalita portrait ch
 #include "QApplication"
 void printermanager::Pri_Rep(double xscale)
 {
-    //test velocità stampa con n letto da file di testo
-    QString name = QApplication::applicationDirPath()+"/numdots";
-    QFile readSpeed(name);
-    bool read = readSpeed.open(QIODevice::ReadOnly);
-    if (read)
-    {
-        QTextStream in(&readSpeed);
-        QString line = in.readLine();
-        int n = line.toInt();
-        m_port->Pri_Speed(n);
-        readSpeed.close();
-    }
-    //test max velocità stampa con n letto da file di testo
-    name = QApplication::applicationDirPath()+"/maxspeed";
-    QFile readMaxSpeed(name);
-    read = readMaxSpeed.open(QIODevice::ReadOnly);
-    if (read)
-    {
-        QTextStream inM(&readMaxSpeed);
-        QString line = inM.readLine();
-        int num = line.toInt();
-        uint8_t  a = (num /256);
-        uint8_t  b = num & 0xff;
-        m_port->Pri_Max_Speed(a,b);
-        readMaxSpeed.close();
-    }
+//    //test velocità stampa con n letto da file di testo
+//    QString name = QApplication::applicationDirPath()+"/numdots";
+//    QFile readSpeed(name);
+//    bool read = readSpeed.open(QIODevice::ReadOnly);
+//    if (read)
+//    {
+//        QTextStream in(&readSpeed);
+//        QString line = in.readLine();
+//        int n = line.toInt();
+//        m_port->Pri_Speed(n);
+//        readSpeed.close();
+//    }
+//    //test max velocità stampa con n letto da file di testo
+//    name = QApplication::applicationDirPath()+"/maxspeed";
+//    QFile readMaxSpeed(name);
+//    read = readMaxSpeed.open(QIODevice::ReadOnly);
+//    if (read)
+//    {
+//        QTextStream inM(&readMaxSpeed);
+//        QString line = inM.readLine();
+//        int num = line.toInt();
+//        uint8_t  a = (num /256);
+//        uint8_t  b = num & 0xff;
+//        m_port->Pri_Max_Speed(a,b);
+//        readMaxSpeed.close();
+//    }
 
 
     //      Intestazione
@@ -461,7 +461,7 @@ void printermanager::Pri_Rep(double xscale)
 
     //     Identificativi Esame
     Report_data();		// scrive i dati del paziente e lo spazio per le note manuali
-    m_port->Pri_Str(3, (char*)"\n \n", 0);
+    m_port->Pri_Str(2, LINE2, 0);
 
     // Grafico FLW + VOL ed eventualmente EMG
     if(m_printMode == PORTRAIT_MODE)			// grafico trasversale con numero di punti fisso
@@ -518,7 +518,7 @@ void printermanager::Pri_Rep(double xscale)
     // 	Risultati dell'esame ricavati dall'analisi semplificata, implementata nel firmware
     Report_result();		// scrive in elenco i dati calcolati dall'analisi dell'esame
     //m_port->status();
-    m_port->Pri_Str(3, (char*)"\n \n", 0); // LINE"\x3",0);
+    m_port->Pri_Str(2, LINE2, 0); // LINE"\x3",0);
 
     //	Scrive i dati riguardanti versione firmware e date/ora ultima calibrazione
        //m_port->Pri_justif(F_center);
@@ -537,7 +537,7 @@ E' stampata l'intestazione del report, con intestazione clinica, logo and so on
 */
 void printermanager::Intest()
 {
-    m_port->Pri_Str(3,(char*)"\n \n", 0); // LINE"\x1",0);  			// scrive una riga vuota
+    m_port->Pri_Str(2, LINE2, 0); // LINE"\x1",0);  			// scrive una riga vuota
     m_port->Pri_justif(F_center);				// scrittura al centro
     m_port->Pri_Font(1);						// font 12x20
     m_port->Pri_mode(0x30);						// modo doppia dimensione non sottolienata
@@ -570,7 +570,7 @@ void printermanager::Report_data()
 
     m_port->Pri_mode(0x00); 					// modo default
     m_port->Pri_justif(F_left);					// tutto a sinistra
-    m_port->Pri_Str(3,(char*)"\n \n", 0); 	// scrive una riga vuota
+    m_port->Pri_Str(2, LINE2, 0); 	// scrive una riga vuota
 
     m_port->Pri_Font(1);							// font 12x20
 
@@ -639,7 +639,7 @@ void printermanager::Report_data()
         m_port->Pri_Str( strlen(str), str, 0);
     }
 
-    m_port->Pri_Str(3,(char*)"\n \n", 0); //riga vuota
+    m_port->Pri_Str(2, LINE2, 0); //riga vuota
 
     // scritta relativa al tipo di modalita
     if(m_modal_e == 2) {
@@ -660,7 +660,7 @@ void printermanager::Report_data()
 /**
 stampa del grafico di flusso/volume nella versione a grafici in portrait mode
 */
-void printermanager:: Report_flw(double xscale)
+void printermanager::Report_flw(double xscale)
 {
     Calc_Max(xscale);	// calcolo FC curva di flusso (max_y) e FC curva di volume (max_x) cosi da individuare il giusto fondoscala
 
@@ -687,7 +687,7 @@ void printermanager:: Report_flw(double xscale)
     m_port->Pri_Font(1);
     m_port->Pri_Str(strlen(str_label_time[m_i_max_x]), (char *)str_label_time[m_i_max_x], 1);
 
-    m_port->Pri_Str( 3, (char*)"\n \n", 0); // modifica per risparm carta e tempo: da riattivare
+    m_port->Pri_Str(2, LINE2, 0); // modifica per risparm carta e tempo: da riattivare
 }
 
 /**
@@ -967,8 +967,25 @@ void printermanager::Pri_Rep_Gra(int __num_riga)
 
     // trasposizione
     Str_Trasposta(0, CLS, CLD); // fa la trasposta di m_str_gr che e' costruita per colonne mentre noi si stampa per righe
+
     // finalmente stampa
-    m_port->Pri_Str( (LCMD + CLS*24 + m_uw3 + CLD*24), (char *)m_str_gr, 0);
+//    m_port->Pri_Str( (LCMD + CLS*24 + m_uw3 + CLD*24), (char *)m_str_gr, 0);
+
+    // bitmap completa spezzata in
+    // una riga di bit per volta
+    const int ByteXline = 102;      // 0x66
+    m_str_gr[2] = ByteXline;        // n1 = n6:larghezza 4+94+4=102 byte
+    m_str_gr[3] = 0;                // n2
+    m_str_gr[4] = 0;                // n3
+    char tbuf[LCMD + ByteXline];
+    memcpy(tbuf, m_str_gr, LCMD);   // comando di stampa
+    char  * p = m_str_gr + LCMD;    // ptr a bitmap
+    for(int i = 0; i < sz; ) {
+        memcpy(tbuf+LCMD, p, ByteXline);
+        m_port->Pri_Str(sizeof(tbuf), tbuf, 0);
+        i += ByteXline;
+        p += ByteXline;
+    }
 }
 
 void printermanager::Pri_Rep_Gra_Ini_Grid(int __n_riga)
@@ -1187,7 +1204,7 @@ void printermanager::Report_emg()
     m_port->Pri_mode(0);
     m_port->Pri_Font(1);
     m_port->Pri_Str( strlen(str_label_time[m_i_max_x]), (char *) str_label_time[m_i_max_x], 1);
-    m_port->Pri_Str( 3, (char*)"\n \n", 0); // LINE"\x1", 0 );// spazio singolo
+    m_port->Pri_Str(2, LINE2, 0); // LINE"\x1", 0 );// spazio singolo
 }
 
 void printermanager::Calc_Max_EMG()
@@ -1575,7 +1592,7 @@ void printermanager::Report_Real_Time(short __num_sample, double xscale)
     Pri_Rep_asse_dx();
     m_port->Pri_mode(0x00);
     m_port->Pri_Font(1);
-    m_port->Pri_Str( 3, (char*)"\n \n", 0); // modifica per risparm carta e tempo: da riattivare
+    m_port->Pri_Str(2, LINE2, 0);
 }
 
 
@@ -2381,10 +2398,10 @@ void printermanager::Pri_Rep_asse_dx()
 
 void printermanager::Report_BitMap_test()
 {
-    m_port->init_printer();
-    m_port->Pri_Speed(1);
-    int sp = 1000;
-    m_port->Pri_Max_Speed((sp >> 8) & 0xff, sp & 0xff);
+//    m_port->init_printer();
+//    m_port->Pri_Speed(1);
+//    int sp = 1000;
+//    m_port->Pri_Max_Speed((sp >> 8) & 0xff, sp & 0xff);
 
     char txt0[] = "--iniz test--\n";
     m_port->Pri_Str(strlen(txt0), txt0, 0);
@@ -2406,9 +2423,9 @@ void printermanager::Report_BitMap_test()
     for(int s = 0; s < sz; ) {
         for(int i = 0; i < 103; i++)
             tbm[i] = (rand() & 0x11);
-        for(int n = 0; (n < 1000) && (m_port->status(false) & (1 << 3)); n++)
-            ;
-        m_port->status();
+//        for(int n = 0; (n < 1000) && (m_port->status(false) & (1 << 3)); n++)
+//            ;
+//        m_port->status();
         m_port->Pri_Str(8, head, 0);
         m_port->Pri_Str(szchunk, tbm, 0);
         s += szchunk;
@@ -2444,7 +2461,7 @@ void printermanager::Report_BitMap(bool __isSiro)
     }
 
     int     szchunk = 103;  // 824/8
-    char    head[8];
+    char    head[8+103];
     qDebug("sz:%d szch:%d p:%p", sz,szchunk,p);
 
     head[0] = ESC;	//0x1B;	// ESC
@@ -2459,8 +2476,10 @@ void printermanager::Report_BitMap(bool __isSiro)
     for(int s = 0; s < sz; ) {
         //for(int n = 0; (n < 1000) && (m_port->status(false) & (1 << 3)); n++);
         //m_port->status(false);
-        m_port->Pri_Str(8, head, 0);
-        m_port->Pri_Str(szchunk, p, 0);
+        memcpy(head+8, p, szchunk);
+//        m_port->Pri_Str(8, head, 0);
+//        m_port->Pri_Str(szchunk, p, 0);
+        m_port->Pri_Str(8+szchunk, head, 0);
         p += szchunk;
         s += szchunk;
     }
@@ -2468,8 +2487,7 @@ void printermanager::Report_BitMap(bool __isSiro)
     m_port->Pri_Font(1);
     m_port->Pri_mode(0x00);
     m_port->Pri_justif(F_left);
-    QString xxx = tr("\n\n");
-    m_port->Pri_Str(strlen(xxx.toLatin1().data()), xxx.toLatin1().data(), 1);
+    m_port->Pri_Str(2, LINE2, 1);
     qDebug("fine pr bitm");
 }
 
@@ -2733,7 +2751,7 @@ void printermanager::printTest()
     buffer_vol = NULL;
 
     m_port = new printerserialport(this);
-    m_port->init_printer();
+//    m_port->init_printer();
 
     QString configPrinterS = g_P7SettingsManager.printerSettings();
     if(!QFile::exists(configPrinterS))
