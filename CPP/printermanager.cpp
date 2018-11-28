@@ -175,7 +175,6 @@ printermanager::~printermanager()
     m_port->closeSerialPort();
     if (m_port != NULL)
         delete m_port;
-    m_port = NULL;
 }
 
 void printermanager::closePrinter()
@@ -183,7 +182,6 @@ void printermanager::closePrinter()
     m_port->closeSerialPort();
     if (m_port != NULL)
         delete m_port;
-    m_port = NULL;
 }
 
 /**
@@ -673,7 +671,7 @@ void printermanager::Report_flw(double xscale)
 //    sprintf( str, "   Q ( ml/s )             %s              Vol ( ml )", strToWrite.toLatin1().data());
 
     QString strToWrite = tr("  Q ( ml/s )              Flowmetry               Vol ( ml )");
-    char str[200];
+    char str[90];
     sprintf( str,strToWrite.toLatin1().data());
 
     m_port->Pri_Str( strlen(str), str, 1 );

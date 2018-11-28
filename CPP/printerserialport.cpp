@@ -170,22 +170,22 @@ void printerserialport::Pri_Intensity(char __intens)
     dato il consumo in ampere desiderato Ca, la velocita massima si ha per n = ((Ca-0,3)*Rdot/(V*8) -1
     Ca = 1.4A @5V --> n =
 */    // default n = 5
-void printerserialport::Pri_Speed(char m_speed )
-{
-    char pri_str[] = { GS, '/', m_speed };     // 1 <= speed <= 32, 0 max speed
-    Pri_Str(3, pri_str, 0);
-}
+//void printerserialport::Pri_Speed(char m_speed )
+//{
+//    char pri_str[] = { GS, '/', m_speed };     // 1 <= speed <= 32, 0 max speed
+//    Pri_Str(3, pri_str, 0);
+//}
 
 /* setta la massima velocita di stampa settando il tempo di avanzamento
     T = 256*n1 + n2
     2080 < T < 25000 [us]
     vel[mm/sec] = 1/(8*T)   5 < vel < 60 [mm/sec]
  */
-void printerserialport::Pri_Max_Speed(char m_n1, char m_n2)
-{
-    char pri_str[] = { GS, 's', m_n1, m_n2 };
-    Pri_Str(4, pri_str, 0);
-}
+//void printerserialport::Pri_Max_Speed(char m_n1, char m_n2)
+//{
+//    char pri_str[] = { GS, 's', m_n1, m_n2 };
+//    Pri_Str(4, pri_str, 0);
+//}
 
 //void printerserialport::waiting()
 //{
