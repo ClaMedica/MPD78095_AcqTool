@@ -1,15 +1,15 @@
-﻿<Configuration>
-        <AutomaticFlow>
+﻿<Configuration label="Configuration">
+        <AutomaticFlow label="Automatic Flow">
         <Auto
             label="Automatic flow"
             type="CheckBox"
             unit=""
-            value="false"
+            value="true"
             visible="false"
         />
-        <AutoStarts>
-               <Amplitude>
-                                <min
+        <AutoStarts label="Auto Starts">>
+               <Amplitude label="Amplitude">
+                      <min
                                 label="Minimum"
                                 type="TextField"
                                 unit="g"
@@ -22,7 +22,7 @@
                                 value="15"
                                 />
                         </Amplitude>
-                        <Duration>
+                        <Duration label="Duration">
                                 <min
                                 label="Minimum"
                                 type="TextField"
@@ -34,7 +34,7 @@
                             type="TextField"
                             unit=""
                             label="Channel Type"
-                            value="VV"
+                            value="VBT"
                             visible = "false"
                          />
                          <num
@@ -45,8 +45,8 @@
                             visible = "false"
                          />
         </AutoStarts>
-        <AutoStops>
-                    <Value>
+        <AutoStops label="Auto Stops">
+                    <Value label="Value">
                                 <min
                                 label="Minimum"
                                 type="TextField"
@@ -60,7 +60,7 @@
                                 value="1"
                                 />
                         </Value>
-                        <Duration>
+                        <Duration label="Duration">
                                 <min
                                 label="Minimum"
                                 type="TextField"
@@ -78,7 +78,7 @@
                               label="Channel Type"
                               type="TextField"
                               unit=""
-                              value="Q"
+                              value="QBT"
                               visible = "false"
                           />
                           <num
@@ -90,7 +90,7 @@
                           />
         </AutoStops>
         </AutomaticFlow>
-        <Supervisor>
+        <Supervisor label="Supervisor">
                 <Visible
                 label="Visible"
                 type="CheckBox"
@@ -99,7 +99,7 @@
                 />
 
         </Supervisor>
-        <ChannelsAbilitation>
+        <ChannelsAbilitation label="Channels Abilitation">
             <Emg
                 label="EMG"
                 type="CheckBox"
@@ -121,160 +121,4 @@
                 />
              </Type>
          </ChannelsAbilitation>
-        <ChannelsProp>
-            <VV>
-                <width
-                   label="width track"
-                   type="TextField"
-                   unit=""
-                   value="1"
-                />
-                <thick
-                    label="thick"
-                    type="TextField"
-                    unit=""
-                    value="3"
-                />
-                <color
-                    label="color track"
-                    type="ColorBox"
-                    unit=""
-                    value="black"
-                />
-                <yAutoScale
-                    label="Auto Range"
-                    type="CheckBox"
-                    unit=""
-                    value="1"
-                />
-                <Range
-                    label="Range"
-                    type="SpinBox"
-                    dt="real"
-                    unit="ml"
-                    model="500#50#5#0#"
-                    value="200"
-                />
-                <Zero
-                    label="Zero"
-                    type="SpinBox"
-                    dt="real"
-                    unit="%"
-                    model="100#0#10#0#"
-                    value="0"
-                />
-            </VV>
-            <Q>
-                <width
-                   label="width track"
-                   type="TextField"
-                   unit=""
-                   value="1"
-                />
-                <thick
-                    label="thick"
-                    type="TextField"
-                    unit=""
-                    value="3"
-                />
-                <color
-                    label="color track"
-                    type="ColorBox"
-                    unit=""
-                    value="red"
-                />
-                <yAutoScale
-                    label="Auto Range"
-                    type="CheckBox"
-                    unit=""
-                    value="1"
-                />
-                <Range
-                    label="Range"
-                    type="SpinBox"
-                    dt="real"
-                    unit="ml/sec"
-                    model="100#25#25#0#"
-                    value="50"
-                />
-                <Zero
-                    label="Zero"
-                    type="SpinBox"
-                    dt="real"
-                    unit="%"
-                    model="100#0#10#0#"
-                    value="0"
-                />
-            </Q>
-            <EMG>
-                <width
-                   label="width track"
-                   type="TextField"
-                   unit=""
-                   value="1"
-                />
-                <thick
-                    label="thick"
-                    type="TextField"
-                    unit=""
-                    value="3"
-                />
-                <color
-                    label="color track"
-                    type="ColorBox"
-                    unit=""
-                    value="red"
-                />
-                <yAutoScale
-                    label="Auto Range"
-                    type="CheckBox"
-                    unit=""
-                    value="1"
-                />
-                <Range
-                    label="Range"
-                    type="SpinBox"
-                    dt="real"
-                    unit="uV"
-                    model="5000#500#500#0#"
-                    value="1000"
-                />
-                <Zero
-                    label="Zero"
-                    type="SpinBox"
-                    dt="real"
-                    unit="%"
-                    model="100#0#10#0#"
-                    value="0"
-                />
-            </EMG>
-        </ChannelsProp>
-
-        <AnalysisSettings>
-        <AutoPrint
-            label="Automatic Print"
-            type="CheckBox"
-            unit=""
-            value="true"
-        />
-        <Siroky
-            label="Siroky"
-            type="CheckBox"
-            unit=""
-            value="false"
-        />
-        <Liverpool
-            label="Liverpool"
-            type="CheckBox"
-            unit=""
-            value="false"
-        />
-        <PrinterMode
-            label="Print Landscape Mode"
-            type="CheckBox"
-            unit=""
-            value="false"
-        />
-        </AnalysisSettings>
-
 </Configuration>

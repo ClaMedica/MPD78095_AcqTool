@@ -39,9 +39,12 @@
 char strvers[] = "AcqTool del " __DATE__ " alle " __TIME__;
 
 bool DebugAcqTool = false;
+int CODSOFT = 0;
 
 AcqBridge *g_mainAppBridge;
+#ifdef PICOFLOW
 UdpPico     udpConn;
+#endif
 
 int main(int argc, char *argv[])
 {
@@ -91,7 +94,10 @@ int main(int argc, char *argv[])
         DebugAcqTool = true;
     if(DebugAcqTool == false)
         g_mainAppBridge = new AcqBridge(QStringList() << argv[1] << argv[2]);   //definisco un bridge tra app di tipo server
-
+#ifndef PICOFLOW
+    CODSOFT = QString(argv[3]).toInt();
+    qDebug() << "Codice Software" << CODSOFT;
+#endif
 
     qmlRegisterType<ParameterManager>("Managers", 1, 0, "ParameterManager");
     qmlRegisterType<ModelManager>("Managers", 1, 0, "ModelManager");
@@ -148,6 +154,7 @@ int main(int argc, char *argv[])
     engine.rootContext()->setContextProperty("screenH", size.height());
     engine.rootContext()->setContextProperty("screenW", size.width());
     engine.rootContext()->setContextProperty("PicoFlow", bool_false);
+    engine.rootContext()->setContextProperty("codSoft",argv[3] );
 #endif
 
     engine.rootContext()->setContextProperty("layout", &mngLayout);

@@ -1,4 +1,4 @@
-#ifndef MABSTRACTMANAGER_H
+﻿#ifndef MABSTRACTMANAGER_H
 #define MABSTRACTMANAGER_H
 
 #include <QObject>
@@ -37,6 +37,9 @@ public:
 
     Q_PROPERTY(QString patientInfo READ patientInfo NOTIFY patientInfoChanged)
 
+    enum CODICESOFT {PICO = 0, FLOWSOFT = 4,FLWHS};
+    Q_ENUM(CODICESOFT)
+
 signals:
     void patientInfoChanged();
 
@@ -61,7 +64,8 @@ protected:
     QMap<QString, SimpleTCPChannel *> m_tcpChannels;    //canali di comunicazione verso l'esterno
     Ancestry m_configLocale,    //e' la prima ad essere caricata e contiene la lingua
     m_configMarkers,            //contiene le info per i marker
-    m_configUser,               //contiene le info modificate dall'utente
+    m_configUser,               //contiene le info modificate dall'utente per acquisizione
+    m_configUserProp,               //contiene le info modificate dall'utente per grafica canali
     m_configPrinter,            //contiene le info relative alla stampa
     m_configLang;            //contiene le info relative alla lingua
 

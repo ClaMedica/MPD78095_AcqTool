@@ -2,6 +2,7 @@
 #include "systemmanager.h"
 
 extern bool DebugAcqTool;
+extern int CODSOFT;
 
 
 MDataManager::MDataManager(QObject *parent)
@@ -61,9 +62,9 @@ MDataManager::~MDataManager()
 
 void MDataManager::getGrabbedImage(QObject *gi, QString __nome)
 {
-    qDebug()<<"Immagine"<<nome<<gi;
+    qDebug()<<"Immagine"<<__nome<<gi;
 #ifdef PICOFLOW
-    if (nome != "grafo")
+    if (__nome != "grafo")
         m_mngPrint->getGrabbedImage(gi,nome);
 #elif WIN32
     //grafo e nomogrammi
@@ -72,15 +73,15 @@ void MDataManager::getGrabbedImage(QObject *gi, QString __nome)
     QImage img = item->image();
     QPixmap pix = QPixmap::fromImage(img);
     QString imgName;
-    if (nome == "grafo")
+    if (__nome == "grafo")
         imgName = "GR100";
-    else if (nome.startsWith("Live"))
-        if (nome.contains("Ave"))
+    else if (__nome.startsWith("Live"))
+        if (__nome.contains("Ave"))
             imgName = "GR202";
         else
             imgName = "GR203";
-    else if (nome.startsWith("Siro"))
-        if (nome.contains("Ave"))
+    else if (__nome.startsWith("Siro"))
+        if (__nome.contains("Ave"))
             imgName = "GR204";
         else
             imgName = "GR210";

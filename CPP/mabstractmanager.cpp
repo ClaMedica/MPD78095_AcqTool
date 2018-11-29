@@ -1,6 +1,6 @@
-#include "mabstractmanager.h"
+﻿#include "mabstractmanager.h"
 #include "QApplication"
-
+extern int CODSOFT;
 
 MAbstractManager::MAbstractManager(QObject *parent) : QObject(parent)
 {
@@ -315,16 +315,30 @@ bool MAbstractManager::load()
     if(!m_configLocale.loadFromXML(":/Config/Config_Locale.xml"))
         qCritical() << "Error on locale configuration file";
 
-    QString configUser = g_P7SettingsManager.userSettings();
-    if(!QFile::exists(configUser))
+    QString configUser;
 #ifdef PICOFLOW
+    configUser = g_P7SettingsManager.userSettings();
+    if(!QFile::exists(configUser))
         configUser = ":/Config/Config_User_pico.xml";
-#else
-        configUser = ":/Config/Config_User.xml";
-#endif
     m_configUser.erase();
     if(!m_configUser.loadFromXML(configUser))
         qCritical() << "Error on user configuration file";
+    if(!m_configUserProp.loadFromXML(configUser))
+        qCritical() << "Error on user configuration file";
+#else
+    QString configUserProp;
+    configUserProp = g_P7SettingsManager.userPropSettings();
+    if(!QFile::exists(configUserProp))
+        configUserProp = ":/Config/Config_User_Prop.xml";
+    if(!m_configUserProp.loadFromXML(configUserProp))
+        qCritical() << "Error on user configuration file";
+
+    configUser = g_P7SettingsManager.userSettings();
+    if(!QFile::exists(configUser))
+        configUser = ":/Config/Config_User.xml";
+    if(!m_configUser.loadFromXML(configUser))
+        qCritical() << "Error on user configuration file";
+#endif    
 
     m_configMarkers.erase();
     if(!m_configMarkers.loadFromXML(":/Config/markers.xml"))
@@ -443,7 +457,7 @@ bool MAbstractManager::buildConfigurationFile()
 
         //devo leggere le informazioni sulle dimensioni delle tracce e il loro colore
         //all'interno del file config_user
-        Ancestry * chProps = m_configUser.getSafeChild(XML_CHANNELSPROP);
+        Ancestry * chProps = m_configUserProp.getSafeChild(XML_CHANNELSPROP);
         QStringList chNames = chProps->childrenNames();
 
         foreach (QString chanName, m_chanInPlots[graphName]) {  //qui scrivo le proprietA  delle tracce
@@ -451,7 +465,7 @@ bool MAbstractManager::buildConfigurationFile()
             Ancestry * ch = NULL;
             foreach (QString chNamePart, chNames) {
                 if(chanName.contains(chNamePart))
-                    ch = m_configUser.getSafeChild(chNamePart);
+                    ch = m_configUserProp.getSafeChild(chNamePart);
             }
 
             if(ch != NULL) {

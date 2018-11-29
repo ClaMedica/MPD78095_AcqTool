@@ -25,7 +25,7 @@ ApplicationWindow {
 
     //@@@@@@@@@@    Properties      @@@@@@@@@@
     id: root
-    flags: Qt.FramelessWindowHint
+    flags:Qt.Window | Qt.FramelessWindowHint
     visible: false
 
     width:platform==="linux"?640:Screen.width//*0.94
@@ -68,8 +68,8 @@ ApplicationWindow {
     //@@@@@@@@@@    Events          @@@@@@@@@@
      Component.onCompleted: {
          acqLoaded.createFileLoaded()
-         console.log("debug??? ", Qt.application.arguments[3])
-         if (Qt.application.arguments[3] === "debug") {
+         console.log("debug??? ", Qt.application.arguments[4])
+         if (Qt.application.arguments[4] === "debug") {
              root.visible = true
              launchDEBUG(Qt.application.arguments[1],Qt.application.arguments[2])
          }
