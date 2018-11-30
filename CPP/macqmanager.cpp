@@ -665,6 +665,16 @@ void MAcqManager::analyzeStatus(uint8_t __currState, bool __isBT)
 //    }
 
     qDebug("olstate:%s new:%s %s", names[m_oldState], names[__currState], __isBT ? "BT" : "Cavo");
+
+    //DA TESTARE CON NUOVO SUP, FORSE NON PIU' NECESSARIO
+    static bool first = true;
+    if (first && !__isBT && m_oldState == ESTATE_IDLE_NOT_CONNECTED)
+    {
+            first = false;
+            m_oldState = ESTATE_IDLE_NOT_CONNECTED;
+    }
+    //END
+
     switch(__currState)
     {
     case ESTATE_IDLE_NOT_CONNECTED:

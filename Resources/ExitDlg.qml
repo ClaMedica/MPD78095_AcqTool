@@ -12,7 +12,7 @@ Rectangle {
     color : layout.value("BackgroundColor")
 
     Keys.onReturnPressed: {
-        volResDlg.visible = false
+        exitDlg.visible = false
     }
 
     MLabel {

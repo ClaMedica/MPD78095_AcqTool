@@ -144,22 +144,15 @@ MForm{
         delegate: MMarkerButton{
             onClick:{
                 if (value === "116") {
-                    plot.stopAll()
-                    mngAcq.endAcquisitionDiscard()
-                    timClose.start(1000);
+                    //necessaria richiesta di conferma
+                    dlgDiscard.visible = true
                 }
             }
         }
         visible:true
     }
 
-    Timer{
-        //@@@@@@@@@@    Properties      @@@@@@@@@@
-        id:timClose
 
-        //@@@@@@@@@@    Events          @@@@@@@@@@
-        //onTriggered: Qt.quit()
-    }
     MAlarmBox{
         //@@@@@@@@@@    Properties      @@@@@@@@@@
         id:alarmBox
@@ -178,5 +171,60 @@ MForm{
         anchors.centerIn: parent
         width: 200
         height: 100
+    }
+
+    Rectangle {
+        id: dlgDiscard
+        height:screenH*grafic.valueOf("Dialog","height")
+        width:screenW*grafic.valueOf("Dialog","width")
+        anchors.centerIn: parent
+        visible: false
+        color : layout.value("BackgroundColor")
+
+        Keys.onReturnPressed: {
+            dlgDiscard.visible = false
+        }
+
+        MLabel
+         {
+             anchors.top:parent.top
+             anchors.left: parent.left
+             anchors.right:parent.right
+             height:parent.height*0.8
+             labelSize: grafic.valueOf("Dialog","labelSize")
+             color: "white"
+             horizontalAlignment: Text.AlignHCenter
+             verticalAlignment: Text.AlignVCenter
+             text: qsTr("Are you sure to discard the exam?")
+             wrapMode: Text.WordWrap
+         }
+
+        MButton {
+            id: btnYes
+            anchors.bottom: parent.bottom
+            anchors.left: parent.left
+            height: parent.height/5
+            width: parent.width/3
+            anchors.margins: 10
+            labelSize: layout.value("F4")
+            text: qsTr("Yes")
+            onClicked: {
+                dlgDiscard.visible = false
+                plot.stopAll()
+                mngAcq.endAcquisitionDiscard()
+            }
+        }
+
+        MButton {
+            id: btnNo
+            anchors.bottom: parent.bottom
+            anchors.right: parent.right
+            height: parent.height/5
+            width: parent.width/3
+            anchors.margins: 10
+            labelSize: layout.value("F4")
+            text: qsTr("No")
+            onClicked: dlgDiscard.visible = false
+        }
     }
 }
