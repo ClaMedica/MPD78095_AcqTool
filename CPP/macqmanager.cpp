@@ -110,7 +110,7 @@ void MAcqManager::dataOnTCP(QObject *__pParent, SimpleTCPClient *__pTCP, QByteAr
 {//arriviamo qua dentro ogni volta che arriva qualcosa da uno dei server a cui siamo collegati
 
     int s = __block.size();  int sm = (s < 16) ? s : 16;
-    qDebug() << __pTCP->hostAddress() << __pTCP->hostPort() << s << QByteArray(__block.constData(),sm);
+    //qDebug() << __pTCP->hostAddress() << __pTCP->hostPort() << s << QByteArray(__block.constData(),sm);
 
     if(__pParent != NULL) {     //punta a qualcosa andiamo avanti
         if(__pTCP != NULL) {    //punta a qualcosa proviamo a gestirlo
@@ -235,6 +235,18 @@ bool MAcqManager::newAcquisition(QString __dataFile)
         bool res = m_mng->Continue();
         qDebug() << "Continue ..." << res;
 
+        //DA TESTARE CON NUOVO SUP, FORSE NON PIU' NECESSARIO
+        //la prima volta che si fa un'acquisizione siamo nello stato di ACQUIRING
+        //questo fa si che il messaggio di inizializzazione non scompaia perche' in attesa
+        //del passaggio di stato da CONNECTED a ACQUIRING.
+        //al termine dell'acquisizione c'è una disconnessione dal supe e lo stato
+        //diventa NOT_CONNECTED, quindi poi tutto procede bene
+        static bool firstAcq = true;
+        if (firstAcq) {
+            firstAcq = false;
+            m_oldState = ESTATE_IDLE_CONNECTED;
+        }
+
         //dico a medica di salvare il file nel db
         g_mainAppBridge->sendSave();
 
@@ -243,6 +255,7 @@ bool MAcqManager::newAcquisition(QString __dataFile)
 
         //disabilito alcuni allarmi
         m_alarmMng.manageAlarm(ALA_NOT_ACQUIRING, DISABLE);
+
 
         //mi connetto ai server del supe e del programma di gestione archivi
         connectToServers();
@@ -601,7 +614,6 @@ void MAcqManager::analyzeStatus(uint8_t __currState, bool __isBT)
     static const char * names[] = { "st_IDLE_NOT_CONNECTED", "st_IDLE_CONNECTED", "st_ACQUIRING" };
 
     // m_alarmMng.stopTimeoutAlarm(ALA_TIMEOUT_STATUS);
-    qDebug("olstate:%s new:%s %s", names[m_oldState], names[__currState], __isBT ? "BT" : "Cavo");
 
     // trasformato in  m_acquired
     // static acquired ok SOLO per la prima volta dall'accensione
@@ -652,6 +664,7 @@ void MAcqManager::analyzeStatus(uint8_t __currState, bool __isBT)
 //    default:break;
 //    }
 
+    qDebug("olstate:%s new:%s %s", names[m_oldState], names[__currState], __isBT ? "BT" : "Cavo");
     switch(__currState)
     {
     case ESTATE_IDLE_NOT_CONNECTED:
@@ -664,7 +677,7 @@ void MAcqManager::analyzeStatus(uint8_t __currState, bool __isBT)
     case ESTATE_IDLE_CONNECTED:
         if(m_oldState == ESTATE_IDLE_NOT_CONNECTED) {
             m_alarmMng.stopTimeoutAlarm(ALA_NOT_CONNECTED);
-            sendStartAcq ();
+            sendStartAcq();
         }
         if(m_oldState == ESTATE_ACQUIRING) {
             m_alarmMng.addAlarm(ALA_NOT_ACQUIRING);
