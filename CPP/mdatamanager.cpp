@@ -1354,6 +1354,7 @@ void MDataManager::sendToPrint(enum WHO __from, int __val)
     case BtGoingUp:
     case BtOn:
     case WaitPrnEnd:
+        break;
     }
     QTimer::singleShot(500, this, SLOT(sendToPrint()));
     m_mngPrint->print();
