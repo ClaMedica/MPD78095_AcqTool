@@ -28,6 +28,7 @@
 #include <QSplashScreen>
 #include <fileio.h>
 #include <systemmanager.h>
+#include "spooler.h"
 
 
 #ifdef ANDROID
@@ -41,7 +42,6 @@ char strvers[] = "AcqTool del " __DATE__ " alle " __TIME__;
 bool DebugAcqTool = false;
 
 AcqBridge *g_mainAppBridge;
-UdpPico     udpConn;
 
 int main(int argc, char *argv[])
 {

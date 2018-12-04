@@ -44,7 +44,8 @@ SOURCES += \
     ../AnaUro/anautils.cpp \
     ../MGlobal/fileio.cpp \
     ../MGlobal/udpmsgs.cpp \
-    CPP/graficmanager.cpp
+    CPP/graficmanager.cpp \
+    ../MGlobal/spooler.cpp
 
 HEADERS += \
     CPP/alarmmanager.h \
@@ -80,7 +81,8 @@ HEADERS += \
     ../MGlobal/fileio.h \
     ../MGlobal/udpmsgs.h \
     CPP/bitmapsv.h \
-    CPP/graficmanager.h
+    CPP/graficmanager.h \
+    ../MGlobal/spooler.h
 
 INCLUDEPATH +=  CPP \
                 CPP/TCP \
