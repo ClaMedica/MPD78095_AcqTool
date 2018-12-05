@@ -171,7 +171,7 @@ MForm{
                     mngData.analysis();
 
                 if (value === "112") {
-                    restartBt()
+                    if (PicoFlow) restartBt()
                     mngData.exitFromReview()
                 }
 

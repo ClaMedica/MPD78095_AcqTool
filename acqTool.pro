@@ -147,6 +147,8 @@ win32 {
 
     DISTFILES += ../MGlobal/MComponents/* \
                  ../MGlobal/MComponents/Images/*
+
+    QT += printsupport
 }
 
 unix {

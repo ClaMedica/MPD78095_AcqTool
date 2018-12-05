@@ -1,6 +1,5 @@
 ﻿#include "mabstractmanager.h"
 #include "QApplication"
-extern int CODSOFT;
 
 MAbstractManager::MAbstractManager(QObject *parent) : QObject(parent)
 {

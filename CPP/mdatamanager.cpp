@@ -2,8 +2,6 @@
 #include "systemmanager.h"
 
 extern bool DebugAcqTool;
-extern int CODSOFT;
-
 
 MDataManager::MDataManager(QObject *parent)
 {
@@ -272,7 +270,10 @@ void MDataManager::loadFile(QString __fileName)
 
             double supLim = m_mng->GetSupLim(h);
             double infLim = m_mng->GetInfLim(h);
+#ifdef PICOFLOW
             Ancestry *chProp = m_configUser.getSafeChild(XML_CHANNELSPROP);
+#else
+            Ancestry *chProp = m_configUserProp.getSafeChild(XML_CHANNELSPROP);
             Ancestry *chName = chProp->getSafeChild(m_mng->GetChanName(h).remove("1"));
             //max#min#step#decimals
             QStringList rangesDef = chName->getSafeChild(ATT_RANGE)->getSafeAttribute(ATT_MODEL).split("#");
@@ -1327,17 +1328,41 @@ void MDataManager::startPrint()
     m_mngPrint->setVolRes((float)(qRound(m_aflwdatas.at(0)->getResidualVolume()*10))/10);
     m_mngPrint->setDetContrMax((float)(qRound(m_aflwdatas.at(0)->getVDetMax()*10))/10);
 
+
+#endif
     //stampo
     if (m_autoPrint)
         sendToPrint();
-#endif
     //qml
     qDebug() << "FINE analisys";
 }
 
 void MDataManager::sendToPrint()
 {
+#ifdef PICOFLOW
      m_mngPrint->print();
+#else
+    QPrinter printer;
+    QString printer_name = QPrinterInfo::defaultPrinterName();
+
+    //se l'utente ha scelto la stampante la trovo nel file .dat
+    //se il file .dat non esiste uso la stampante di default
+    QString namePrinter = g_P7SettingsManager.appPath() + "/DefaultPrinterSettings.dat";
+    QFile* filePrinter = new QFile(namePrinter);
+    if (filePrinter->exists())
+    {
+        //leggo il file .dat per la stampante da utilizzare
+        filePrinter->open(QIODevice::ReadOnly| QIODevice::Text);
+        QTextStream* streamPrinter = new QTextStream(filePrinter);
+        printer_name = streamPrinter->readLine();
+        filePrinter->close();
+        delete filePrinter;
+        delete streamPrinter;
+    }
+    printer.setPrinterName(printer_name);
+    qDebug()<<"PRINTER NAME"<<printer_name;
+
+#endif
      qDebug() << "stampato";
 }
 

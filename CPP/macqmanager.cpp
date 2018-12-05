@@ -387,9 +387,10 @@ void MAcqManager::setAlarms(QVariantList __list)
 
 void MAcqManager::send_Command(int __command)
 {
+#ifdef PICOFLOW
 //    sendCommand((tcp_flow_bt_cmd_t) __command);
     QByteArray msg = (__command == 4) ? "suspBt" : "restartBt";
-#ifdef PICOFLOW
+
     udpConn.sendSup(msg);
 #endif
 }
