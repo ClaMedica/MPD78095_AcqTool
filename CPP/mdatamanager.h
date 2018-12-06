@@ -98,8 +98,8 @@ signals:
     void infoToSave();
 
     void sg_exitFromReview();
-    void udpMdmBtStatus(enum WHO, char);
-    void udpMdmPrnStatus(enum WHO, char);
+    void udpMdmBtStatus(enum WHO, int);
+    void udpMdmPrnStatus(enum WHO, int);
 
 public slots:
     void analysis(void);

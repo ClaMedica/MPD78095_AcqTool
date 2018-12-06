@@ -474,10 +474,10 @@ void MAcqManager::handleTCP(SimpleTCPClient *__client, QByteArray __block)
             flowBT_status_t stBT;
             picoFlow_status_t stPico;
             alarms_t alarms;
-            union {
-                flowBT_states_t bt;
-                picoFlow_states_t pf;
-            } currState;
+//            union {
+//                flowBT_states_t bt;
+//                picoFlow_states_t pf;
+//            } currState;
             uint8_t newState = 0;
             bool isBT;
             uint i = 0;

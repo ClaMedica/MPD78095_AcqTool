@@ -65,6 +65,8 @@ HEADERS += \
     CPP/TCP/SimpleTCPClient.h \
     CPP/TCP/TcpServers.h \
     CPP/TCP/TcpSettingFile.h \
+    CPP/bitmapsv.h \
+    CPP/graficmanager.h \
     ../AnaUro/anauro.h\
     ../AnaUro/anauro_global.h \
     ../AnaUro/analysis.h \
@@ -80,8 +82,6 @@ HEADERS += \
     ../MGlobal/UdmImpl.h \
     ../MGlobal/fileio.h \
     ../MGlobal/udpmsgs.h \
-    CPP/bitmapsv.h \
-    CPP/graficmanager.h \
     ../MGlobal/spooler.h
 
 INCLUDEPATH +=  CPP \

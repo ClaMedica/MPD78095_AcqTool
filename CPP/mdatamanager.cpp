@@ -39,8 +39,8 @@ MDataManager::MDataManager(QObject *parent)
 
     setValVolRes(-999);
     connect(&udpConn, SIGNAL(receivedUdp(enum WHO, QByteArray)), this, SLOT(udpMdmBtDecode(WHO,QByteArray)));
-    connect(this, SIGNAL(udpMdmBtStatus(enum WHO, char)), this, SLOT(sendToPrint(enum WHO,int)));
-    connect(this, SIGNAL(udpMdmPrnStatus(enum WHO, char)), this, SLOT(sendToPrint(enum WHO,int)));
+    connect(this, SIGNAL(udpMdmBtStatus(enum WHO, int)), this, SLOT(sendToPrint(enum WHO,int)));
+    connect(this, SIGNAL(udpMdmPrnStatus(enum WHO, int)), this, SLOT(sendToPrint(enum WHO,int)));
 }
 
 MDataManager::~MDataManager()
