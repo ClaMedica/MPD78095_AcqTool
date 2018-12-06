@@ -68,6 +68,14 @@ MForm{
         mngCon.read()
     }
 
+    function printImagePlot()
+    {
+        plot.grabToImage(
+                    function(result) { mngData.getGrabbedImage(result, "grafo"); },
+                    Qt.size(600,400)
+                    )
+    }
+
     //@@@@@@@@@@    Objects     @@@@@@@@@@
 
     MPlot2DStack {
@@ -163,7 +171,7 @@ MForm{
                     mngData.analysis();
 
                 if (value === "112") {
-                    restartBt()
+                    if (PicoFlow) restartBt()
                     mngData.exitFromReview()
                 }
 
@@ -218,5 +226,6 @@ MForm{
             anchors.horizontalCenter: parent.horizontalCenter
         }
     }
+
 
 }

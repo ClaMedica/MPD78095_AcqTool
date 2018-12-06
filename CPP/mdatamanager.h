@@ -1,4 +1,4 @@
-#ifndef MDATAMANAGER_H
+﻿#ifndef MDATAMANAGER_H
 #define MDATAMANAGER_H
 
 #include "mabstractmanager.h"
@@ -7,6 +7,8 @@
 #include "mflowdatas.h"
 #include "printermanager.h"
 #include <QQuickItemGrabResult>
+#include <QPrinterInfo>
+#include <QPrinter>
 
 
 typedef struct {
@@ -118,7 +120,8 @@ private:
 
     QString m_currentSignalName,
     m_fileName,
-    m_copyFileName;
+    m_copyFileName,
+    m_pathData;
 
     MSignal *m_pCurrentSignal;
 

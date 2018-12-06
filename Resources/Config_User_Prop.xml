@@ -1,0 +1,114 @@
+﻿<Configuration label="Configuration">
+<ChannelsProp label="Channels Prop">
+    <VV>
+        <width
+           label="width track"
+           type="TextField"
+           unit=""
+           value="1"
+           alfanum="false"
+        />
+        <thick
+            label="thick"
+            type="TextField"
+            unit=""
+            value="3"
+            alfanum="false"
+        />
+        <color
+            label="color track"
+            type="ColorBox"
+            unit=""
+            value="black"
+        />
+        <yAutoScale
+            label="Auto Range"
+            type="CheckBox"
+            unit=""
+            value="1"
+        />
+        <Range
+            label="Range"
+            type="SpinBox"
+            dt="real"
+            unit="ml"
+            model="2000#1000#500#200#0#"
+            value="200"
+        />
+
+    </VV>
+    <Q>
+        <width
+           label="width track"
+           type="TextField"
+           unit=""
+           value="1"
+           alfanum="false"
+        />
+        <thick
+            label="thick"
+            type="TextField"
+            unit=""
+            value="3"
+            alfanum="false"
+        />
+        <color
+            label="color track"
+            type="ColorBox"
+            unit=""
+            value="red"
+        />
+        <yAutoScale
+            label="Auto Range"
+            type="CheckBox"
+            unit=""
+            value="1"
+        />
+        <Range
+            label="Range"
+            type="SpinBox"
+            dt="real"
+            unit="ml/sec"
+            model="100#25#1#0#"
+            value="50"
+        />
+
+    </Q>
+    <EMG>
+        <width
+           label="width track"
+           type="TextField"
+           unit=""
+           value="1"
+           alfanum="false"
+        />
+        <thick
+            label="thick"
+            type="TextField"
+            unit=""
+            value="3"
+            alfanum="false"
+        />
+        <color
+            label="color track"
+            type="ColorBox"
+            unit=""
+            value="red"
+        />
+        <yAutoScale
+            label="Auto Range"
+            type="CheckBox"
+            unit=""
+            value="1"
+        />
+        <Range
+            label="Range"
+            type="SpinBox"
+            dt="real"
+            unit="uV"
+            model="5000#500#500#0#"
+            value="1000"
+        />
+    </EMG>
+</ChannelsProp>
+</Configuration>

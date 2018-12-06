@@ -1,5 +1,4 @@
-#include "macqmanager.h"
-#include "udpmsgs.h"
+﻿#include "macqmanager.h"
 
 MAcqManager::MAcqManager(QObject *parent)
 {
@@ -38,10 +37,8 @@ MAcqManager::MAcqManager(QObject *parent)
 
     if(!m_configAcq.loadFromXML(g_P7SettingsManager.progPath() + "/Config_Acq.xml"))
         qCritical() << "Error on acq configuration file";
-    qDebug("qui");
     //carico info di connettivitA
     loadConnectivityInfo(m_configAcq.getSafeChild(XML_CONNECTIONS));
-    qDebug("qui");
 //    QString lang = m_configLocale.getChild(XML_LOCALE)->getSafeAttribute("value");
 //    qDebug("qui");
 //    QString configAlarms = m_applicationPath + "/Config_Alarms_" + lang + ".xml";
@@ -51,16 +48,17 @@ MAcqManager::MAcqManager(QObject *parent)
 //    qDebug("qui");
 //    if(!m_alarmMng.load(configAlarms))
 //        qCritical() << "Error on alarm configuration file";
-    qDebug("tutto");
+//    qDebug("tutto");
 
     QTimer::singleShot(2000, this, SLOT(connectToServers()));
 
     //connetto il gestore degli allarmi alla proprietA  alarms
     connect(&m_alarmMng, SIGNAL(alarmsUpdated(QVariantList)), this, SLOT(setAlarms(QVariantList)));
-
+#ifdef PICOFLOW
     connect(&udpConn, SIGNAL(receivedUdp(enum WHO, QByteArray)), this, SLOT(udpBtDecode(WHO,QByteArray)));
     udpConn.iAmAcq();
     udpConn.sendSup("hello from acq");
+#endif
 }
 
 MAcqManager::~MAcqManager()
@@ -402,10 +400,12 @@ void MAcqManager::setAlarms(QVariantList __list)
 
 void MAcqManager::send_Command(int __command)
 {
+#ifdef PICOFLOW
 //    sendCommand((tcp_flow_bt_cmd_t) __command);
     QByteArray msg = (__command == 4) ? "suspBt" : "restartBt";
 
     udpConn.sendSup(msg);
+#endif
 }
 
 bool MAcqManager::sendCommand(tcp_flow_bt_cmd_t __command)

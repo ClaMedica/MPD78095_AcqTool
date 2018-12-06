@@ -308,7 +308,7 @@ MForm {
         interval:1000
         onTriggered: {
             console.log("================ btStatusUdp (timPrint):",btStatusUdp,"btOkPrint",btOkPrint)
-            if(btOkPrint) {
+            if(btOkPrint || !PicoFlow) {
                 console.log("startPrint()")
                 mngData.startPrint()
                 console.log("print completed")
@@ -333,10 +333,10 @@ MForm {
         height: screenH*grafic.valueOf("Button","height")
         labelSize: grafic.valueOf("Button","labelSize")
 //        labelSize: PicoFlow ? layout.value("F4") : layout.value("F3")
-        enabled: btOkPrint
+        enabled: PicoFlow ? btOkPrint : true
         onClicked: {
             console.log("================ btStatusUdp (btnPrint):",btStatusUdp,"btOkPrint",btOkPrint)
-            if(btOkPrint) {
+            if(btOkPrint || !PicoFlow) {
                 console.log("start print")
                 mngData.sendToPrint()
                 console.log("print completed")

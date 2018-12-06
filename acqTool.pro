@@ -89,6 +89,7 @@ INCLUDEPATH +=  CPP \
                 ../MPF78003-Picoflow2R3Supe \
                 ../DataFileManager \
                 ../SupeFlowBT
+                ../MedicalReport
 
 # Default rules for deployment.
 include(deployment.pri)
@@ -123,6 +124,9 @@ contains(ANDROID_TARGET_ARCH,armeabi-v7a) {
 win32 {
     DEFINES += WIN32
     TARGET = acqTool
+
+    INCLUDEPATH +=  ../MedicalReport
+
     rootPath = E:\Piattaforma70
     #creo la cartella da copiare in giro
     #plugin.path = $${rootPath}\Lavoro\Software\Build\StandAlone
@@ -133,6 +137,9 @@ win32 {
 
     win32:CONFIG(release, debug|release): LIBS += -L$$PWD/../Build/DatafileManager/release/ -lDatafileManager
     else:win32:CONFIG(debug, debug|release): LIBS += -L$$PWD/../Build/DatafileManager/debug/ -lDatafileManager
+    win32:CONFIG(release, debug|release): LIBS += -L$$PWD/../Build/MedicalReport/release/ -lMedicalReport
+    else:win32:CONFIG(debug, debug|release): LIBS += -L$$PWD/../Build/MedicalReport/debug/ -lMedicalReport
+
 
     # Additional import path used to resolve QML modules in Qt Creator's code model
     QML_IMPORT_PATH = ../MGlobal \
@@ -140,6 +147,8 @@ win32 {
 
     DISTFILES += ../MGlobal/MComponents/* \
                  ../MGlobal/MComponents/Images/*
+
+    QT += printsupport
 }
 
 unix {

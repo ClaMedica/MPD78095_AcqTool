@@ -41,7 +41,9 @@ char strvers[] = "AcqTool del " __DATE__ " alle " __TIME__;
 bool DebugAcqTool = false;
 
 AcqBridge *g_mainAppBridge;
+#ifdef PICOFLOW
 UdpPico     udpConn;
+#endif
 
 int main(int argc, char *argv[])
 {
@@ -91,7 +93,6 @@ int main(int argc, char *argv[])
         DebugAcqTool = true;
     if(DebugAcqTool == false)
         g_mainAppBridge = new AcqBridge(QStringList() << argv[1] << argv[2]);   //definisco un bridge tra app di tipo server
-
 
     qmlRegisterType<ParameterManager>("Managers", 1, 0, "ParameterManager");
     qmlRegisterType<ModelManager>("Managers", 1, 0, "ModelManager");

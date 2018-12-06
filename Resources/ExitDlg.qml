@@ -39,7 +39,7 @@ Rectangle {
         anchors.margins: parent.height*0.02
         labelSize: grafic.valueOf("Button","labelSize")
         onClicked: {
-            restartBt()
+            if (PicoFlow) restartBt()
             exitDlg.visible = false
             mngData.toSave = "yes"
             mngData.exitFromReview()
@@ -56,7 +56,7 @@ Rectangle {
         anchors.margins: parent.height*0.02
         labelSize: grafic.valueOf("Button","labelSize")
         onClicked: {
-            restartBt()
+            if (PicoFlow) restartBt()
             exitDlg.visible = false
             mngData.toSave = "no"
             mngData.exitFromReview()

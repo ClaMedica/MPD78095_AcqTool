@@ -3,7 +3,6 @@
 
 extern bool DebugAcqTool;
 
-
 MDataManager::MDataManager(QObject *parent)
 {
     (void) parent;
@@ -16,7 +15,7 @@ MDataManager::MDataManager(QObject *parent)
     m_updateWhenNews = false;
     m_start = 0;
     m_end = 3600;   //fine esame di default a 1 ora
-    //m_applicationPath=applicationDirPath();
+
     m_configurationFileLoaded = false;  //nessun file di configurazione caricato
     m_changesToBeSaved = false;
 
@@ -34,6 +33,8 @@ MDataManager::MDataManager(QObject *parent)
     m_firstHead = "Medica S.p.A - Menfis Divisione";
     m_secondHead = "Pico Flow 2";
     m_etaPatient = -1;
+
+    m_pathData = this->m_applicationPath;
 
     setValVolRes(-999);
 }
@@ -59,8 +60,32 @@ MDataManager::~MDataManager()
 
 void MDataManager::getGrabbedImage(QObject *gi, QString __nome)
 {
+    qDebug()<<"Immagine"<<__nome<<gi;
 #ifdef PICOFLOW
-    m_mngPrint->getGrabbedImage(gi,__nome);
+    if (__nome != "grafo")
+        m_mngPrint->getGrabbedImage(gi,nome);
+#elif WIN32
+    //grafo e nomogrammi
+    QQuickItemGrabResult *item = qobject_cast<QQuickItemGrabResult *>(gi);
+    qDebug()<<"Item"<<item;
+    QImage img = item->image();
+    QPixmap pix = QPixmap::fromImage(img);
+    QString imgName;
+    if (__nome == "grafo")
+        imgName = "GR100";
+    else if (__nome.startsWith("Live"))
+        if (__nome.contains("Ave"))
+            imgName = "GR202";
+        else
+            imgName = "GR203";
+    else if (__nome.startsWith("Siro"))
+        if (__nome.contains("Ave"))
+            imgName = "GR204";
+        else
+            imgName = "GR210";
+
+    pix.save(m_pathData + imgName + ".jpg");
+
 #endif
 }
 
@@ -113,6 +138,8 @@ void MDataManager::loadFile(QString __fileName)
     }
 
     m_fileName = __fileName;
+    m_pathData = m_fileName.left(m_fileName.lastIndexOf("\\")+1);
+
     //la prima volta che salvo mi faccio la copia del file originale
     m_copyFileName = m_fileName;
     m_copyFileName.insert(m_copyFileName.length() - 4, "_copy");
@@ -243,7 +270,10 @@ void MDataManager::loadFile(QString __fileName)
 
             double supLim = m_mng->GetSupLim(h);
             double infLim = m_mng->GetInfLim(h);
+#ifdef PICOFLOW
             Ancestry *chProp = m_configUser.getSafeChild(XML_CHANNELSPROP);
+#else
+            Ancestry *chProp = m_configUserProp.getSafeChild(XML_CHANNELSPROP);
             Ancestry *chName = chProp->getSafeChild(m_mng->GetChanName(h).remove("1"));
             //max#min#step#decimals
             QStringList rangesDef = chName->getSafeChild(ATT_RANGE)->getSafeAttribute(ATT_MODEL).split("#");
@@ -1298,17 +1328,41 @@ void MDataManager::startPrint()
     m_mngPrint->setVolRes((float)(qRound(m_aflwdatas.at(0)->getResidualVolume()*10))/10);
     m_mngPrint->setDetContrMax((float)(qRound(m_aflwdatas.at(0)->getVDetMax()*10))/10);
 
+
+#endif
     //stampo
     if (m_autoPrint)
         sendToPrint();
-#endif
     //qml
     qDebug() << "FINE analisys";
 }
 
 void MDataManager::sendToPrint()
 {
+#ifdef PICOFLOW
      m_mngPrint->print();
+#else
+    QPrinter printer;
+    QString printer_name = QPrinterInfo::defaultPrinterName();
+
+    //se l'utente ha scelto la stampante la trovo nel file .dat
+    //se il file .dat non esiste uso la stampante di default
+    QString namePrinter = g_P7SettingsManager.appPath() + "/DefaultPrinterSettings.dat";
+    QFile* filePrinter = new QFile(namePrinter);
+    if (filePrinter->exists())
+    {
+        //leggo il file .dat per la stampante da utilizzare
+        filePrinter->open(QIODevice::ReadOnly| QIODevice::Text);
+        QTextStream* streamPrinter = new QTextStream(filePrinter);
+        printer_name = streamPrinter->readLine();
+        filePrinter->close();
+        delete filePrinter;
+        delete streamPrinter;
+    }
+    printer.setPrinterName(printer_name);
+    qDebug()<<"PRINTER NAME"<<printer_name;
+
+#endif
      qDebug() << "stampato";
 }
 

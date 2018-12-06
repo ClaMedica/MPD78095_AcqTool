@@ -25,7 +25,7 @@ ApplicationWindow {
 
     //@@@@@@@@@@    Properties      @@@@@@@@@@
     id: root
-    flags: Qt.FramelessWindowHint
+    flags:Qt.Window | Qt.FramelessWindowHint
     visible: false
 
     width:platform==="linux"?640:Screen.width//*0.94
@@ -33,9 +33,9 @@ ApplicationWindow {
 
     color:"steelblue"
 
-    function launchDEBUG(mode,dataFile)
+    function launchDEBUG(mode,dataFile,codSoft)
      {
-         console.log("launchDEBUG(mode,dataFile)", mode, dataFile)
+         console.log("launchDEBUG(mode,dataFile)", mode, dataFile,codSoft)
 
          if(mode === "acq")
          {
@@ -60,6 +60,7 @@ ApplicationWindow {
              forAna.setMarkersInfo(mngData.markersInfo("type", [1, 6]))
              forAna.setDefinersInfo(mngData.definersInfo())
              forAna.setCommandsInfo(mngData.commandsInfo())
+             forAna.printImagePlot()
          }
          console.log("Application Ready!")
      }
@@ -67,19 +68,19 @@ ApplicationWindow {
     //@@@@@@@@@@    Events          @@@@@@@@@@
      Component.onCompleted: {
          acqLoaded.createFileLoaded()
-         console.log("debug??? ", Qt.application.arguments[3])
-         if (Qt.application.arguments[3] === "debug") {
+         console.log("debug??? ", Qt.application.arguments[4])
+         if (Qt.application.arguments[4] === "debug") {
              root.visible = true
-             launchDEBUG(Qt.application.arguments[1],Qt.application.arguments[2])
+             launchDEBUG(Qt.application.arguments[1],Qt.application.arguments[2], Qt.application.arguments[3])
          }
      }
 
-    function launch(mode,dataFile)
+    function launch(mode,dataFile,codSoft)
     {
         console.log("launch(mode,dataFile)", mode, dataFile)
         if(mode === "acq")
         {
-            console.log("Start new acq")
+            console.log("Start new acq", codSoft)
             mngAcq.load()
             mngAcq.newAcquisition(dataFile)
             forReal.setMarkersInfo(mngAcq.markersInfo("type", [1, 6]))
@@ -91,8 +92,8 @@ ApplicationWindow {
         }
         else if(mode === "vis")
         {
-            suspendBt()
-            console.log("Start new vis")
+            if (PicoFlow) suspendBt()
+            console.log("Start new vis", codSoft)
             forAna.initialize()
             mngData.load()
             if(platform !== "android")
@@ -102,10 +103,11 @@ ApplicationWindow {
             forAna.setMarkersInfo(mngData.markersInfo("type", [1, 6]))
             forAna.setDefinersInfo(mngData.definersInfo())
             forAna.setCommandsInfo(mngData.commandsInfo())
+            forAna.printImagePlot()
         }
         else if (mode === "sta")
         {
-            suspendBt()
+            if (PicoFlow) suspendBt()
             console.log("Start stampa prova")
             mngData.sendPrintTest()
         }
@@ -114,6 +116,8 @@ ApplicationWindow {
         if (mode !== "sta")
             bridgeMain.sendSwitch()
     }
+
+
 
     //@@@@@@@@@@    Objects         @@@@@@@@@@
     FileIO {
@@ -177,13 +181,13 @@ ApplicationWindow {
         onNewAcquisition:
         {
             console.log(datafile);
-            launch("acq", datafile)
+            launch("acq", datafile, codSoft)
             vis = false
         }
         onNewVisualization:
         {
             console.log(datafile);
-            launch("vis", datafile)
+            launch("vis", datafile, codSoft)
             vis = true
         }
         onStampaProva:
