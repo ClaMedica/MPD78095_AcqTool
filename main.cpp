@@ -28,6 +28,7 @@
 #include <QSplashScreen>
 #include <fileio.h>
 #include <systemmanager.h>
+#include "spooler.h"
 
 
 #ifdef ANDROID
@@ -42,7 +43,6 @@ bool DebugAcqTool = false;
 
 AcqBridge *g_mainAppBridge;
 #ifdef PICOFLOW
-UdpPico     udpConn;
 #endif
 
 int main(int argc, char *argv[])

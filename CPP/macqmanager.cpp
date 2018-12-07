@@ -98,9 +98,20 @@ void MAcqManager::udpBtDecode(enum WHO __from, QByteArray __msg)
 {
     qDebug() << __from << __msg;
 
-    if(__from == E_SUP) {
-        if(__msg == "Suspended") emit udpBtStopped();
-        if(__msg == "Restarted") emit udpBtRestarted();
+    switch(__from) {
+    case E_SUP:
+                if((__msg.at(0) == 'S') && (__msg == "Suspended")) emit udpBtStopped();
+                if((__msg.at(0) == 'R') && (__msg == "Restarted")) emit udpBtRestarted();
+                if((__msg.at(0) == 'U') && (__msg == "UseBt"))     emit udpBtUsable(true);
+                if((__msg.at(0) == 'N') && (__msg == "NoBt"))      emit udpBtUsable(false);
+                break;
+    case E_PRN:
+                if((__msg.at(0) == 'R') && (__msg == "Ready"))     emit udpPrnStatus(__msg.at(0));
+                if((__msg.at(0) == 'F') && (__msg == "Fail"))      emit udpPrnStatus(__msg.at(0));
+                if((__msg.at(0) == 'D') && (__msg == "Done"))      emit udpPrnStatus(__msg.at(0));
+                break;
+    default:
+        break;
     }
 }
 
@@ -108,7 +119,7 @@ void MAcqManager::dataOnTCP(QObject *__pParent, SimpleTCPClient *__pTCP, QByteAr
 {//arriviamo qua dentro ogni volta che arriva qualcosa da uno dei server a cui siamo collegati
 
     int s = __block.size();  int sm = (s < 16) ? s : 16;
-    qDebug() << __pTCP->hostAddress() << __pTCP->hostPort() << s << QByteArray(__block.constData(),sm);
+    //qDebug() << __pTCP->hostAddress() << __pTCP->hostPort() << s << QByteArray(__block.constData(),sm);
 
     if(__pParent != NULL) {     //punta a qualcosa andiamo avanti
         if(__pTCP != NULL) {    //punta a qualcosa proviamo a gestirlo
@@ -233,6 +244,18 @@ bool MAcqManager::newAcquisition(QString __dataFile)
         bool res = m_mng->Continue();
         qDebug() << "Continue ..." << res;
 
+        //DA TESTARE CON NUOVO SUP, FORSE NON PIU' NECESSARIO
+        //la prima volta che si fa un'acquisizione siamo nello stato di ACQUIRING
+        //questo fa si che il messaggio di inizializzazione non scompaia perche' in attesa
+        //del passaggio di stato da CONNECTED a ACQUIRING.
+        //al termine dell'acquisizione c'è una disconnessione dal supe e lo stato
+        //diventa NOT_CONNECTED, quindi poi tutto procede bene
+        static bool firstAcq = true;
+        if (firstAcq) {
+            firstAcq = false;
+            m_oldState = ESTATE_IDLE_CONNECTED;
+        }
+
         //dico a medica di salvare il file nel db
         g_mainAppBridge->sendSave();
 
@@ -241,6 +264,7 @@ bool MAcqManager::newAcquisition(QString __dataFile)
 
         //disabilito alcuni allarmi
         m_alarmMng.manageAlarm(ALA_NOT_ACQUIRING, DISABLE);
+
 
         //mi connetto ai server del supe e del programma di gestione archivi
         connectToServers();
@@ -450,10 +474,10 @@ void MAcqManager::handleTCP(SimpleTCPClient *__client, QByteArray __block)
             flowBT_status_t stBT;
             picoFlow_status_t stPico;
             alarms_t alarms;
-            union {
-                flowBT_states_t bt;
-                picoFlow_states_t pf;
-            } currState;
+//            union {
+//                flowBT_states_t bt;
+//                picoFlow_states_t pf;
+//            } currState;
             uint8_t newState = 0;
             bool isBT;
             uint i = 0;
@@ -601,7 +625,6 @@ void MAcqManager::analyzeStatus(uint8_t __currState, bool __isBT)
     static const char * names[] = { "st_IDLE_NOT_CONNECTED", "st_IDLE_CONNECTED", "st_ACQUIRING" };
 
     // m_alarmMng.stopTimeoutAlarm(ALA_TIMEOUT_STATUS);
-    qDebug("olstate:%s new:%s %s", names[m_oldState], names[__currState], __isBT ? "BT" : "Cavo");
 
     // trasformato in  m_acquired
     // static acquired ok SOLO per la prima volta dall'accensione
@@ -652,6 +675,17 @@ void MAcqManager::analyzeStatus(uint8_t __currState, bool __isBT)
 //    default:break;
 //    }
 
+    qDebug("olstate:%s new:%s %s", names[m_oldState], names[__currState], __isBT ? "BT" : "Cavo");
+
+    //DA TESTARE CON NUOVO SUP, FORSE NON PIU' NECESSARIO
+    static bool first = true;
+    if (first && !__isBT && m_oldState == ESTATE_IDLE_NOT_CONNECTED)
+    {
+            first = false;
+            m_oldState = ESTATE_IDLE_NOT_CONNECTED;
+    }
+    //END
+
     switch(__currState)
     {
     case ESTATE_IDLE_NOT_CONNECTED:
@@ -664,7 +698,7 @@ void MAcqManager::analyzeStatus(uint8_t __currState, bool __isBT)
     case ESTATE_IDLE_CONNECTED:
         if(m_oldState == ESTATE_IDLE_NOT_CONNECTED) {
             m_alarmMng.stopTimeoutAlarm(ALA_NOT_CONNECTED);
-            sendStartAcq ();
+            sendStartAcq();
         }
         if(m_oldState == ESTATE_ACQUIRING) {
             m_alarmMng.addAlarm(ALA_NOT_ACQUIRING);
@@ -1103,6 +1137,23 @@ void MAcqManager::fillBuffers(QByteArray __block)
                         m_bufferMap[QString::number(currChan)]->append(sample);
 //                        if (m_valPrecVolume > mediato)
 //                            mediato = m_valPrecVolume;
+
+//                        if (sample < 0 )
+//                            sample = 0;
+//                        //media mobile
+//                        m_sommaMMobileV = m_sommaMMobileV - m_buffer_MMobileV.at(0) + sample;
+//                        m_buffer_MMobileV.remove(0);
+//                        m_buffer_MMobileV.append(sample);
+//                        double mediato = m_sommaMMobileV/m_lenMMobile;
+//                        //controllo valori monotoni, i valori di volume non devono decrescere
+//                        if (m_valPrecVolume < 0) //impostiamo la prima volta il valore precedente
+//                            m_valPrecVolume = mediato;
+//                        if (m_valPrecVolume > mediato)
+//                            mediato = m_valPrecVolume;
+//                        qDebug()<<"media volume applicata in "<<sample<<"ris "<<mediato;
+
+//                        m_bufferMap[QString::number(currChan)]->append(mediato);
+//                        m_valPrecVolume = mediato;
                         //qDebug("samples(ch:%d, nd:%d):%f",currChan,numChanData,sample);
                     }
 

@@ -8,6 +8,7 @@
 #include "printermanager.h"
 #include <QQuickItemGrabResult>
 #include <QPrinterInfo>
+#include "udpmsgs.h"
 #include <QPrinter>
 
 
@@ -36,6 +37,19 @@ class MDataManager : public MAbstractManager
 {
     Q_OBJECT
 public:
+
+    enum BtMng {
+        BtUnkn = 0,
+        BtQueryWait,    // bt in use: wait for query result
+        Btno,           // bt not in use
+        Btyes,          // bt in use
+        BtOff,          // bt in use: stopped
+        BtGoingDown,    // bt in use:
+        BtGoingUp,      // bt in use:
+        BtOn,           // bt in use: connected
+        WaitPrnEnd
+    };
+
     explicit MDataManager(QObject *parent = 0);
     ~MDataManager();
     Q_PROPERTY(QVariantList infoList READ infoList WRITE setInfoList NOTIFY infoListChanged)
@@ -86,6 +100,8 @@ signals:
     void infoToSave();
 
     void sg_exitFromReview();
+    void udpMdmBtStatus(enum WHO, int);
+    void udpMdmPrnStatus(enum WHO, int);
 
 public slots:
     void analysis(void);
@@ -104,7 +120,8 @@ public slots:
     QVariant getSignal(QString __name);
     QStringList getLinks(QString __what, QStringList __filterFamily=QStringList(), QStringList __filterType=QStringList());
     void startPrint();
-    void sendToPrint();
+    void sendToPrint(enum WHO __from = E_NONE, int __val = -1);
+    void udpMdmBtDecode(enum WHO __from, QByteArray __msg);
 
     void sendPrintTest();
 
@@ -157,6 +174,7 @@ private:
     QVector<mflowdatas*> m_aflwdatas; //array di analisi di tipo flussimetria
 
     printermanager *m_mngPrint;
+    enum BtMng m_BtMng;
 
 
 //----

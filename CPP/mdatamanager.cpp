@@ -34,9 +34,12 @@ MDataManager::MDataManager(QObject *parent)
     m_secondHead = "Pico Flow 2";
     m_etaPatient = -1;
 
-    m_pathData = this->m_applicationPath;
+    m_BtMng = BtUnkn;
 
     setValVolRes(-999);
+    connect(&udpConn, SIGNAL(receivedUdp(enum WHO, QByteArray)), this, SLOT(udpMdmBtDecode(WHO,QByteArray)));
+    connect(this, SIGNAL(udpMdmBtStatus(enum WHO, int)), this, SLOT(sendToPrint(enum WHO,int)));
+    connect(this, SIGNAL(udpMdmPrnStatus(enum WHO, int)), this, SLOT(sendToPrint(enum WHO,int)));
 }
 
 MDataManager::~MDataManager()
@@ -56,7 +59,6 @@ MDataManager::~MDataManager()
         m_mngPrint = NULL;
     }
 }
-
 
 void MDataManager::getGrabbedImage(QObject *gi, QString __nome)
 {
@@ -124,8 +126,6 @@ bool MDataManager::addSignal(MSignal *__pSignal)
 
     return true;
 }
-
-
 
 void MDataManager::loadFile(QString __fileName)
 {
@@ -511,7 +511,6 @@ void MDataManager::loadFile(QString __fileName)
     qDebug()<<"Load file operation completed succesfully!";
 }
 
-
 void MDataManager::resetAll()
 {
     m_data.clear();
@@ -587,7 +586,6 @@ void MDataManager::saveChanges()
     delete m_copy;
     m_copy = NULL;
 }
-
 
 /**
  * @brief MDataManager::addCustomObj add a custom object like a marker or a definer linked to __families,
@@ -1308,9 +1306,6 @@ qDebug() << "INIZIO";
     emit sg_loadResult();
 }
 
-
-
-
 void MDataManager::startPrint()
 {
 #ifdef PICOFLOW
@@ -1338,10 +1333,62 @@ void MDataManager::startPrint()
     qDebug() << "FINE analisys";
 }
 
-void MDataManager::sendToPrint()
+void MDataManager::udpMdmBtDecode(enum WHO __from, QByteArray __msg)
+{
+    qDebug() << __from << __msg;
+
+    char cmd = __msg.at(0);
+    switch(__from) {
+    case E_SUP:
+                if((cmd == 'S') && (__msg == "Suspended")) emit udpMdmBtStatus(__from, cmd);
+                if((cmd == 'R') && (__msg == "Restarted")) emit udpMdmBtStatus(__from, cmd);
+                if((cmd == 'U') && (__msg == "UseBt"))     emit udpMdmBtStatus(__from, cmd);
+                if((cmd == 'N') && (__msg == "NoBt"))      emit udpMdmBtStatus(__from, cmd);
+                break;
+    case E_PRN:
+                if((cmd == 'R') && (__msg == "Ready"))     emit udpMdmPrnStatus(__from, cmd);
+                if((cmd == 'F') && (__msg == "Fail"))      emit udpMdmPrnStatus(__from, cmd);
+                if((cmd == 'D') && (__msg == "Done"))      emit udpMdmPrnStatus(__from, cmd);
+                break;
+    default:
+        break;
+    }
+}
+
+void MDataManager::sendToPrint(enum WHO __from, int __val)
 {
 #ifdef PICOFLOW
-     m_mngPrint->print();
+//    m_copyFileName
+//    BtUnkn = 0,
+//    BtQueryWait,    // bt in use: wait for query result
+//    Btno,           // bt not in use
+//    Btyes,          // bt in use
+//    BtOff,          // bt in use: stopped
+//    BtGoingDown,    // bt in use:
+//    BtGoingUp,      // bt in use:
+//    BtOn            // bt in use: connected
+    switch(m_BtMng) {
+    case BtUnkn:
+                        m_BtMng = BtQueryWait;
+                        udpConn.sendSup("testBt");
+                        break;
+    case BtQueryWait:
+                        if(__from == E_SUP) {
+                            if(__val == 'U') m_BtMng = Btyes;
+                            if(__val == 'N') m_BtMng = Btno;
+                        }
+                        break;
+    case Btno:
+    case Btyes:
+    case BtOff:
+    case BtGoingDown:
+    case BtGoingUp:
+    case BtOn:
+    case WaitPrnEnd:
+        break;
+    }
+    QTimer::singleShot(500, this, SLOT(sendToPrint()));
+    m_mngPrint->print();
 #else
     QPrinter printer;
     QString printer_name = QPrinterInfo::defaultPrinterName();
@@ -1364,7 +1411,7 @@ void MDataManager::sendToPrint()
     qDebug()<<"PRINTER NAME"<<printer_name;
 
 #endif
-     qDebug() << "stampato";
+    qDebug() << "stampato";
 }
 
 void MDataManager::setToSave(QString __val)

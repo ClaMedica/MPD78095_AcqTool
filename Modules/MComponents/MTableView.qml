@@ -29,11 +29,9 @@ BuzzTableView{
 
     function selectRowFromPK(pk)
     {
-        rootTable.selection.clear()
         if (pk !== -1)
         {
             var row = model.indexOfPK(pk)
-            rootTable.positionViewAtRow(row,ListView.Beginning)
             rootTable.selection.select(row)
             rootTable.currentRow = row
         }
