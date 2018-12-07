@@ -274,6 +274,7 @@ void MDataManager::loadFile(QString __fileName)
             Ancestry *chProp = m_configUser.getSafeChild(XML_CHANNELSPROP);
 #else
             Ancestry *chProp = m_configUserProp.getSafeChild(XML_CHANNELSPROP);
+#endif
             Ancestry *chName = chProp->getSafeChild(m_mng->GetChanName(h).remove("1"));
             //max#min#step#decimals
             QStringList rangesDef = chName->getSafeChild(ATT_RANGE)->getSafeAttribute(ATT_MODEL).split("#");
