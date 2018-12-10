@@ -31,9 +31,7 @@ MAcqManager::MAcqManager(QObject *parent)
 
 
     m_startAcqManuale = false; //non ancora premuto tasto start
-#ifdef PICOFLOW
 
-#endif
 
     if(!m_configAcq.loadFromXML(g_P7SettingsManager.progPath() + "/Config_Acq.xml"))
         qCritical() << "Error on acq configuration file";
@@ -50,11 +48,12 @@ MAcqManager::MAcqManager(QObject *parent)
 //        qCritical() << "Error on alarm configuration file";
 //    qDebug("tutto");
 
+    #ifdef PICOFLOW
     QTimer::singleShot(2000, this, SLOT(connectToServers()));
 
     //connetto il gestore degli allarmi alla proprietA  alarms
     connect(&m_alarmMng, SIGNAL(alarmsUpdated(QVariantList)), this, SLOT(setAlarms(QVariantList)));
-#ifdef PICOFLOW
+//#ifdef PICOFLOW
     connect(&udpConn, SIGNAL(receivedUdp(enum WHO, QByteArray)), this, SLOT(udpBtDecode(WHO,QByteArray)));
     udpConn.iAmAcq();
     udpConn.sendSup("hello from acq");
@@ -283,11 +282,11 @@ void MAcqManager::connectToServers()
         client->registerDataReadyCallBack(&(this->dataOnTCP));
         client->connectToHost();
     }
-
     if(m_supeConnected == false) {
         qDebug() << "Retrying to connect in 2 seconds...";
         QTimer::singleShot(2000, this, SLOT(connectToServers()));
     }
+
 }
 
 
@@ -1319,3 +1318,4 @@ bool MAcqManager::readConfigurationFile()
 
     return true;
 }
+

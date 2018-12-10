@@ -1,4 +1,4 @@
-#ifndef MACQMANAGER_H
+﻿#ifndef MACQMANAGER_H
 #define MACQMANAGER_H
 
 #include "mabstractmanager.h"
@@ -129,6 +129,9 @@ private:
     //to manage interrupted file
     QString m_itsok;
     QFile *OutFile;
+
+    //codice software
+    int m_codSoft;
 };
 
 

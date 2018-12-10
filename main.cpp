@@ -28,7 +28,7 @@
 #include <QSplashScreen>
 #include <fileio.h>
 #include <systemmanager.h>
-#include "spooler.h"
+//#include "spooler.h"
 
 
 #ifdef ANDROID

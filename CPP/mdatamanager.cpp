@@ -37,9 +37,11 @@ MDataManager::MDataManager(QObject *parent)
     m_BtMng = BtUnkn;
 
     setValVolRes(-999);
+#ifdef PICOFLOW
     connect(&udpConn, SIGNAL(receivedUdp(enum WHO, QByteArray)), this, SLOT(udpMdmBtDecode(WHO,QByteArray)));
     connect(this, SIGNAL(udpMdmBtStatus(enum WHO, int)), this, SLOT(sendToPrint(enum WHO,int)));
     connect(this, SIGNAL(udpMdmPrnStatus(enum WHO, int)), this, SLOT(sendToPrint(enum WHO,int)));
+#endif
 }
 
 MDataManager::~MDataManager()

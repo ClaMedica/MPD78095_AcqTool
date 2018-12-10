@@ -362,22 +362,22 @@ MForm {
         anchors.bottom: parent.bottom
         anchors.bottomMargin: 10
         anchors.leftMargin: 10
-//        width:PicoFlow ? parent.width*0.2 : parent.width*0.15
-//        height:PicoFlow ? parent.height*0.08 : parent.height*0.06
         width: screenW*grafic.valueOf("Button","width")
         height: screenH*grafic.valueOf("Button","height")
         labelSize: grafic.valueOf("Button","labelSize")
-//        labelSize: PicoFlow ? layout.value("F4") : layout.value("F3")
         onClicked: {
-            if(timBtAvail) {
-                timBtAvail = false
-//                enabled = false
-                if(btStopped == false) {
-                    btStopped = true
-
+            if (PicoFlow)
+            {
+                if(timBtAvail) {
+                    timBtAvail = false
+                    if(btStopped == false) {
+                        btStopped = true
+                    }
+                    timStopBT.start()
                 }
-                timStopBT.start()
             }
+            else
+                mngData.sendToPrint()
         }
     }
 
