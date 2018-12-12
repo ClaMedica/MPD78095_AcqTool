@@ -1,5 +1,7 @@
 ﻿
 #include "printermanager.h"
+#include "udpmsgs.h"
+#include "spooler.h"
 
 //const char str_label_time_old[29][68]={
 //    "   0    3     6     9    12    15    18    21    24    27   30s",
@@ -123,7 +125,9 @@ const unsigned char  SD[2][4][20] = {
 
 printermanager::printermanager(QString __namefile, QObject *parent) : QObject(parent)
 {
-    m_namefile = __namefile;
+    m_namefile    = __namefile;
+    m_namefilePrn = __namefile.remove("_copy").remove(".pic").append(".prn");
+    qDebug() << m_namefilePrn;
 
     m_dfm = new DatafileManager();
     m_dfm->SetFileName(m_namefile);
@@ -150,7 +154,7 @@ printermanager::printermanager(QString __namefile, QObject *parent) : QObject(pa
     m_printFirstHeader = "";
     m_printSecondHeader = "";
 
-    m_port = new printerserialport(__namefile.remove(".pic").append(".prn"), this);
+    m_port = new printerserialport(m_namefilePrn, this);
 
     m_resultBm_w = 824; // 103 bytes * 8 bit
     m_resultBm_h = 300;
@@ -233,6 +237,9 @@ void printermanager::print()
     m_dfm->Close();
 
     pri_rep_review();	// qui va subito in stampa
+
+//    udpConn.sendPrn("print:" + m_namefilePrn.toLatin1());   // diretto
+    udpConn.sendSup("Print:" + m_namefilePrn.toLatin1());   // gateway
 }
 
 void printermanager::pri_rep_review()
@@ -527,6 +534,7 @@ void printermanager::Pri_Rep(double xscale)
     m_port->Pri_forward(npix);
 
 //    m_port->Pri_Reset();	// resetta RAM della stampante: equivale ad un reset HW
+    qDebug() << "Pri_Rep FINE file:" << m_namefile;
 }
 
 
@@ -2392,50 +2400,6 @@ void printermanager::Pri_Rep_asse_dx()
     // finalmente stampa
     m_port->Pri_Str((char *)m_str_gr, dim_string_solo_ax, false);
 
-}
-
-void printermanager::Report_BitMap_test()
-{
-//    m_port->init_printer();
-//    m_port->Pri_Speed(1);
-//    int sp = 1000;
-//    m_port->Pri_Max_Speed((sp >> 8) & 0xff, sp & 0xff);
-
-    char txt0[] = "--iniz test--\n";
-    m_port->Pri_Str(txt0, strlen(txt0), false);
-
-    int     szchunk = 103;  // 824/8
-    char tbm[103];
-    char    head[8];
-    int     sz = szchunk*100;
-
-    head[0] = ESC;	//0x1B;	// ESC
-    head[1] = '*';	//0x2A;	// *
-    head[2] = szchunk         & 0xff;	// n1
-    head[3] = (szchunk >>  8) & 0xff;	// n2
-    head[4] = (szchunk >> 16) & 0xff;	// n3
-    head[5] =  0;	// n4	singola altezza
-    head[6] =  0;	// n5	scrive a n5 byte dal bordo
-    head[7] = szchunk;	// n6
-
-    for(int s = 0; s < sz; ) {
-        for(int i = 0; i < 103; i++)
-            tbm[i] = (rand() & 0x11);
-//        for(int n = 0; (n < 1000) && (m_port->status(false) & (1 << 3)); n++)
-//            ;
-//        m_port->status();
-        m_port->Pri_Str(head, 8, false);
-        m_port->Pri_Str(tbm, szchunk, false);
-        s += szchunk;
-    }
-
-    m_port->Pri_Font(1);
-    m_port->Pri_mode(0x00);
-    m_port->Pri_justif(F_left);
-    m_port->Pri_Str("\n\n", 2, true);
-
-    char txt1[] = "--fine test--\n";
-    m_port->Pri_Str(txt1, strlen(txt1), 0);
 }
 
 /**

@@ -8,31 +8,15 @@ printerserialport::printerserialport(QString __namefile, QObject *parent) : QObj
     if(m_file->exists())
         m_file->remove();
     m_file->open(QIODevice::WriteOnly);
-////    m_serialPort.setPortName("/dev/ttyUSB0");
-//    m_serialPort.setPortName("/dev/ttyS0");
-//    m_serialPort.setBaudRate(115200);
-//    m_serialPort.setFlowControl(QSerialPort::HardwareControl);
-//    m_serialPort.setParity(QSerialPort::NoParity);
-//    m_serialPort.setDataBits(QSerialPort::Data8);
-//    m_serialPort.setStopBits(QSerialPort::OneStop);
-
-//    if ( ! m_serialPort.open(QIODevice::ReadWrite))
-//        qWarning() << "Unable to open serial port";
+    qDebug() << "file aperto in scrittura:" << __namefile;
 }
-
-//void printerserialport::init_printer()
-//{
-//    system("/root/PicoFlow/initprinter.sh");
-//    Pri_Reset();
-////    Pri_Default();
-//    m_serialPort.flush();
-//}
 
 void printerserialport::closeSerialPort()
 {
     m_file->close();
     delete m_file;
     m_file = NULL;
+    qDebug() << "file chiuso in scrittura";
 }
 
 
@@ -48,11 +32,13 @@ bool printerserialport::Pri_Str(char *__str, int __str_len, bool __flag_lf)
     int sz = __str_len + (__flag_lf ? 1 : 0);
     char header[6] = { 0x5a, 0xa5, 0xa5, 0x5a, sz & 0xff, (sz >> 8) & 0xff };
 
-    m_file->write(header, sizeof(header));
-    m_file->write(__str, __str_len);
-    if(__flag_lf)
-        m_file->write(s, 1);
-    m_file->write(trailer, sizeof(trailer));
+    if(m_file->isOpen()) {
+        m_file->write(header, sizeof(header));
+        m_file->write(__str, __str_len);
+        if(__flag_lf)
+            m_file->write(s, 1);
+        m_file->write(trailer, sizeof(trailer));
+    }
 
     return true;
 }

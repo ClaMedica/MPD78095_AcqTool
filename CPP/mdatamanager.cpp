@@ -39,8 +39,8 @@ MDataManager::MDataManager(QObject *parent)
     setValVolRes(-999);
 #ifdef PICOFLOW
     connect(&udpConn, SIGNAL(receivedUdp(enum WHO, QByteArray)), this, SLOT(udpMdmBtDecode(WHO,QByteArray)));
-    connect(this, SIGNAL(udpMdmBtStatus(enum WHO, int)), this, SLOT(sendToPrint(enum WHO,int)));
-    connect(this, SIGNAL(udpMdmPrnStatus(enum WHO, int)), this, SLOT(sendToPrint(enum WHO,int)));
+//    connect(this, SIGNAL(udpMdmBtStatus(enum WHO, int)), this, SLOT(sendToPrint(enum WHO,int)));
+//    connect(this, SIGNAL(udpMdmPrnStatus(enum WHO, int)), this, SLOT(sendToPrint(enum WHO,int)));
 #endif
 }
 
@@ -67,7 +67,7 @@ void MDataManager::getGrabbedImage(QObject *gi, QString __nome)
     qDebug()<<"Immagine"<<__nome<<gi;
 #ifdef PICOFLOW
     if (__nome != "grafo")
-        m_mngPrint->getGrabbedImage(gi,nome);
+        m_mngPrint->getGrabbedImage(gi, __nome);
 #elif WIN32
     //grafo e nomogrammi
     QQuickItemGrabResult *item = qobject_cast<QQuickItemGrabResult *>(gi);
@@ -1360,36 +1360,36 @@ void MDataManager::udpMdmBtDecode(enum WHO __from, QByteArray __msg)
 void MDataManager::sendToPrint(enum WHO __from, int __val)
 {
 #ifdef PICOFLOW
-//    m_copyFileName
-//    BtUnkn = 0,
-//    BtQueryWait,    // bt in use: wait for query result
-//    Btno,           // bt not in use
-//    Btyes,          // bt in use
-//    BtOff,          // bt in use: stopped
-//    BtGoingDown,    // bt in use:
-//    BtGoingUp,      // bt in use:
-//    BtOn            // bt in use: connected
-    switch(m_BtMng) {
-    case BtUnkn:
-                        m_BtMng = BtQueryWait;
-                        udpConn.sendSup("testBt");
-                        break;
-    case BtQueryWait:
-                        if(__from == E_SUP) {
-                            if(__val == 'U') m_BtMng = Btyes;
-                            if(__val == 'N') m_BtMng = Btno;
-                        }
-                        break;
-    case Btno:
-    case Btyes:
-    case BtOff:
-    case BtGoingDown:
-    case BtGoingUp:
-    case BtOn:
-    case WaitPrnEnd:
-        break;
-    }
-    QTimer::singleShot(500, this, SLOT(sendToPrint()));
+////    m_copyFileName
+////    BtUnkn = 0,
+////    BtQueryWait,    // bt in use: wait for query result
+////    Btno,           // bt not in use
+////    Btyes,          // bt in use
+////    BtOff,          // bt in use: stopped
+////    BtGoingDown,    // bt in use:
+////    BtGoingUp,      // bt in use:
+////    BtOn            // bt in use: connected
+//    switch(m_BtMng) {
+//    case BtUnkn:
+//                        m_BtMng = BtQueryWait;
+//                        udpConn.sendSup("testBt");
+//                        break;
+//    case BtQueryWait:
+//                        if(__from == E_SUP) {
+//                            if(__val == 'U') m_BtMng = Btyes;
+//                            if(__val == 'N') m_BtMng = Btno;
+//                        }
+//                        break;
+//    case Btno:
+//    case Btyes:
+//    case BtOff:
+//    case BtGoingDown:
+//    case BtGoingUp:
+//    case BtOn:
+//    case WaitPrnEnd:
+//        break;
+//    }
+//    QTimer::singleShot(500, this, SLOT(sendToPrint()));
     m_mngPrint->print();
 #else
     QPrinter printer;
