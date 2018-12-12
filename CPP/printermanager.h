@@ -190,8 +190,6 @@ public:
     void getImage(QImage __img, QString __nome);
     void setPrintHeaders(QString __first, QString __second)     {m_printFirstHeader = __first; m_printSecondHeader = __second;}
 
-    //stampa una prova di esame
-    void printTest();
 signals:
 
 public slots:
