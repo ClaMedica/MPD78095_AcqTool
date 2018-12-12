@@ -1829,9 +1829,7 @@ void MDataManager::sendPrintTest()
 {
     qDebug() << "inizio stampa";
 #ifdef PICOFLOW
-     m_mngPrint = new printermanager();
-     m_mngPrint->printTest();
-     m_mngPrint->closePrinter();
+    udpConn.sendPrn("print:/root/PicoFlow/urodata/UDSData/printTest.prn");
 #endif
 }
 
