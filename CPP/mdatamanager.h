@@ -7,9 +7,9 @@
 #include "mflowdatas.h"
 #include "printermanager.h"
 #include <QQuickItemGrabResult>
-//#include <QPrinterInfo>
+#include <QPrinterInfo>
 #include "udpmsgs.h"
-//#include <QPrinter>
+#include <QPrinter>
 
 
 typedef struct {

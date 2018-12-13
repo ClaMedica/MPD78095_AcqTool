@@ -30,6 +30,7 @@ public:
 
 private:
     QFile  *m_file;
+    QString m_fileName;
 };
 
 #endif // PrinterSerialPort_H

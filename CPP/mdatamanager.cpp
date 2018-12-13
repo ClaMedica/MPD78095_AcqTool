@@ -967,6 +967,9 @@ void MDataManager::exitFromReview()
 {
     qDebug() << "Exit" << getToSave();
 
+    if (m_mngPrint != NULL)
+        m_mngPrint->closePrinter();
+
     //devo resettare il parametro di flusso automatico a false per non far partire sempre l'analisi in automatico all'apertura in review di un file
     Ancestry *autoflow = m_configUser.getSafeChild("AutomaticFlow");
     Ancestry *child = autoflow->getSafeChild("Auto");
@@ -979,7 +982,8 @@ void MDataManager::exitFromReview()
     }
 
     if (getToSave() == "ret") {
-        if (m_mngPrint != NULL) m_mngPrint->closePrinter();
+//        if (m_mngPrint != NULL)
+//            m_mngPrint->closePrinter();
         qDebug()<<"cancellata copia all'exit"<<QFile::remove(m_copyFileName);
         if(DebugAcqTool == false)
             g_mainAppBridge->sendSwitch();  //send(MEX_SHOW);
@@ -993,7 +997,8 @@ void MDataManager::exitFromReview()
         emit sg_exitFromReview();
     else
     {
-        if (m_mngPrint != NULL) m_mngPrint->closePrinter();
+//        if (m_mngPrint != NULL)
+//            m_mngPrint->closePrinter();
 
         if (getToSave() == "yes")
         {        //copio il file copy nell'originale

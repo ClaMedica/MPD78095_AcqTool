@@ -175,16 +175,16 @@ printermanager::printermanager(QString __namefile, QObject *parent) : QObject(pa
 
 printermanager::~printermanager()
 {
-    if (m_port != NULL)
-        m_port->closeSerialPort();
+    closePrinter();
 }
 
 void printermanager::closePrinter()
 {
-    m_port->closeSerialPort();
-    if (m_port != NULL)
+    if (m_port != NULL) {
+        m_port->closeSerialPort();
         delete m_port;
-    m_port = NULL;
+        m_port = NULL;
+    }
 }
 
 /**
@@ -239,12 +239,12 @@ void printermanager::print()
     pri_rep_review();	// qui va subito in stampa
 
 //    udpConn.sendPrn("print:" + m_namefilePrn.toLatin1());   // diretto
-    udpConn.sendSup("Print:" + m_namefilePrn.toLatin1());   // gateway
+    udpConn.sendSup("Print:" + m_namefilePrn.toLatin1());   // supe come gateway
 }
 
 void printermanager::pri_rep_review()
 {
-    qDebug("pri_rep_review()");
+    qDebug("pri_rep_review() start");
     int n_chEmg = 0, n_chFlw = 0, n_chVol = 0;
 
     m_dfm->Open();
@@ -387,6 +387,7 @@ void printermanager::pri_rep_review()
 
     Pri_Rep(xscale);
 //    Report_BitMap();
+    qDebug("pri_rep_review() end");
 }
 
 /**
@@ -532,6 +533,8 @@ void printermanager::Pri_Rep(double xscale)
     // fa avanzare la carta per consentire lo strappo
     int npix = (int) (25 / 0.125);
     m_port->Pri_forward(npix);
+
+    m_port->closeSerialPort();
 
 //    m_port->Pri_Reset();	// resetta RAM della stampante: equivale ad un reset HW
     qDebug() << "Pri_Rep FINE file:" << m_namefile;

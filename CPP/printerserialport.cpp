@@ -4,6 +4,7 @@
 
 printerserialport::printerserialport(QString __namefile, QObject *parent) : QObject(parent)
 {
+    m_fileName = __namefile;
     m_file = new QFile(__namefile);
     if(m_file->exists())
         m_file->remove();
@@ -13,10 +14,16 @@ printerserialport::printerserialport(QString __namefile, QObject *parent) : QObj
 
 void printerserialport::closeSerialPort()
 {
-    m_file->close();
-    delete m_file;
-    m_file = NULL;
-    qDebug() << "file chiuso in scrittura";
+    if(m_file != NULL) {
+        m_file->close();
+        qDebug() << "file size:" << m_fileName << m_file->size();
+        delete m_file;
+        m_file = NULL;
+        m_fileName = "===NO FILENAME===";
+        qDebug() << "file chiuso in scrittura";
+    }
+    else
+        qDebug() << "file GIA chiuso" << m_fileName;
 }
 
 

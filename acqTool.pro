@@ -2,6 +2,7 @@ TEMPLATE = app
 VERSION = 1.0.0.6
 
 QT += qml quick widgets sql network multimedia xml core serialport
+QT += printsupport
 
 RESOURCES += Resources/qml.qrc
 RESOURCES += Resources/Icone/icons.qrc
@@ -149,8 +150,6 @@ win32 {
 
     DISTFILES += ../MGlobal/MComponents/* \
                  ../MGlobal/MComponents/Images/*
-
-    QT += printsupport
 }
 
 unix {
