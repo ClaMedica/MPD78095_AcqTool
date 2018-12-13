@@ -122,9 +122,10 @@ public slots:
     void startPrint();
     void sendToPrint(enum WHO __from = E_NONE, int __val = -1);
     void udpMdmBtDecode(enum WHO __from, QByteArray __msg);
-
     void sendPrintTest();
-
+#ifndef PICOFLOW
+    void openReport();
+#endif
 
 private:
     QVector<MSignal *> m_signalVector;
@@ -139,6 +140,7 @@ private:
     m_fileName,
     m_copyFileName,
     m_pathData;
+    int m_testNumber;
 
     MSignal *m_pCurrentSignal;
 
@@ -188,6 +190,21 @@ private:
     bool InitArraysFLW(int __start, int __end, QVector<unsigned char> __chEn, int __curDef, unsigned char __auto);
     int ReadResult(int & __numEv);
     bool checkForVolRes();
+
+#ifndef PICOFLOW
+    //referto
+    QTimer* m_reportOpenedTimer;
+    QTimer* m_reportTimer;
+    bool m_winword;
+    QString m_nomeReferto;
+    bool checkReportFileOpen();
+
+private slots:
+    //per referto
+    void slot_checkReportOpened();
+    void slot_startReport();
+#endif
+
 };
 
 

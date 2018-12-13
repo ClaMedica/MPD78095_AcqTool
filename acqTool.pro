@@ -1,5 +1,5 @@
 TEMPLATE = app
-VERSION = 1.0.0.5
+VERSION = 1.0.0.6
 
 QT += qml quick widgets sql network multimedia xml core serialport
 
@@ -43,9 +43,7 @@ SOURCES += \
     ../AnaUro/analysis.cpp \
     ../AnaUro/anautils.cpp \
     ../MGlobal/fileio.cpp \
-    ../MGlobal/udpmsgs.cpp \
-    CPP/graficmanager.cpp \
-    ../MGlobal/spooler.cpp
+    CPP/graficmanager.cpp
 
 HEADERS += \
     CPP/alarmmanager.h \
@@ -81,8 +79,7 @@ HEADERS += \
     ../MGlobal/systemmanager.h \
     ../MGlobal/UdmImpl.h \
     ../MGlobal/fileio.h \
-    ../MGlobal/udpmsgs.h \
-    ../MGlobal/spooler.h
+
 
 INCLUDEPATH +=  CPP \
                 CPP/TCP \
@@ -91,7 +88,6 @@ INCLUDEPATH +=  CPP \
                 ../MPF78003-Picoflow2R3Supe \
                 ../DataFileManager \
                 ../SupeFlowBT
-                ../MedicalReport
 
 # Default rules for deployment.
 include(deployment.pri)
@@ -195,6 +191,14 @@ CLAUDIA {
     DEFINES += PICOFLOW
     TARGET = PicoAcq
 
+    SOURCES += \
+        ../MGlobal/spooler.cpp \
+        ../MGlobal/udpmsgs.cpp
+
+    HEADERS *= \
+        ../MGlobal/spooler.h \
+        ../MGlobal/udpmsgs.h
+
     RESOURCES += modules_picoflow.qrc
 
     LIBS        += -L/sviluppo/qt/Piattaforma70/Build-IMX6/DatafileManager/ -lDatafileManager
@@ -212,6 +216,14 @@ PICOFLOW {
     QMAKE_CXXFLAGS += -Wno-psabi
     DEFINES += PICOFLOW
     TARGET = PicoAcq
+
+    SOURCES += \
+        ../MGlobal/spooler.cpp \
+        ../MGlobal/udpmsgs.cpp
+
+    HEADERS *= \
+        ../MGlobal/spooler.h \
+        ../MGlobal/udpmsgs.h
 
     RESOURCES += modules_picoflow.qrc
 

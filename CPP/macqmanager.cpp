@@ -48,7 +48,7 @@ MAcqManager::MAcqManager(QObject *parent)
 //        qCritical() << "Error on alarm configuration file";
 //    qDebug("tutto");
 
-    #ifdef PICOFLOW
+#ifdef PICOFLOW
     QTimer::singleShot(2000, this, SLOT(connectToServers()));
 
     //connetto il gestore degli allarmi alla proprietA  alarms

@@ -229,7 +229,7 @@ MForm {
                     SQM.udmY =  mngData.getFlowDatas(i).getSirokyMax().getUnity()
                     SQM.tracksWidth = [1,2,1,1]
                     SQM.traksToDraw =  mngData.getFlowDatas(i).getSirokyMax().getTracce()
-                    SQM.tracksColors =  mngData.getFlowDatas(i).getSirokyMax().getColors()
+                    SQM.tracksColors =  mngData.getFlowDatas(i).getSirokyMax().getColors()                    
                     SQM.drawTracks()
                     //bande colorate
                     SQM.numBande = 2
@@ -365,19 +365,31 @@ MForm {
         width: screenW*grafic.valueOf("Button","width")
         height: screenH*grafic.valueOf("Button","height")
         labelSize: grafic.valueOf("Button","labelSize")
+        visible: PicoFlow ? true : false
         onClicked: {
-            if (PicoFlow)
-            {
-                if(timBtAvail) {
-                    timBtAvail = false
-                    if(btStopped == false) {
-                        btStopped = true
-                    }
-                    timStopBT.start()
+            if(timBtAvail) {
+                timBtAvail = false
+                if(btStopped == false) {
+                    btStopped = true
                 }
+                timStopBT.start()
             }
-            else
-                mngData.sendToPrint()
+        }
+    }
+
+    MButton{
+        id: btnReport
+        text: qsTr("report")
+        anchors.left: parent.left
+        anchors.bottom: parent.bottom
+        anchors.bottomMargin: 10
+        anchors.leftMargin: 10
+        width: screenW*grafic.valueOf("Button","width")
+        height: screenH*grafic.valueOf("Button","height")
+        labelSize: grafic.valueOf("Button","labelSize")
+        visible: PicoFlow ? false : true
+        onClicked: {
+            mngData.openReport()
         }
     }
 

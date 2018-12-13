@@ -408,11 +408,28 @@ Rectangle {
         }
     }
 
+    ShaderEffectSource {
+        id: sourceImg
+               width: rootPlot.width
+               height: rootPlot.height
+               sourceItem: rootPlot
+           }
+
+    //C.F: in caso di window c'è un problema nella grabToImage che fa perdere le immagini (forse memoryleak)
+    //ho trovato online una soluzione funzionante, passare per una ShaderEffectSource,
+    //anche se perdiamo in qualità dell'immagine sembra funzionare
     Component.onCompleted: {
+        if (PicoFlow)
             rootPlot.grabToImage(
-                    function(result) { mngData.getGrabbedImage(result, nome); },
+                    function(result) {mngData.getGrabbedImage(result, nome); },
+                    Qt.size(400,300)
+                    )
+        else
+            sourceImg.grabToImage(
+                    function(result) {mngData.getGrabbedImage(result, nome); },
                     Qt.size(400,300)
                     )
     }
+
 }
 
