@@ -163,7 +163,7 @@ void MDataManager::loadFile(QString __fileName)
 
     m_fileName = __fileName;
     QString path = m_fileName.left(m_fileName.lastIndexOf("\\"));
-    m_pathData = path.left(path.lastIndexOf("\\")+1);
+    m_pathData = path.left(path.lastIndexOf("/")+1);
 
     //la prima volta che salvo mi faccio la copia del file originale
     m_copyFileName = m_fileName;
@@ -1355,7 +1355,7 @@ void MDataManager::startPrint()
         sendToPrint();
 
 #else
-    //le immagini vanno salvata dentro un file .xml nella stessa cartella degli esami: an000001a.xml
+    //le immagini vanno salvate dentro un file .xml nella stessa cartella degli esami: an000001a.xml
     //e poi cancellate
     QDir dirImgs(m_pathData);
     QStringList filesList = dirImgs.entryList(QStringList("*.jpg"),QDir::Files);
@@ -1365,7 +1365,6 @@ void MDataManager::startPrint()
     testnumber = QString("%1").arg(m_testNumber,5,10,QLatin1Char('0'));
 
     QString path = m_pathData;
-    path.append("UDSData\\");
     path.append("temp");
     path.append(testnumber);
     path.append(".xml");

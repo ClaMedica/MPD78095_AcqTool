@@ -68,13 +68,29 @@ MForm{
         mngCon.read()
     }
 
+
     function printImagePlot()
     {
-        plot.grabToImage(
-                    function(result) { mngData.getGrabbedImage(result, "grafo"); },
-                    Qt.size(600,400)
-                    )
+        timeGrabImage.start()
     }
+
+    Timer {
+        id:timeGrabImage
+        interval: 2000
+        repeat: true
+        onTriggered: {
+            if (plot.visible)
+            {
+                timeGrabImage.stop()
+                plot.grabToImage(
+                            function(result) { mngData.getGrabbedImage(result, "grafo"); },
+                            Qt.size(600,400)
+                            )
+            }
+        }
+    }
+
+
 
     //@@@@@@@@@@    Objects     @@@@@@@@@@
 
@@ -95,7 +111,9 @@ MForm{
             if(completed)
                 mngData.changeObject(curObj)
         }
+
     }
+
     MLabel{
         id: lbNamePat
         clip:true

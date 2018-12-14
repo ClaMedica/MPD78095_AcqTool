@@ -410,10 +410,10 @@ Rectangle {
 
     ShaderEffectSource {
         id: sourceImg
-               width: rootPlot.width
-               height: rootPlot.height
-               sourceItem: rootPlot
-           }
+        width: rootPlot.width
+        height: rootPlot.height
+        sourceItem: rootPlot
+    }
 
     //C.F: in caso di window c'è un problema nella grabToImage che fa perdere le immagini (forse memoryleak)
     //ho trovato online una soluzione funzionante, passare per una ShaderEffectSource,
