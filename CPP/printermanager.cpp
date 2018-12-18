@@ -238,8 +238,10 @@ void printermanager::print()
 
     pri_rep_review();	// qui va subito in stampa
 
+#ifdef PICOFLOW
 //    udpConn.sendPrn("print:" + m_namefilePrn.toLatin1());   // diretto
     udpConn.sendSup("Print:" + m_namefilePrn.toLatin1());   // gateway
+#endif
 }
 
 void printermanager::pri_rep_review()
