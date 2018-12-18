@@ -53,7 +53,6 @@ MAcqManager::MAcqManager(QObject *parent)
 
     //connetto il gestore degli allarmi alla proprietA  alarms
     connect(&m_alarmMng, SIGNAL(alarmsUpdated(QVariantList)), this, SLOT(setAlarms(QVariantList)));
-//#ifdef PICOFLOW
     connect(&udpConn, SIGNAL(receivedUdp(enum WHO, QByteArray)), this, SLOT(udpBtDecode(WHO,QByteArray)));
     udpConn.iAmAcq();
     udpConn.sendSup("hello from acq");

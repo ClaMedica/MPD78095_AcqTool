@@ -185,13 +185,10 @@ public:
     void setTipoEsame(unsigned char __val)  {m_test_type = __val;}
 
     void Report_BitMap(bool __isSiro = false);
-    void Report_BitMap_test();
     void getGrabbedImage(QObject *__gi, QString __nome);
     void getImage(QImage __img, QString __nome);
     void setPrintHeaders(QString __first, QString __second)     {m_printFirstHeader = __first; m_printSecondHeader = __second;}
 
-    //stampa una prova di esame
-    void printTest();
 signals:
 
 public slots:
@@ -200,6 +197,7 @@ private:
     printerserialport *m_port;
 
     QString m_namefile;
+    QString m_namefilePrn;
     DatafileManager *m_dfm;
 
     bool m_printMode;
@@ -230,10 +228,6 @@ private:
     int m_num_sam; //numero campioni minimo nas (vol)
 
     //dati risultati analisi
-
-
-
-
     float  m_tem_att;              /* Tempo di Attesa          (Decimi di Sec) */
     float  m_flu_max;              /* Flusso Massimo           (ml/sec)        */
     float  m_flu_med;              /* Flusso Medio             (ml/sec)        */
@@ -314,7 +308,6 @@ private:
     void print_char_left_label(short __value, int __pos_in_string, short int __num_char, bool __pri_decim, short int __pre_char);
     void print_udm_label(int __ch_type, short __pos_in_string, short int __pre_char);
     bool check_stamp_label();
-
 
 };
 

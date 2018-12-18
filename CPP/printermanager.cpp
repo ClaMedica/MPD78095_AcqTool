@@ -1,5 +1,7 @@
 ﻿
 #include "printermanager.h"
+#include "udpmsgs.h"
+#include "spooler.h"
 
 //const char str_label_time_old[29][68]={
 //    "   0    3     6     9    12    15    18    21    24    27   30s",
@@ -123,7 +125,9 @@ const unsigned char  SD[2][4][20] = {
 
 printermanager::printermanager(QString __namefile, QObject *parent) : QObject(parent)
 {
-    m_namefile = __namefile;
+    m_namefile    = __namefile;
+    m_namefilePrn = __namefile.remove("_copy").remove(".pic").append(".prn");
+    qDebug() << m_namefilePrn;
 
     m_dfm = new DatafileManager();
     m_dfm->SetFileName(m_namefile);
@@ -150,8 +154,7 @@ printermanager::printermanager(QString __namefile, QObject *parent) : QObject(pa
     m_printFirstHeader = "";
     m_printSecondHeader = "";
 
-    m_port = new printerserialport(this);
-//    m_port->init_printer();
+    m_port = new printerserialport(m_namefilePrn, this);
 
     m_resultBm_w = 824; // 103 bytes * 8 bit
     m_resultBm_h = 300;
@@ -172,9 +175,8 @@ printermanager::printermanager(QString __namefile, QObject *parent) : QObject(pa
 
 printermanager::~printermanager()
 {
-    m_port->closeSerialPort();
     if (m_port != NULL)
-        delete m_port;
+        m_port->closeSerialPort();
 }
 
 void printermanager::closePrinter()
@@ -182,6 +184,7 @@ void printermanager::closePrinter()
     m_port->closeSerialPort();
     if (m_port != NULL)
         delete m_port;
+    m_port = NULL;
 }
 
 /**
@@ -234,6 +237,9 @@ void printermanager::print()
     m_dfm->Close();
 
     pri_rep_review();	// qui va subito in stampa
+
+//    udpConn.sendPrn("print:" + m_namefilePrn.toLatin1());   // diretto
+    udpConn.sendSup("Print:" + m_namefilePrn.toLatin1());   // gateway
 }
 
 void printermanager::pri_rep_review()
@@ -455,11 +461,12 @@ void printermanager::Pri_Rep(double xscale)
 
 
     //      Intestazione
+    qDebug() << "Pri_Rep file:" << m_namefile;
     Intest();
 
     //     Identificativi Esame
     Report_data();		// scrive i dati del paziente e lo spazio per le note manuali
-    m_port->Pri_Str(2, LINE2, 0);
+    m_port->Pri_Str(LINE2, 2, false);
 
     // Grafico FLW + VOL ed eventualmente EMG
     if(m_printMode == PORTRAIT_MODE)			// grafico trasversale con numero di punti fisso
@@ -486,7 +493,7 @@ void printermanager::Pri_Rep(double xscale)
             QString strToWrite = tr("! Examination longer than 5 minutes");
             char str[60];
             sprintf( str, "%s\n", strToWrite.toLatin1().data());
-            m_port->Pri_Str( strlen(str), str, 1 );
+            m_port->Pri_Str(str, strlen(str), true );
             m_port->Pri_justif(2);	// bandiera a sinistra
         }
 #endif
@@ -516,7 +523,7 @@ void printermanager::Pri_Rep(double xscale)
     // 	Risultati dell'esame ricavati dall'analisi semplificata, implementata nel firmware
     Report_result();		// scrive in elenco i dati calcolati dall'analisi dell'esame
     //m_port->status();
-    m_port->Pri_Str(2, LINE2, 0); // LINE"\x3",0);
+    m_port->Pri_Str(LINE2, 2, false); // LINE"\x3",0);
 
     //	Scrive i dati riguardanti versione firmware e date/ora ultima calibrazione
        //m_port->Pri_justif(F_center);
@@ -527,6 +534,7 @@ void printermanager::Pri_Rep(double xscale)
     m_port->Pri_forward(npix);
 
 //    m_port->Pri_Reset();	// resetta RAM della stampante: equivale ad un reset HW
+    qDebug() << "Pri_Rep FINE file:" << m_namefile;
 }
 
 
@@ -535,7 +543,7 @@ E' stampata l'intestazione del report, con intestazione clinica, logo and so on
 */
 void printermanager::Intest()
 {
-    m_port->Pri_Str(2, LINE2, 0); // LINE"\x1",0);  			// scrive una riga vuota
+    m_port->Pri_Str(LINE2, 2, false); // LINE"\x1",0);  			// scrive una riga vuota
     m_port->Pri_justif(F_center);				// scrittura al centro
     m_port->Pri_Font(1);						// font 12x20
     m_port->Pri_mode(0x30);						// modo doppia dimensione non sottolienata
@@ -543,18 +551,18 @@ void printermanager::Intest()
     char str[60];
     QString ditta_pers = m_printFirstHeader;
     sprintf( str, "%s\n", ditta_pers.toLatin1().data());
-    m_port->Pri_Str(strlen(str), str, 0);			// a capo con il "\n"
+    m_port->Pri_Str(str, strlen(str), false);			// a capo con il "\n"
 
     m_port->Pri_mode(0x14);						// modo altezza doppia larghezza quadrupla
     QString logo = m_printSecondHeader;
     sprintf( str, "%s", logo.toLatin1().data());
-    m_port->Pri_Str(strlen(str), str, 1);			// a capo con il "\n"
+    m_port->Pri_Str(str, strlen(str), true);			// a capo con il "\n"
 
     m_port->Pri_Font(1); 						// font 12x20
     m_port->Pri_mode(0x90);						// modo altezza doppia sottolineata
     QString msg_title = tr("Urodynamic Equipment");
     sprintf( str, "%s\n", msg_title.toLatin1().data());
-    m_port->Pri_Str(strlen(str), str, 0);			// a capo con il "\n"
+    m_port->Pri_Str(str, strlen(str), false);			// a capo con il "\n"
 
     m_port->Pri_mode(0);
 }
@@ -568,7 +576,7 @@ void printermanager::Report_data()
 
     m_port->Pri_mode(0x00); 					// modo default
     m_port->Pri_justif(F_left);					// tutto a sinistra
-    m_port->Pri_Str(2, LINE2, 0); 	// scrive una riga vuota
+    m_port->Pri_Str(LINE2, 2, false); 	// scrive una riga vuota
 
     m_port->Pri_Font(1);							// font 12x20
 
@@ -579,12 +587,12 @@ void printermanager::Report_data()
     strToWrite = tr("Test Number ....:");
     sprintf( str, " %s %s\n", strToWrite.toLatin1().data(), QString::number(m_numTest).toLatin1().data());
 
-    m_port->Pri_Str(strlen(str),str,0);
+    m_port->Pri_Str(str, strlen(str), false);
 
     strToWrite = tr("Test Date ......:");
     sprintf(str," %s %s\n", strToWrite.toLatin1().data(), m_dateofexam.toLatin1().data());
 
-    m_port->Pri_Str(strlen(str), str, 0);
+    m_port->Pri_Str(str, strlen(str), false);
 
     // cognome
     strToWrite = tr("Surname ........:");
@@ -592,7 +600,7 @@ void printermanager::Report_data()
         sprintf( str, " %s %s", strToWrite.toLatin1().data(), puntini);
     else
         sprintf( str, " %s %s\n", strToWrite.toLatin1().data(), m_surname.toLatin1().data());
-    m_port->Pri_Str(strlen(str), str, 0);
+    m_port->Pri_Str(str, strlen(str), false);
 
     // nome
     strToWrite = tr("Name ...........:");
@@ -600,7 +608,7 @@ void printermanager::Report_data()
         sprintf( str, " %s %s", strToWrite.toLatin1().data(), puntini);
     else
         sprintf( str, " %s %s\n", strToWrite.toLatin1().data(), m_name.toLatin1().data());
-    m_port->Pri_Str(strlen(str),str,0);
+    m_port->Pri_Str(str, strlen(str), false);
 
     // data di nascita stampata nei due formati: uno per ita e spa e uno per eng
     strToWrite = tr("Birth Date .....:");
@@ -609,35 +617,35 @@ void printermanager::Report_data()
     else
         sprintf(str," %s %s\n",strToWrite.toLatin1().data(), m_dateofbirth.toLatin1().data());
 
-    m_port->Pri_Str(strlen(str), str, 0);
+    m_port->Pri_Str(str, strlen(str), false);
 
     // sesso
     strToWrite = tr("Gender .........:");
     if(m_test_type){
         sprintf( str, " %s %s", strToWrite.toLatin1().data(), puntini );
-        m_port->Pri_Str(strlen(str), str, 0);
+        m_port->Pri_Str(str, strlen(str), false);
     }
     else {
         sprintf( str, " %s %c", strToWrite.toLatin1().data(), m_sex );
-        m_port->Pri_Str(strlen(str), str, 1);
+        m_port->Pri_Str(str, strlen(str), true);
     }
 
     // operatore
     strToWrite = tr("Investigator ...:");
     sprintf( str, " %s %s", strToWrite.toLatin1().data(), puntini );
-    m_port->Pri_Str(strlen(str), str, 0);
+    m_port->Pri_Str(str, strlen(str), false);
 
     // commenti
     strToWrite = tr("Comments .......:");
     sprintf( str, " %s %s", strToWrite.toLatin1().data(), puntini );
-    m_port->Pri_Str( strlen( str ), str, 0);
+    m_port->Pri_Str(str, strlen(str), false);
     for (int i = 0; i < 3; i++)	{	// tre righe vuote per eventuali commenti
-        m_port->Pri_Str( 19, (char *)space_bar, 0 );
+        m_port->Pri_Str((char *)space_bar, 19, false );
         strcpy(str, puntini);
-        m_port->Pri_Str( strlen(str), str, 0);
+        m_port->Pri_Str(str, strlen(str), false);
     }
 
-    m_port->Pri_Str(2, LINE2, 0); //riga vuota
+    m_port->Pri_Str(LINE2, 2, false); //riga vuota
 
     // scritta relativa al tipo di modalita
     if(m_modal_e == 2) {
@@ -649,7 +657,7 @@ void printermanager::Report_data()
             strToWrite = tr("AUTOMATIC  MODALITY ");
             sprintf( str, " %s\n", strToWrite.toLatin1().data() );
         }
-    m_port->Pri_Str( strlen(str), str, 0 );
+    m_port->Pri_Str(str, strlen(str), false);
 
     m_port->Pri_Intensity(0x80);		// intensita di default
 }
@@ -674,7 +682,7 @@ void printermanager::Report_flw(double xscale)
     char str[90];
     sprintf( str,strToWrite.toLatin1().data());
 
-    m_port->Pri_Str( strlen(str), str, 1 );
+    m_port->Pri_Str(str, strlen(str), true);
 
     // label solo su righe pari
     for(int i = 0; i < 10; i++ ) {                       /* scompone la griglia in 10 righe*/
@@ -683,9 +691,9 @@ void printermanager::Report_flw(double xscale)
 
     m_port->Pri_mode(0x00);
     m_port->Pri_Font(1);
-    m_port->Pri_Str(strlen(str_label_time[m_i_max_x]), (char *)str_label_time[m_i_max_x], 1);
+    m_port->Pri_Str((char *)str_label_time[m_i_max_x], strlen(str_label_time[m_i_max_x]), true);
 
-    m_port->Pri_Str(2, LINE2, 0); // modifica per risparm carta e tempo: da riattivare
+    m_port->Pri_Str(LINE2, 2, false); // modifica per risparm carta e tempo: da riattivare
 }
 
 /**
@@ -967,7 +975,7 @@ void printermanager::Pri_Rep_Gra(int __num_riga)
     Str_Trasposta(0, CLS, CLD); // fa la trasposta di m_str_gr che e' costruita per colonne mentre noi si stampa per righe
 
     // finalmente stampa
-//    m_port->Pri_Str( (LCMD + CLS*24 + m_uw3 + CLD*24), (char *)m_str_gr, 0);
+//    m_port->Pri_Str((char *)m_str_gr, (LCMD + CLS*24 + m_uw3 + CLD*24), false);
 
     // bitmap completa spezzata in
     // una riga di bit per volta
@@ -980,7 +988,7 @@ void printermanager::Pri_Rep_Gra(int __num_riga)
     char  * p = m_str_gr + LCMD;    // ptr a bitmap
     for(int i = 0; i < sz; ) {
         memcpy(tbuf+LCMD, p, ByteXline);
-        m_port->Pri_Str(sizeof(tbuf), tbuf, 0);
+        m_port->Pri_Str(tbuf, sizeof(tbuf), false);
         i += ByteXline;
         p += ByteXline;
     }
@@ -1194,15 +1202,15 @@ void printermanager::Report_emg()
     char str[60];
     QString emg_title = tr(" EMG Diagram ");
     sprintf(str,"   EMG ( uV )              %s\n",emg_title.toLatin1().data());
-    m_port->Pri_Str(strlen(str), str, 0);
+    m_port->Pri_Str(str, strlen(str), false);
 
     for(int i = 0; i < 10; i++)          /*scompone la griglia in 10 righe*/
         Pri_Rep_Gra_EMG( i );
 
     m_port->Pri_mode(0);
     m_port->Pri_Font(1);
-    m_port->Pri_Str( strlen(str_label_time[m_i_max_x]), (char *) str_label_time[m_i_max_x], 1);
-    m_port->Pri_Str(2, LINE2, 0); // LINE"\x1", 0 );// spazio singolo
+    m_port->Pri_Str((char *) str_label_time[m_i_max_x], strlen(str_label_time[m_i_max_x]), true);
+    m_port->Pri_Str(LINE2, 2, false); // LINE"\x1", 0 );// spazio singolo
 }
 
 void printermanager::Calc_Max_EMG()
@@ -1328,7 +1336,7 @@ void printermanager::Pri_Rep_Gra_EMG(int __num_riga)
 
     Str_Trasposta( 0, CLS, CLD ); // fa la trasposta di str_gr che e costruita per colonne mentre noi si stampa per righe
 
-    m_port->Pri_Str( ( LCMD + a_emg ), (char *)m_str_gr, 0 );
+    m_port->Pri_Str((char *)m_str_gr, LCMD + a_emg, false );
 }
 
 
@@ -1590,7 +1598,7 @@ void printermanager::Report_Real_Time(short __num_sample, double xscale)
     Pri_Rep_asse_dx();
     m_port->Pri_mode(0x00);
     m_port->Pri_Font(1);
-    m_port->Pri_Str(2, LINE2, 0);
+    m_port->Pri_Str(LINE2, 2, false);
 }
 
 
@@ -1734,7 +1742,7 @@ void printermanager::Pri_Rep_Label()
         m_str_gr[ _NUM_BYTE_CMD + str_byte ] = m_str_tr[ str_byte ];
 
     // finalmente stampa
-    m_port->Pri_Str( dim_string_rel2, (char *)m_str_gr, 0);
+    m_port->Pri_Str((char *)m_str_gr, dim_string_rel2, false);
 
 }
 
@@ -2292,7 +2300,7 @@ void printermanager::Pri_Rep_Gra_Landscape(short __num_sample, double xscale)
         m_str_gr[ _NUM_BYTE_CMD + i ] = m_str_tr[ i ];
 
     // finalmente stampa
-    m_port->Pri_Str( (dim_string_gr), (char *)m_str_gr, 0);
+    m_port->Pri_Str((char *)m_str_gr, dim_string_gr, false);
 //qDebug("dopo Pri_str");
 }
 
@@ -2390,53 +2398,8 @@ void printermanager::Pri_Rep_asse_dx()
         m_str_gr[ _NUM_BYTE_CMD + str_byte ] = m_str_tr[ str_byte ];
 
     // finalmente stampa
-    m_port->Pri_Str( dim_string_solo_ax, (char *)m_str_gr, 0);
+    m_port->Pri_Str((char *)m_str_gr, dim_string_solo_ax, false);
 
-}
-
-void printermanager::Report_BitMap_test()
-{
-//    m_port->init_printer();
-//    m_port->Pri_Speed(1);
-//    int sp = 1000;
-//    m_port->Pri_Max_Speed((sp >> 8) & 0xff, sp & 0xff);
-
-    char txt0[] = "--iniz test--\n";
-    m_port->Pri_Str(strlen(txt0), txt0, 0);
-
-    int     szchunk = 103;  // 824/8
-    char tbm[103];
-    char    head[8];
-    int     sz = szchunk*100;
-
-    head[0] = ESC;	//0x1B;	// ESC
-    head[1] = '*';	//0x2A;	// *
-    head[2] = szchunk         & 0xff;	// n1
-    head[3] = (szchunk >>  8) & 0xff;	// n2
-    head[4] = (szchunk >> 16) & 0xff;	// n3
-    head[5] =  0;	// n4	singola altezza
-    head[6] =  0;	// n5	scrive a n5 byte dal bordo
-    head[7] = szchunk;	// n6
-
-    for(int s = 0; s < sz; ) {
-        for(int i = 0; i < 103; i++)
-            tbm[i] = (rand() & 0x11);
-//        for(int n = 0; (n < 1000) && (m_port->status(false) & (1 << 3)); n++)
-//            ;
-//        m_port->status();
-        m_port->Pri_Str(8, head, 0);
-        m_port->Pri_Str(szchunk, tbm, 0);
-        s += szchunk;
-    }
-
-    m_port->Pri_Font(1);
-    m_port->Pri_mode(0x00);
-    m_port->Pri_justif(F_left);
-    QString xxx = tr("\n\n");
-    m_port->Pri_Str(strlen(xxx.toLatin1().data()), xxx.toLatin1().data(), 1);
-
-    char txt1[] = "--fine test--\n";
-    m_port->Pri_Str(strlen(txt1), txt1, 0);
 }
 
 /**
@@ -2475,9 +2438,7 @@ void printermanager::Report_BitMap(bool __isSiro)
         //for(int n = 0; (n < 1000) && (m_port->status(false) & (1 << 3)); n++);
         //m_port->status(false);
         memcpy(head+8, p, szchunk);
-//        m_port->Pri_Str(8, head, 0);
-//        m_port->Pri_Str(szchunk, p, 0);
-        m_port->Pri_Str(8+szchunk, head, 0);
+        m_port->Pri_Str(head, 8+szchunk, false);
         p += szchunk;
         s += szchunk;
     }
@@ -2485,7 +2446,7 @@ void printermanager::Report_BitMap(bool __isSiro)
     m_port->Pri_Font(1);
     m_port->Pri_mode(0x00);
     m_port->Pri_justif(F_left);
-    m_port->Pri_Str(2, LINE2, 1);
+    m_port->Pri_Str(LINE2, 2, true);
     qDebug("fine pr bitm");
 }
 
@@ -2498,7 +2459,7 @@ void printermanager::Report_result()
     m_port->Pri_mode(0x10);
     m_port->Pri_justif(F_center);
     QString flures = tr("Flowmetry Results");
-    m_port->Pri_Str(strlen(flures.toLatin1().data()), flures.toLatin1().data(), 1);
+    m_port->Pri_Str(flures.toLatin1().data(), strlen(flures.toLatin1().data()), true);
 
     m_port->Pri_justif(F_left);
     // tolgo l'accapo automatico della Pri_Rep_Lin e lo metto manuale
@@ -2566,9 +2527,7 @@ void printermanager::Pri_Rep_Lin(char *__str_des, int __rep_dat, unsigned char _
             sprintf(str2,"%u.%1u", __rep_dat / uw, __rep_dat % uw);
         }
     }
-    sprintf(m_str_gr, "  %s", __str_des);		// allontano la riga dal bordo sinistro di 2 spazi
-
-    strcat(m_str_gr," :");
+    sprintf(m_str_gr, "  %s :", __str_des);		// allontano la riga dal bordo sinistro di 2 spazi
 
     char space_bar[21] = "                    ";
     if (strlen(str2) > 5) {// quando esami lunghissimi, si puo arrivare a lavorare con valori in migliaia di secondi e col decimale la stringa e lunga 6
@@ -2581,7 +2540,7 @@ void printermanager::Pri_Rep_Lin(char *__str_des, int __rep_dat, unsigned char _
     strcat(m_str_gr, str2);
     strcat(m_str_gr, "  ");
     strcat(m_str_gr, __str_udm);
-    m_port->Pri_Str(strlen(m_str_gr),m_str_gr,__flag_lf);
+    m_port->Pri_Str(m_str_gr, strlen(m_str_gr), (__flag_lf == 1));
 }
 
 // conversione da RGB 8*3 = 24 bit a RGB 4*3 = 12 bit
@@ -2695,178 +2654,3 @@ void printermanager::getImage(QImage __img, QString __nome)
     free(bm);
     qDebug("fine getGrabbed, nblack:%d", nblack);
 }
-
-
-#include "global.h"
-#include "p7settingsmanager.h"
-#include "ancestry.h"
-#include "bitmapsv.h"
-
-void printermanager::printTest()
-{
-    QDir dir("/root/PicoFlow/urodata/UDSData");
-    //se esiste
-    QFileInfoList entries = dir.entryInfoList(QDir::NoDotAndDotDot | QDir::Files);
-    for(QList<QFileInfo>::iterator it = entries.begin(); it!=entries.end();++it)
-    {
-        QFileInfo &finfo = *it;
-        if (finfo.fileName().endsWith(".pic") )
-        {
-            m_namefile = "/root/PicoFlow/urodata/UDSData/"+finfo.fileName();
-            break;
-        }
-    }
-
-    qDebug()<<"file name"<<m_namefile;
-
-    m_printMode = PORTRAIT_MODE;
-
-    m_realDots = 0;
-
-    m_modal_e = 0;
-    m_numTest = -1;
-    m_test_type = false;
-    m_emgPresent = false;
-    m_i_max_x = -1;
-    m_max_y = -1;
-    m_uw3 = 1;
-    m_cursore = 0;
-
-    m_chVol = -1;
-    m_chFlw = -1;
-    m_chEmg = -1;
-
-    m_resultBm_w = 824; // 103 bytes * 8 bit
-    m_resultBm_h = 300;
-
-    m_bitmapSiroky.resize((m_resultBm_w * m_resultBm_h) / 8);
-    m_bitmapLiverpool.resize((m_resultBm_w * m_resultBm_h) / 8);
-    m_bitmapSiroky.fill(0);
-    m_bitmapLiverpool.fill(0);
-
-    buffer_emg = NULL;
-    buffer_flw = NULL;
-    buffer_vol = NULL;
-
-    m_port = new printerserialport(this);
-//    m_port->init_printer();
-
-    QString configPrinterS = g_P7SettingsManager.printerSettings();
-    if(!QFile::exists(configPrinterS))
-        configPrinterS = ":/Config/Config_Printer.xml";
-    Ancestry configPrinter;
-    configPrinter.erase();
-    if(!configPrinter.loadFromXML(configPrinterS))
-        qCritical() << "Error on user configuration file";
-
-    Ancestry *siroky = configPrinter.getSafeChild("Settings");
-    m_printSiroky = (siroky->getSafeChild("Siroky")->getSafeAttribute(ATT_VALUE) == "true" ? true : false);
-
-    Ancestry *liverpool = configPrinter.getSafeChild("Settings");
-    m_printLiverpool = (liverpool->getSafeChild("Liverpool")->getSafeAttribute(ATT_VALUE) == "true" ? true : false);
-
-    Ancestry *printmode = configPrinter.getSafeChild("Settings");
-    m_printModeUser = (printmode->getSafeChild("PrinterMode")->getSafeAttribute(ATT_VALUE) == "true" ? true : false);
-
-    Ancestry *head1 = configPrinter.getSafeChild("Headers");
-    m_printFirstHeader = head1->getSafeChild("First")->getSafeAttribute(ATT_VALUE);
-
-    Ancestry *head2 = configPrinter.getSafeChild("Headers");
-    m_printSecondHeader = head2->getSafeChild("Second")->getSafeAttribute(ATT_VALUE);
-
-    if (m_printLiverpool || m_printSiroky) //devo caricare l'immagine salvata in "bitmapsv.h"
-    {
-         QString imgHex(fixedbm);
-         imgHex = imgHex.mid(8);
-         QByteArray ArrayVal = QByteArray::fromHex(imgHex.toLatin1());
-         QImage img;
-         img.loadFromData(ArrayVal);
-
-         if (m_printLiverpool)
-         {
-             getImage(img,"Liverpool Qmax");
-             getImage(img,"Liverpool Ave");
-         }
-         if (m_printSiroky)
-         {
-             getImage(img,"Siroky Qmax");
-             getImage(img,"Siroky Ave");
-         }
-    }
-
-    m_dfm = new DatafileManager();
-    m_dfm->SetFileName(m_namefile);
-    m_dfm->SetFileType(7);
-
-    //dati paziente e esame
-    m_dfm->Open();
-    m_dfm->GetParameters();
-    //paziente
-    m_name = "Stampa";//m_dfm->GetPatient().section(";", 0, 0);
-    m_surname = "Test";//m_dfm->GetPatient().section(";", 1, 1);
-    m_dateofbirth = "01/01/2000";//m_dfm->GetPatient().section(";", 2, 2);
-    m_sex = QString("M").data()->toLatin1();//*( m_dfm->GetPatient().section(";", 12, 12).toLatin1().data());
-    m_ID = "1";//m_dfm->GetPatient().section(";", 3, 3);
-    //esame
-    m_numchan = m_dfm->GetChanNum();
-    m_numTest = m_dfm->GetTestNum();
-
-    m_dateofexam = "12/12/2012";//dateExam.toString("dd/MM/yyyy");
-
-    QTime time = QTime(0,0,0).addSecs(m_dfm->GetStartTime());
-    m_timeofstart = time.toString();	//ora inizio esame
-
-    m_durata = m_dfm->GetDuration() / 1000; //in sec
-
-    //risultati esami
-    m_tem_att = 7.5;
-    m_flu_max = 40.0;
-    m_flu_med = 15.0;
-    m_tem_max = 6.7;
-    m_tem_595 = 6.6;
-    m_tem_svu = 8.7;
-    m_tem_flu = 8.8;
-    m_tem_dis = 0.8;
-    m_flu_acc = 6.0;
-    m_vol_max = 99.6;
-    m_vol_vuo = 132.0;
-    m_modal_e = 0;
-
-    if(m_printModeUser)
-        m_printMode = LANDSCAPE_MODE;
-    else
-        m_printMode = PORTRAIT_MODE;
-
-    int minNas = 5000;
-    for (int i = 0; i < m_dfm->GetChanNum(); i++) {
-        int nas = m_dfm->GetNAS(i);
-        if (nas < minNas)
-            minNas = nas;
-    }
-    m_num_sam = minNas * m_durata;
-    m_realDots = m_num_sam;
-
-    // Dati relativi alla stampa
-    if (m_num_sam >= NUMOF_X_PRINT_DOTS) {
-        if(m_printMode == PORTRAIT_MODE)
-            m_realDots = NUMOF_X_PRINT_DOTS;
-        else	// cioe nel caso di Report_Print_Mode = Landscape
-        {
-            if(m_num_sam > NUMOFMAX_LEGHT_PORTRAIT_REP)	// esame troppo lungo per la modalita di stampa LANDSCAPE (5minuti)
-            {
-                m_printMode = PORTRAIT_MODE;
-                m_realDots = NUMOF_X_PRINT_DOTS;
-            }
-        }
-    }
-
-    m_dfm->Close();
-
-   pri_rep_review();	// qui va subito in stampa
-}
-
-
-
-
-
-
