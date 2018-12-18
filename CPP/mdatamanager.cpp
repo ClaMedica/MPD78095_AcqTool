@@ -925,7 +925,7 @@ bool MDataManager::changeObject(QVariantList __curObj)
         //tolgo il whoami e lascio solo le proprietA
         __curObj.removeFirst();
 
-        qDebug() << "Richiesta di modifica per " << whoAmI;
+       // qDebug() << "Richiesta di modifica per " << whoAmI;
         if(m_storage.modifyElement(whoAmI, __curObj)) {
             m_changesToBeSaved = true;
             if(__curObj.length() == 0) {
@@ -1503,6 +1503,8 @@ void MDataManager::openReport()
 
     if (returnValue)
     {
+        //disabilitazione pulsante
+        emit sg_openReport(true);
         m_reportOpenedTimer->setInterval(1000);
         m_reportOpenedTimer->start();
     }
@@ -1553,7 +1555,7 @@ void MDataManager::slot_checkReportOpened()
     if (!wordFound || PIDpos == -1)
     {
         //riabilitazine eventuali pulsanti disabilitati
-        //setMode(REVIEWAFTER);
+        emit sg_openReport(false);
         return;
     }
 
@@ -1576,7 +1578,7 @@ void MDataManager::slot_checkReportOpened()
 
 void MDataManager::slot_startReport()
 {
-    Sleep(1000);
+    //Sleep(1000);
     static int counter = 0;
     if (m_winword)
     {
@@ -1592,7 +1594,7 @@ void MDataManager::slot_startReport()
             counter = 0;
             m_reportTimer->stop();
             //riabilitazine eventuali pulsanti disabilitati
-            //setMode(REVIEWAFTER);
+            emit sg_openReport(false);
         }
     }
     else
@@ -1604,7 +1606,7 @@ void MDataManager::slot_startReport()
         {
             m_reportTimer->stop();
             //riabilitazine eventuali pulsanti disabilitati
-            //setMode(REVIEWAFTER);
+            emit sg_openReport(false);
         }
     }
 }

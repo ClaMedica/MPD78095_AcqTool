@@ -413,6 +413,7 @@ Rectangle {
         width: rootPlot.width
         height: rootPlot.height
         sourceItem: rootPlot
+        recursive: true
     }
 
     //C.F: in caso di window c'è un problema nella grabToImage che fa perdere le immagini (forse memoryleak)

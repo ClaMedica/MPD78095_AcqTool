@@ -40,6 +40,17 @@ MForm {
         pagesLocal[btnId].visible = true;
     }
 
+    function disablebuttons(__disable){
+        if (__disable){
+            btnReport.enabled = false
+            btnBack.enabled = false
+        }
+        else {
+            btnReport.enabled = true
+            btnBack.enabled = true
+        }
+    }
+
     function loadPageAnalysis()
     {
         if (mngData.getNumAnaFlwAdv() > 0)

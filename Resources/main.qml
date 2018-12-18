@@ -60,7 +60,6 @@ ApplicationWindow {
              forAna.setMarkersInfo(mngData.markersInfo("type", [1, 6]))
              forAna.setDefinersInfo(mngData.definersInfo())
              forAna.setCommandsInfo(mngData.commandsInfo())
-             forAna.printImagePlot()
          }
          console.log("Application Ready!")
      }
@@ -103,7 +102,6 @@ ApplicationWindow {
             forAna.setMarkersInfo(mngData.markersInfo("type", [1, 6]))
             forAna.setDefinersInfo(mngData.definersInfo())
             forAna.setCommandsInfo(mngData.commandsInfo())
-            forAna.printImagePlot()
         }
         else if (mode === "sta")
         {
@@ -259,6 +257,10 @@ ApplicationWindow {
             forRes.loadPageAnalysis()
             forRes.visible = true
 
+        }
+
+        onSg_openReport: {
+            forRes.disablebuttons(__disable)
         }
 
         onSg_exitFromReview:{

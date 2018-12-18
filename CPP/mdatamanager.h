@@ -96,6 +96,7 @@ signals:
 
     void sg_openVolResDlg(QString __tipoAn);
     void sg_loadResult();
+    void sg_openReport(bool __disable);
     void infoValVolRes();
     void infoToSave();
 
