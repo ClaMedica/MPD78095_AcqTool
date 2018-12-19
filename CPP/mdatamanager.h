@@ -66,6 +66,8 @@ public:
     Q_INVOKABLE bool getAutoPrint(){return m_autoPrint;}
     Q_INVOKABLE int getAutoFlow(){return m_autoFlow;}
 
+    Q_INVOKABLE int getSpoolerQueueLen() { return spoolerQueueLen; }
+
     QStringList availableData(){return m_availableData;}
     QStringList availableTracks(){return m_data.keys();}
 
@@ -82,6 +84,7 @@ public:
     bool addSignal(MSignal *__pSignal);
     void storeNews(QString __family, QString __name, qulonglong __element);
 
+    void send_Command(int __command);   // replicato da macqmanager perche' non si puo' invocare l'originale
 
     Q_INVOKABLE mflowdatas *getFlowDatas(int __i);
 
@@ -178,6 +181,7 @@ private:
 
     printermanager *m_mngPrint;
     enum BtMng m_BtMng;
+    int spoolerQueueLen;
 
 
 //----

@@ -64,7 +64,7 @@ int main(int argc, char *argv[])
 #endif
 #ifdef PICOFLOW
     QString logFile = "acqTool_log_" + QDateTime::currentDateTime().toString("yyyyMMdd_hhmmss")+".htm";
-    gPath_log = /*QApplication::applicationDirPath()*/ + "/tmp/" + logFile;
+    gPath_log = "/tmp/" + logFile;
 #endif
 #ifdef WIN32
      QString logFile = "acqTool_log_" + QDateTime::currentDateTime().toString("yyyyMMdd_hhmmss")+".htm";

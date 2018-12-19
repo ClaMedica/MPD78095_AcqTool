@@ -20,6 +20,7 @@ class printerserialport : public QObject
 public:
     explicit printerserialport(QString __namefile, QObject *parent = 0);
     void closeSerialPort();
+    void flushFile()    { m_file->flush(); m_file->seek(0); }
 
     bool Pri_Str(char *__str, int __str_len, bool __flag_lf);
     void Pri_justif(char __mode);
