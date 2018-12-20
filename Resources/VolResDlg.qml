@@ -13,8 +13,16 @@ MForm {
 
     property string titleDlg: ""
 
-    Keys.onReturnPressed: {
+    function okbutton() {
+        var volResVal = parVolResVal.info
         volResDlg.visible = false
+        Qt.inputMethod.hide()
+        mngData.valVolRes = volResVal
+        mngData.analysis()
+    }
+
+    Keys.onReturnPressed: {
+        okbutton()
     }
 
     onVisibleChanged: {
@@ -64,13 +72,7 @@ MForm {
         width: screenW*grafic.valueOf("Button","width")
         anchors.margins: parent.height*0.02
         labelSize: grafic.valueOf("Button","labelSize")
-        onClicked: {
-            var volResVal = parVolResVal.info
-            volResDlg.visible = false
-            Qt.inputMethod.hide()
-            mngData.valVolRes = volResVal
-            mngData.analysis()
-        }
+        onClicked: okbutton()
     }
 
 

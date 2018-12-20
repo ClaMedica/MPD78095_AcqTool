@@ -87,19 +87,15 @@ MDataManager::~MDataManager()
 void MDataManager::getGrabbedImage(QObject *gi, QString __nome)
 {
     qDebug()<<"Immagine"<<__nome<<gi;
-#ifdef PICOFLOW
     if (__nome != "grafo")
         m_mngPrint->getGrabbedImage(gi, __nome);
-#elif WIN32
-    //grafo e nomogrammi
-    QQuickItemGrabResult *item = qobject_cast<QQuickItemGrabResult *>(gi);
-    qDebug()<<"Item"<<item;
-    QImage img = item->image();
-    QPixmap pix = QPixmap::fromImage(img);
-    QString imgName;
-    if (__nome == "grafo")
-        imgName = "GR000";
-    else if (__nome.startsWith("Live"))
+}
+
+void MDataManager::saveImg(QQuickItem *__item, QString __nome)
+{
+    QString imgName = __nome;
+    //caso nomogrammi
+    if (__nome.startsWith("Live"))
         if (__nome.contains("Ave"))
             imgName = "GR202";
         else
@@ -110,9 +106,14 @@ void MDataManager::getGrabbedImage(QObject *gi, QString __nome)
         else
             imgName = "GR210";
 
-    pix.save(m_pathData + imgName + ".jpg"); 
+    auto grabResult = __item->grabToImage();
+    connect(grabResult.data(), &QQuickItemGrabResult::ready, [=]() {
+        QImage img = grabResult.data()->image();
+        QPixmap pix = QPixmap::fromImage(img);
+        //QString imgName = imgName;
+        pix.save(m_pathData + imgName + ".jpg");
+    });
 
-#endif
 }
 
 void MDataManager::setInfoList(QVariantList __list)
@@ -1002,9 +1003,24 @@ void MDataManager::exitFromReview()
         m_configUser.saveToXML(configUser);
     }
 
+#ifndef PICOFLOW
+        //file analisi temporaneo
+        //copio il file temp dell'analisi in anTESTNUM1a.xml
+        QString testnumber;
+        testnumber = QString("%1").arg(m_testNumber,5,10,QLatin1Char('0'));
+        QString filenameAna = m_pathData;
+        filenameAna.append("temp");
+        filenameAna.append(testnumber);
+        filenameAna.append(".xml");
+#endif
+
     if (getToSave() == "ret") {
         if (m_mngPrint != NULL) m_mngPrint->closePrinter();
         qDebug()<<"cancellata copia all'exit"<<QFile::remove(m_copyFileName);
+#ifndef PICOFLOW
+        if (QFile::exists(filenameAna))
+            qDebug()<<"cancello file temp analisi"<<QFile::remove(filenameAna);
+#endif
         if(DebugAcqTool == false)
             g_mainAppBridge->sendSwitch();  //send(MEX_SHOW);
         else
@@ -1018,20 +1034,31 @@ void MDataManager::exitFromReview()
     else
     {
         if (m_mngPrint != NULL) m_mngPrint->closePrinter();
-
         if (getToSave() == "yes")
-        {        //copio il file copy nell'originale
+        {
+            //copio il file copy nell'originale
             if (QFile::exists(m_copyFileName))
             {
                 saveChanges();
                 qDebug()<<"cancello vecchio file"<<QFile::remove(m_fileName);
                 qDebug()<<"copio le modifiche"<<QFile::rename(m_copyFileName,m_fileName);
             }
+#ifndef PICOFLOW
+            if (QFile::exists(filenameAna)) {
+                QString newname = filenameAna;
+                newname.replace("temp","an");
+                qDebug()<<"salvo file analisi"<<QFile::rename(filenameAna,newname);
+            }
+#endif
         }
         else //"no"
         {
             //cancello il file copy
             qDebug()<<"cancellata copia all'exit"<<QFile::remove(m_copyFileName);
+#ifndef PICOFLOW
+            if (QFile::exists(filenameAna))
+                 qDebug()<<"cancello file temp analisi"<<QFile::remove(filenameAna);
+#endif
         }
         if(DebugAcqTool == false)
             g_mainAppBridge->sendSwitch(); //poi dovra tornare al modulo database

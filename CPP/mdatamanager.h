@@ -82,8 +82,8 @@ public:
     bool addSignal(MSignal *__pSignal);
     void storeNews(QString __family, QString __name, qulonglong __element);
 
-
     Q_INVOKABLE mflowdatas *getFlowDatas(int __i);
+    Q_INVOKABLE void saveImg(QQuickItem* __item, QString __nome);
 
 signals:
     void dataNewsChanged();
@@ -126,6 +126,7 @@ public slots:
     void sendPrintTest();
 #ifndef PICOFLOW
     void openReport();
+
 #endif
 
 private:

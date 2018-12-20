@@ -69,6 +69,7 @@ MForm{
     }
 
 
+
     //@@@@@@@@@@    Objects     @@@@@@@@@@
 
     MPlot2DStack {
@@ -88,8 +89,6 @@ MForm{
             if(completed)
                 mngData.changeObject(curObj)
         }
-
-
     }
 
     MLabel{
@@ -152,6 +151,14 @@ MForm{
 
     }
 
+    ShaderEffectSource {
+        id: sourceImg
+        width: plot.width
+        height: plot.height
+        sourceItem: plot
+        recursive: true
+    }
+
     MGridView{
         //@@@@@@@@@@    Properties      @@@@@@@@@@
         id:gridComand
@@ -165,20 +172,7 @@ MForm{
         delegate: MMarkerButton{
             onClick: {
                 if (value === "111") {
-                    //Il seguente un trucco che è stato utilizzato perchè la grabToImage() da i seguente problema:
-                    //se l'utente cambia la posizione dei markers analitici, analizza e lancia un nuovo report, in questo
-                    //veniva inserita l'immagine sbagliata con la vecchia posizione dei markers analitici.
-                    //La seconda volta che viene effettuata analisi e report, l'immagine era aggiornata.
-                    //Così non  avendo in questo momento idee migliori, vengono fatte due immagini consegutive
-                    //con il risultato di avere l'immagine ultima corretta sul report
-                    plot.grabToImage(
-                                function(result) { mngData.getGrabbedImage(result, "grafo"); },
-                                Qt.size(600,400)
-                                )
-                    plot.grabToImage(
-                                function(result) { mngData.getGrabbedImage(result, "grafo"); },
-                                Qt.size(600,400)
-                                )
+                    mngData.saveImg(sourceImg,"GR000")
                     mngData.analysis();
                 }
 
