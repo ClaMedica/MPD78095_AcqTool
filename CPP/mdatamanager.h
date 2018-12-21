@@ -38,18 +38,6 @@ class MDataManager : public MAbstractManager
     Q_OBJECT
 public:
 
-    enum BtMng {
-        BtUnkn = 0,
-        BtQueryWait,    // bt in use: wait for query result
-        Btno,           // bt not in use
-        Btyes,          // bt in use
-        BtOff,          // bt in use: stopped
-        BtGoingDown,    // bt in use:
-        BtGoingUp,      // bt in use:
-        BtOn,           // bt in use: connected
-        WaitPrnEnd
-    };
-
     explicit MDataManager(QObject *parent = 0);
     ~MDataManager();
     Q_PROPERTY(QVariantList infoList READ infoList WRITE setInfoList NOTIFY infoListChanged)
@@ -180,7 +168,6 @@ private:
     QVector<mflowdatas*> m_aflwdatas; //array di analisi di tipo flussimetria
 
     printermanager *m_mngPrint;
-    enum BtMng m_BtMng;
     int spoolerQueueLen;
 
 

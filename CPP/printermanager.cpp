@@ -1,7 +1,6 @@
 ﻿
 #include "printermanager.h"
 #include "udpmsgs.h"
-#include "spooler.h"
 
 //const char str_label_time_old[29][68]={
 //    "   0    3     6     9    12    15    18    21    24    27   30s",

@@ -195,7 +195,6 @@ CLAUDIA {
         ../MGlobal/udpmsgs.cpp
 
     HEADERS *= \
-        ../MGlobal/spooler.h \
         ../MGlobal/udpmsgs.h
 
     RESOURCES += modules_picoflow.qrc
@@ -220,7 +219,6 @@ PICOFLOW {
         ../MGlobal/udpmsgs.cpp
 
     HEADERS *= \
-        ../MGlobal/spooler.h \
         ../MGlobal/udpmsgs.h
 
     RESOURCES += modules_picoflow.qrc

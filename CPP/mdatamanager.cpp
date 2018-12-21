@@ -50,7 +50,6 @@ MDataManager::MDataManager(QObject *parent)
     m_secondHead = "Pico Flow 2";
     m_etaPatient = -1;
 
-    m_BtMng = BtUnkn;
     spoolerQueueLen = 0;
 
     setValVolRes(-999);
@@ -1458,36 +1457,6 @@ void MDataManager::udpMdmBtDecode(enum WHO __from, QByteArray __msg)
 void MDataManager::sendToPrint(enum WHO __from, int __val)
 {
 #ifdef PICOFLOW
-////    m_copyFileName
-////    BtUnkn = 0,
-////    BtQueryWait,    // bt in use: wait for query result
-////    Btno,           // bt not in use
-////    Btyes,          // bt in use
-////    BtOff,          // bt in use: stopped
-////    BtGoingDown,    // bt in use:
-////    BtGoingUp,      // bt in use:
-////    BtOn            // bt in use: connected
-//    switch(m_BtMng) {
-//    case BtUnkn:
-//                        m_BtMng = BtQueryWait;
-//                        udpConn.sendSup("testBt");
-//                        break;
-//    case BtQueryWait:
-//                        if(__from == E_SUP) {
-//                            if(__val == 'U') m_BtMng = Btyes;
-//                            if(__val == 'N') m_BtMng = Btno;
-//                        }
-//                        break;
-//    case Btno:
-//    case Btyes:
-//    case BtOff:
-//    case BtGoingDown:
-//    case BtGoingUp:
-//    case BtOn:
-//    case WaitPrnEnd:
-//        break;
-//    }
-//    QTimer::singleShot(500, this, SLOT(sendToPrint()));
     m_mngPrint->print();
     qDebug() << "stampato";
 #endif

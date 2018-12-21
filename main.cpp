@@ -28,9 +28,6 @@
 #include <QSplashScreen>
 #include <fileio.h>
 #include <systemmanager.h>
-#ifdef PICOFLOW
-#include "spooler.h"
-#endif
 
 #ifdef ANDROID
 #include <QAndroidJniObject>

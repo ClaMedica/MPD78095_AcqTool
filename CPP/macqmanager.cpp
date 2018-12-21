@@ -467,15 +467,9 @@ void MAcqManager::handleTCP(SimpleTCPClient *__client, QByteArray __block)
         if(who == "STA") {      //allora e' uno stato
             m_supeConnected = true;
             __block.remove(0, 4);
-            //#BUG non e' in gradi di interpretare lo stato del picoflow(cavo+emg) ma solo quello della cellaBT
-            // vedere picoFlow_status_t e flowBT_status_t
             flowBT_status_t stBT;
             picoFlow_status_t stPico;
             alarms_t alarms;
-//            union {
-//                flowBT_states_t bt;
-//                picoFlow_states_t pf;
-//            } currState;
             uint8_t newState = 0;
             bool isBT;
             uint i = 0;
@@ -498,8 +492,6 @@ void MAcqManager::handleTCP(SimpleTCPClient *__client, QByteArray __block)
                 newState = stPico.currState;
                 isBT = false;
             }
-//            for(i = 0; i < sizeof(flowBT_status_t); i++)
-//                ((qint8 *) (& status) )[i] = __block[i];
             i++;
             for(uint j = i; j < sizeof(alarms_t) + i; j++)
                 ((qint8 *) (& alarms))[j-i] = __block[j];
@@ -621,57 +613,6 @@ bool MAcqManager::loadConnectivityInfo(Ancestry *__info)
 void MAcqManager::analyzeStatus(uint8_t __currState, bool __isBT)
 {
     static const char * names[] = { "st_IDLE_NOT_CONNECTED", "st_IDLE_CONNECTED", "st_ACQUIRING" };
-
-    // m_alarmMng.stopTimeoutAlarm(ALA_TIMEOUT_STATUS);
-
-    // trasformato in  m_acquired
-    // static acquired ok SOLO per la prima volta dall'accensione
-//    static bool acquired = false;
-
-//    picoFlow_states_t inputEv = (picoFlow_states_t) __currState;
-//    switch(m_oldState)
-//    {
-//    case ESTATE_IDLE_NOT_CONNECTED:
-//        switch(inputEv) {
-//                        case ESTATE_IDLE_CONNECTED:
-//                                m_alarmMng.stopTimeoutAlarm(ALA_NOT_CONNECTED);
-//                                sendStartAcq ();
-//                                break;
-//                        case ESTATE_ACQUIRING:
-//                        case ESTATE_IDLE_NOT_CONNECTED:
-//                        default:break;
-//        }
-//        break;
-//    case ESTATE_IDLE_CONNECTED:
-//        switch(inputEv) {
-//                        case ESTATE_IDLE_NOT_CONNECTED:
-//                                m_alarmMng.startTimeoutAlarm(ALA_NOT_CONNECTED, 1000);
-//                                break;
-//                        case ESTATE_IDLE_CONNECTED:
-//                                if(acquired) { acquired = false; sendStartAcq(); } // re-start se il caso
-//                                break;
-//                        case ESTATE_ACQUIRING:
-//                                emit systemInAcqStatus();
-//                                acquired = true;
-//                                m_alarmMng.manageAlarm(ALA_NOT_ACQUIRING, ENABLE);
-//                                break;
-//                        default:break;
-//        }
-//        break;
-//    case ESTATE_ACQUIRING:
-//        switch(inputEv) {
-//                        case ESTATE_IDLE_NOT_CONNECTED:
-//                                m_alarmMng.addAlarm(ALA_NOT_CONNECTED);
-//                                break;
-//                        case ESTATE_IDLE_CONNECTED:
-//                                m_alarmMng.addAlarm(ALA_NOT_ACQUIRING);
-//                                break;
-//                        case ESTATE_ACQUIRING:
-//                        default:break;
-//        }
-//        break;
-//    default:break;
-//    }
 
     qDebug("olstate:%s new:%s %s", names[m_oldState], names[__currState], __isBT ? "BT" : "Cavo");
 
