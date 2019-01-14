@@ -71,8 +71,7 @@ MForm{
 
 
     //@@@@@@@@@@    Objects     @@@@@@@@@@
-
-    MPlot2DStack {
+    MPlot2DStack{
         //@@@@@@@@@@    Properties      @@@@@@@@@@
         id: plot
         clip:true
@@ -83,11 +82,17 @@ MForm{
         height: PicoFlow?(rootAna.height - 15):(rootAna.height - 25)
         plotProp:mngCon.plotSetting
 
+        property real opMarkerKey: -1
         //@@@@@@@@@@    Events          @@@@@@@@@@
 
         onCurObjChanged: {
             if(completed)
                 mngData.changeObject(curObj)
+        }
+
+        onOpMarkerPosChanged:{
+            //console.log("Analysi insert opmarker",opMarkerPos)
+            mngData.addOpMarker(opMarkerKey,opMarkerPos);
         }
     }
 
@@ -122,17 +127,16 @@ MForm{
         anchors.right: rootAna.right
         anchors.top: parent.top
         anchors.bottom: parent.bottom
-        width:0
+        width:PicoFlow ? 0 : 60
         owner:"Marker"
         itemsInRow:1
         delegate: MMarkerButton{
             onClick: {
-                mngAcq.addMarker(value);
-                //console.log(mngAcq.acqMarkers)
-                plot.markers=mngAcq.acqMarkers;
+                plot.opMarkerKey = value
+                plot.newOpMarker = true
             }
         }
-        visible:false
+        visible: PicoFlow ? false : true
     }
 
     MGridView{
@@ -141,13 +145,13 @@ MForm{
         anchors.right: gridMarker.left
         anchors.top: parent.top
         anchors.bottom: parent.bottom
-        width:0
+        width:PicoFlow ? 0 : 60
         owner:"Definers"
         itemsInRow:1
         delegate: MMarkerButton {
 
         }
-        visible:true
+        visible: PicoFlow ? false : true
 
     }
 

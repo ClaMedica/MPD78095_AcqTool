@@ -244,10 +244,10 @@ void MDataManager::loadFile(QString __fileName)
         for(int i = 0; i < m_mng->GetNumOperativeMarkers(); i++) {
             VarMap *mrk = new VarMap;
             m_mng->GetOpMarker(i, &key, numSamp, &descr);
-            qDebug() << numSamp[0];
-            qDebug() << numSamp[1];
-            qDebug() << numSamp[2];
-            qDebug() << numSamp[3];
+//            qDebug() << numSamp[0];
+//            qDebug() << numSamp[1];
+//            qDebug() << numSamp[2];
+//            qDebug() << numSamp[3];
             double val = (double) numSamp[0] / m_mng->GetNAS(0);
             qDebug() << "Marker" << key << val;
 
@@ -725,14 +725,13 @@ bool MDataManager::updateInfoList()
         }
 
         //markers
-        //        VarMapVec *op = m_storage.getAll(CAT_MARKER);
-        //        if (op->size() > 0)
-        //            elements<<"Markers:Operative";
-
-        //        if (m_mng->GetNumDefiners()> 0)
-        //           elements<<"Definers:Operative";
-
-
+        VarMapVec *op = m_storage.getAll(CAT_MARKER);
+        foreach (VarMap *curMap, (*op)) {
+            if (curMap->value("color") == COLOR_OPERATIVE) {
+                elements << "Markers:Operative";
+                break;
+            }
+        }
 
         VarMapVec *opAn = m_storage.getAll(CAT_MARKER);
         foreach (VarMap *curMap, (*opAn)) {
@@ -933,7 +932,7 @@ bool MDataManager::changeObject(QVariantList __curObj)
                 saveChanges();
                 updateInfoList();
                 emit reloadingCompleted();
-            }
+           }
         }
         return true;
     }
@@ -1501,6 +1500,35 @@ void MDataManager::sendToPrint(enum WHO __from, int __val)
 }
 
 #ifndef PICOFLOW
+void MDataManager::addOpMarker(QVariant __key,QVariant __posX)
+{
+    //prendo il marker operativo corrispondete al __key
+    VarMap mark = m_markerMap[__key];
+
+    VarMapVec *mrkAnVec = new VarMapVec;
+    VarMap *mrk = new VarMap;
+
+    (*mrk)["val"] = __posX;
+    (*mrk)["type"] = mark.value(ATT_TYPE);
+    (*mrk)["name"] = "Operative";
+    (*mrk)["family"] = "Markers";
+    (*mrk)["code"] = mark.value(ATT_CODE);
+    (*mrk)["descr"] = mark.value(ATT_DESCR);
+    (*mrk)["lock"] = false;
+    (*mrk)["key"] = __key;
+    (*mrk)["color"] = COLOR_OPERATIVE;
+    (*mrk)["visible"] = true;
+    (*mrk)["category"] = CAT_MARKER;
+    mrkAnVec->append(mrk);
+    QString family = "Markers";
+    QString name = "Operative";
+    saveDataAndUpdate(family, name, mrkAnVec,APPEND);
+
+    updateInfoList();
+    emit reloadingCompleted();
+}
+
+
 void MDataManager::openReport()
 {
     QLibrary reportLib("MedicalReport.dll");

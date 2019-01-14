@@ -126,6 +126,7 @@ public slots:
     void sendPrintTest();
 #ifndef PICOFLOW
     void openReport();
+    void addOpMarker(QVariant __key, QVariant __posX);
 
 #endif
 
