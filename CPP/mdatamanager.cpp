@@ -264,7 +264,8 @@ void MDataManager::loadFile(QString __fileName)
                 (*mrk)["category"] = CAT_MARKER;
             }
             (*mrk)["val"] = val;
-
+            (*mrk)["name"] = "Operative";
+            (*mrk)["family"] = "Markers";
             mrkOpVec->append(mrk);
         }
 
