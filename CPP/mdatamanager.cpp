@@ -916,6 +916,14 @@ QVariantList MDataManager::getPlotLimits()
     return limits;
 }
 
+QString MDataManager::getNameOfObj(QVariantList __whoAmI)
+{
+    qulonglong whoAmI = __whoAmI.first().toULongLong();
+    VarMap *elementToModify = (VarMap *) whoAmI;
+    QString toRet = elementToModify->value("category").toString();
+    return toRet.toLower();
+}
+
 bool MDataManager::changeObject(QVariantList __curObj)
 {
     //qDebug()<<"Cambio un elemento con queste caratteristiche :"<<__curObj;

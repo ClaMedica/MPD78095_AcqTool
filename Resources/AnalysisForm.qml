@@ -86,8 +86,14 @@ MForm{
         //@@@@@@@@@@    Events          @@@@@@@@@@
 
         onCurObjChanged: {
-            if(completed)
-                mngData.changeObject(curObj)
+            if(completed){
+                if (curObj.length === 1) {//sto cancellando un markers
+                    dialogDelete.obj = curObj
+                    dialogDelete.owner=this
+                }
+                else //sto modificando
+                    mngData.changeObject(curObj)
+            }
         }
 
         onOpMarkerPosChanged:{
@@ -237,5 +243,40 @@ MForm{
         }
     }
 
+    MDialogYesNo {
+        id: dialogDelete
+        property var owner:dialogDelete
+        property var obj
+        onOwnerChanged: {
+            switch(owner){
+            case dialogDelete:break;
+            case plot:
+                var name = mngData.getNameOfObj(obj)
+                message=qsTr("Do you really want to delete the " + name + "?")
+                break
+
+            default:console.error("Owner sconosciuto",owner)
+            }
+            if(owner!=dialogDelete)
+                dialogDelete.open()
+        }
+        onAccepted:  {
+            switch(owner){
+            case dialogDelete:break;
+            case plot:
+                mngData.changeObject(obj)
+                break
+            default:console.error("Owner sconosciuto",owner)
+            }
+        }
+        onRejected: {
+            switch(owner){
+            case dialogDelete:break;
+            case plot:break
+            default:console.error("Owner sconosciuto",owner)
+            }
+        }
+
+    }
 
 }

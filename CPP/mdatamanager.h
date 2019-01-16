@@ -127,6 +127,7 @@ public slots:
 #ifndef PICOFLOW
     void openReport();
     void addOpMarker(QVariant __key, QVariant __posX);
+    QString getNameOfObj(QVariantList __whoAmI);
 
 #endif
 
