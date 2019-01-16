@@ -13,6 +13,8 @@ Rectangle{
     property string name: ""
     property string backgroundImage: ""
     property var image: undefined
+    property var keyboard: appKey
+    property var keyboardNum: appKeyNum
     signal changePage(var page)
     signal backClicked
     signal nextClicked
@@ -83,5 +85,18 @@ Rectangle{
         else
             if(image !== undefined)
                 image.source = ""
+    }
+
+    MKeyboard {
+        id:appKey
+        y: parent.height
+        anchors.left: parent.left
+        anchors.right: parent.right
+        visible: false
+    }
+
+    MKeyboardNum {
+        id: appKeyNum
+        visible: false
     }
 }
