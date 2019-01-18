@@ -1,7 +1,6 @@
 ﻿
 #include "printermanager.h"
 #include "udpmsgs.h"
-#include "spooler.h"
 
 //const char str_label_time_old[29][68]={
 //    "   0    3     6     9    12    15    18    21    24    27   30s",
@@ -534,6 +533,7 @@ void printermanager::Pri_Rep(double xscale)
     // fa avanzare la carta per consentire lo strappo
     int npix = (int) (25 / 0.125);
     m_port->Pri_forward(npix);
+    m_port->flushFile();
 
 //    m_port->Pri_Reset();	// resetta RAM della stampante: equivale ad un reset HW
     qDebug() << "Pri_Rep FINE file:" << m_namefile;

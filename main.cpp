@@ -28,9 +28,6 @@
 #include <QSplashScreen>
 #include <fileio.h>
 #include <systemmanager.h>
-#ifdef PICOFLOW
-#include "spooler.h"
-#endif
 
 #ifdef ANDROID
 #include <QAndroidJniObject>
@@ -64,7 +61,7 @@ int main(int argc, char *argv[])
 #endif
 #ifdef PICOFLOW
     QString logFile = "acqTool_log_" + QDateTime::currentDateTime().toString("yyyyMMdd_hhmmss")+".htm";
-    gPath_log = /*QApplication::applicationDirPath()*/ + "/tmp/" + logFile;
+    gPath_log = "/tmp/" + logFile;
 #endif
 #ifdef WIN32
      QString logFile = "acqTool_log_" + QDateTime::currentDateTime().toString("yyyyMMdd_hhmmss")+".htm";

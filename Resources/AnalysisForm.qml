@@ -190,7 +190,7 @@ MForm{
                 }
 
                 if (value === "112") {
-                    if (PicoFlow) restartBt()
+//                    if (PicoFlow) restartBt()
                     mngData.exitFromReview()
                 }
 

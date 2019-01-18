@@ -18,7 +18,7 @@ ApplicationWindow {
     property string examFolder:settings.datafilePath
     property string configFolder:settings.appPath()
     property bool vis: false
-    property int btStatusUdp: 0    // 0:don't care 1:stopping 2:stopped 3:restarting 4:restarted
+//    property int btStatusUdp: 0    // 0:don't care 1:stopping 2:stopped 3:restarting 4:restarted
     property bool btStopped: false
     property bool timBtAvail: true
     property bool btOkPrint: false
@@ -124,52 +124,54 @@ ApplicationWindow {
 
     function suspendBt()
     {
-        console.log("================ btStatusUdp:",btStatusUdp,"btOkPrint",btOkPrint)
-        if(btStatusUdp == 0)
-            timStopBT.start()
+//        console.log("================ btStatusUdp:",btStatusUdp,"btOkPrint",btOkPrint)
+        mngAcq.send_Command(4)   // STOPBT
+//        if(btStatusUdp == 0)
+//            timStopBT.start()
     }
 
-    function restartBt()
-    {
-        console.log("================ btStatusUdp:",btStatusUdp,"btOkPrint",btOkPrint)
-        if(btStatusUdp == 2)
-            timStopBT.start()
-    }
+//    function restartBt()
+//    {
+////        console.log("================ btStatusUdp:",btStatusUdp,"btOkPrint",btOkPrint)
+//        mngAcq.send_Command(5)   // STARTBT
+////        if(btStatusUdp == 2)
+////            timStopBT.start()
+//    }
 
-    Timer{
-        id: timStopBT
-        interval: 500
-        repeat: true
-        onTriggered: {
-            console.log("================ btStatusUdp:",btStatusUdp,"btOkPrint",btOkPrint)
-            switch(btStatusUdp) {  // 0:don't care 1:stopping 2:stopped 3:restarting 4:restarted
-            case 0:
-                mngAcq.send_Command(4)   // STOPBT
-                btStatusUdp = 1
-                break
-            case 1: // da 1 a 2 alla ricezione di udpBtStopped
-                break
-            case 2:
-                if(!btOkPrint) {
-                    btOkPrint = true    //  mngData.sendToPrint()
-                    stop()
-                }
-                else {
-                    mngAcq.send_Command(5)   // STARTBT
-                    btStatusUdp = 3
-                }
-                break
-            case 3: // da 3 a 4 alla ricezione di udpBtRestarted
-                break
-            case 4:
-                btStatusUdp = 0
-                btOkPrint = false
-                stop()
-                break
-            }
+//    Timer{
+//        id: timStopBT
+//        interval: 500
+//        repeat: true
+//        onTriggered: {
+//            console.log("================ btStatusUdp:",btStatusUdp,"btOkPrint",btOkPrint)
+//            switch(btStatusUdp) {  // 0:don't care 1:stopping 2:stopped 3:restarting 4:restarted
+//            case 0:
+//                mngAcq.send_Command(4)   // STOPBT
+//                btStatusUdp = 1
+//                break
+//            case 1: // da 1 a 2 alla ricezione di udpBtStopped
+//                break
+//            case 2:
+//                if(!btOkPrint) {
+//                    btOkPrint = true    //  mngData.sendToPrint()
+//                    stop()
+//                }
+//                else {
+////                    mngAcq.send_Command(5)   // STARTBT
+//                    btStatusUdp = 3
+//                }
+//                break
+//            case 3: // da 3 a 4 alla ricezione di udpBtRestarted
+//                break
+//            case 4:
+//                btStatusUdp = 0
+//                btOkPrint = false
+//                stop()
+//                break
+//            }
 
-        }
-    }
+//        }
+//    }
 
 
     Connections {
@@ -222,12 +224,12 @@ ApplicationWindow {
         onUdpBtStopped:
         {
             console.log("udp BtStopped")
-            btStatusUdp = 2
+//            btStatusUdp = 2
         }
         onUdpBtRestarted:
         {
             console.log("udp BtRestarted")
-            btStatusUdp = 4
+//            btStatusUdp = 4
         }
 
 

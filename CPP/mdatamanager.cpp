@@ -10,12 +10,14 @@
 
 extern bool DebugAcqTool;
 
+#ifndef PICOFLOW
 class MyException : public QException
 {
 public:
     void raise() const override { throw *this; }
     MyException *clone() const override { return new MyException(*this); }
 };
+#endif
 
 MDataManager::MDataManager(QObject *parent)
 {
@@ -48,7 +50,7 @@ MDataManager::MDataManager(QObject *parent)
     m_secondHead = "Pico Flow 2";
     m_etaPatient = -1;
 
-    m_BtMng = BtUnkn;
+    spoolerQueueLen = 0;
 
     setValVolRes(-999);
 #ifdef PICOFLOW
@@ -996,6 +998,16 @@ bool MDataManager::saveDataAndUpdate(QString __family, QString __name, VarMapVec
         return false;
 }
 
+void MDataManager::send_Command(int __command)  // replicato da macqmanager perche' non lo si puo' invocare
+{
+#ifdef PICOFLOW
+//    sendCommand((tcp_flow_bt_cmd_t) __command);
+    QByteArray msg = (__command == 4) ? "suspBt" : "restartBt";
+
+    udpConn.sendSup(msg);
+#endif
+}
+
 void MDataManager::exitFromReview()
 {
     qDebug() << "Exit" << getToSave();
@@ -1029,8 +1041,10 @@ void MDataManager::exitFromReview()
         if (QFile::exists(filenameAna))
             qDebug()<<"cancello file temp analisi"<<QFile::remove(filenameAna);
 #endif
-        if(DebugAcqTool == false)
+        if(DebugAcqTool == false) {
+            send_Command(5);   // STARTBT
             g_mainAppBridge->sendSwitch();  //send(MEX_SHOW);
+        }
         else
             exit(0);
 
@@ -1068,8 +1082,10 @@ void MDataManager::exitFromReview()
                  qDebug()<<"cancello file temp analisi"<<QFile::remove(filenameAna);
 #endif
         }
-        if(DebugAcqTool == false)
+        if(DebugAcqTool == false) {
+            send_Command(5);   // STARTBT
             g_mainAppBridge->sendSwitch(); //poi dovra tornare al modulo database
+        }
         else
             exit(0);
     }
@@ -1458,11 +1474,14 @@ void MDataManager::udpMdmBtDecode(enum WHO __from, QByteArray __msg)
                 if((cmd == 'R') && (__msg == "Restarted")) emit udpMdmBtStatus(__from, cmd);
                 if((cmd == 'U') && (__msg == "UseBt"))     emit udpMdmBtStatus(__from, cmd);
                 if((cmd == 'N') && (__msg == "NoBt"))      emit udpMdmBtStatus(__from, cmd);
+                if((cmd == 'q') && __msg.startsWith("queue:")) spoolerQueueLen = __msg.remove(0,6).toInt();
                 break;
     case E_PRN:
                 if((cmd == 'R') && (__msg == "Ready"))     emit udpMdmPrnStatus(__from, cmd);
                 if((cmd == 'F') && (__msg == "Fail"))      emit udpMdmPrnStatus(__from, cmd);
                 if((cmd == 'D') && (__msg == "Done"))      emit udpMdmPrnStatus(__from, cmd);
+                break;
+    case E_MED:
                 break;
     default:
         break;
@@ -1473,36 +1492,6 @@ void MDataManager::udpMdmBtDecode(enum WHO __from, QByteArray __msg)
 void MDataManager::sendToPrint(enum WHO __from, int __val)
 {
 #ifdef PICOFLOW
-////    m_copyFileName
-////    BtUnkn = 0,
-////    BtQueryWait,    // bt in use: wait for query result
-////    Btno,           // bt not in use
-////    Btyes,          // bt in use
-////    BtOff,          // bt in use: stopped
-////    BtGoingDown,    // bt in use:
-////    BtGoingUp,      // bt in use:
-////    BtOn            // bt in use: connected
-//    switch(m_BtMng) {
-//    case BtUnkn:
-//                        m_BtMng = BtQueryWait;
-//                        udpConn.sendSup("testBt");
-//                        break;
-//    case BtQueryWait:
-//                        if(__from == E_SUP) {
-//                            if(__val == 'U') m_BtMng = Btyes;
-//                            if(__val == 'N') m_BtMng = Btno;
-//                        }
-//                        break;
-//    case Btno:
-//    case Btyes:
-//    case BtOff:
-//    case BtGoingDown:
-//    case BtGoingUp:
-//    case BtOn:
-//    case WaitPrnEnd:
-//        break;
-//    }
-//    QTimer::singleShot(500, this, SLOT(sendToPrint()));
     m_mngPrint->print();
     qDebug() << "stampato";
 #endif

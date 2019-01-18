@@ -38,18 +38,6 @@ class MDataManager : public MAbstractManager
     Q_OBJECT
 public:
 
-    enum BtMng {
-        BtUnkn = 0,
-        BtQueryWait,    // bt in use: wait for query result
-        Btno,           // bt not in use
-        Btyes,          // bt in use
-        BtOff,          // bt in use: stopped
-        BtGoingDown,    // bt in use:
-        BtGoingUp,      // bt in use:
-        BtOn,           // bt in use: connected
-        WaitPrnEnd
-    };
-
     explicit MDataManager(QObject *parent = 0);
     ~MDataManager();
     Q_PROPERTY(QVariantList infoList READ infoList WRITE setInfoList NOTIFY infoListChanged)
@@ -65,6 +53,8 @@ public:
     Q_INVOKABLE void getGrabbedImage(QObject *gi, QString __nome);
     Q_INVOKABLE bool getAutoPrint(){return m_autoPrint;}
     Q_INVOKABLE int getAutoFlow(){return m_autoFlow;}
+
+    Q_INVOKABLE int getSpoolerQueueLen() { return spoolerQueueLen; }
 
     QStringList availableData(){return m_availableData;}
     QStringList availableTracks(){return m_data.keys();}
@@ -82,6 +72,7 @@ public:
     bool addSignal(MSignal *__pSignal);
     void storeNews(QString __family, QString __name, qulonglong __element);
 
+    void send_Command(int __command);   // replicato da macqmanager perche' non si puo' invocare l'originale
     Q_INVOKABLE mflowdatas *getFlowDatas(int __i);
     Q_INVOKABLE void saveImg(QQuickItem* __item, QString __nome);
 
@@ -180,7 +171,7 @@ private:
     QVector<mflowdatas*> m_aflwdatas; //array di analisi di tipo flussimetria
 
     printermanager *m_mngPrint;
-    enum BtMng m_BtMng;
+    int spoolerQueueLen;
 
 
 //----

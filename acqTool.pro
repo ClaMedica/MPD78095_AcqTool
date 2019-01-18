@@ -192,11 +192,9 @@ CLAUDIA {
     TARGET = PicoAcq
 
     SOURCES += \
-        ../MGlobal/spooler.cpp \
         ../MGlobal/udpmsgs.cpp
 
     HEADERS *= \
-        ../MGlobal/spooler.h \
         ../MGlobal/udpmsgs.h
 
     RESOURCES += modules_picoflow.qrc
@@ -218,11 +216,9 @@ PICOFLOW {
     TARGET = PicoAcq
 
     SOURCES += \
-        ../MGlobal/spooler.cpp \
         ../MGlobal/udpmsgs.cpp
 
     HEADERS *= \
-        ../MGlobal/spooler.h \
         ../MGlobal/udpmsgs.h
 
     RESOURCES += modules_picoflow.qrc

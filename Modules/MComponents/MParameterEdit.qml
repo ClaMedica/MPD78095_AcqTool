@@ -9,7 +9,7 @@ Rectangle {
     property string type:typTextField
     property string style:"default"
     property var component:undefined
-    property var info:""
+    property string info: ""
     property var model //contiene un modello per il componente
     property real viewPerc:0.6 //indica quanto spazio occupa la label
     property bool labelFirst:true
