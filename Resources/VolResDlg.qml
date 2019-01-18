@@ -13,6 +13,12 @@ MForm {
 
     property string titleDlg: ""
 
+    function open()
+    {
+        DataEngine.putItemOnTop(this)
+        visible=true
+    }
+
     function okbutton() {
         var volResVal = parVolResVal.info
         volResDlg.visible = false

@@ -155,7 +155,10 @@ MForm{
         owner:"Definers"
         itemsInRow:1
         delegate: MMarkerButton {
+            onClick: {
+                plot.newDefiner = true
 
+            }
         }
         visible: PicoFlow ? false : true
 
