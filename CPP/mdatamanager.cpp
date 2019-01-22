@@ -1465,7 +1465,7 @@ void MDataManager::startPrint()
 
 void MDataManager::udpMdmBtDecode(enum WHO __from, QByteArray __msg)
 {
-    qDebug() << __from << __msg;
+  //  qDebug() << __from << __msg;
 
     char cmd = __msg.at(0);
     switch(__from) {
