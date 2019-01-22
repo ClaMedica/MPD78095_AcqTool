@@ -92,7 +92,7 @@ void MDataManager::getGrabbedImage(QObject *gi, QString __nome)
     if (__nome != "grafo")
         m_mngPrint->getGrabbedImage(gi, __nome);
 }
-
+#ifndef PICOFLOW
 void MDataManager::saveImg(QQuickItem *__item, QString __nome)
 {
     QString imgName = __nome;
@@ -117,7 +117,7 @@ void MDataManager::saveImg(QQuickItem *__item, QString __nome)
     });
 
 }
-
+#endif
 void MDataManager::setInfoList(QVariantList __list)
 {
     if(__list != m_infoList) {
@@ -917,7 +917,7 @@ QVariantList MDataManager::getPlotLimits()
     }
     return limits;
 }
-
+#ifndef PICOFLOW
 QString MDataManager::getNameOfObj(QVariantList __whoAmI)
 {
     qulonglong whoAmI = __whoAmI.first().toULongLong();
@@ -925,7 +925,7 @@ QString MDataManager::getNameOfObj(QVariantList __whoAmI)
     QString toRet = elementToModify->value("category").toString();
     return toRet.toLower();
 }
-
+#endif
 bool MDataManager::changeObject(QVariantList __curObj)
 {
     //qDebug()<<"Cambio un elemento con queste caratteristiche :"<<__curObj;

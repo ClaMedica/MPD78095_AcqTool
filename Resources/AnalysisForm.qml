@@ -87,7 +87,7 @@ MForm{
 
         onCurObjChanged: {
             if(completed){
-                if (curObj.length === 1) {//sto cancellando un markers
+                if (!PicoFlow && curObj.length === 1) {//sto cancellando un markers
                     dialogDelete.obj = curObj
                     dialogDelete.owner=this
                 }
@@ -185,7 +185,8 @@ MForm{
         delegate: MMarkerButton{
             onClick: {
                 if (value === "111") {
-                    mngData.saveImg(sourceImg,"GR000")
+                    if (!PicoFlow)
+                        mngData.saveImg(sourceImg,"GR000")
                     mngData.analysis();
                 }
 

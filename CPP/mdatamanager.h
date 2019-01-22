@@ -74,8 +74,9 @@ public:
 
     void send_Command(int __command);   // replicato da macqmanager perche' non si puo' invocare l'originale
     Q_INVOKABLE mflowdatas *getFlowDatas(int __i);
+#ifndef PICOFLOW
     Q_INVOKABLE void saveImg(QQuickItem* __item, QString __nome);
-
+#endif
 signals:
     void dataNewsChanged();
     void availableDataChanged();
