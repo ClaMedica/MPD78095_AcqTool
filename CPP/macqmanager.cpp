@@ -243,16 +243,8 @@ bool MAcqManager::newAcquisition(QString __dataFile)
         bool res = m_mng->Continue();
         qDebug() << "Continue ..." << res;
 
-        //la prima volta che si fa un'acquisizione siamo nello stato di ACQUIRING
-        //questo fa si che il messaggio di inizializzazione non scompaia perche' in attesa
-        //del passaggio di stato da CONNECTED a ACQUIRING.
-        //al termine dell'acquisizione c'è una disconnessione dal supe e lo stato
-        //diventa NOT_CONNECTED, quindi poi tutto procede bene
-        static bool firstAcq = true;
-        if (firstAcq) {
-            firstAcq = false;
-            m_oldState = ESTATE_IDLE_CONNECTED;
-        }
+//        m_oldState = 255;
+        m_newStateQ.clear();
 
         //dico a medica di salvare il file nel db
         g_mainAppBridge->sendSave();
@@ -359,7 +351,7 @@ void MAcqManager::endAcquisition(bool discard)
     m_autoStartStop = false;
     m_saving = false;           //non sto salvando i dati
     m_supeConnected = 0;
-    m_oldState = ESTATE_IDLE_NOT_CONNECTED;
+ //   m_oldState = ESTATE_IDLE_NOT_CONNECTED;
     emit acquisitionEnded();
 }
 
@@ -477,7 +469,9 @@ void MAcqManager::handleTCP(SimpleTCPClient *__client, QByteArray __block)
 
         if(who == "STA") {      //allora e' uno stato
             m_supeConnected = true;
-            qint32 numBytes;
+            bool     isBT;
+            qint32   numBytes;
+            qint8  * dest;
             static QByteArray staticblock;
             staticblock += __block;
             while(staticblock.size() > (int)(sizeof(qint32))) {
@@ -487,38 +481,36 @@ void MAcqManager::handleTCP(SimpleTCPClient *__client, QByteArray __block)
                     break;
 
                 staticblock.remove(0, 4);
-                uint8_t newState = 0;
-                bool isBT;
-                qDebug("blk.sz:%d sz(alarms_t):%d sz(flowBT_status_t):%d sz(picoFlow_status_t):%d",numBytes, sizeof(alarms_t),sizeof(flowBT_status_t),sizeof(picoFlow_status_t));
                 int xsize = numBytes - sizeof(alarms_t);
-                qint8  * d = NULL;
                 switch(xsize) {
                 default:
                                                 qDebug() << "WRONG STATUS SIZE:" << xsize;
                                                 xsize = -1;
                                                 break;
                 case sizeof(flowBT_status_t):
-                                                qDebug(" --> currState.bt = stBT.currState");
                                                 isBT = true;
-                                                d = (qint8 *) &stBT;
+                                                dest = (qint8 *) &stBT;
                                                 break;
                 case sizeof(picoFlow_status_t):
-                                                qDebug(" --> currState.pf = stPico.currState");
-                                                d = (qint8 *) &stPico;
+                                                dest = (qint8 *) &stPico;
                                                 isBT = false;
                                                 break;
                 }
+                qDebug("stateQueue:%d blk.sz:%d sz(alarms_t):%d sz(flowBT_status_t):%d sz(picoFlow_status_t):%d", m_newStateQ.size(), numBytes, sizeof(alarms_t),sizeof(flowBT_status_t),sizeof(picoFlow_status_t));
                 if(xsize > 0) {
-                    memcpy(d                   , staticblock.data()         , xsize);
+                    memcpy(dest                , staticblock.data()         , xsize);
                     memcpy((qint8 *) (& alarms), staticblock.data() + xsize , sizeof(alarms_t));
-                    if(isBT)
-                        newState = stBT.currState;
-                    else
-                        newState = stPico.currState;
+                    int newState = isBT ? (int) stBT.currState : (int) stPico.currState;
 
-                    analyzeStatus(newState, isBT);
+                    m_newStateQ.enqueue(newState);
+                    if(m_acqFileOpened && !m_acqFinished) {
+                        while(!m_newStateQ.empty()) {
+                            newState = m_newStateQ.dequeue();
+                            analyzeStatus(newState, isBT);
+                        }
+                    }
                     analyzeAlarms(alarms);
-                    qDebug() << "Supervisore connesso"<<sizeof(flowBT_status_t)<<sizeof(picoFlow_status_t)<<sizeof(alarms_t)<<__block.size();
+//                    qDebug() << "Supervisore connesso"<<sizeof(flowBT_status_t)<<sizeof(picoFlow_status_t)<<sizeof(alarms_t)<<__block.size();
                 }
                 staticblock.remove(0, numBytes);
             }
@@ -576,7 +568,7 @@ void MAcqManager::handleTCP(SimpleTCPClient *__client, QByteArray __block)
                             sig->saveLastSec(secToSave);
 
                     m_saving = true;    //posso iniziare a salvare i dati
-                    emit acquisitionStarted();
+                  //  emit systemInAcqStatus();
                     qDebug() << "Start acquiring";
                     m_acqFinished = false;
                 }
@@ -636,21 +628,14 @@ bool MAcqManager::loadConnectivityInfo(Ancestry *__info)
 void MAcqManager::analyzeStatus(uint8_t __currState, bool __isBT)
 {
     static const char * names[] = { "st_IDLE_NOT_CONNECTED", "st_IDLE_CONNECTED", "st_ACQUIRING" };
+    qDebug("new:%s olstate:%s %s", names[__currState], names[m_oldState], __isBT ? "BT" : "Cavo");
 
-//    static uint8_t st[2] = { ESTATE_IDLE_NOT_CONNECTED, ESTATE_IDLE_NOT_CONNECTED };
-//    static bool    aq[2] = { false, false };
-//    int ipfbt = __isBT ? 1 : 0;
-//    m_oldState = st[ipfbt];
-//    m_acquired = aq[ipfbt];
-
-    qDebug("olstate:%s new:%s %s", names[m_oldState], names[__currState], __isBT ? "BT" : "Cavo");
-
-    static bool first = true;
-    if (first && !__isBT && m_oldState == ESTATE_IDLE_NOT_CONNECTED)
-    {
-            first = false;
-            m_oldState = ESTATE_IDLE_NOT_CONNECTED;
-    }
+//    static bool first = true;
+//    if (first && !__isBT && m_oldState == ESTATE_IDLE_NOT_CONNECTED)
+//    {
+//            first = false;
+//            m_oldState = ESTATE_IDLE_NOT_CONNECTED;
+//    }
 
     switch(__currState)
     {
@@ -664,19 +649,23 @@ void MAcqManager::analyzeStatus(uint8_t __currState, bool __isBT)
     case ESTATE_IDLE_CONNECTED:
         if(m_oldState == ESTATE_IDLE_NOT_CONNECTED) {
             m_alarmMng.stopTimeoutAlarm(ALA_NOT_CONNECTED);
+            qDebug() << "sendStartAcq()";
             sendStartAcq();
         }
-        if(m_oldState == ESTATE_ACQUIRING) {
-            m_alarmMng.addAlarm(ALA_NOT_ACQUIRING);
+        if(m_oldState == ESTATE_ACQUIRING) {          // SE DA ACQ PASSO A IDLE_CONN PERCHE DEVO ATTIVARE ALA_NOT_ACQ ??????????????
+            qDebug() << "SE DA ACQ PASSO A IDLE_CONN PERCHE DEVO ATTIVARE ALA_NOT_ACQ ?";
+//            m_alarmMng.addAlarm(ALA_NOT_ACQUIRING);
         }
         if(m_oldState == ESTATE_IDLE_CONNECTED && m_acquired) {
             m_acquired = false;
+            qDebug() << "sendStartAcq()";
             sendStartAcq();
         }
         break;
 
     case ESTATE_ACQUIRING:
         if(m_oldState == ESTATE_IDLE_CONNECTED) {
+            qDebug() << "emit systemInAcqStatus()";
             emit systemInAcqStatus();
             m_acquired = true;
             m_alarmMng.manageAlarm(ALA_NOT_ACQUIRING, ENABLE);
@@ -688,10 +677,6 @@ void MAcqManager::analyzeStatus(uint8_t __currState, bool __isBT)
 
     m_oldState = __currState;
    // m_alarmMng.startTimeoutAlarm(ALA_TIMEOUT_STATUS, 2000);
-
-//    st[ipfbt] = m_oldState;
-//    aq[ipfbt] = m_acquired;
-
 }
 
 void MAcqManager::analyzeAlarms(alarms_t __alarms)
@@ -762,7 +747,7 @@ void MAcqManager::checkAutomaticStartStop(QString __which)
                             sig->saveLastSec(5.0);
 
                     m_saving = true;    //posso iniziare a salvare i dati
-                    emit acquisitionStarted();
+                   // emit systemInAcqStatus();
                     qDebug() << "Start acquiring";
                     m_acqFinished = false;
                     return;

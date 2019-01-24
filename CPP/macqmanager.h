@@ -1,6 +1,8 @@
 ﻿#ifndef MACQMANAGER_H
 #define MACQMANAGER_H
 
+#include <QQueue>
+
 #include "mabstractmanager.h"
 #include "udpmsgs.h"
 
@@ -28,7 +30,7 @@ public:
 signals:
     void alarmsChanged();
     void acqMarkersChanged();
-    void acquisitionStarted();
+//    void acquisitionStarted();
     void systemInAcqStatus();
     void acquisitionEnded();
     void udpBtStopped();
@@ -104,6 +106,7 @@ private:
    AlarmManager    m_alarmMng;         //gestore allarmi
 
     uint8_t m_oldState;
+    QQueue<int>     m_newStateQ;
 
     MSignal m_stopBuffer;
 
