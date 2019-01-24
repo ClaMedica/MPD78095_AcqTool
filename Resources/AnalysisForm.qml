@@ -69,9 +69,9 @@ MForm{
     }
 
 
-    //@@@@@@@@@@    Objects     @@@@@@@@@@
 
-    MPlot2DStack {
+    //@@@@@@@@@@    Objects     @@@@@@@@@@
+    MPlot2DStack{
         //@@@@@@@@@@    Properties      @@@@@@@@@@
         id: plot
         clip:true
@@ -82,14 +82,24 @@ MForm{
         height: PicoFlow?(rootAna.height - 15):(rootAna.height - 25)
         plotProp:mngCon.plotSetting
 
+        property real opMarkerKey: -1
         //@@@@@@@@@@    Events          @@@@@@@@@@
 
         onCurObjChanged: {
-            if(completed)
-                mngData.changeObject(curObj)
+            if(completed){
+                if (!PicoFlow && curObj.length === 1) {//sto cancellando un markers
+                    dialogDelete.obj = curObj
+                    dialogDelete.owner=this
+                }
+                else //sto modificando
+                    mngData.changeObject(curObj)
+            }
         }
 
-
+        onOpMarkerPosChanged:{
+            //console.log("Analysi insert opmarker",opMarkerPos)
+            mngData.addOpMarker(opMarkerKey,opMarkerPos);
+        }
     }
 
     MLabel{
@@ -123,17 +133,16 @@ MForm{
         anchors.right: rootAna.right
         anchors.top: parent.top
         anchors.bottom: parent.bottom
-        width:0
+        width:PicoFlow ? 0 : 60
         owner:"Marker"
         itemsInRow:1
         delegate: MMarkerButton{
             onClick: {
-                mngAcq.addMarker(value);
-                //console.log(mngAcq.acqMarkers)
-                plot.markers=mngAcq.acqMarkers;
+                plot.opMarkerKey = value
+                plot.newOpMarker = true
             }
         }
-        visible:false
+        visible: PicoFlow ? false : true
     }
 
     MGridView{
@@ -142,14 +151,25 @@ MForm{
         anchors.right: gridMarker.left
         anchors.top: parent.top
         anchors.bottom: parent.bottom
-        width:0
+        width:PicoFlow ? 0 : 60
         owner:"Definers"
         itemsInRow:1
         delegate: MMarkerButton {
+            onClick: {
+                plot.newDefiner = true
 
+            }
         }
-        visible:true
+        visible: PicoFlow ? false : true
 
+    }
+
+    ShaderEffectSource {
+        id: sourceImg
+        width: plot.width
+        height: plot.height
+        sourceItem: plot
+        recursive: true
     }
 
     MGridView{
@@ -165,20 +185,8 @@ MForm{
         delegate: MMarkerButton{
             onClick: {
                 if (value === "111") {
-                    //Il seguente un trucco che è stato utilizzato perchè la grabToImage() da i seguente problema:
-                    //se l'utente cambia la posizione dei markers analitici, analizza e lancia un nuovo report, in questo
-                    //veniva inserita l'immagine sbagliata con la vecchia posizione dei markers analitici.
-                    //La seconda volta che viene effettuata analisi e report, l'immagine era aggiornata.
-                    //Così non  avendo in questo momento idee migliori, vengono fatte due immagini consegutive
-                    //con il risultato di avere l'immagine ultima corretta sul report
-                    plot.grabToImage(
-                                function(result) { mngData.getGrabbedImage(result, "grafo"); },
-                                Qt.size(600,400)
-                                )
-                    plot.grabToImage(
-                                function(result) { mngData.getGrabbedImage(result, "grafo"); },
-                                Qt.size(600,400)
-                                )
+                    if (!PicoFlow)
+                        mngData.saveImg(sourceImg,"GR000")
                     mngData.analysis();
                 }
 
@@ -239,5 +247,40 @@ MForm{
         }
     }
 
+    MDialogYesNo {
+        id: dialogDelete
+        property var owner:dialogDelete
+        property var obj
+        onOwnerChanged: {
+            switch(owner){
+            case dialogDelete:break;
+            case plot:
+                var name = mngData.getNameOfObj(obj)
+                message=qsTr("Do you really want to delete the " + name + "?")
+                break
+
+            default:console.error("Owner sconosciuto",owner)
+            }
+            if(owner!=dialogDelete)
+                dialogDelete.open()
+        }
+        onAccepted:  {
+            switch(owner){
+            case dialogDelete:break;
+            case plot:
+                mngData.changeObject(obj)
+                break
+            default:console.error("Owner sconosciuto",owner)
+            }
+        }
+        onRejected: {
+            switch(owner){
+            case dialogDelete:break;
+            case plot:break
+            default:console.error("Owner sconosciuto",owner)
+            }
+        }
+
+    }
 
 }

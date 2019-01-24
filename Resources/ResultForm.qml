@@ -161,6 +161,7 @@ MForm {
                 LQM.tracksColors =  mngData.getFlowDatas(i).getLiverpoolMax().getColors()
                 LQM.drawTracks()
                 LQM.visible = false
+                LQM.saveImgNomogramma()
 
                 //button
                 var buttonLQM = Qt.createQmlObject('import "qrc:/Components"; MAnaButton {}', rectdata)
@@ -201,6 +202,7 @@ MForm {
                 LQA.tracksColors =  mngData.getFlowDatas(i).getLiverpoolAve().getColors()
                 LQA.drawTracks()
                 LQA.visible = false
+                LQA.saveImgNomogramma()
 
                 //button
                 var buttonLQA = Qt.createQmlObject('import "qrc:/Components"; MAnaButton {}', rectdata)
@@ -248,6 +250,7 @@ MForm {
                     SQM.polygonXpoints = mngData.getFlowDatas(i).getSirokyMax().getXpoints()
                     SQM.polygonYpoints = mngData.getFlowDatas(i).getSirokyMax().getYpoints()
                     SQM.visible = false
+                    SQM.saveImgNomogramma()
 
                     //button
                     var buttonSQM = Qt.createQmlObject('import "qrc:/Components"; MAnaButton {}', rectdata)
@@ -293,6 +296,7 @@ MForm {
                     SQA.polygonXpoints = mngData.getFlowDatas(i).getSirokyAve().getXpoints()
                     SQA.polygonYpoints = mngData.getFlowDatas(i).getSirokyAve().getYpoints()
                     SQA.visible = false
+                    SQA.saveImgNomogramma()
 
                     //button
                     var buttonSQA = Qt.createQmlObject('import "qrc:/Components"; MAnaButton {}', rectdata)

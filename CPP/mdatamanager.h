@@ -73,9 +73,10 @@ public:
     void storeNews(QString __family, QString __name, qulonglong __element);
 
     void send_Command(int __command);   // replicato da macqmanager perche' non si puo' invocare l'originale
-
     Q_INVOKABLE mflowdatas *getFlowDatas(int __i);
-
+#ifndef PICOFLOW
+    Q_INVOKABLE void saveImg(QQuickItem* __item, QString __nome);
+#endif
 signals:
     void dataNewsChanged();
     void availableDataChanged();
@@ -117,6 +118,9 @@ public slots:
     void sendPrintTest();
 #ifndef PICOFLOW
     void openReport();
+    void addOpMarker(QVariant __key, QVariant __posX);
+    QString getNameOfObj(QVariantList __whoAmI);
+
 #endif
 
 private:

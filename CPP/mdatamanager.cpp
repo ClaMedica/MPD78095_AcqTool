@@ -89,19 +89,15 @@ MDataManager::~MDataManager()
 void MDataManager::getGrabbedImage(QObject *gi, QString __nome)
 {
     qDebug()<<"Immagine"<<__nome<<gi;
-#ifdef PICOFLOW
     if (__nome != "grafo")
         m_mngPrint->getGrabbedImage(gi, __nome);
-#elif WIN32
-    //grafo e nomogrammi
-    QQuickItemGrabResult *item = qobject_cast<QQuickItemGrabResult *>(gi);
-    qDebug()<<"Item"<<item;
-    QImage img = item->image();
-    QPixmap pix = QPixmap::fromImage(img);
-    QString imgName;
-    if (__nome == "grafo")
-        imgName = "GR000";
-    else if (__nome.startsWith("Live"))
+}
+#ifndef PICOFLOW
+void MDataManager::saveImg(QQuickItem *__item, QString __nome)
+{
+    QString imgName = __nome;
+    //caso nomogrammi
+    if (__nome.startsWith("Live"))
         if (__nome.contains("Ave"))
             imgName = "GR202";
         else
@@ -112,11 +108,16 @@ void MDataManager::getGrabbedImage(QObject *gi, QString __nome)
         else
             imgName = "GR210";
 
-    pix.save(m_pathData + imgName + ".jpg"); 
+    auto grabResult = __item->grabToImage();
+    connect(grabResult.data(), &QQuickItemGrabResult::ready, [=]() {
+        QImage img = grabResult.data()->image();
+        QPixmap pix = QPixmap::fromImage(img);
+        //QString imgName = imgName;
+        pix.save(m_pathData + imgName + ".jpg");
+    });
 
-#endif
 }
-
+#endif
 void MDataManager::setInfoList(QVariantList __list)
 {
     if(__list != m_infoList) {
@@ -245,10 +246,10 @@ void MDataManager::loadFile(QString __fileName)
         for(int i = 0; i < m_mng->GetNumOperativeMarkers(); i++) {
             VarMap *mrk = new VarMap;
             m_mng->GetOpMarker(i, &key, numSamp, &descr);
-            qDebug() << numSamp[0];
-            qDebug() << numSamp[1];
-            qDebug() << numSamp[2];
-            qDebug() << numSamp[3];
+//            qDebug() << numSamp[0];
+//            qDebug() << numSamp[1];
+//            qDebug() << numSamp[2];
+//            qDebug() << numSamp[3];
             double val = (double) numSamp[0] / m_mng->GetNAS(0);
             qDebug() << "Marker" << key << val;
 
@@ -265,7 +266,8 @@ void MDataManager::loadFile(QString __fileName)
                 (*mrk)["category"] = CAT_MARKER;
             }
             (*mrk)["val"] = val;
-
+            (*mrk)["name"] = "Operative";
+            (*mrk)["family"] = "Markers";
             mrkOpVec->append(mrk);
         }
 
@@ -726,14 +728,13 @@ bool MDataManager::updateInfoList()
         }
 
         //markers
-        //        VarMapVec *op = m_storage.getAll(CAT_MARKER);
-        //        if (op->size() > 0)
-        //            elements<<"Markers:Operative";
-
-        //        if (m_mng->GetNumDefiners()> 0)
-        //           elements<<"Definers:Operative";
-
-
+        VarMapVec *op = m_storage.getAll(CAT_MARKER);
+        foreach (VarMap *curMap, (*op)) {
+            if (curMap->value("color") == COLOR_OPERATIVE) {
+                elements << "Markers:Operative";
+                break;
+            }
+        }
 
         VarMapVec *opAn = m_storage.getAll(CAT_MARKER);
         foreach (VarMap *curMap, (*opAn)) {
@@ -916,7 +917,15 @@ QVariantList MDataManager::getPlotLimits()
     }
     return limits;
 }
-
+#ifndef PICOFLOW
+QString MDataManager::getNameOfObj(QVariantList __whoAmI)
+{
+    qulonglong whoAmI = __whoAmI.first().toULongLong();
+    VarMap *elementToModify = (VarMap *) whoAmI;
+    QString toRet = elementToModify->value("category").toString();
+    return toRet.toLower();
+}
+#endif
 bool MDataManager::changeObject(QVariantList __curObj)
 {
     //qDebug()<<"Cambio un elemento con queste caratteristiche :"<<__curObj;
@@ -934,7 +943,7 @@ bool MDataManager::changeObject(QVariantList __curObj)
                 saveChanges();
                 updateInfoList();
                 emit reloadingCompleted();
-            }
+           }
         }
         return true;
     }
@@ -1015,9 +1024,24 @@ void MDataManager::exitFromReview()
         m_configUser.saveToXML(configUser);
     }
 
+#ifndef PICOFLOW
+        //file analisi temporaneo
+        //copio il file temp dell'analisi in anTESTNUM1a.xml
+        QString testnumber;
+        testnumber = QString("%1").arg(m_testNumber,5,10,QLatin1Char('0'));
+        QString filenameAna = m_pathData;
+        filenameAna.append("temp");
+        filenameAna.append(testnumber);
+        filenameAna.append(".xml");
+#endif
+
     if (getToSave() == "ret") {
         if (m_mngPrint != NULL) m_mngPrint->closePrinter();
         qDebug()<<"cancellata copia all'exit"<<QFile::remove(m_copyFileName);
+#ifndef PICOFLOW
+        if (QFile::exists(filenameAna))
+            qDebug()<<"cancello file temp analisi"<<QFile::remove(filenameAna);
+#endif
         if(DebugAcqTool == false) {
             send_Command(5);   // STARTBT
             g_mainAppBridge->sendSwitch();  //send(MEX_SHOW);
@@ -1033,20 +1057,31 @@ void MDataManager::exitFromReview()
     else
     {
         if (m_mngPrint != NULL) m_mngPrint->closePrinter();
-
         if (getToSave() == "yes")
-        {        //copio il file copy nell'originale
+        {
+            //copio il file copy nell'originale
             if (QFile::exists(m_copyFileName))
             {
                 saveChanges();
                 qDebug()<<"cancello vecchio file"<<QFile::remove(m_fileName);
                 qDebug()<<"copio le modifiche"<<QFile::rename(m_copyFileName,m_fileName);
             }
+#ifndef PICOFLOW
+            if (QFile::exists(filenameAna)) {
+                QString newname = filenameAna;
+                newname.replace("temp","an");
+                qDebug()<<"salvo file analisi"<<QFile::rename(filenameAna,newname);
+            }
+#endif
         }
         else //"no"
         {
             //cancello il file copy
             qDebug()<<"cancellata copia all'exit"<<QFile::remove(m_copyFileName);
+#ifndef PICOFLOW
+            if (QFile::exists(filenameAna))
+                 qDebug()<<"cancello file temp analisi"<<QFile::remove(filenameAna);
+#endif
         }
         if(DebugAcqTool == false) {
             send_Command(5);   // STARTBT
@@ -1431,7 +1466,7 @@ void MDataManager::startPrint()
 
 void MDataManager::udpMdmBtDecode(enum WHO __from, QByteArray __msg)
 {
-    qDebug() << __from << __msg;
+  //  qDebug() << __from << __msg;
 
     char cmd = __msg.at(0);
     switch(__from) {
@@ -1464,6 +1499,35 @@ void MDataManager::sendToPrint(enum WHO __from, int __val)
 }
 
 #ifndef PICOFLOW
+void MDataManager::addOpMarker(QVariant __key,QVariant __posX)
+{
+    //prendo il marker operativo corrispondete al __key
+    VarMap mark = m_markerMap[__key];
+
+    VarMapVec *mrkAnVec = new VarMapVec;
+    VarMap *mrk = new VarMap;
+
+    (*mrk)["val"] = __posX;
+    (*mrk)["type"] = mark.value(ATT_TYPE);
+    (*mrk)["name"] = "Operative";
+    (*mrk)["family"] = "Markers";
+    (*mrk)["code"] = mark.value(ATT_CODE);
+    (*mrk)["descr"] = mark.value(ATT_DESCR);
+    (*mrk)["lock"] = false;
+    (*mrk)["key"] = __key;
+    (*mrk)["color"] = COLOR_OPERATIVE;
+    (*mrk)["visible"] = true;
+    (*mrk)["category"] = CAT_MARKER;
+    mrkAnVec->append(mrk);
+    QString family = "Markers";
+    QString name = "Operative";
+    saveDataAndUpdate(family, name, mrkAnVec,APPEND);
+
+    updateInfoList();
+    emit reloadingCompleted();
+}
+
+
 void MDataManager::openReport()
 {
     QLibrary reportLib("MedicalReport.dll");

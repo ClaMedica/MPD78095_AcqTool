@@ -251,7 +251,7 @@ ApplicationWindow {
         onSg_openVolResDlg:{
             volRes.focus = true
             volRes.titleDlg = __tipoAn
-            volRes.visible = true
+            volRes.open()
         }
 
         onSg_loadResult:{
@@ -266,7 +266,7 @@ ApplicationWindow {
         }
 
         onSg_exitFromReview:{
-            exit.visible = true;
+             exit.open()
         }
 
         Component.onCompleted: console.log("MDataManager Ready!")

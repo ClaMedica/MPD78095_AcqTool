@@ -27,7 +27,6 @@
     </qresource>
     <qresource prefix="/Scripts">
         <file>func.js</file>
-        <file>pippo.java</file>
     </qresource>
     <qresource prefix="/Models">
         <file>AlarmModel.qml</file>

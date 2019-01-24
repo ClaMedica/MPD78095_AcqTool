@@ -504,7 +504,7 @@ bool MAbstractManager::buildMarkerInfoMap()
         mark[ATT_CODE] = marker->getAttribute(ATT_CODE);
         mark[ATT_DESCR] = marker->getAttribute(ATT_DESCR);
         mark[ATT_TYPE] = marker->getAttribute(ATT_TYPE);
-        mark["lock"]     = true;
+        mark["lock"]     = false;
         mark["color"]    = COLOR_OPERATIVE;
         mark["visible"]  = true;
         mark["category"] = CAT_MARKER;

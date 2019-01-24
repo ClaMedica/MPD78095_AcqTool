@@ -11,6 +11,12 @@ Rectangle {
     visible: false
     color : layout.value("BackgroundColor")
 
+    function open()
+    {
+        DataEngine.putItemOnTop(this)
+        visible=true
+    }
+
     Keys.onReturnPressed: {
         exitDlg.visible = false
     }

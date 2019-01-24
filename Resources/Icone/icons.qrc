@@ -25,5 +25,7 @@
         <file>discard.png</file>
         <file>discard_click.png</file>
         <file>discard_off.png</file>
+        <file>cmDefFlo_click.jpg</file>
+        <file>cmDefFlo_off.jpg</file>
     </qresource>
 </RCC>
