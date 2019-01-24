@@ -114,10 +114,11 @@ void MAcqManager::udpBtDecode(enum WHO __from, QByteArray __msg)
 }
 
 void MAcqManager::dataOnTCP(QObject *__pParent, SimpleTCPClient *__pTCP, QByteArray __block)
-{//arriviamo qua dentro ogni volta che arriva qualcosa da uno dei server a cui siamo collegati
+{
+    //arriviamo qua dentro ogni volta che arriva qualcosa da uno dei server a cui siamo collegati
 
-    int s = __block.size();  int sm = (s < 16) ? s : 16;
-    //qDebug() << __pTCP->hostAddress() << __pTCP->hostPort() << s << QByteArray(__block.constData(),sm);
+//    int s = __block.size();  int sm = (s < 16) ? s : 16;
+//    qDebug() << __pTCP->hostAddress() << __pTCP->hostPort() << s << QByteArray(__block.constData(),sm);
 
     if(__pParent != NULL) {     //punta a qualcosa andiamo avanti
         if(__pTCP != NULL) {    //punta a qualcosa proviamo a gestirlo
@@ -291,12 +292,14 @@ void MAcqManager::connectToServers()
 
 void MAcqManager::endAcquisitionSave()
 {
+    qDebug() << "traccia start-stop";
     endAcquisition();
     g_mainAppBridge->sendOpen();
 }
 
 void MAcqManager::endAcquisitionDiscard()
 {
+    qDebug() << "traccia start-stop";
     endAcquisition(true);
     g_mainAppBridge->sendDiscard();
 }
@@ -307,6 +310,7 @@ void MAcqManager::endAcquisition(bool discard)
     m_alarmMng.disableAll();
 
     //interrompo la connessione
+    qDebug() << "traccia start-stop";
     sendStopAcq();
 
     foreach (SimpleTCPClient *client, m_tcpClients) {
@@ -385,11 +389,13 @@ void MAcqManager::addDefiner(bool __startEnd, QVariantList __info)
 
 bool MAcqManager::sendStartAcq()
 {
+    qDebug() << "traccia start-stop";
     return sendCommand(ETCP_CMD_START_WITH_ZERO /*ETCP_CMD_START_WITH_ZERO*/);
 }
 
 bool MAcqManager::sendStopAcq()
 {
+    qDebug() << "traccia start-stop";
     m_alarmMng.manageAlarm(ALA_NOT_ACQUIRING, DISABLE);
     return sendCommand(ETCP_CMD_STOP);
 }
@@ -410,6 +416,7 @@ void MAcqManager::setAlarms(QVariantList __list)
 void MAcqManager::send_Command(int __command)
 {
 #ifdef PICOFLOW
+    qDebug() << "traccia start-stop";
 //    sendCommand((tcp_flow_bt_cmd_t) __command);
     QByteArray msg = (__command == 4) ? "suspBt" : "restartBt";
 
@@ -419,6 +426,8 @@ void MAcqManager::send_Command(int __command)
 
 bool MAcqManager::sendCommand(tcp_flow_bt_cmd_t __command)
 {
+    qDebug() << "traccia start-stop";
+    qDebug() << "Sending command: " << __command;
     if(m_tcpClients.contains("CMD")) {
         quint8 c = (quint8) __command;
         m_tcpClients["CMD"]->sendData((char *) &c, sizeof(quint8));
@@ -460,45 +469,60 @@ void MAcqManager::updateAcqData()
 
 void MAcqManager::handleTCP(SimpleTCPClient *__client, QByteArray __block)
 {
+    flowBT_status_t stBT;
+    picoFlow_status_t stPico;
+    alarms_t alarms;
     if(m_tcpClients.values().contains(__client)) {
         QString who = m_tcpClients.key(__client);
         //qDebug() << who ;//<< __block;
 
         if(who == "STA") {      //allora e' uno stato
             m_supeConnected = true;
-            __block.remove(0, 4);
-            flowBT_status_t stBT;
-            picoFlow_status_t stPico;
-            alarms_t alarms;
-            uint8_t newState = 0;
-            bool isBT;
-            uint i = 0;
-            qDebug("blk.sz:%d sz(alarms_t):%d sz(flowBT_status_t):%d sz(picoFlow_status_t):%d",__block.size(), sizeof(alarms_t),sizeof(flowBT_status_t),sizeof(picoFlow_status_t));
-            if((__block.size() - sizeof(alarms_t)) == sizeof(flowBT_status_t)) {
-                qDebug(" --> currState.bt = stBT.currState");
-                qint8  * d = (qint8 *) &stBT;
-                for(i = 0; i < sizeof(flowBT_status_t); i++)
-                    *d++ = __block.at(i);
-//                currState.bt = stBT.currState;
-                newState = stBT.currState;
-                isBT = true;
-            }
-            else {
-                qDebug(" --> currState.pf = stPico.currState");
-                qint8  * d = (qint8 *) &stPico;
-                for(i = 0; i < sizeof(picoFlow_status_t); i++)
-                    *d++ = __block.at(i);
-//                currState.pf = stPico.currState;
-                newState = stPico.currState;
-                isBT = false;
-            }
-            i++;
-            for(uint j = i; j < sizeof(alarms_t) + i; j++)
-                ((qint8 *) (& alarms))[j-i] = __block[j];
+            qint32 numBytes;
+            static QByteArray staticblock;
+            staticblock += __block;
+            while(staticblock.size() > (int)(sizeof(qint32))) {
+                QDataStream in(&staticblock, QIODevice::ReadOnly);
+                in >> numBytes;
+                if((staticblock.size() - sizeof(qint32)) < numBytes)
+                    break;
 
-            analyzeStatus(newState, isBT);
-            analyzeAlarms(alarms);
-            qDebug() << "Supervisore connesso"<<sizeof(flowBT_status_t)<<sizeof(picoFlow_status_t)<<sizeof(alarms_t)<<__block.size();
+                staticblock.remove(0, 4);
+                uint8_t newState = 0;
+                bool isBT;
+                qDebug("blk.sz:%d sz(alarms_t):%d sz(flowBT_status_t):%d sz(picoFlow_status_t):%d",numBytes, sizeof(alarms_t),sizeof(flowBT_status_t),sizeof(picoFlow_status_t));
+                int xsize = numBytes - sizeof(alarms_t);
+                qint8  * d = NULL;
+                switch(xsize) {
+                default:
+                                                qDebug() << "WRONG STATUS SIZE:" << xsize;
+                                                xsize = -1;
+                                                break;
+                case sizeof(flowBT_status_t):
+                                                qDebug(" --> currState.bt = stBT.currState");
+                                                isBT = true;
+                                                d = (qint8 *) &stBT;
+                                                break;
+                case sizeof(picoFlow_status_t):
+                                                qDebug(" --> currState.pf = stPico.currState");
+                                                d = (qint8 *) &stPico;
+                                                isBT = false;
+                                                break;
+                }
+                if(xsize > 0) {
+                    memcpy(d                   , staticblock.data()         , xsize);
+                    memcpy((qint8 *) (& alarms), staticblock.data() + xsize , sizeof(alarms_t));
+                    if(isBT)
+                        newState = stBT.currState;
+                    else
+                        newState = stPico.currState;
+
+                    analyzeStatus(newState, isBT);
+                    analyzeAlarms(alarms);
+                    qDebug() << "Supervisore connesso"<<sizeof(flowBT_status_t)<<sizeof(picoFlow_status_t)<<sizeof(alarms_t)<<__block.size();
+                }
+                staticblock.remove(0, numBytes);
+            }
         }
         else if(who == "VAL")
         {
@@ -614,6 +638,12 @@ void MAcqManager::analyzeStatus(uint8_t __currState, bool __isBT)
 {
     static const char * names[] = { "st_IDLE_NOT_CONNECTED", "st_IDLE_CONNECTED", "st_ACQUIRING" };
 
+//    static uint8_t st[2] = { ESTATE_IDLE_NOT_CONNECTED, ESTATE_IDLE_NOT_CONNECTED };
+//    static bool    aq[2] = { false, false };
+//    int ipfbt = __isBT ? 1 : 0;
+//    m_oldState = st[ipfbt];
+//    m_acquired = aq[ipfbt];
+
     qDebug("olstate:%s new:%s %s", names[m_oldState], names[__currState], __isBT ? "BT" : "Cavo");
 
     //DA TESTARE CON NUOVO SUP, FORSE NON PIU' NECESSARIO
@@ -661,6 +691,10 @@ void MAcqManager::analyzeStatus(uint8_t __currState, bool __isBT)
 
     m_oldState = __currState;
    // m_alarmMng.startTimeoutAlarm(ALA_TIMEOUT_STATUS, 2000);
+
+//    st[ipfbt] = m_oldState;
+//    aq[ipfbt] = m_acquired;
+
 }
 
 void MAcqManager::analyzeAlarms(alarms_t __alarms)

@@ -992,6 +992,7 @@ bool MDataManager::saveDataAndUpdate(QString __family, QString __name, VarMapVec
 void MDataManager::send_Command(int __command)  // replicato da macqmanager perche' non lo si puo' invocare
 {
 #ifdef PICOFLOW
+    qDebug() << "traccia start-stop";
 //    sendCommand((tcp_flow_bt_cmd_t) __command);
     QByteArray msg = (__command == 4) ? "suspBt" : "restartBt";
 
