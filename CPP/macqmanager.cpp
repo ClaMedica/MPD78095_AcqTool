@@ -283,14 +283,14 @@ void MAcqManager::connectToServers()
 
 void MAcqManager::endAcquisitionSave()
 {
-    qDebug() << "traccia start-stop";
+    qDebug() << "endAcquisitionSave()";
     endAcquisition();
     g_mainAppBridge->sendOpen();
 }
 
 void MAcqManager::endAcquisitionDiscard()
 {
-    qDebug() << "traccia start-stop";
+    qDebug() << "endAcquisitionDiscard()";
     endAcquisition(true);
     g_mainAppBridge->sendDiscard();
 }
@@ -301,7 +301,7 @@ void MAcqManager::endAcquisition(bool discard)
     m_alarmMng.disableAll();
 
     //interrompo la connessione
-    qDebug() << "traccia start-stop";
+    qDebug() << "endAcquisition discard:" << discard;
     sendStopAcq();
 
     foreach (SimpleTCPClient *client, m_tcpClients) {
@@ -380,13 +380,13 @@ void MAcqManager::addDefiner(bool __startEnd, QVariantList __info)
 
 bool MAcqManager::sendStartAcq()
 {
-    qDebug() << "traccia start-stop";
+    qDebug() << "sendStartAcq()";
     return sendCommand(ETCP_CMD_START_WITH_ZERO /*ETCP_CMD_START_WITH_ZERO*/);
 }
 
 bool MAcqManager::sendStopAcq()
 {
-    qDebug() << "traccia start-stop";
+    qDebug() << "sendStopAcq()";
     m_alarmMng.manageAlarm(ALA_NOT_ACQUIRING, DISABLE);
     return sendCommand(ETCP_CMD_STOP);
 }
@@ -468,11 +468,11 @@ void MAcqManager::handleTCP(SimpleTCPClient *__client, QByteArray __block)
         //qDebug() << who ;//<< __block;
 
         if(who == "STA") {      //allora e' uno stato
-            m_supeConnected = true;
-            bool     isBT;
-            qint32   numBytes;
-            qint8  * dest;
             static QByteArray staticblock;
+            bool     selBtPf = false;
+            qint8  * dest;
+            qint32   numBytes;
+            m_supeConnected = true;
             staticblock += __block;
             while(staticblock.size() > (int)(sizeof(qint32))) {
                 QDataStream in(&staticblock, QIODevice::ReadOnly);
@@ -488,25 +488,25 @@ void MAcqManager::handleTCP(SimpleTCPClient *__client, QByteArray __block)
                                                 xsize = -1;
                                                 break;
                 case sizeof(flowBT_status_t):
-                                                isBT = true;
+                                                selBtPf = true;
                                                 dest = (qint8 *) &stBT;
                                                 break;
                 case sizeof(picoFlow_status_t):
+                                                selBtPf = false;
                                                 dest = (qint8 *) &stPico;
-                                                isBT = false;
                                                 break;
                 }
-                qDebug("stateQueue:%d blk.sz:%d sz(alarms_t):%d sz(flowBT_status_t):%d sz(picoFlow_status_t):%d", m_newStateQ.size(), numBytes, sizeof(alarms_t),sizeof(flowBT_status_t),sizeof(picoFlow_status_t));
+                qDebug("stateQueue:%d %s blk.sz:%d sz(alarms_t):%d sz(flowBT_status_t):%d sz(picoFlow_status_t):%d", m_newStateQ.size(), selBtPf ? "BT":"PF",numBytes, sizeof(alarms_t),sizeof(flowBT_status_t),sizeof(picoFlow_status_t));
                 if(xsize > 0) {
                     memcpy(dest                , staticblock.data()         , xsize);
                     memcpy((qint8 *) (& alarms), staticblock.data() + xsize , sizeof(alarms_t));
-                    int newState = isBT ? (int) stBT.currState : (int) stPico.currState;
+                    int newState = selBtPf ? (int) stBT.currState : (int) stPico.currState;
 
                     m_newStateQ.enqueue(newState);
                     if(m_acqFileOpened && !m_acqFinished) {
                         while(!m_newStateQ.empty()) {
                             newState = m_newStateQ.dequeue();
-                            analyzeStatus(newState, isBT);
+                            analyzeStatus(newState, selBtPf);
                         }
                     }
                     analyzeAlarms(alarms);
@@ -515,8 +515,7 @@ void MAcqManager::handleTCP(SimpleTCPClient *__client, QByteArray __block)
                 staticblock.remove(0, numBytes);
             }
         }
-        else if(who == "VAL")
-        {
+        else if(who == "VAL") {
             if (m_autoStartStop || m_startAcqManuale) {
                 // riempo i buffer
                 fillBuffers(__block);
@@ -524,7 +523,7 @@ void MAcqManager::handleTCP(SimpleTCPClient *__client, QByteArray __block)
                 // finche' i buffer hanno abbastanza campioni
                 // faccio le mie operazioni e rimuovo i primi campioni
                 while(buffersReady()) {
-                    qDebug() << "BUFFER ready";
+//                    qDebug() << "BUFFER ready";
                     applyOperations();
                     foreach(QString hwc, m_totalHWChan)
                         m_bufferMap[hwc]->remove(0, m_frameMap[hwc]);
@@ -533,7 +532,7 @@ void MAcqManager::handleTCP(SimpleTCPClient *__client, QByteArray __block)
                 qDebug() << "m_saving:" << m_saving << "m_autoStartStop:" << m_autoStartStop;
                 if(m_autoStartStop) {
                     if(!m_saving)
-                        checkAutomaticStartStop("Start");   //finche' non devo salvare riempo il buffer e controllo
+                        checkAutomaticStartStop("Start");   //finche' non devo salvare riempio il buffer e controllo
                     else {
                         checkAutomaticStartStop("Stop");
                         if(!m_acqFinished) {
@@ -550,12 +549,13 @@ void MAcqManager::handleTCP(SimpleTCPClient *__client, QByteArray __block)
                 }
             }
         }
-        else if(who == "CMD")
-        {
+        else if(who == "CMD") {
+            qDebug() << "CMD __block[4]" << __block[4];
             if(__block[4] == '5') {
                 if(!m_saving) {
-                    //parte immediatamnte l'acquisizione
+                    //parte immediatamente l'acquisizione
                     //azzero
+                    qDebug() << "Start acquiring";
                     sendStartAcq();
                     m_startAcqManuale = true;
                     int secToSave = 0.0;
@@ -569,7 +569,6 @@ void MAcqManager::handleTCP(SimpleTCPClient *__client, QByteArray __block)
 
                     m_saving = true;    //posso iniziare a salvare i dati
                   //  emit systemInAcqStatus();
-                    qDebug() << "Start acquiring";
                     m_acqFinished = false;
                 }
                 else {
@@ -652,7 +651,7 @@ void MAcqManager::analyzeStatus(uint8_t __currState, bool __isBT)
             qDebug() << "sendStartAcq()";
             sendStartAcq();
         }
-        if(m_oldState == ESTATE_ACQUIRING) {          // SE DA ACQ PASSO A IDLE_CONN PERCHE DEVO ATTIVARE ALA_NOT_ACQ ??????????????
+        if(m_oldState == ESTATE_ACQUIRING) {
             qDebug() << "SE DA ACQ PASSO A IDLE_CONN PERCHE DEVO ATTIVARE ALA_NOT_ACQ ?";
 //            m_alarmMng.addAlarm(ALA_NOT_ACQUIRING);
         }
