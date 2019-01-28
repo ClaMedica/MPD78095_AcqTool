@@ -1001,7 +1001,6 @@ bool MDataManager::saveDataAndUpdate(QString __family, QString __name, VarMapVec
 void MDataManager::send_Command(int __command)  // replicato da macqmanager perche' non lo si puo' invocare
 {
 #ifdef PICOFLOW
-    qDebug() << "traccia start-stop";
 //    sendCommand((tcp_flow_bt_cmd_t) __command);
     QByteArray msg = (__command == 4) ? "suspBt" : "restartBt";
 
@@ -2133,8 +2132,8 @@ int MDataManager::ReadResult(int & __numEv)
         m_aflwdatas.at(0)->setQAve(m_aflwdatas.at(0)->getQAve()/__numEv);
         m_aflwdatas.at(0)->setTimeAtV3(m_aflwdatas.at(0)->getTimeAtV3()/__numEv);
         m_aflwdatas.at(0)->setTimeAtV2(m_aflwdatas.at(0)->getTimeAtV2()/__numEv);
-        m_aflwdatas.at(0)->setTime90(m_aflwdatas.at(0)->getTimeAtQmax()/__numEv);
-        m_aflwdatas.at(0)->setTimeAtQmax(m_aflwdatas.at(0)->getTime90()/__numEv);
+        m_aflwdatas.at(0)->setTime90(m_aflwdatas.at(0)->getTime90()/__numEv);
+        m_aflwdatas.at(0)->setTimeAtQmax(m_aflwdatas.at(0)->getTimeAtQmax()/__numEv);
         m_aflwdatas.at(0)->setFlowTime(m_aflwdatas.at(0)->getFlowTime()/__numEv);
         m_aflwdatas.at(0)->setDescTime(m_aflwdatas.at(0)->getDescTime()/__numEv);
         m_aflwdatas.at(0)->setVoidingTime(m_aflwdatas.at(0)->getVoidingTime()/__numEv);

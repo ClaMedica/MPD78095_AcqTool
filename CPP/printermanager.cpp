@@ -38,7 +38,7 @@ const char *str_label_time[] = {
 //    "   0          6          12          18          24         30s",
 //    "   0          9          18          27          36         45s",
 //    "   0         12          24          36          48         60s",
-    "   0         0:15       0:30        1:45        1:00       1:15",
+    "   0         0:15       0:30        0:45        1:00       1:15",
     "   0         0:18       0:36        0:54        1:12       1:30",
     "   0         0:21       0:42        1:03        1:24       1:45",
     "   0         0:24       0:48        1:12        1:36       2:00",
@@ -2496,11 +2496,11 @@ void printermanager::Report_result()
     message = tr("Voided Volume ...............");
     Pri_Rep_Lin(message.toLatin1().data(), (int)(m_vol_vuo * Fc_FLW), 1, (char *)"ml\n",   0);
     message = tr("Corrected maximum flow ......");
-    Pri_Rep_Lin(message.toLatin1().data(), (int)(m_cQ * Fc_FLW),      1, (char *)"ml\n",   0);
+    Pri_Rep_Lin(message.toLatin1().data(), (int)(m_cQ * Fc_FLW),      1, (char *)"ml^(1/2)/s\n",   0);
     message = tr("Flow acceleration ...........");
     Pri_Rep_Lin(message.toLatin1().data(), (int)(m_flu_acc * Fc_FLW), 1,(char *)"ml/s^2\n",0);    //?=2 apice
-    message = tr("Maximun contraction speed ...");
-    Pri_Rep_Lin(message.toLatin1().data(), (int)(m_vDetMax * Fc_FLW), 1, (char *)"ml/s\n", 0);
+    message = tr("Maximum contraction speed ...");
+    Pri_Rep_Lin(message.toLatin1().data(), (int)(m_vDetMax * Fc_FLW), 1, (char *)"mm/s\n", 0);
     message = tr("Residual volume .............");
     Pri_Rep_Lin(message.toLatin1().data(), (int)(m_resVol * Fc_FLW),  1, (char *)"ml\n",   0);
 }
