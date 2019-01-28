@@ -328,6 +328,14 @@ void MAcqManager::endAcquisition(bool discard)
         qDebug() << "Commit Values?" << cvres;
     }
 
+    m_acqFileOpened = false;    //nessuna acquisizione in atto
+    m_sendingToPlot = false;    //nessuno sta spedendo qualcosa per cui ci si puo scrivere sopra
+    m_serverReady = false;      //i server non sono inizializzati quindi falso
+    m_autoStartStop = false;
+    m_startAcqManuale = false;
+    m_saving = false;           //non sto salvando i dati
+
+    //chiudo il file .pic
     bool ret = m_mng->Close();
     qDebug() << "File closed?" << ret;
 
@@ -352,13 +360,6 @@ void MAcqManager::endAcquisition(bool discard)
         }
     }
 
-    m_acqFileOpened = false;    //nessuna acquisizione in atto
-    m_sendingToPlot = false;    //nessuno sta spedendo qualcosa per cui ci si puo scrivere sopra
-    m_serverReady = false;      //i server non sono inizializzati quindi falso
-    m_autoStartStop = false;
-    m_saving = false;           //non sto salvando i dati
-//    m_supeConnected = false;
- //   m_oldState = ESTATE_IDLE_NOT_CONNECTED;
     emit acquisitionEnded();
 }
 
