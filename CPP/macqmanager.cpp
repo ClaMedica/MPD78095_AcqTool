@@ -518,21 +518,26 @@ void MAcqManager::handleTCP(SimpleTCPClient *__client, QByteArray __block)
                     }
                     inAcq = tmpInAcq;
 
-                    if((m_acqFileOpened && !m_acqFinished) || (prevState != newState))
-                        m_newStateQ.enqueue(newState);
-                    prevState = newState;
+                    if(selBtPf)
+                        inAcqBT = (newState == ESTATE_ACQUIRING);
 
-                    static const char * names[] = { "st_IDLE_NOT_CONNECTED", "st_IDLE_CONNECTED", "st_ACQUIRING" };
-                    qDebug("stateQueue:%d %s xsize:%d blk.sz:%d %s", m_newStateQ.size(), selBtPf ? "BT":"PF", xsize, numBytes, names[newState]);
+                    bool skip = (inAcqBT && !selBtPf);
 
-//                    if(m_acqFileOpened && !m_acqFinished)
-                    {
+                    if(!skip) {
+                        if((m_acqFileOpened && !m_acqFinished) || (prevState != newState))
+                            m_newStateQ.enqueue(newState);
+                        prevState = newState;
+
+                        static const char * names[] = { "st_IDLE_NOT_CONNECTED", "st_IDLE_CONNECTED", "st_ACQUIRING" };
+                        qDebug("stateQueue:%d %s xsize:%d blk.sz:%d %s", m_newStateQ.size(), selBtPf ? "BT":"PF", xsize, numBytes, names[newState]);
                         while(!m_newStateQ.empty()) {
                             newState = m_newStateQ.dequeue();
                             analyzeStatus(newState, selBtPf);
                         }
+                        //                    analyzeAlarms(alarms); TANTO NON FA NIENTE !!!!!!!!!!!!!!!!!!!!
                     }
-//                    analyzeAlarms(alarms); TANTO NON FA NIENTE !!!!!!!!!!!!!!!!!!!!
+                    else
+                        qDebug() << "inAcqBT: stato cavo ignorato";
                 }
                 staticblock.remove(0, numBytes);
             }
