@@ -10,7 +10,7 @@ MAcqManager::MAcqManager(QObject *parent)
     m_serverReady = false;      //i server non sono inizializzati quindi falso
     m_autoStartStop = false;
     m_saving = false;           //non sto salvando i dati
-    m_supeConnected = 0;
+    m_supeConnected = false;
     m_oldState = 0;
     m_itsok = "              &";
     OutFile = NULL;
@@ -49,7 +49,7 @@ MAcqManager::MAcqManager(QObject *parent)
 //    qDebug("tutto");
 
 #ifdef PICOFLOW
-    QTimer::singleShot(2000, this, SLOT(connectToServers()));
+    QTimer::singleShot(1000, this, SLOT(connectToServers()));
 
     //connetto il gestore degli allarmi alla proprietA  alarms
     connect(&m_alarmMng, SIGNAL(alarmsUpdated(QVariantList)), this, SLOT(setAlarms(QVariantList)));
@@ -57,6 +57,8 @@ MAcqManager::MAcqManager(QObject *parent)
     udpConn.iAmAcq();
     udpConn.sendSup("hello from acq");
 #endif
+    qDebug() << "fine costruttore ";
+    qDebug() << "m_acqFileOpened:" << m_acqFileOpened;
 }
 
 MAcqManager::~MAcqManager()
@@ -79,13 +81,11 @@ MAcqManager::~MAcqManager()
         }
     }
 
-
     foreach (QList<MSignal *> list, m_channelMap) {
         foreach(MSignal *sig,list) {
             delete sig;
         }
     }
-
 
     //    for(int i=0;i<m_signalVector.size();i++)
     //        if(m_signalVector[i]!=NULL)
@@ -117,14 +117,14 @@ void MAcqManager::dataOnTCP(QObject *__pParent, SimpleTCPClient *__pTCP, QByteAr
 {
     //arriviamo qua dentro ogni volta che arriva qualcosa da uno dei server a cui siamo collegati
 
-//    int s = __block.size();  int sm = (s < 16) ? s : 16;
-//    qDebug() << __pTCP->hostAddress() << __pTCP->hostPort() << s << QByteArray(__block.constData(),sm);
-
     if(__pParent != NULL) {     //punta a qualcosa andiamo avanti
         if(__pTCP != NULL) {    //punta a qualcosa proviamo a gestirlo
             ((MAcqManager *) __pParent)->handleTCP(__pTCP, __block);
+            return;
         }
     }
+    int s = __block.size();  int sm = (s < 16) ? s : 16;
+    qDebug() << "dataOnTCP() dati ignorati" << s << QByteArray(__block.constData(),sm);
 }
 
 bool MAcqManager::newAcquisition(QString __dataFile)
@@ -267,19 +267,26 @@ bool MAcqManager::newAcquisition(QString __dataFile)
 
 void MAcqManager::connectToServers()
 {
+    bool retry = false;
+    qDebug() << "m_acqFileOpened:" << m_acqFileOpened;
+
+    if(m_supeConnected)
+        return;
+
     //mi connetto ai server
     qDebug() << "Connecting to servers ..." << m_tcpClients.keys();
     foreach (SimpleTCPClient *client, m_tcpClients) {
-        client->registerDataReadyCallBack(&(this->dataOnTCP));
-        client->connectToHost();
+        if(!client->getSocketState() != QAbstractSocket::ConnectedState) {
+            client->registerDataReadyCallBack(&(this->dataOnTCP));
+            client->connectToHost();
+            retry |= true;
+        }
     }
-    if(m_supeConnected == false) {
-        qDebug() << "Retrying to connect in 2 seconds...";
+    if(retry)
         QTimer::singleShot(2000, this, SLOT(connectToServers()));
-    }
-
+    else
+        qDebug() << "TCP connected m_supeConnected:" << m_supeConnected;
 }
-
 
 void MAcqManager::endAcquisitionSave()
 {
@@ -304,13 +311,13 @@ void MAcqManager::endAcquisition(bool discard)
     qDebug() << "endAcquisition discard:" << discard;
     sendStopAcq();
 
-    foreach (SimpleTCPClient *client, m_tcpClients) {
-        //mi disconnetto dal supe
-        if(client->disconnectToHost())
-            qDebug() << "disconnect "
-                     << client->hostAddress().toString()
-                     << client->hostPort();
-    }
+//    foreach (SimpleTCPClient *client, m_tcpClients) {
+//        //mi disconnetto dal supe
+//        if(client->disconnectToHost())
+//            qDebug() << "disconnect "
+//                     << client->hostAddress().toString()
+//                     << client->hostPort();
+//    }
 
     qDebug() << "stato:" << m_mng->GetState();
 
@@ -350,7 +357,7 @@ void MAcqManager::endAcquisition(bool discard)
     m_serverReady = false;      //i server non sono inizializzati quindi falso
     m_autoStartStop = false;
     m_saving = false;           //non sto salvando i dati
-    m_supeConnected = 0;
+//    m_supeConnected = false;
  //   m_oldState = ESTATE_IDLE_NOT_CONNECTED;
     emit acquisitionEnded();
 }
@@ -381,7 +388,7 @@ void MAcqManager::addDefiner(bool __startEnd, QVariantList __info)
 bool MAcqManager::sendStartAcq()
 {
     qDebug() << "sendStartAcq()";
-    return sendCommand(ETCP_CMD_START_WITH_ZERO /*ETCP_CMD_START_WITH_ZERO*/);
+    return sendCommand(ETCP_CMD_START_WITH_ZERO);
 }
 
 bool MAcqManager::sendStopAcq()
@@ -496,21 +503,35 @@ void MAcqManager::handleTCP(SimpleTCPClient *__client, QByteArray __block)
                                                 dest = (qint8 *) &stPico;
                                                 break;
                 }
-                qDebug("stateQueue:%d %s blk.sz:%d sz(alarms_t):%d sz(flowBT_status_t):%d sz(picoFlow_status_t):%d", m_newStateQ.size(), selBtPf ? "BT":"PF",numBytes, sizeof(alarms_t),sizeof(flowBT_status_t),sizeof(picoFlow_status_t));
                 if(xsize > 0) {
                     memcpy(dest                , staticblock.data()         , xsize);
                     memcpy((qint8 *) (& alarms), staticblock.data() + xsize , sizeof(alarms_t));
                     int newState = selBtPf ? (int) stBT.currState : (int) stPico.currState;
 
-                    m_newStateQ.enqueue(newState);
-                    if(m_acqFileOpened && !m_acqFinished) {
+                    static int prevState = -1;
+                    static bool inAcq = false;
+                    bool tmpInAcq = (m_acqFileOpened && !m_acqFinished);
+                    if(tmpInAcq && !inAcq) {
+                        qDebug() << "sendStartAcq()";
+                        sendStartAcq();
+                    }
+                    inAcq = tmpInAcq;
+
+                    if((m_acqFileOpened && !m_acqFinished) || (prevState != newState))
+                        m_newStateQ.enqueue(newState);
+                    prevState = newState;
+
+                    static const char * names[] = { "st_IDLE_NOT_CONNECTED", "st_IDLE_CONNECTED", "st_ACQUIRING" };
+                    qDebug("stateQueue:%d %s xsize:%d blk.sz:%d %s", m_newStateQ.size(), selBtPf ? "BT":"PF", xsize, numBytes, names[newState]);
+
+//                    if(m_acqFileOpened && !m_acqFinished)
+                    {
                         while(!m_newStateQ.empty()) {
                             newState = m_newStateQ.dequeue();
                             analyzeStatus(newState, selBtPf);
                         }
                     }
-                    analyzeAlarms(alarms);
-//                    qDebug() << "Supervisore connesso"<<sizeof(flowBT_status_t)<<sizeof(picoFlow_status_t)<<sizeof(alarms_t)<<__block.size();
+//                    analyzeAlarms(alarms); TANTO NON FA NIENTE !!!!!!!!!!!!!!!!!!!!
                 }
                 staticblock.remove(0, numBytes);
             }
@@ -639,17 +660,18 @@ void MAcqManager::analyzeStatus(uint8_t __currState, bool __isBT)
     switch(__currState)
     {
     case ESTATE_IDLE_NOT_CONNECTED:
-        if(m_oldState == ESTATE_IDLE_CONNECTED)
-            m_alarmMng.startTimeoutAlarm(ALA_NOT_CONNECTED, 1000);
-        else if(m_oldState == ESTATE_ACQUIRING)
-            m_alarmMng.addAlarm(ALA_NOT_CONNECTED);
+        if(m_oldState == ESTATE_IDLE_CONNECTED) m_alarmMng.startTimeoutAlarm(ALA_NOT_CONNECTED, 1000); // mai
+        if(m_oldState == ESTATE_ACQUIRING)      m_alarmMng.addAlarm(ALA_NOT_CONNECTED);                 // mai
         break;
 
     case ESTATE_IDLE_CONNECTED:
         if(m_oldState == ESTATE_IDLE_NOT_CONNECTED) {
             m_alarmMng.stopTimeoutAlarm(ALA_NOT_CONNECTED);
-            qDebug() << "sendStartAcq()";
-            sendStartAcq();
+
+//            if(m_acqFileOpened) { non va bene: se no test sendstartacq in anticipo see c'e' no lo fa mai
+//                qDebug() << "sendStartAcq()";
+//                sendStartAcq();
+//            }
         }
         if(m_oldState == ESTATE_ACQUIRING) {
             qDebug() << "SE DA ACQ PASSO A IDLE_CONN PERCHE DEVO ATTIVARE ALA_NOT_ACQ ?";
@@ -657,8 +679,8 @@ void MAcqManager::analyzeStatus(uint8_t __currState, bool __isBT)
         }
         if(m_oldState == ESTATE_IDLE_CONNECTED && m_acquired) {
             m_acquired = false;
-            qDebug() << "sendStartAcq()";
-            sendStartAcq();
+//            qDebug() << "sendStartAcq()";
+//            sendStartAcq();
         }
         break;
 
