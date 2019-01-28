@@ -477,6 +477,7 @@ void MAcqManager::handleTCP(SimpleTCPClient *__client, QByteArray __block)
 
         if(who == "STA") {      //allora e' uno stato
             static QByteArray staticblock;
+            static bool currSelCh = 0;   // (E_CH_DISP) (uint8_t)mngr->getCurrChan(): canale selezionato
             bool     selBtPf = false;
             qint8  * dest;
             qint32   numBytes;
@@ -492,7 +493,12 @@ void MAcqManager::handleTCP(SimpleTCPClient *__client, QByteArray __block)
                 int xsize = numBytes - sizeof(alarms_t);
                 switch(xsize) {
                 default:
-                                                qDebug() << "WRONG STATUS SIZE:" << xsize;
+                                                if(numBytes == 1) {
+                                                    currSelCh = (staticblock.at(0) != 0);   // 0:cavo 1:BT,RFCOMM,...
+                                                    qDebug() << "Source acq from" << (currSelCh ? "BT" : "cavo");
+                                                }
+                                                else
+                                                    qDebug() << "WRONG STATUS SIZE:" << xsize;
                                                 xsize = -1;
                                                 break;
                 case sizeof(flowBT_status_t):
@@ -504,12 +510,11 @@ void MAcqManager::handleTCP(SimpleTCPClient *__client, QByteArray __block)
                                                 dest = (qint8 *) &stPico;
                                                 break;
                 }
-                if(xsize > 0) {
+                if((xsize > 0) && (selBtPf == currSelCh)) {
                     memcpy(dest                , staticblock.data()         , xsize);
                     memcpy((qint8 *) (& alarms), staticblock.data() + xsize , sizeof(alarms_t));
                     int newState = selBtPf ? (int) stBT.currState : (int) stPico.currState;
 
-                    static int prevState = -1;
                     static bool inAcq = false;
                     bool tmpInAcq = (m_acqFileOpened && !m_acqFinished);
                     if(tmpInAcq && !inAcq) {
@@ -518,12 +523,14 @@ void MAcqManager::handleTCP(SimpleTCPClient *__client, QByteArray __block)
                     }
                     inAcq = tmpInAcq;
 
-                    if(selBtPf)
-                        inAcqBT = (newState == ESTATE_ACQUIRING);
+//                    static bool inAcqBT = false;
+//                    if(selBtPf)
+//                        inAcqBT = (newState == ESTATE_ACQUIRING);
 
-                    bool skip = (inAcqBT && !selBtPf);
+//                    bool skip = (inAcqBT && !selBtPf);
 
-                    if(!skip) {
+//                    if(!skip) {
+                        static int prevState = -1;
                         if((m_acqFileOpened && !m_acqFinished) || (prevState != newState))
                             m_newStateQ.enqueue(newState);
                         prevState = newState;
@@ -535,9 +542,9 @@ void MAcqManager::handleTCP(SimpleTCPClient *__client, QByteArray __block)
                             analyzeStatus(newState, selBtPf);
                         }
                         //                    analyzeAlarms(alarms); TANTO NON FA NIENTE !!!!!!!!!!!!!!!!!!!!
-                    }
-                    else
-                        qDebug() << "inAcqBT: stato cavo ignorato";
+//                    }
+//                    else
+//                        qDebug() << "inAcqBT: stato cavo ignorato";
                 }
                 staticblock.remove(0, numBytes);
             }
