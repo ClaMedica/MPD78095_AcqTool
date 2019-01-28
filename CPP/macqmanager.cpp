@@ -520,31 +520,23 @@ void MAcqManager::handleTCP(SimpleTCPClient *__client, QByteArray __block)
                     if(tmpInAcq && !inAcq) {
                         qDebug() << "sendStartAcq()";
                         sendStartAcq();
+                        m_oldState = ESTATE_IDLE_CONNECTED;
                     }
                     inAcq = tmpInAcq;
 
-//                    static bool inAcqBT = false;
-//                    if(selBtPf)
-//                        inAcqBT = (newState == ESTATE_ACQUIRING);
+                    static int prevState = -1;
+                    if((m_acqFileOpened && !m_acqFinished) || (prevState != newState))
+                        m_newStateQ.enqueue(newState);
+                    prevState = newState;
 
-//                    bool skip = (inAcqBT && !selBtPf);
-
-//                    if(!skip) {
-                        static int prevState = -1;
-                        if((m_acqFileOpened && !m_acqFinished) || (prevState != newState))
-                            m_newStateQ.enqueue(newState);
-                        prevState = newState;
-
-                        static const char * names[] = { "st_IDLE_NOT_CONNECTED", "st_IDLE_CONNECTED", "st_ACQUIRING" };
-                        qDebug("stateQueue:%d %s xsize:%d blk.sz:%d %s", m_newStateQ.size(), selBtPf ? "BT":"PF", xsize, numBytes, names[newState]);
-                        while(!m_newStateQ.empty()) {
-                            newState = m_newStateQ.dequeue();
-                            analyzeStatus(newState, selBtPf);
-                        }
-                        //                    analyzeAlarms(alarms); TANTO NON FA NIENTE !!!!!!!!!!!!!!!!!!!!
-//                    }
-//                    else
-//                        qDebug() << "inAcqBT: stato cavo ignorato";
+                    static const char * names[] = { "st_IDLE_NOT_CONNECTED", "st_IDLE_CONNECTED", "st_ACQUIRING" };
+                    qDebug("stateQueue:%d %s xsize:%d blk.sz:%d %s", m_newStateQ.size(), selBtPf ? "BT":"PF", xsize, numBytes, names[newState]);
+                    qDebug() << "m_oldState" << m_oldState << "m_acqFileOpened" << m_acqFileOpened << "m_acqFinished" << m_acqFinished;
+                    while(!m_newStateQ.empty()) {
+                        newState = m_newStateQ.dequeue();
+                        analyzeStatus(newState, selBtPf);
+                    }
+                    //                    analyzeAlarms(alarms); TANTO NON FA NIENTE !!!!!!!!!!!!!!!!!!!!
                 }
                 staticblock.remove(0, numBytes);
             }
