@@ -516,13 +516,22 @@ void MAcqManager::handleTCP(SimpleTCPClient *__client, QByteArray __block)
                     int newState = selBtPf ? (int) stBT.currState : (int) stPico.currState;
 
                     static bool inAcq = false;
+                    static bool acqStarted = false;
                     bool tmpInAcq = (m_acqFileOpened && !m_acqFinished);
-                    if(tmpInAcq && !inAcq) {
+                    if(tmpInAcq && !inAcq) {    // inizio acq: transizione stato
+                        acqStarted = true;
                         qDebug() << "sendStartAcq()";
                         sendStartAcq();
-                        m_oldState = ESTATE_IDLE_CONNECTED;
+//                        if(selBtPf)
+//                            m_oldState = ESTATE_IDLE_CONNECTED;
                     }
                     inAcq = tmpInAcq;
+
+                    if(acqStarted && (newState == ESTATE_ACQUIRING)) {
+                        acqStarted = false;
+                        qDebug() << "transizione: emit systemInAcqStatus()";
+                        emit systemInAcqStatus();
+                    }
 
                     static int prevState = -1;
                     if((m_acqFileOpened && !m_acqFinished) || (prevState != newState))
@@ -691,8 +700,8 @@ void MAcqManager::analyzeStatus(uint8_t __currState, bool __isBT)
 
     case ESTATE_ACQUIRING:
         if(m_oldState == ESTATE_IDLE_CONNECTED) {
-            qDebug() << "emit systemInAcqStatus()";
-            emit systemInAcqStatus();
+            qDebug() << "RIMOSSA emit systemInAcqStatus()";
+//            emit systemInAcqStatus();
             m_acquired = true;
             m_alarmMng.manageAlarm(ALA_NOT_ACQUIRING, ENABLE);
         }
