@@ -466,6 +466,8 @@ void MAcqManager::updateAcqData()
     emit acqMarkersChanged();
 }
 
+static bool acqStarted = false;
+
 void MAcqManager::handleTCP(SimpleTCPClient *__client, QByteArray __block)
 {
     flowBT_status_t stBT;
@@ -516,11 +518,11 @@ void MAcqManager::handleTCP(SimpleTCPClient *__client, QByteArray __block)
                     int newState = selBtPf ? (int) stBT.currState : (int) stPico.currState;
 
                     static bool inAcq = false;
-                    static bool acqStarted = false;
+//                    static bool acqStarted = false;
                     bool tmpInAcq = (m_acqFileOpened && !m_acqFinished);
                     if(tmpInAcq && !inAcq) {    // inizio acq: transizione stato
                         acqStarted = true;
-                        qDebug() << "sendStartAcq()";
+                        qDebug() << "(tmpInAcq && !inAcq): sendStartAcq()";
                         sendStartAcq();
 //                        if(selBtPf)
 //                            m_oldState = ESTATE_IDLE_CONNECTED;
@@ -590,7 +592,8 @@ void MAcqManager::handleTCP(SimpleTCPClient *__client, QByteArray __block)
                 if(!m_saving) {
                     //parte immediatamente l'acquisizione
                     //azzero
-                    qDebug() << "Start acquiring";
+                    qDebug() << "CMD __block[4] == '5': Start acquiring sendStartAcq()";
+                    acqStarted = true;
                     sendStartAcq();
                     m_startAcqManuale = true;
                     int secToSave = 0.0;
