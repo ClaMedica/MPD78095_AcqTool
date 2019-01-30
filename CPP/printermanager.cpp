@@ -1629,7 +1629,7 @@ void printermanager::Pri_Rep_Label()
     m_str_gr[4] = (sz >> 16) & 0xff;	// n3
     m_str_gr[5] = 0x00;	// n4	normal
     m_str_gr[6] = 0x00;	// n5	scrive a n5 byte dal bordo
-    m_str_gr[7] = 0x65;	// n6	larghezza 808dots=101 byte
+    m_str_gr[7] = 0x65;	// n6	larghezza 808 dots = 101 byte
     // stampo lo zero dell'emg senza udm
     if(m_emgPresent) {
         pos_4_this_string = m_pos_gra_emg;	// inizio dell'asse delle emg
@@ -1744,8 +1744,22 @@ void printermanager::Pri_Rep_Label()
         m_str_gr[ _NUM_BYTE_CMD + str_byte ] = m_str_tr[ str_byte ];
 
     // finalmente stampa
-    m_port->Pri_Str((char *)m_str_gr, dim_string_rel2, false);
-
+//    m_port->Pri_Str((char *)m_str_gr, dim_string_rel2, false);
+    // bitmap completa spezzata in una riga di bit per volta
+    const int ByteXline = m_str_gr[7];      // bytes x linea
+    qDebug() << "spezzo bitmap da" << (m_str_gr[3] * 256 + m_str_gr[2]) << "in pezzi da" << m_str_gr[2];
+    m_str_gr[2] = ByteXline;        // n1
+    m_str_gr[3] = 0;                // n2
+    m_str_gr[4] = 0;                // n3
+    char tbuf[LCMD + 256];
+    memcpy(tbuf, m_str_gr, LCMD);   // comando di stampa
+    char  * p = m_str_gr + LCMD;    // ptr a bitmap
+    for(int i = 0; i < sz; ) {
+        memcpy(tbuf+LCMD, p, ByteXline);
+        m_port->Pri_Str(tbuf, LCMD+ByteXline, false);
+        i += ByteXline;
+        p += ByteXline;
+    }
 }
 
 
@@ -2302,8 +2316,22 @@ void printermanager::Pri_Rep_Gra_Landscape(short __num_sample, double xscale)
         m_str_gr[ _NUM_BYTE_CMD + i ] = m_str_tr[ i ];
 
     // finalmente stampa
-    m_port->Pri_Str((char *)m_str_gr, dim_string_gr, false);
-//qDebug("dopo Pri_str");
+//    m_port->Pri_Str((char *)m_str_gr, dim_string_gr, false);
+    // bitmap completa spezzata in una riga di bit per volta
+    const int ByteXline = m_str_gr[7];      // bytes x linea
+    qDebug() << "spezzo bitmap da" << (m_str_gr[3] * 256 + m_str_gr[2]) << "in pezzi da" << m_str_gr[2];
+    m_str_gr[2] = ByteXline;        // n1
+    m_str_gr[3] = 0;                // n2
+    m_str_gr[4] = 0;                // n3
+    char tbuf[LCMD + 256];
+    memcpy(tbuf, m_str_gr, LCMD);   // comando di stampa
+    char  * p = m_str_gr + LCMD;    // ptr a bitmap
+    for(int i = 0; i < sz; ) {
+        memcpy(tbuf+LCMD, p, ByteXline);
+        m_port->Pri_Str(tbuf, LCMD+ByteXline, false);
+        i += ByteXline;
+        p += ByteXline;
+    }
 }
 
 /**
