@@ -13,6 +13,7 @@ Rectangle{
     property int oriH:0
     property real zoom:0
     property var modello:[]
+    property string key: modM.key
     signal click(var value)
     signal tooltipActive(var testo, var posY)
 

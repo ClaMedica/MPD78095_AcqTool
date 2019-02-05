@@ -1043,6 +1043,7 @@ void MDataManager::exitFromReview()
 #endif
         if(DebugAcqTool == false) {
             send_Command(5);   // STARTBT
+            g_mainAppBridge->sendExitReview();
             g_mainAppBridge->sendSwitch();  //send(MEX_SHOW);
         }
         else
@@ -1084,6 +1085,7 @@ void MDataManager::exitFromReview()
         }
         if(DebugAcqTool == false) {
             send_Command(5);   // STARTBT
+            g_mainAppBridge->sendExitReview();
             g_mainAppBridge->sendSwitch(); //poi dovra tornare al modulo database
         }
         else
