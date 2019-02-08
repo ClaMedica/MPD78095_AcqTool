@@ -72,7 +72,6 @@ private:
     m_acqFinished,  //mi dice se ho finito di acquisire
     m_autoStartStop;//mi dice se il controllo A? abilitato o meno
     bool m_startAcqManuale; //tasto start
-    bool m_acquired;
 
     QByteArray m_sendingPack;
 
@@ -115,7 +114,6 @@ private:
     void initializeServers();
     bool loadConnectivityInfo(Ancestry *__info);
     void analyzeStatus(uint8_t __currState, bool __isBT);
-    void analyzeAlarms(alarms_t __alarms);
     bool newAcqFromConfigFile();
     bool newAcqFromPIC();
     void checkAutomaticStartStop(QString __which);

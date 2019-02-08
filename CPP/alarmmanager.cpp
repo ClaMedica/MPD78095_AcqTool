@@ -77,8 +77,37 @@ void AlarmManager::addAlarm(int __code)
         return;
     }
 
-    ala["message"] = child->getTextOfChild("Text");
-    ala["help"]    = child->getTextOfChild("Help");
+    //Config_Alarms TESTO DA TRADURRE
+    static const char* stringTraslated[] = {
+        QT_TR_NOOP("Fatal Error"),                      //code 0 Text
+        QT_TR_NOOP("Call the technical service"),       //code 0 Help
+        QT_TR_NOOP("Cell not connected"),               // code 200 Text
+        QT_TR_NOOP("Turn the cell off and on again"),   //code 200/201 Help
+        QT_TR_NOOP("Interrupted acquisition"),          //code 201 Text
+        QT_TR_NOOP("Allarm not present")                //code non previsto
+    };
+
+    int indexAllarmText = -1, indexAllarmHelp = -1;
+    if (__code == 0 ) //fatal error
+    {
+        indexAllarmText = 0;
+        indexAllarmHelp = 1;
+    } else if (__code == 200 ) //cella non connessa
+    {
+        indexAllarmText = 2;
+        indexAllarmHelp = 3;
+    } else if (__code == 200 ) //acquisizione interrotta
+    {
+        indexAllarmText = 4;
+        indexAllarmHelp = 3;
+    } else
+    {
+        indexAllarmText = 5;
+        indexAllarmHelp = 5;
+    }
+
+    ala["message"] = tr(stringTraslated[indexAllarmText]);
+    ala["help"]    = tr(stringTraslated[indexAllarmHelp]);
     ala["color"]   = "red";
     ala["sound"]   = "file:///" + g_P7SettingsManager.appPath() + "/Alarm.wav";
 

@@ -14,7 +14,6 @@ MAcqManager::MAcqManager(QObject *parent)
     m_oldState = 0;
     m_itsok = "              &";
     OutFile = NULL;
-    m_acquired = false;
 
     //media mobile flusso e volume
     m_lenMMobile = 10;
@@ -37,16 +36,6 @@ MAcqManager::MAcqManager(QObject *parent)
         qCritical() << "Error on acq configuration file";
     //carico info di connettivitA
     loadConnectivityInfo(m_configAcq.getSafeChild(XML_CONNECTIONS));
-//    QString lang = m_configLocale.getChild(XML_LOCALE)->getSafeAttribute("value");
-//    qDebug("qui");
-//    QString configAlarms = m_applicationPath + "/Config_Alarms_" + lang + ".xml";
-//    qDebug("qui");
-//    if(!QFile::exists(configAlarms))
-//        configAlarms = ":/Config/Config_Alarms_"+ lang + ".xml";
-//    qDebug("qui");
-//    if(!m_alarmMng.load(configAlarms))
-//        qCritical() << "Error on alarm configuration file";
-//    qDebug("tutto");
 
 #ifdef PICOFLOW
     QTimer::singleShot(1000, this, SLOT(connectToServers()));
@@ -139,11 +128,10 @@ bool MAcqManager::newAcquisition(QString __dataFile)
         if(!m_configAcq.loadFromXML(g_P7SettingsManager.progPath() + "/Config_Acq.xml"))
             qCritical() << "Error on acq configuration file";
 
-        //e infine carico il file degli allarmi con la lingua giusta
-        QString lang = m_configLocale.getChild(XML_LOCALE)->getSafeAttribute("value");
-        QString configAlarms = m_applicationPath + "/Config_Alarms_" + lang + ".xml";
+        //e infine carico il file degli allarmi
+        QString configAlarms = m_applicationPath + "/Config_Alarms.xml";
         if(!QFile::exists(configAlarms))
-            configAlarms = ":/Config/Config_Alarms_"+ lang + ".xml";
+            configAlarms = ":/Config/Config_Alarms.xml";
         if(!m_alarmMng.load(configAlarms))
             qCritical() << "Error on alarm configuration file";
 
@@ -497,7 +485,7 @@ void MAcqManager::handleTCP(SimpleTCPClient *__client, QByteArray __block)
                 default:
                                                 if(numBytes == 1) {
                                                     currSelCh = (staticblock.at(0) != 0);   // 0:cavo 1:BT,RFCOMM,...
-                                                    qDebug() << "Source acq from" << (currSelCh ? "BT" : "cavo");
+                                                    //qDebug() << "Source acq from" << (currSelCh ? "BT" : "cavo");
                                                 }
                                                 else
                                                     qDebug() << "WRONG STATUS SIZE:" << xsize;
@@ -522,7 +510,7 @@ void MAcqManager::handleTCP(SimpleTCPClient *__client, QByteArray __block)
                     bool tmpInAcq = (m_acqFileOpened && !m_acqFinished);
                     if(tmpInAcq && !inAcq) {    // inizio acq: transizione stato
                         acqStarted = true;
-                        qDebug() << "(tmpInAcq && !inAcq): sendStartAcq()";
+                        //qDebug() << "(tmpInAcq && !inAcq): sendStartAcq()";
                         sendStartAcq();
 //                        if(selBtPf)
 //                            m_oldState = ESTATE_IDLE_CONNECTED;
@@ -531,7 +519,7 @@ void MAcqManager::handleTCP(SimpleTCPClient *__client, QByteArray __block)
 
                     if(acqStarted && (newState == ESTATE_ACQUIRING)) {
                         acqStarted = false;
-                        qDebug() << "transizione: emit systemInAcqStatus()";
+                        //qDebug() << "transizione: emit systemInAcqStatus()";
                         emit systemInAcqStatus();
                     }
 
@@ -540,14 +528,13 @@ void MAcqManager::handleTCP(SimpleTCPClient *__client, QByteArray __block)
                         m_newStateQ.enqueue(newState);
                     prevState = newState;
 
-                    static const char * names[] = { "st_IDLE_NOT_CONNECTED", "st_IDLE_CONNECTED", "st_ACQUIRING" };
-                    qDebug("stateQueue:%d %s xsize:%d blk.sz:%d %s", m_newStateQ.size(), selBtPf ? "BT":"PF", xsize, numBytes, names[newState]);
-                    qDebug() << "m_oldState" << m_oldState << "m_acqFileOpened" << m_acqFileOpened << "m_acqFinished" << m_acqFinished;
+                   // static const char * names[] = { "st_IDLE_NOT_CONNECTED", "st_IDLE_CONNECTED", "st_ACQUIRING" };
+                   // qDebug("stateQueue:%d %s xsize:%d blk.sz:%d %s", m_newStateQ.size(), selBtPf ? "BT":"PF", xsize, numBytes, names[newState]);
+                   // qDebug() << "m_oldState" << m_oldState << "m_acqFileOpened" << m_acqFileOpened << "m_acqFinished" << m_acqFinished;
                     while(!m_newStateQ.empty()) {
                         newState = m_newStateQ.dequeue();
                         analyzeStatus(newState, selBtPf);
                     }
-                    //                    analyzeAlarms(alarms); TANTO NON FA NIENTE !!!!!!!!!!!!!!!!!!!!
                 }
                 staticblock.remove(0, numBytes);
             }
@@ -667,61 +654,46 @@ void MAcqManager::analyzeStatus(uint8_t __currState, bool __isBT)
     static const char * names[] = { "st_IDLE_NOT_CONNECTED", "st_IDLE_CONNECTED", "st_ACQUIRING" };
     qDebug("new:%s olstate:%s %s", names[__currState], names[m_oldState], __isBT ? "BT" : "Cavo");
 
-//    static bool first = true;
-//    if (first && !__isBT && m_oldState == ESTATE_IDLE_NOT_CONNECTED)
-//    {
-//            first = false;
-//            m_oldState = ESTATE_IDLE_NOT_CONNECTED;
-//    }
-
     switch(__currState)
     {
     case ESTATE_IDLE_NOT_CONNECTED:
-        if(m_oldState == ESTATE_IDLE_CONNECTED) m_alarmMng.startTimeoutAlarm(ALA_NOT_CONNECTED, 1000); // mai
-        if(m_oldState == ESTATE_ACQUIRING)      m_alarmMng.addAlarm(ALA_NOT_CONNECTED);                 // mai
+        //se ero connesso e poi non lo sono più, parte un timer di attesa per allarme "non connesso"
+        if(m_oldState == ESTATE_IDLE_CONNECTED)
+            m_alarmMng.startTimeoutAlarm(ALA_NOT_CONNECTED, 1000);
+
+        //quando durante un'acquisizione si spegne la cella
+        if(m_oldState == ESTATE_ACQUIRING)
+            m_alarmMng.addAlarm(ALA_NOT_CONNECTED);
         break;
 
     case ESTATE_IDLE_CONNECTED:
-        if(m_oldState == ESTATE_IDLE_NOT_CONNECTED) {
+        //se torna la connessione stoppo il timer di attesa allarme "non connesso"
+        if(m_oldState == ESTATE_IDLE_NOT_CONNECTED)
             m_alarmMng.stopTimeoutAlarm(ALA_NOT_CONNECTED);
 
-//            if(m_acqFileOpened) { non va bene: se no test sendstartacq in anticipo see c'e' no lo fa mai
-//                qDebug() << "sendStartAcq()";
-//                sendStartAcq();
-//            }
-        }
-        if(m_oldState == ESTATE_ACQUIRING) {
-            qDebug() << "SE DA ACQ PASSO A IDLE_CONN PERCHE DEVO ATTIVARE ALA_NOT_ACQ ?";
-//            m_alarmMng.addAlarm(ALA_NOT_ACQUIRING);
-        }
-        if(m_oldState == ESTATE_IDLE_CONNECTED && m_acquired) {
-            m_acquired = false;
-//            qDebug() << "sendStartAcq()";
-//            sendStartAcq();
-        }
+        //se improvvisamente non acquisisco più
+        if(m_oldState == ESTATE_ACQUIRING)
+            m_alarmMng.addAlarm(ALA_NOT_ACQUIRING);
+
         break;
 
     case ESTATE_ACQUIRING:
+        //inizio acquisizione attivo allarme "non sto acquisendo"
         if(m_oldState == ESTATE_IDLE_CONNECTED) {
-            qDebug() << "RIMOSSA emit systemInAcqStatus()";
-//            emit systemInAcqStatus();
-            m_acquired = true;
+            //avviso l'utente che l'acquisizione è ripartita
+            resetAlarms();
+            emit systemInAcqStatus();
+            //attivo allarme di possibile perdita acquisizione
             m_alarmMng.manageAlarm(ALA_NOT_ACQUIRING, ENABLE);
         }
+
         break;
 
     default:break;
     }
 
     m_oldState = __currState;
-   // m_alarmMng.startTimeoutAlarm(ALA_TIMEOUT_STATUS, 2000);
 }
-
-void MAcqManager::analyzeAlarms(alarms_t __alarms)
-{
-    qDebug()<<"analyzeAlarm"<<__alarms.ala;
-}
-
 
 bool MAcqManager::checkAutomaticFlow()
 {

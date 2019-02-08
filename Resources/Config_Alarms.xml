@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Root>
+	<EALA_FATAL_ERROR code="0">
+                <Text>Fatal Error</Text>
+                <Help>Call the technical service</Help>
+	</EALA_FATAL_ERROR>
+	<S_ALA_NOT_CONNECTED code="200">
+                <Text>Cell not connected</Text>
+                <Help>Turn the cell off and on again</Help>
+	</S_ALA_NOT_CONNECTED>
+	<S_ALA_NOT_ACQUIRING code="201">
+                <Text>Interrupted acquisition</Text>
+                <Help>Turn the cell off and on again</Help>
+	</S_ALA_NOT_ACQUIRING>
+</Root>

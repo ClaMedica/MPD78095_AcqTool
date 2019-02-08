@@ -5,7 +5,7 @@ ListModel {
     property string message: "Alarm"
     property string help: "call 911"
     property int code: 0
-    property string image:Images.medica
+  //  property string image:Images.medica
     property string color: "red"
     property string sound:""
     property var strList:["message","code","image","color","help","sound"]
@@ -17,7 +17,7 @@ ListModel {
         switch(role)
         {
         case "message":message=value;break;
-        case "image":image=value;break;
+       // case "image":image=value;break;
         case "help":help=value;break;
         case "code":code=value;break;
         case "color":color=value;break;

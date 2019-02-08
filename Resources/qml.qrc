@@ -46,7 +46,6 @@
         <file alias="Supervisor">Supervisor.jpg</file>
     </qresource>
     <qresource prefix="/Config">
-        <file>Config_Alarms_it.xml</file>
         <file>Config_Locale.xml</file>
         <file>Config_User.xml</file>
         <file>Config_Layout.xml</file>
@@ -56,6 +55,7 @@
         <file>Config_Grafic.xml</file>
         <file>Config_Grafic_pico.xml</file>
         <file>Config_User_Prop.xml</file>
+        <file>Config_Alarms.xml</file>
     </qresource>
     <qresource prefix="/Dialog">
         <file>VolResDlg.qml</file>

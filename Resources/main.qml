@@ -214,7 +214,7 @@ ApplicationWindow {
         onSystemInAcqStatus:
         {
             console.log("Go Go Go");
-            forReal.displayMessage(qsTr("start"),2000,5)
+            forReal.displayMessage(qsTr("start"),3000,6)
         }
         onAcquisitionEnded:
         {
