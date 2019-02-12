@@ -178,16 +178,19 @@ public:
     void setVolRes(unsigned int  __val)         {m_resVol = __val;}
     void setDetContrMax(float  __val)           {m_vDetMax = __val;}
 
-    void setMode(unsigned char   __val)     {m_modal_e = __val;}
-    void setPrintSiroky(bool __val)         {m_printSiroky = __val;}
-    void setPrintLiverpool(bool __val)      {m_printLiverpool = __val;}
-    void setPrintModeUser(bool __val)       {m_printModeUser = __val;}
-    void setTipoEsame(unsigned char __val)  {m_test_type = __val;}
+    void setMode(unsigned char   __val)         {m_modal_e = __val;}
+    void setPrintSiroky(bool __val)             {m_printSiroky = __val;}
+    void setPrintLiverpool(bool __val)          {m_printLiverpool = __val;}
+    void setPrintModeUser(bool __val)           {m_printModeUser = __val;}
+    void setTipoEsame(unsigned char __val)      {m_test_type = __val;}
 
     void Report_BitMap(bool __isSiro = false);
     void getGrabbedImage(QObject *__gi, QString __nome);
     void getImage(QImage __img, QString __nome);
     void setPrintHeaders(QString __first, QString __second)     {m_printFirstHeader = __first; m_printSecondHeader = __second;}
+
+    void set_gra_Header_str_gr(int __sz, int __n4, int __dots);
+    void printDigits(int __val, int __ndigits, int __pos);
 
 signals:
 
@@ -295,7 +298,7 @@ private:
     void Pri_Rep_Gra_Landscape(short __num_sample, double xscale);
     void Pri_Rep_asse_dx();
     void Pri_Rep_Label();
-    void Pri_Rep_Lin(char *__str_des, int __rep_dat, unsigned char __num_dec, char *__str_udm, unsigned char __flag_lf);
+    void Pri_Rep_Lin(QString __descr, int __rep_dat, int __num_dec, const char *__str_udm, bool __flag_lf);
 
     unsigned char  Int_Pun(int __i4);
     void Gra_Line();

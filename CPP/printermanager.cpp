@@ -2,38 +2,6 @@
 #include "printermanager.h"
 #include "udpmsgs.h"
 
-//const char str_label_time_old[29][68]={
-//    "   0    3     6     9    12    15    18    21    24    27   30s",
-//    "   0    6     12   18    24    30    36    42    48    54   60s",
-//    "   0    9     18   27    36    45    54    63    72    81   90s",
-//    "   0    12    24   36    48    60    72    84    96   108  120s",
-//    "   0    15    30   45    60    75    90   105   120   135  150s",
-//    "   0    18    36   54    72    90   108   126   144   162  180s",
-//    "   0    21    42   63    84   105   126   147   168   189  210s",
-//    "   0    24    48   72    96   120   144   168   192   216  240s",
-//    "   0    27    54   81   108   135   162   189   216   243  270s",
-//    "   0    30    60   90   120   150   180   210   240   270  300s",
-//    "   0    36    72  108   144   180   216   252   288   324  360s",
-//    "   0    42    84  126   168   210   252   294   336   378  420s",
-//    "   0    48    96  144   192   240   288   336   384   432  480s",
-//    "   0    54   108  162   216   260   314   368   422   476  540s",
-//    "   0    60   120  180   240   300   360   420   480   540  600s",
-//    "   0    66   132  198   264   330   396   462   528   594  660s",
-//    "   0    72   144  216   288   360   432   504   586   658  720s",
-//    "   0    78   156  234   312   390   468   546   624   702  780s",
-//    "   0    84   168  252   336   420   504   588   668   752  840s",
-//    "   0    90   180  270   360   450   540   630   720   810  900s",/* 15*60=900*/
-//    "   0    96   192  288   384   480   576   672   768   864  960s",
-//    "   0   102   204  306   408   510   612   714   816   918 1020s",
-//    "   0   108   216  324   432   540   648   756   864   972 1080s",
-//    "   0   114   228  342   456   570   684   798   912  1026 1140s",
-//    "   0    2m    4m   6m    8m   10m   12m   14m   16m   18m   20m",
-//    "   0          9          18          27          36         45s",
-//    "   0          15         30          45          60         75s",
-//    "   0          21         42          63          84        105s",
-//    "   0          27         54          81         108        135s"
-//};
-
 const char *str_label_time[] = {
 //    "   0          6          12          18          24         30s",
 //    "   0          9          18          27          36         45s",
@@ -171,11 +139,59 @@ printermanager::printermanager(QString __namefile, QObject *parent) : QObject(pa
     buffer_vol = NULL;
 }
 
-
 printermanager::~printermanager()
 {
     if (m_port != NULL)
         m_port->closeSerialPort();
+}
+
+void printermanager::set_gra_Header_str_gr(int __sz, int __n4, int __dots)
+{
+    m_str_gr[0] = ESC;      // 0x1B;	// ESC
+    m_str_gr[1] = '*';      // 0x2A;	// *
+    m_str_gr[2] = __sz % 256         ;	// n1
+    m_str_gr[3] = (__sz >>  8) & 0xff;	// n2
+    m_str_gr[4] = (__sz >> 16) & 0xff;	// n3
+    m_str_gr[5] = __n4;     // n4
+    m_str_gr[6] = 0x00;     // n5	scrive a n5 byte dal bordo
+    m_str_gr[7] = __dots;   // n6	larghezza dots in bytes
+}
+
+/**
+ * @brief printermanager::printDigits
+ * @param __val     : valore POSITIVO da convertire
+ * @param __ndigits
+ * @param __pos
+ */
+void printermanager::printDigits(int __val, int __ndigits, int __pos)
+{
+    char  * dst;
+    char  * src;
+    int   * digits = new int(__ndigits);
+
+    for(int i = 0; i < __ndigits; i++ )
+        digits[i] = -1;
+
+    int i = __ndigits;
+    do {
+        digits[--i] = __val % 10;
+        __val /= 10;
+    } while(__val > 0);
+
+    dst = (char *) & m_str_gr[ __pos ];   // clear
+    for(int i = 0; i < 24*__ndigits; i++)
+        *dst++ = 0;
+
+    for(int n = 0; n < __ndigits; n++) {
+        dst = (char *) & m_str_gr[ __pos + n*24];
+        if(digits[n] >= 0) {
+            src = (char *) & print7x13Set[ digits[n]*13 ];
+            for(int i = 0; i < 13; i++ )
+                *dst++ = *src++;
+        }
+    }
+
+    delete digits;
 }
 
 void printermanager::closePrinter()
@@ -422,7 +438,6 @@ void printermanager::smooting_PRINT_flow()
     }
 }
 
-
 //funzioni che erano nel file Report.cpp
 /**
 la stampa e prevista comunque sempre dopo il review, si avvale dei dati di review, cosi usiamo
@@ -538,7 +553,6 @@ void printermanager::Pri_Rep(double xscale)
 //    m_port->Pri_Reset();	// resetta RAM della stampante: equivale ad un reset HW
     qDebug() << "Pri_Rep FINE file:" << m_namefile;
 }
-
 
 /**
 E' stampata l'intestazione del report, con intestazione clinica, logo and so on
@@ -664,7 +678,6 @@ void printermanager::Report_data()
     m_port->Pri_Intensity(0x80);		// intensita di default
 }
 
-
 /**
 stampa del grafico di flusso/volume nella versione a grafici in portrait mode
 */
@@ -746,7 +759,6 @@ void printermanager::Calc_Max(double xscale)
     m_max_y_gr2 = ((long) ((m_max_vol + 10) / 100) + 1) * 100;	// 05 dicembre
 }
 
-
 /**
 GRAFICI IN PORTRAIT MODE - modo tradizionale
 funzione chiamata ciclicamente per stampare le 10 righe in cui e suddiviso il grafico del flusso/volume
@@ -757,23 +769,14 @@ void printermanager::Pri_Rep_Gra(int __num_riga)
     bool label = false;
     unsigned short uw8;
     short int max_y_flw, max_x_vol;
-    short int first_char, second_char, third_char, fourth_char;
 
     for(int i = 0; i < (LCMD + a_flw); i++ )
         m_str_gr[i] = 0;
 
     // setta la stampa grafica
-    m_str_gr[0] = ESC;	//0x1B;	// ESC
-    m_str_gr[1] = '*';	//0x2A;	// *
-
     int sz = 96 + 2256 + 96;    // 	num_byte = 96 + 2256 + 96 = 2448 = ( 65536 * n3 ) + ( 256 * n2 ) + n1
-    m_str_gr[2] = sz % 256         ;	// n1
-    m_str_gr[3] = (sz >>  8) & 0xff;	// n2
-    m_str_gr[4] = (sz >> 16) & 0xff;	// n3
-
-    m_str_gr[5] = 0x02;	// n4	doppia altezza
-    m_str_gr[6] = 0x00;	// n5	scrive a n5 byte dal bordo
-    m_str_gr[7] = 0x66;	// n6	larghezza 4+94+4=102 byte
+    int dots = 102;             // larghezza 4+94+4=102 byte
+    set_gra_Header_str_gr(sz, 0x02, dots);    // n4	doppia altezza
 
     // se label e' true devo scrivere i valori sugli assi di flw e vol
     // la prima riga del grafico si compone di 24 righe di 94byte ciascuna alle quali antepongo un carattere vuoto, le 24 righe di 3 byte del dato di flw
@@ -785,23 +788,7 @@ void printermanager::Pri_Rep_Gra(int __num_riga)
 #endif
         {
             max_y_flw = (int) (m_max_y - (__num_riga / 2) * (m_max_y / 5));
-
-            // sono 3 i caratteri da 1Bx13 da inserire
-            int ch3[3];
-            ch3[0] = max_y_flw / 100;
-            ch3[1] = (max_y_flw - (ch3[0] * 100)) / 10;
-            ch3[2] = (max_y_flw - (ch3[0] * 100) - (ch3[1] * 10));
-            int nch = 2;
-            if(max_y_flw > 9)
-                nch = 1;
-            if(max_y_flw > 99)
-                nch = 0;
-
-            for( ; nch < 3; nch++) {
-                char  * src_bm = (char *) & print7x13Set[ ch3[nch] * 13];
-                for(int i = 0; i < 13; i++ )
-                    m_str_gr[ LCMD + (CLS - (3 - nch)) * 24 + i ] = *src_bm++;
-            }
+            printDigits(max_y_flw, 3, LCMD + CLS - 3);
         }
     }
 
@@ -818,7 +805,7 @@ void printermanager::Pri_Rep_Gra(int __num_riga)
         int x_pt	=	0;
         int flow_pt	= 240;
         int vol_pt	= 240;
-        int uw5		= m_num_sam-1;		// correzione per evitare l'andata azero // 23-03
+        int uw5		= m_num_sam-1;		// correzione per evitare l'andata a zero // 23-03
         int i4		= __num_riga*24;
 
         int graf_g_x	=752/*(10*m_max_x)*/;			//asse dei tempi in funzione della durata dell'esame
@@ -829,18 +816,18 @@ void printermanager::Pri_Rep_Gra(int __num_riga)
 //        for (int gg=0; gg<NUMOF_X_PRINT_DOTS;gg++)
 //            tmp.append(buffer_flw[gg]);
 
-        for (int uw6 = 1; uw6 < uw5; uw6++ ) {	     /*trovo estremi della retta passante per il campione uw6 uw6+1*/
+        for (int i = 1; i < uw5; i++ ) {	     /*trovo estremi della retta passante per il campione uw6 uw6+1*/
             int x_pt_prec = x_pt;                    /*94*8=752 punti x  i2=x1 della retta*/
             m_x1 = x_pt;
 
-            x_pt = (int) ((752 * uw6) / graf_g_x);             /*x_pt=x2 retta */
+            x_pt = (int) ((752 * i) / graf_g_x);             /*x_pt=x2 retta */
             m_y1 = flow_pt;
 
-            flow_pt = 239 - (int) ((239 * buffer_flw[uw6]) / graf_g_fl); /*y2*/
+            flow_pt = 239 - (int) ((239 * buffer_flw[i]) / graf_g_fl); /*y2*/
 
             if (flow_pt > 239)   // flow_pt = _y1;
                 while (flow_pt <= 239) {
-                    uw8 = uw6 - 1;
+                    uw8 = i - 1;
                     flow_pt	= 239 - (int) ((239 * buffer_flw[uw8]) / (graf_g_fl));//239; modifica 31-03
                 }
             else
@@ -850,21 +837,20 @@ void printermanager::Pri_Rep_Gra(int __num_riga)
             /*ogni riga composta da 1 linee di stampa m_str_gr*/
             m_x2 = x_pt;
             m_y2 = flow_pt;
-            if( Int_Pun(i4 ) ) { //questa funzione utilizza m_x2 e m_y2
+            if( Int_Pun(i4) ) { //questa funzione utilizza m_x2 e m_y2
                 if (m_num_xy > 25)
                     m_num_xy = 25;
-                for(int i22 = 0; i22 < m_num_xy; i22++) {
-                    m_y[i22] -= i4;
-                    int i33 = 24 * (m_x[i22] / 8) + m_y[i22];
-                    unsigned char ub3 = 0x80 >> (unsigned char)(m_x[i22] % 8);
-                    int i6 = i33 / 24;
-                    int i7 = i33 % 24;
-                    m_str_gr[ pos_gra + 24 * i6 + i7] |= (char)ub3;
+                for(int j = 0; j < m_num_xy; j++) {
+                    m_y[j] -= i4;
+                    int i33 = 24 * (m_x[j] / 8) + m_y[j];
+//                    int i6 = i33 / 24;
+//                    int i7 = i33 % 24;
+                    m_str_gr[ pos_gra + i33/*24 * i6 + i7*/] |= (0x80 >> (m_x[j] % 8));
                 }
             }
             m_y1 = vol_pt;
 
-            vol_pt = 239 - (int) ((239 * buffer_vol[uw6]) / (graf_g_vl));
+            vol_pt = 239 - (int) ((239 * buffer_vol[i]) / (graf_g_vl));
             if( vol_pt > 239 )
                 vol_pt = m_y1; // se campione sfarlocco, scrive quello precedente
 
@@ -890,85 +876,8 @@ void printermanager::Pri_Rep_Gra(int __num_riga)
     // inserimento label volume
     if( label ) {
         max_x_vol = (int) (m_max_y_gr2 - (__num_riga / 2) * (m_max_y_gr2 / 5));
-        if( max_x_vol > 999 ) {
-            // inserimento cifre volume 4 caratteri dalla posizone xxx
-            first_char  = max_x_vol / 1000;	// cifra delle migliaia
-            second_char = ( max_x_vol - (first_char * 1000) ) / 100; // cifra delle centinaia
-            third_char  = ( max_x_vol - (first_char * 1000) - (second_char * 100)) / 10; // cifra delle decine
-            fourth_char = ( max_x_vol - (first_char * 1000) - (second_char * 100) - (third_char * 10)); // cifra delle unita
-
-            for(int i = 0; i < 13; i++ )
-                m_str_gr[ pos_lab_vol + (CLD-4)*24 + i ] = (char)print7x13Set[ first_char*13 + i];
-            for(int i = 13; i < 24; i++)
-                m_str_gr[ pos_lab_vol + (CLD-4)*24 + i ] = (char)0x00;
-
-            for(int i = 0; i < 13; i++ )
-                m_str_gr[ pos_lab_vol + (CLD-3)*24 + i ] = (char)print7x13Set[ second_char*13 + i];
-            for(int i = 13; i < 24; i++)
-                m_str_gr[ pos_lab_vol + (CLD-3)*24 + i ] = (char)0x00;
-
-            for(int i = 0; i < 13; i++ )
-                m_str_gr[ pos_lab_vol + (CLD-2)*24 + i ] = (char)print7x13Set[ third_char*13 + i];
-            for(int i = 13; i < 24; i++)
-                m_str_gr[ pos_lab_vol + (CLD-2)*24 + i ] = (char)0x00;
-
-            for(int i = 0; i < 13; i++ )
-                m_str_gr[ pos_lab_vol + (CLD-1)*24 + i ] = (char)print7x13Set[ fourth_char*13 + i];
-            for(int i = 13; i < 24; i++)
-                m_str_gr[ pos_lab_vol + (CLD-1)*24 + i ] = (char)0x00;
-        }
-        else {
-            for(int i = 0; i < 24; i++ )	// spazio
-                m_str_gr[ pos_lab_vol + (CLD-4)*24 + i] = (char)0x00;
-            if( max_x_vol > 99 ) {
-                // inserimento cifre volume 3 caratteri
-                second_char = ( max_x_vol /*- ( first_char*1000 )*/) / 100; // cifra delle centinaia
-                for(int i = 0; i < 13; i++ )
-                    m_str_gr[ pos_lab_vol + (CLD-3)*24 + i ] = (char)print7x13Set[ second_char*13 + i];
-                for(int i = 13; i < 24; i++)
-                    m_str_gr[ pos_lab_vol + (CLD-3)*24 + i ] = (char)0x00;
-
-                third_char =  ( max_x_vol /*- ( first_char*1000 ) */- ( second_char*100 ) ) / 10; // cifra delle decine
-                for(int i = 0; i < 13; i++ )
-                    m_str_gr[ pos_lab_vol + (CLD-2)*24 + i ] = (char)print7x13Set[ third_char*13 + i];
-                for(int i = 13; i < 24; i++)
-                    m_str_gr[ pos_lab_vol + (CLD-2)*24 + i ] = (char)0x00;
-
-                fourth_char = ( max_x_vol /*- ( first_char*1000 ) */- ( second_char*100 ) - ( third_char*10 ) ); // cifra delle unita
-                for(int i = 0; i < 13; i++ )
-                    m_str_gr[ pos_lab_vol + (CLD-1)*24 + i ] = (char)print7x13Set[ fourth_char*13 + i];
-                for(int i = 13; i < 24; i++)
-                    m_str_gr[ pos_lab_vol + (CLD-1)*24 + i ] = (char)0x00;
-            }
-            else {
-                for(int i = 0; i < 24; i++ )	// spazio
-                    m_str_gr[ pos_lab_vol + (CLD-3)*24 + i] = (char)0x00;
-                if( max_x_vol > 9 ) {
-                    // inserimento cifre volume 2 caratteri
-                    third_char =  ( max_x_vol /*- ( first_char*1000 ) - ( second_char*100 ) */) / 10; // cifra delle decine
-                    for(int i = 0; i < 13; i++ )
-                        m_str_gr[ pos_lab_vol + (CLD-2)*24 + i ] = (char)print7x13Set[ third_char*13 + i];
-                    for(int i = 13; i < 24; i++)
-                        m_str_gr[ pos_lab_vol + (CLD-2)*24 + i ] = (char)0x00;
-
-                    fourth_char = ( max_x_vol /*- ( first_char*1000 ) - ( second_char*100 ) */- ( third_char*10 ) ); // cifra delle unita
-                    for(int i = 0; i < 13; i++ )
-                        m_str_gr[  pos_lab_vol + (CLD-1)*24 + i ] = (char)print7x13Set[ fourth_char*13 + i];
-                    for(int i = 13; i < 24; i++)
-                        m_str_gr[ pos_lab_vol + (CLD-1)*24 + i ] = (char)0x00;
-                }
-                else {
-                    for(int i = 0; i < 24; i++ )	// spazio
-                        m_str_gr[ pos_lab_vol + (CLD-2)*24 + i] = (char)0x00;
-                    // inserimento cifre volume 1 carattere
-                    fourth_char = ( max_x_vol /*- ( first_char*1000 ) - ( second_char*100 ) x- ( third_char*10 ) */); // cifra delle unita
-                    for(int i = 0; i < 13; i++ )
-                        m_str_gr[ pos_lab_vol + (CLD-1)*24 + i ] = (char)print7x13Set[ fourth_char*13 + i];
-                    for(int i = 13; i < 24; i++)
-                        m_str_gr[ pos_lab_vol + (CLD-1)*24 + i ] = (char)0x00;
-                }
-            }
-        }
+        // inserimento cifre volume 4 caratteri dalla posizone 'pos_lab_vol'
+        printDigits(max_x_vol, 4, pos_lab_vol);
     }
 
 #endif
@@ -1034,8 +943,6 @@ void printermanager::Pri_Rep_Gra_Ini_Grid(int __n_riga)
             m_str_gr[ pos_gra + i] |= (char)0x10;
     }
 }  // fine Pri_Rep_Gra_Ini_Grid
-
-
 
 unsigned char printermanager::Int_Pun(int __i4)
 {
@@ -1190,7 +1097,6 @@ void printermanager::Str_Trasposta(unsigned char __type, unsigned short __sx_byt
         m_str_gr[ LCMD + j ] = m_str_tr[ j ];
 }
 
-
 /**
 stampa del grafico di EMG nella versione a grafici in portrait mode
 */
@@ -1233,7 +1139,6 @@ void printermanager::Calc_Max_EMG()
     return;
 }
 
-
 void printermanager::Pri_Rep_Gra_EMG(int __num_riga)
 {
     qDebug() << "Pri_Rep_Gra_EMG(" << __num_riga << ")";
@@ -1244,14 +1149,8 @@ void printermanager::Pri_Rep_Gra_EMG(int __num_riga)
         m_str_gr[ i ] = 0;
 
     int sz = 96 + 2256 + 96;    // 	num_byte = 96 + 2256 + 96 = 2448 = ( 65536 * n3 ) + ( 256 * n2 ) + n1
-    m_str_gr[0] = ESC;	//0x1B;	// ESC
-    m_str_gr[1] = '*';	//0x2A;	// *
-    m_str_gr[2] = sz % 256         ;	// n1
-    m_str_gr[3] = (sz >>  8) & 0xff;	// n2
-    m_str_gr[4] = (sz >> 16) & 0xff;	// n3
-    m_str_gr[5] = 0x02;	// n4	doppia altezza // con label di 4 cifre
-    m_str_gr[6] = 0x00;	// n5	scrive a n5 byte dal bordo
-    m_str_gr[7] = 102;	// n6	larghezza 4+4+94=102 byte
+    int dots = 102;             // larghezza 4+4+94=102 byte
+    set_gra_Header_str_gr(sz, 0x02, dots);    // n4	doppia altezza
 
     if( (__num_riga == 0) || ( !(__num_riga % 2) ) )
         label = true;  // scrive i label solo nelle righe 0, 2, 4, 6, 8
@@ -1262,30 +1161,11 @@ void printermanager::Pri_Rep_Gra_EMG(int __num_riga)
     {
         // la prima riga del grafico si compone di 24 righe di 94byte ciascuna alle quali antepongo le 24 righe di m byte del dato di emg
         // gli m byte aggiuntivi sono per le quattre cifre di dato
-        int digits[4];
-        int curDigit;
-        int tmax = max_emg;
-        for(int i = 3; i >= 0; i--) {
-            digits[i] = tmax % 10;
-            tmax /= 10;
-        }
-        for(curDigit = 4; curDigit > 0; curDigit--)
-            for(int i = 0; i < 24; i++ )
-                m_str_gr[ LCMD + (CLD - curDigit)*24 + i] = 0;
-
-        bool leftspace = true;
-        for(curDigit = 4; curDigit > 0; curDigit--) {
-            int digit = digits[4 - curDigit];
-            if(leftspace && (digit == 0))
-                continue;
-            leftspace = false;
-            for(int i = 0; i < 13; i++ )
-                m_str_gr[ LCMD + (CLD - curDigit)*24 + i ] = (char)print7x13Set[ digit*13 + i];
-        }
+        printDigits(max_emg, 4, LCMD);
     }
 #ifdef __ZERO_ASSE_EMG__
     else {                      // niente label m caratteri vuoti
-        if( __num_riga == 9 )   // se e l'ultima riga sovrascrivo lo "0" al terzo carattere
+        if( __num_riga == 9 )   // se e' l'ultima riga sovrascrivo lo "0" al terzo carattere
             for(int i = 0; i < 13; i++ )	// spazio
                 m_str_gr[ LCMD + (CLD-1)*24 + (i+10) ] = (char)print7x13Set[ 0*13 + i];
     }
@@ -1341,7 +1221,6 @@ void printermanager::Pri_Rep_Gra_EMG(int __num_riga)
     m_port->Pri_Str((char *)m_str_gr, LCMD + a_emg, false );
 }
 
-
 /**
 Nella stampa del report tipo reale, individuo il fondoscala del flusso, parametro che serve per adattare i valori
 degli array dati volume e emg (e anche flusso)
@@ -1362,140 +1241,6 @@ long printermanager::Calc_Max_Flw()
         flw_max = 100;
     return flw_max;	// mi servira per la graficazione dei dati
 }
-
-#if 0
-/**
-In stampa devo avere una distribuzione dell'asse del tempo dipendente dalla scala della curva
-del flusso1sec/mm; ho 8 punti/mm e per ogni risoluzione dipendente
-dal valore di FS del flusso, dovro adattare, dal caso minore di 5 sample ogni 8punti, fino al 20sample ogni 8 punti.
-Il paramentro num_sample e il valore assoluto di dati reali acqusiti, e dividendo per 10 questo
-valore ho i secondi effettivi di acquisizione.
-ritorna il numero di punti da stampare, ricavati dall'adattamento del num_sample a seconda della
-risoluzione dell'asse tempo richiesta
-*/
-short printermanager::adatta_buffer_dati(int __num_sample, long __fs_flw)
-{
-    unsigned short j, k;		// valore massimo = 20min*60sec*10sample/sec = 12000
-    unsigned short num_max_sample = __num_sample;
-
-//    if(m_vol_store == NULL)
-//        m_vol_store  = new unsigned short [FREQ_ACQ * MAX_DURATA_ESAME * 60];
-//    if(m_flow_store == NULL)
-//        m_flow_store = new unsigned short [FREQ_ACQ * MAX_DURATA_ESAME * 60];
-//    if(m_emg_store == NULL)
-//        m_emg_store  = new unsigned short [FREQ_ACQ * MAX_DURATA_ESAME * 60];
-
-    j = 0;
-    k = 0;
-    switch(__fs_flw)
-    {
-    case 25:		// 5 sample al mm, cioe 5 sample effettivi per 8 punti: ne devo aggiungere 3 fittizi
-        for(int i = 0; i < (2*__num_sample); i++) {
-            if(k < __num_sample) {
-                j++;
-                m_vol_store[i]  = (unsigned short)buffer_vol[k];
-                m_flow_store[i] = (unsigned short)buffer_flw[k];
-                if (m_emgPresent)
-                    m_emg_store[i] = (unsigned short)buffer_emg[k];
-
-                if((j == 2) || (j == 4) || (j == 5) || (j == 7))
-                    k++;
-                else if(j == 8) {
-                    k++;
-                    j = 0;
-                }
-            }
-            else {
-                num_max_sample = i - 1;
-                break;
-            }
-        }
-        break;
-    case 50:		// rapporto 1:1 cioe 1mm per 1sec, allora 10 sample per mm, cioe ne devo eliminare 2 ogni 10
-        for(int i = 0; i < __num_sample; i++) {
-            if( (i + k) < (__num_sample - 1)) {
-                j++;
-                if( j == 5 ) {
-                    j = 1;
-                    k++;
-                }
-                m_vol_store[i] = buffer_vol[i + k];
-                m_flow_store[i] = buffer_flw[i + k];
-                if (m_emgPresent)
-                    m_emg_store[i] = buffer_emg[i + k];
-            }
-            else {
-                num_max_sample = i;
-                break;
-            }
-        }
-        if(num_max_sample > 0)	// le celle preallocate ma non usate causa compressione buffer dati, le fisso a valori precisi
-            for(int i = (num_max_sample - 1); i < __num_sample; i++) {
-                m_vol_store[i] = buffer_vol[num_max_sample + k -1];// fissata ala valore finale perche questo non varia
-                m_flow_store[i] = 0; // fissata a zero, perche non c'e flusso
-                if (m_emgPresent)
-                    // fissata a zero, perche qui non devo avere attivita alettrica registrata,
-                    // o meglio non devo inventarmi dei valori io
-                    m_emg_store[i] = 0;
-            }
-        break;
-    case 75:		// rapporto 1,5sec per mm, cioe 15sample per mm, 8punti per mm, cioe 15 sample per 8 punti, allora 1 sample ogni 2
-        j = 1;	// devo prendere il primo valore
-        k = 0;
-        for(int i = 0; i < __num_sample; i++) {
-            j++;
-            if(j == 2) {	// poi un campione ogni due
-                m_vol_store[k] = buffer_vol[i];
-                m_flow_store[k] = buffer_flw[i];
-                if (m_emgPresent)
-                    m_emg_store[k] = buffer_emg[i];
-                k++;
-                j = 0;
-            }
-        }
-        num_max_sample = k;	// se num_sample=21, num_max_sample e 12, uno ogni due ma compreso il primo...
-        // le celle preallocate ma non usate causa compressione buffer dati, le fisso a valori precisi
-        for(int i = num_max_sample; i < __num_sample; i++) {
-            m_vol_store[i] = buffer_vol[k - 1];
-            m_flow_store[i] = 0;
-            if (m_emgPresent)
-                m_emg_store[i] = 0;
-            //            *( vol_store + i ) = *( ExamParam.PRINTPhysValBuf[READ_VOL] + k -1); // fissata ala valore finale perche questo non varia
-            //            *( flow_store + i ) = 0;		// fissata a zero, perche non c'e flusso
-            //            if(__num_curve == NUMOF_READ_CHAN)
-            //                *( s3 + i ) = 0;			// fissata a zero, perche qui non devo avere attivita alettrica registrata, o meglio non devo inventarmi dei valori io
-        }
-        break;
-    case 100:	// rapporto 20 sample per mm, allora 20 sample per 8 punti, ogni 5 prendo il secondo e il quinto
-        // il primo campione da prendere e il secondo, poi il quinto, il settimo, il decimo, il dodicesimo e cosi via
-        j = k = 0;
-        for(int i = 0; i < __num_sample; i++) {
-            j++;
-            if((j == 2) || (j == 5)) {
-                m_vol_store[k] = buffer_vol[i];
-                m_flow_store[k] = buffer_flw[i];
-                if (m_emgPresent)
-                    m_emg_store[k] = buffer_emg[i];
-
-                if(j == 5)
-                    j = 0;
-                k++;
-            }
-        }
-        num_max_sample = k;	// se num_sample=21, num_max_sample e 12, uno ogni due ma compreso il primo...
-        // le celle preallocate ma non usate causa compressione buffer dati, le fisso a valori precisi
-        for(int i = num_max_sample; i < __num_sample; i++) {
-            m_vol_store[i] = buffer_vol[k - 1];
-            m_flow_store[i] = 0;
-            if (m_emgPresent)
-                m_emg_store[i] = 0;
-        }
-        break;
-    }
-
-    return num_max_sample;
-}
-#endif
 
 /**
 Nella stampa del report tipo reale, qui si cercano i massimi dei vari array per settare i fondoscala dei grafici
@@ -1603,7 +1348,6 @@ void printermanager::Report_Real_Time(short __num_sample, double xscale)
     m_port->Pri_Str(LINE2, 2, false);
 }
 
-
 /**
 STAMPO in corrispondenza dell'asse ascisse grafico flusso, i label del flusso, dove lo zero sara posto in corrispondenza della prima linea del grafico
 si tratta di un'immagine grafica composta da una matrice di punti larga 808dots e alta (8char*8puntiperchar)=64righe, quindi 808*64=12800punti = 1600caratteri
@@ -1621,15 +1365,10 @@ void printermanager::Pri_Rep_Label()
         m_str_gr[ i ] = 0;
 
     // setta la stampa grafica
-    m_str_gr[0] = ESC;	//0x1B;	// ESC
-    m_str_gr[1] = '*';	//0x2A;	// *
-    int sz = 6464;    // 	num_byte = dim_string_rel2 - 8 = 6472-8= 6464
-    m_str_gr[2] = sz % 256         ;	// n1
-    m_str_gr[3] = (sz >>  8) & 0xff;	// n2
-    m_str_gr[4] = (sz >> 16) & 0xff;	// n3
-    m_str_gr[5] = 0x00;	// n4	normal
-    m_str_gr[6] = 0x00;	// n5	scrive a n5 byte dal bordo
-    m_str_gr[7] = 0x65;	// n6	larghezza 808 dots = 101 byte
+    int sz = 6464;      // num_byte = dim_string_rel2 - 8 = 6472-8= 6464
+    int dots = 101;     // larghezza 808 dots = 101 byte
+    set_gra_Header_str_gr(sz, 0, dots);
+
     // stampo lo zero dell'emg senza udm
     if(m_emgPresent) {
         pos_4_this_string = m_pos_gra_emg;	// inizio dell'asse delle emg
@@ -1762,7 +1501,6 @@ void printermanager::Pri_Rep_Label()
     }
 }
 
-
 /**
 funzione dedicata alla stampa dei caratteri dell'asse a sinistra nel caso del report reale, che
 possono essere volume e flusso, oppure emg, volume e flusso
@@ -1844,7 +1582,6 @@ void printermanager::print_char_left_label(short __value, int __pos_in_string, s
         }
 }
 
-
 /**
 Inserisce nella stringa le udm delle curve che possono essere: ml/s, ml, uV
 */
@@ -1896,7 +1633,6 @@ void printermanager::print_udm_label(int ch_type, short __pos_in_string, short i
     }
 }
 
-
 /**
 GRAFICI IN LANDASCAPE MODE in accordo con specifiche ISC (indifferentemente dal fondoscala,
 l'area sottesa al grafico del flusso, deve essere proporzionale al valore di flusso, quindi anche l'asse
@@ -1928,15 +1664,9 @@ void printermanager::Pri_Rep_Gra_Landscape(short __num_sample, double xscale)
         m_str_gr[ i ] = m_str_tr[ i ] = 0;
 
     // setta la stampa grafica: i primi 8 caratteri della stringa sono comandi
-    m_str_gr[0] = ESC;
-    m_str_gr[1] = '*';
-    int sz = 4160;    // 	num_byte = 4160
-    m_str_gr[2] = sz % 256         ;	// n1
-    m_str_gr[3] = (sz >>  8) & 0xff;	// n2
-    m_str_gr[4] = (sz >> 16) & 0xff;	// n3
-    m_str_gr[5] = 0x00;	// n4	normal
-    m_str_gr[6] = 0x00;	// n5 = 1	scrive a n5 byte dal bordo
-    m_str_gr[7] = 0x68;	// n6 = 104	larghezza 1+50+1+50+1=104 byte
+    int sz   = 4160;    // 	num_byte = 4160
+    int dots = 104;     //	larghezza 1+50+1+50+1=104 byte
+    set_gra_Header_str_gr(sz, 0, dots);
 
     // incrementando init_time_to_print di 5 ad ogni chiamata di questa funzione, sara sempre un multiplo di 5
     // incrementando init_time_to_print del valore in secondi, corrispondente a 40punti stampati, ad ogni chiamata di questa funzione,
@@ -2377,7 +2107,6 @@ bool printermanager::check_stamp_label()
     return false;
 }
 
-
 /**
 Deve stampare l'asse che chiude il grafico e sopra stmpare l label del volume
 */
@@ -2385,21 +2114,12 @@ void printermanager::Pri_Rep_asse_dx()
 {
     // riempio la stringa di zeri
     for(int i = 0; i < dim_string_solo_ax; i++ )
-        m_str_gr[ i ] = 0x00;
+        m_str_gr[ i ] = 0;
 
     // setta la stampa grafica
-    m_str_gr[0]=ESC;	//0x1B;	// ESC
-    m_str_gr[1]='*';	//0x2A;	// *
-//    m_str_gr[2]=0x30;	// n1	num_byte = dim_string_solo_ax - 8 = 816 = ( 65536 * n3 ) + ( 256 * n2 ) + n1 = 256*0x03 + 0x30
-//    m_str_gr[3]=0x03;	// n2
-//    m_str_gr[4]=0x00;	// n3
-    int sz = 816;    // 	num_byte = dim_string_solo_ax - 8 = 816
-    m_str_gr[2] = sz % 256         ;	// n1
-    m_str_gr[3] = (sz >>  8) & 0xff;	// n2
-    m_str_gr[4] = (sz >> 16) & 0xff;	// n3
-    m_str_gr[5]=0x00;	// n4	normal
-    m_str_gr[6]=0x00;	// n5	scrive a n5 byte dal bordo
-    m_str_gr[7]=0x66;	// n6	larghezza 816dots=102 byte
+    int sz   = 816;    // 	num_byte = dim_string_solo_ax - 8 = 816
+    int dots = 102;     // larghezza 816 dots = 102 byte
+    set_gra_Header_str_gr(sz, 0, dots);
 
     // aggiungo la linea dell'asse  delle ordinate, in ogni colonna il primo bit viene acceso
     m_str_gr[_NUM_BYTE_CMD] = (char)0x01;
@@ -2416,7 +2136,7 @@ void printermanager::Pri_Rep_asse_dx()
     unsigned short num_rig_max = (dim_string_solo_ax - 8) / num_col_max;	// 50
 
     for(int i = 0; i < (dim_string_solo_ax - 8); i++ )
-        m_str_tr[i] = (char)0x00;	// azzero tutta questa stringona
+        m_str_tr[i] = 0;	// azzero tutta questa stringona
     for(int num_col = 0; num_col < num_col_max; num_col++ )
     {
         for(int num_rig = 0; num_rig < num_rig_max; num_rig++)
@@ -2492,45 +2212,30 @@ void printermanager::Report_result()
     m_port->Pri_Str(flures.toLatin1().data(), strlen(flures.toLatin1().data()), true);
 
     m_port->Pri_justif(F_left);
-    // tolgo l'accapo automatico della Pri_Rep_Lin e lo metto manuale
+    // tolgo l'acapo automatico della Pri_Rep_Lin e lo metto manuale
     m_port->Pri_Font(1);
     m_port->Pri_mode(0x00);
 
-    QString message;
     if (m_modal_e == 2) {   // il tempo di attesa e' graficato solo se esame manuale
-        message = tr("Waiting time ................");
-        Pri_Rep_Lin(message.toLatin1().data(), (int)((m_tem_att)*Fc_FLW), 1, (char *)"s\n", 0);
+        Pri_Rep_Lin(tr("Waiting time ................"), (int)((m_tem_att)*Fc_FLW), 1, "s\n", false);
     }
     if (m_flu_med > m_flu_max) // piccolo controllo per gestire flussi abnormali, tipici di prove da laboratorio
         if (m_tem_flu < 30) // se la flussata e molto breve e intensa, l'algoritmo sbaglia e puo risultare flu_med > flu_max
             m_flu_med = m_flu_max;
 
-    message = tr("Maximum flow rate ...........");
-    Pri_Rep_Lin(message.toLatin1().data(), (int)(m_flu_max * Fc_FLW), 1, (char *)"ml/s\n", 0);
-    message = tr("Average flow rate ...........");
-    Pri_Rep_Lin(message.toLatin1().data(), (int)(m_flu_med * Fc_FLW), 1, (char *)"ml/s\n", 0);
-    message = tr("Time to maximum flow .........");
-    Pri_Rep_Lin(message.toLatin1().data(), (int)(m_tem_max * Fc_FLW), 1, (char *)"s\n",    0);
-    message = tr("Time between 5% and 95% .....");
-    Pri_Rep_Lin(message.toLatin1().data(), (int)(m_tem_595 * Fc_FLW), 1, (char *)"s\n",    0);
-    message = tr("Flow time ...................");
-    Pri_Rep_Lin(message.toLatin1().data(), (int)(m_tem_flu * Fc_FLW), 1, (char *)"s\n",    0);
-    message = tr("Descent time ................");
-    Pri_Rep_Lin(message.toLatin1().data(), (int)(m_tem_dis * Fc_FLW), 1, (char *)"s\n",    0);
-    message = tr("Voiding time ................");
-    Pri_Rep_Lin(message.toLatin1().data(), (int)(m_tem_svu * Fc_FLW), 1, (char *)"s\n",    0);
-    message = tr("Volume to maximum flow ......");
-    Pri_Rep_Lin(message.toLatin1().data(), (int)(m_vol_max * Fc_FLW), 1, (char *)"ml\n",   0);
-    message = tr("Voided Volume ...............");
-    Pri_Rep_Lin(message.toLatin1().data(), (int)(m_vol_vuo * Fc_FLW), 1, (char *)"ml\n",   0);
-    message = tr("Corrected maximum flow ......");
-    Pri_Rep_Lin(message.toLatin1().data(), (int)(m_cQ * Fc_FLW),      1, (char *)"ml^(1/2)/s\n",   0);
-    message = tr("Flow acceleration ...........");
-    Pri_Rep_Lin(message.toLatin1().data(), (int)(m_flu_acc * Fc_FLW), 1,(char *)"ml/s^2\n",0);    //?=2 apice
-    message = tr("Maximum contraction speed ...");
-    Pri_Rep_Lin(message.toLatin1().data(), (int)(m_vDetMax * Fc_FLW), 1, (char *)"mm/s\n", 0);
-    message = tr("Residual volume .............");
-    Pri_Rep_Lin(message.toLatin1().data(), (int)(m_resVol * Fc_FLW),  1, (char *)"ml\n",   0);
+    Pri_Rep_Lin(tr("Maximum flow rate ..........."), (int)(m_flu_max * Fc_FLW), 1, "ml/s\n", false);
+    Pri_Rep_Lin(tr("Average flow rate ..........."), (int)(m_flu_med * Fc_FLW), 1, "ml/s\n", false);
+    Pri_Rep_Lin(tr("Time to maximum flow ........"), (int)(m_tem_max * Fc_FLW), 1, "s\n",    false);
+    Pri_Rep_Lin(tr("Time between 5% and 95% ....."), (int)(m_tem_595 * Fc_FLW), 1, "s\n",    false);
+    Pri_Rep_Lin(tr("Flow time ..................."), (int)(m_tem_flu * Fc_FLW), 1, "s\n",    false);
+    Pri_Rep_Lin(tr("Descent time ................"), (int)(m_tem_dis * Fc_FLW), 1, "s\n",    false);
+    Pri_Rep_Lin(tr("Voiding time ................"), (int)(m_tem_svu * Fc_FLW), 1, "s\n",    false);
+    Pri_Rep_Lin(tr("Volume to maximum flow ......"), (int)(m_vol_max * Fc_FLW), 1, "ml\n",   false);
+    Pri_Rep_Lin(tr("Voided Volume ..............."), (int)(m_vol_vuo * Fc_FLW), 1, "ml\n",   false);
+    Pri_Rep_Lin(tr("Corrected maximum flow ......"), (int)(m_cQ      * Fc_FLW), 1, "ml^(1/2)/s\n", false);
+    Pri_Rep_Lin(tr("Flow acceleration ..........."), (int)(m_flu_acc * Fc_FLW), 1, "ml/s^2\n", false);    //?=2 apice
+    Pri_Rep_Lin(tr("Maximum contraction speed ..."), (int)(m_vDetMax * Fc_FLW), 1, "mm/s\n", false);
+    Pri_Rep_Lin(tr("Residual volume ............."), (int)(m_resVol  * Fc_FLW), 1, "ml\n",   false);
 }
 
 /**
@@ -2541,7 +2246,7 @@ void printermanager::Report_result()
          -   "str_udm"  =  Stringa Unita' di Misura
          -   "flag_lf"  =  Flag LF Finale
 */
-void printermanager::Pri_Rep_Lin(char *__str_des, int __rep_dat, unsigned char __num_dec, char *__str_udm, unsigned char __flag_lf)
+void printermanager::Pri_Rep_Lin(QString __descr, int __rep_dat, int __num_dec, const char *__str_udm, bool __flag_lf)
 {
     char str2[40];
 
@@ -2551,13 +2256,13 @@ void printermanager::Pri_Rep_Lin(char *__str_des, int __rep_dat, unsigned char _
         if (__num_dec == 0)
             sprintf(str2,"%5u", __rep_dat);
         else {
-            int uw = 1;
-            for (int ub = 0; ub < __num_dec; ub++)
-                uw *= 10;
-            sprintf(str2,"%u.%1u", __rep_dat / uw, __rep_dat % uw);
+            int dec = 1;
+            for (int i = 0; i < __num_dec; i++)
+                dec *= 10;
+            sprintf(str2, "%u.%1u", __rep_dat / dec, __rep_dat % dec);
         }
     }
-    sprintf(m_str_gr, "  %s :", __str_des);		// allontano la riga dal bordo sinistro di 2 spazi
+    sprintf(m_str_gr, "  %s :", __descr.toLatin1().data());		// allontano la riga dal bordo sinistro di 2 spazi
 
     char space_bar[21] = "                    ";
     if (strlen(str2) > 5) {// quando esami lunghissimi, si puo arrivare a lavorare con valori in migliaia di secondi e col decimale la stringa e lunga 6
@@ -2570,7 +2275,7 @@ void printermanager::Pri_Rep_Lin(char *__str_des, int __rep_dat, unsigned char _
     strcat(m_str_gr, str2);
     strcat(m_str_gr, "  ");
     strcat(m_str_gr, __str_udm);
-    m_port->Pri_Str(m_str_gr, strlen(m_str_gr), (__flag_lf == 1));
+    m_port->Pri_Str(m_str_gr, strlen(m_str_gr), __flag_lf);
 }
 
 // conversione da RGB 8*3 = 24 bit a RGB 4*3 = 12 bit
@@ -2684,3 +2389,4 @@ void printermanager::getImage(QImage __img, QString __nome)
     free(bm);
     qDebug("fine getGrabbed, nblack:%d", nblack);
 }
+

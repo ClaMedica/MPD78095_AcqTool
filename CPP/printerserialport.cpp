@@ -19,7 +19,6 @@ void printerserialport::closeSerialPort()
     m_file = NULL;
 }
 
-
 /*
    Invia alla Stampante "num_car" caratteri della stringa "str_pri"
    Se "flag_lf" invia il carattere LF alla fine
@@ -42,7 +41,6 @@ bool printerserialport::Pri_Str(char *__str, int __str_len, bool __flag_lf)
 
     return true;
 }
-
 
 void printerserialport::Pri_justif(char __mode)
 {
