@@ -1,5 +1,5 @@
 TEMPLATE = app
-VERSION = 1.0.0.7
+VERSION = 1.0.0.8
 
 QT += qml quick widgets sql network multimedia xml core serialport
 
@@ -43,7 +43,9 @@ SOURCES += \
     ../AnaUro/analysis.cpp \
     ../AnaUro/anautils.cpp \
     ../MGlobal/fileio.cpp \
-    CPP/graficmanager.cpp
+    CPP/graficmanager.cpp \
+    CPP/mdatamngpico.cpp \
+    CPP/mdatamngdesktop.cpp
 
 HEADERS += \
     CPP/alarmmanager.h \
@@ -79,6 +81,8 @@ HEADERS += \
     ../MGlobal/systemmanager.h \
     ../MGlobal/UdmImpl.h \
     ../MGlobal/fileio.h \
+    CPP/mdatamngpico.h \
+    CPP/mdatamngdesktop.h
 
 
 INCLUDEPATH +=  CPP \
