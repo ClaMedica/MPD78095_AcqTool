@@ -7,9 +7,7 @@
 #include "mflowdatas.h"
 #include "printermanager.h"
 #include <QQuickItemGrabResult>
-//#include <QPrinterInfo>
 #include "udpmsgs.h"
-//#include <QPrinter>
 
 
 typedef struct {
@@ -54,6 +52,7 @@ public:
     Q_INVOKABLE bool getAutoPrint(){return m_autoPrint;}
     Q_INVOKABLE int getAutoFlow(){return m_autoFlow;}
 
+    //PICO
     Q_INVOKABLE int getSpoolerQueueLen() { return spoolerQueueLen; }
 
     QStringList availableData(){return m_availableData;}
@@ -74,9 +73,7 @@ public:
 
     void send_Command(int __command);   // replicato da macqmanager perche' non si puo' invocare l'originale
     Q_INVOKABLE mflowdatas *getFlowDatas(int __i);
-#ifndef PICOFLOW
-    Q_INVOKABLE void saveImg(QQuickItem* __item, QString __nome);
-#endif
+
 signals:
     void dataNewsChanged();
     void availableDataChanged();
@@ -116,12 +113,6 @@ public slots:
     void sendToPrint(enum WHO __from = E_NONE, int __val = -1);
     void udpMdmBtDecode(enum WHO __from, QByteArray __msg);
     void sendPrintTest();
-#ifndef PICOFLOW
-    void openReport();
-    void addOpMarker(QVariant __key, QVariant __posX);
-    QString getNameOfObj(QVariantList __whoAmI);
-
-#endif
 
 private:
     QVector<MSignal *> m_signalVector;
@@ -132,11 +123,7 @@ private:
     m_possibleCategories,
     m_filesLoaded;//contiene l'elenco di tutti i file che sono stati aperti e di cui vi sono i dati disponibili per l'utente
 
-    QString m_currentSignalName,
-    m_fileName,
-    m_copyFileName,
-    m_pathData;
-    int m_testNumber;
+    QString m_currentSignalName;
 
     MSignal *m_pCurrentSignal;
 
@@ -158,7 +145,6 @@ private:
     QString m_toSave;
 
     bool    m_analized;
-    bool    m_autoPrint;
     int     m_autoFlow;     //Modalita dell'esame 0=auto; 2=manual
     bool    m_Siroky;       //se stampare Siroky
     bool    m_Liverpool;    //se stampare Liverpool
@@ -171,35 +157,27 @@ private:
     int m_numAna; //numero di analisi --> non sappiamo se serve
     QVector<mflowdatas*> m_aflwdatas; //array di analisi di tipo flussimetria
 
+    //PICO
     printermanager *m_mngPrint;
     int spoolerQueueLen;
 
-
-//----
-    bool saveDataAndUpdate(QString __family, QString __name, VarMapVec*__elements,bool __whatIfAlreadyPresent=OVERWRITE);
     void updateAvailableData();
     bool buildInfoList();
-    bool updateInfoList();
-
 
     void InitPageGraphs(int __anaType);
     bool InitArraysFLW(int __start, int __end, QVector<unsigned char> __chEn, int __curDef, unsigned char __auto);
     int ReadResult(int & __numEv);
     bool checkForVolRes();
 
-#ifndef PICOFLOW
-    //referto
-    QTimer* m_reportOpenedTimer;
-    QTimer* m_reportTimer;
-    bool m_winword;
-    QString m_nomeReferto;
-    bool checkReportFileOpen();
 
-private slots:
-    //per referto
-    void slot_checkReportOpened();
-    void slot_startReport();
-#endif
+protected:
+    bool saveDataAndUpdate(QString __family, QString __name, VarMapVec*__elements,bool __whatIfAlreadyPresent=OVERWRITE);
+    bool updateInfoList();
+    bool    m_autoPrint;
+    QString m_pathData;
+    QString m_fileName;
+    QString m_copyFileName;
+    int m_testNumber;
 
 };
 

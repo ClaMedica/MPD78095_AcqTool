@@ -9,7 +9,9 @@
 #include <global.h>
 #include <modelmanager.h>
 #include <macqmanager.h>
-#include <mdatamanager.h>
+//#include <mdatamanager.h>
+//#include <MDataMngPico.h>
+#include <MDataMngDesktop.h>
 #include <mflowdatas.h>
 #include <QProcess>
 #include <QtGlobal>
@@ -95,7 +97,12 @@ int main(int argc, char *argv[])
     qmlRegisterType<ParameterManager>("Managers", 1, 0, "ParameterManager");
     qmlRegisterType<ModelManager>("Managers", 1, 0, "ModelManager");
     qmlRegisterType<MAcqManager>("Managers", 1, 0, "MAcqManager");
-    qmlRegisterType<MDataManager>("Managers", 1, 0, "MDataManager");
+#ifdef PICOFLOW
+    qmlRegisterType<MDataMngPico>("Managers", 1, 0, "MDataManager");
+#else
+    qmlRegisterType<MDataMngDesktop>("Managers", 1, 0, "MDataManager");
+#endif
+ //   qmlRegisterType<MDataManager>("Managers", 1, 0, "MDataManager");
     qmlRegisterType<fileIO>("FileIO", 1, 0, "FileIO");
 
     qmlRegisterUncreatableType<mflowdatas>("Managers", 1, 0, "mflowdata", "error on anaFlwAdv creation");
