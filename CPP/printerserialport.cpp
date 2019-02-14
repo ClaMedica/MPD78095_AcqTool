@@ -45,7 +45,7 @@ bool printerserialport::Pri_Str(char *__str, int __str_len, bool __flag_lf)
 void printerserialport::Pri_justif(char __mode)
 {
     /* setta la giustificazione del testo*/
-    // 0 centered; 1 right justified; 2 left justified
+    // 0: centered; 1: right justified; 2: left justified
 
     char pri_str[] = { ESC, 'C', __mode} ;
     Pri_Str(pri_str, sizeof(pri_str), false);

@@ -1,7 +1,7 @@
 TEMPLATE = app
 VERSION = 1.0.0.7
 
-QT += qml quick widgets sql network multimedia xml core serialport
+QT += qml quick widgets sql network multimedia xml core serialport gui
 
 RESOURCES += Resources/qml.qrc
 RESOURCES += Resources/Icone/icons.qrc

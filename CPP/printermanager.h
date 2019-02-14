@@ -6,6 +6,7 @@
 #include "printerserialport.h"
 #include <QQuickItemGrabResult>
 #include "stdint.h"
+#include <QImageWriter>
 
 
 #define     NUMOF_X_PRINT_DOTS 752 // (96 mm - 2mm dovuti agli assi) * 8 bit al mm = 94 * 8 = 752
@@ -51,7 +52,7 @@
 
 // caratteristiche del font dei caratteri usati per i label (ruotati di 90?)
 #define _HEIGHT_CHAR_LABEL 8
-#define _WEIGHT_CHAR_LABEL 8
+#define _WIDTH_CHAR_LABEL  8
 //#define negativo  0
 //#define positivo 1
 
@@ -191,6 +192,14 @@ public:
 
     void set_gra_Header_str_gr(int __sz, int __n4, int __dots);
     void printDigits(int __val, int __ndigits, int __pos);
+    void printNumber(int __val, int __ndigits, int __pos, const unsigned char *fontBm, int fontH, int fontW);
+    void printBitMap_unaRigaPerVolta();
+
+    QSize        imageQsz;
+    QString      imagePath;
+    QImage       imageBm;
+    QPainter    *imagePainter;
+    QPoint       imagePt;
 
 signals:
 
@@ -308,8 +317,8 @@ private:
     void Calc_Max(double xscale);
     void Calc_Max_EMG();
     long Calc_Max_Flw();
-    void print_char_left_label(short __value, int __pos_in_string, short int __num_char, bool __pri_decim, short int __pre_char);
-    void print_udm_label(int __ch_type, short __pos_in_string, short int __pre_char);
+    void print_char_left_label(int __value, int __pos_in_string, int __num_char, bool __pri_decim, int __pre_char);
+    void print_udm_label(int __ch_type, int __pos_in_string, int __pre_char);
     bool check_stamp_label();
 
 };
