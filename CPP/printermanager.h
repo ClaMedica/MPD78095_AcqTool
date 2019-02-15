@@ -14,7 +14,7 @@
 
 #define NUM_POINTS	40 // nella versione nuova che corrispondono a 5sec, infatti 40/8 = 5 considerato che 8punti/mm e 8sample/sec
 
-#define 	Fc_FLW        			10   	// frequenza di calcolo del flusso
+#define 	Fc_FLW        		10   	// frequenza di calcolo del flusso
 #define 	FREQ_ACQ      		10 		// in Hz -  frequenza di campionamento canale di volume
 #define 	FREQ_EMG_ACQ  		100		// in Hz -  frequenza di campionamento canale di emg
 #define 	MAX_DURATA_ESAME	20
@@ -53,8 +53,6 @@
 // caratteristiche del font dei caratteri usati per i label (ruotati di 90?)
 #define _HEIGHT_CHAR_LABEL 8
 #define _WIDTH_CHAR_LABEL  8
-//#define negativo  0
-//#define positivo 1
 
 #define _NUM_BYTE_CMD 8 // numero di char del comando di stampa grafica previsto dal protocollo APS
 #define LCMD 8 //char per comando
@@ -97,36 +95,9 @@
 #define __LABEL_SD__
 #define __POINT__
 
-//per stampare
-//#define PRI_REP_INT     1   /* Flag Stampa Report : Intestazione          */
-//#define PRI_REP_IDE     1   /* Flag Stampa Report : Identificativi Esame  */
-//#define PRI_REP_MODAL	1   /* Flag stampa Report : modalita d'esame      */
-//#define PRI_REP_GRA     1   /* Flag Stampa Report : Grafico               */
-//#define PRI_REP_SRK     1   /* Flag Stampa Report : Siroky                */
-//#define PRI_REP_RIS     1   /* Flag Stampa Report : Risultati             */
-//#define PRI_REP_POS     0   /* Flag Stampa Report : Postfazione e indicazione calibrazione, per debug */
-//#define PRI_REP_SPA     1	  /* Flag Stampa Report : Spazi per strappare   */
-
-//per le stringhe
-//#define NON_SOTTLINEA   "\x1bU\x0"	// \x 1B U \x 0 che significa 1B = ESC; U = modo sottolineatura; 0 = stampa normale
-//#define SOTTLINEA       "\x1bU\x1"
-//#define NON_RUOTA_90    "\x1bV\x0" // 1B V 0 : ESC V 0 = modo ruotato 90? non attivato
-//#define RUOTA_90        "\x1bV\x2"
-//#define REVERS_MODE     "\x1b{\x1"
-//#define NOT_REVERS_MODE "\x1b{\x0"
 #define LINE                "\n\n"          // "\x1b""d"
 #define LINE2               (char *) "\n\n"
-//#define F_16x24         "\x1bR\x02"
-//#define F_24x32         "\x1bR\x03"
-//#define DUBLE_H_L       "\x1b!\x30"
-//#define DUBLE_H         "\x1b!\x10"
-//#define UNDUBLE         "\x1b!\x00"
-//#define DUBLE_L         "\x1b!\x20"
-//#define PRI_TIMEOUT     25000
 
-//#define F_8x16			0x30
-//#define F_12x20			0x31
-//#define F_7x16			0x32
 #define F_center		0x00
 #define F_right			0x01
 #define F_left			0x02
@@ -137,11 +108,6 @@
 #define LF                0x0A            /* Line Feed                      */
 #define ESC               0x1B            /* Escape                         */
 #define GS				  0x1D			  /* SET impostazione				*/
-
-//#define F_LINE 			"\x0A""d"
-
-#define	LOBYTE(x)             ((unsigned char) ((x) & 0xff))
-#define	HIBYTE(x)             ((unsigned char) ((x) >> 8))
 
 
 
@@ -161,6 +127,10 @@ public:
     explicit printermanager(/*QObject *parent = 0*/) {}
     ~printermanager();
 
+    void imageInit();
+    void imagePrint();
+    void imageGraph(QString head, QString baset, int maxL, int maxR, double *bufL, double *bufR);
+    void imageText(QString txt, int fontSize, bool restoreFont);
     void print();
     void closePrinter();
 
@@ -196,10 +166,13 @@ public:
     void printBitMap_unaRigaPerVolta();
 
     QSize        imageQsz;
-    QString      imagePath;
+    QString      imageFont;
+    int          imageFontSize;
     QImage       imageBm;
     QPainter    *imagePainter;
     QPoint       imagePt;
+    QRect        imageRectFlw;
+    QRect        imageRectEmg;
 
 signals:
 
