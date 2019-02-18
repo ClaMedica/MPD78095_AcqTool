@@ -22,7 +22,7 @@ public:
     void closeSerialPort();
     void flushFile()    { m_file->flush(); m_file->seek(0); }
 
-    bool Pri_Str(char *__str, int __str_len, bool __flag_lf);
+    bool Pri_Str(char *__str, int __str_len);
     void Pri_justif(char __mode);
     void Pri_mode(char __mode);
     void Pri_forward(char __dotlines);

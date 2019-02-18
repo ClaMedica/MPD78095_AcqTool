@@ -130,6 +130,7 @@ public:
     void imageInit();
     void imagePrint();
     void imageGraph(QString head, QString baset, int maxL, int maxR, double *bufL, double *bufR);
+    void imageGraphSingle(QPoint leftBottom, QPoint *pts, int npts, double kx, double ky, double *bufV);
     void imageText(QString txt, int fontSize, bool restoreFont);
     void print();
     void closePrinter();
@@ -164,6 +165,7 @@ public:
     void printDigits(int __val, int __ndigits, int __pos);
     void printNumber(int __val, int __ndigits, int __pos, const unsigned char *fontBm, int fontH, int fontW);
     void printBitMap_unaRigaPerVolta();
+    void printPixLine(uchar *p, int sz);
 
     QSize        imageQsz;
     QString      imageFont;

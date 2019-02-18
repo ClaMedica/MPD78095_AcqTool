@@ -9,7 +9,7 @@ const char *str_label_time[] = {
 //    "   0          6          12          18          24         30s",
 //    "   0          9          18          27          36         45s",
 //    "   0         12          24          36          48         60s",
-    "  0         0:15      0:30       0:45       1:00      1:15",
+    "0         0:15      0:30       0:45       1:00      1:15",
     "   0         0:18       0:36        0:54        1:12       1:30",
     "   0         0:21       0:42        1:03        1:24       1:45",
     "   0         0:24       0:48        1:12        1:36       2:00",
@@ -149,56 +149,56 @@ printermanager::~printermanager()
 
 void printermanager::imageInit()
 {
-    qDebug("{");
-    imageQsz = QSize(824, 3000);
+    imageQsz = QSize(824, 6000);
     imageFont = "Bitstream Vera Sans Mono";
     imageFontSize = 12;
 
     imageBm = QImage(imageQsz, QImage::Format_Mono);
     imageBm.fill(Qt::white);
     imagePainter = new QPainter(&imageBm);
-    int h = imageBm.height();
-    int w = imageBm.width();
-    imagePainter->fillRect(0,0, w-1, h-1, Qt::white);
-    imagePainter->drawRect(2,2, w-4,h-4);
+    imagePainter->fillRect(0,0, imageQsz.width(),imageQsz.height(), Qt::white);
 
     QFont tFont(imageFont, imageFontSize, QFont::Normal);
     tFont.setFixedPitch(true);
     imagePainter->setFont(tFont);
 
     imagePt = QPoint(0, 0);
-    qDebug("}");
 }
 
 void printermanager::imagePrint()
 {
-    qDebug("{");
 #ifdef PICOFLOW
 
-//    QFontDatabase database;
-//    imagePt.ry() += 30;
-//    imagePainter->setFont(QFont("ubuntu", 9));
-//    foreach (const QString &family, database.families()) {
-//        foreach (const QString &style, database.styles(family)) {
-//            QString sizes;
-//            foreach (int points, database.smoothSizes(family, style))
-//                sizes += QString::number(points) + ' ';
-//            imagePainter->setFont(QFont(family, 13));
-//            QString res = family+" :ÑÖȧũñ "+style+" : "+sizes.trimmed();
-//            imagePainter->drawText(imagePt, res);
-//            qDebug() << res;
-//            imagePt.ry() += 20;
-//        }
-//    }
-//    imagePainter->drawText(imagePt, "------------------------");
-//    imagePt.ry() += 20;
-
-    int h = imagePt.ry() + 10; // imageBm.height();
+    int h = imagePt.ry() < imageBm.height() ? imagePt.ry() : imageBm.height();
     int w = imageBm.width();
+    int wBytes = w / 8;
+    int emptyLines = 0;
     for (int y = 0; y < h; ++y) {
-        const uchar * pbm = imageBm.scanLine(y);
-        qDebug() << y << pbm << QByteArray((const char *)pbm, w/8).toHex();
+        uchar   tmp[256];
+        uchar * dst = tmp;
+        uchar * pbm = imageBm.scanLine(y);
+        // immagine invertita
+        for(int i = 0; i < wBytes; i++)
+            *dst++ = *pbm++ ^ 0xff;
+        // ottimizzazione spazi bianchi a destra
+        // ottimizzazione per righe vuote
+        int rightZeroED = 0;
+        for(int x = wBytes - 1; (x >= 0) && (tmp[x] == 0); x--)
+            rightZeroED++;
+        if(rightZeroED == wBytes)
+            emptyLines++;
+        else {
+            if(emptyLines > 0) {
+                m_port->Pri_forward(emptyLines);
+                emptyLines = 0;
+            }
+            printPixLine(tmp, wBytes-rightZeroED);
+        }
     }
+    // fa avanzare la carta per consentire lo strappo
+    int npix = (int) (25 / 0.125);
+    emptyLines += npix;
+    m_port->Pri_forward(emptyLines);
 
     QImageWriter qimw("/tmp/prova.bmp");
     qimw.write(imageBm);
@@ -207,7 +207,6 @@ void printermanager::imagePrint()
     udpConn.sendSup("Print:" + m_namefilePrn.toLatin1());   // gateway
 
 #endif
-    qDebug("}");
 }
 
 void printermanager::imageText(QString txt, int fontSize, bool restoreFont)
@@ -231,23 +230,26 @@ void printermanager::imageText(QString txt, int fontSize, bool restoreFont)
 
 void printermanager::imageGraph(QString head, QString baset, int maxL, int maxR, double *bufL, double *bufR)
 {
-    qDebug("{");
     imagePt.rx() = 5;
-    imageText(head, -1, false);
-
-    int h = 240;
-    int w = 752;
 
     QFont savedFont, tfont;
     tfont = savedFont = imagePainter->font();
-    tfont.setPointSize(8);
+
+    tfont.setPixelSize(8);
+    imageText(head, -1, false);
     imagePainter->setFont(tfont);
     {
-        imagePt.rx() = imagePainter->fontMetrics().width("9999") + 5 + 3;
+        imagePt.rx() = 5;
         imagePt.ry() += 10;
 
-        QPoint lt(imagePt.rx() + 20, imagePt.ry());         // leftTop
-        QPoint lb(imagePt.rx() + 20, imagePt.ry() + h);     // leftBottom
+        int digitsW = imagePainter->fontMetrics().width("9999");
+        int left = (digitsW + 1);
+        int h = 240;
+        int w = (imageQsz.width()-imagePt.rx()) - (left + digitsW+5 /* destra */ );
+        qDebug("digitsW:%d w:%d",digitsW,w);
+
+        QPoint lt(imagePt.rx() + left, imagePt.ry());         // leftTop
+        QPoint lb(imagePt.rx() + left, imagePt.ry() + h);     // leftBottom
         imageRectFlw = QRect(lt, QSize(w, h));
         imagePainter->drawRect(imageRectFlw);
 
@@ -260,36 +262,37 @@ void printermanager::imageGraph(QString head, QString baset, int maxL, int maxR,
             if(i < 5)
                 imagePainter->drawLine(lb.x(),y, lb.x()+w,y);
             if(maxL > 0)
-                imagePainter->drawText(QPoint(         5, y+8), QString::asprintf("%4d", (maxL * i) / 5));
+                imagePainter->drawText(QPoint(         5, y+10), QString::asprintf("%4d", (maxL * i) / 5));
             if(maxR > 0)
-                imagePainter->drawText(QPoint(lb.x()+w+5, y+8), QString::asprintf("%4d", (maxR * i) / 5));
+                imagePainter->drawText(QPoint(lb.x()+w+1, y+10), QString::asprintf("%4d", (maxR * i) / 5));
         }
         imagePt = lb;
 
-        int x, x0 = 0,
-            y, yL0 = 0, yR0 = 0;
-        for (int ix = 1; ix < (m_num_sam - 1); ix++ ) {
-            x = lb.rx() + (int)((752 * ix) / m_num_sam);
-            y = (int) (239 * bufL[ix] / maxL);
-            imagePainter->drawLine(x0, lb.ry() - yL0, x, lb.ry() - y);
-            yL0 = y;
-            if(maxR > 0) {
-                y = (int) (239 * bufR[ix] / maxR);
-                imagePainter->drawLine(x0, lb.ry() - yR0, x, lb.ry() - y);
-                yR0 = y;
-            }
-            x0 = x;
-        }
+        QPoint * points = new QPoint[w];
+        imageGraphSingle(lb, points, m_num_sam, (double)w/m_num_sam, (double)h/maxL, bufL);
+        if(maxR > 0)
+            imageGraphSingle(lb, points, m_num_sam, (double)w/m_num_sam, (double)h/maxR, bufR);
+        delete points;
     }
+    imageText(baset, -1, false);
     imagePainter->setFont(savedFont);
 
-    imageText(baset, -1, false);
     imagePt.ry() += 50;
-    qDebug("}");
+}
+
+void printermanager::imageGraphSingle(QPoint leftBottom, QPoint *pts, int npts, double kx, double ky, double *bufV)
+{
+    for (int ix = 0; ix < npts; ix++ ) {
+        int x = leftBottom.rx() + (int)(kx * ix);
+        int y = leftBottom.ry() - (int)(ky * bufV[ix]);
+        pts[ix] = QPoint(x, y);
+    }
+    imagePainter->drawPolyline(pts, npts);
 }
 
 void printermanager::closePrinter()
 {
+    imagePrint();
     m_port->closeSerialPort();
     if (m_port != NULL)
         delete m_port;
@@ -347,7 +350,7 @@ void printermanager::print()
 
     pri_rep_review();	// qui va subito in stampa
 
-    imagePrint();
+//    imagePrint();
 }
 
 void printermanager::pri_rep_review()
@@ -545,7 +548,7 @@ void printermanager::Pri_Rep(double xscale)
 
     //     Identificativi Esame
     Report_data();		// scrive i dati del paziente e lo spazio per le note manuali
-    m_port->Pri_Str(LINE2, 2, false);
+//    m_port->Pri_Str(LINE2, 2, false);
 
     // Grafico FLW + VOL ed eventualmente EMG
     if(m_printMode == PORTRAIT_MODE)			// grafico trasversale con numero di punti fisso
@@ -571,10 +574,7 @@ void printermanager::Pri_Rep(double xscale)
     else {              // print_mode = LANDSCAPE_MODE - grafico longitudinale, con lunghezza legata alla lunghezza dell'esame
         m_max_y = Calc_Max_Flw();			// fondo scala del flusso
         qDebug("dopo Calc_Max_Flw()");
-//        short samples_to_print = adatta_buffer_dati(/*m_realDots*/ m_num_sam, m_max_y);
-//        qDebug("dopo adatta_buffer_dati()");
         Calc_Max_RealReport_rel2(m_num_sam);
-        qDebug("dopo Calc_Max_RealReport_rel2()");
         Report_Real_Time(m_num_sam, xscale);		// finalmente stampa
         qDebug("dopo Report_Real_Time()");
     }
@@ -588,19 +588,11 @@ void printermanager::Pri_Rep(double xscale)
 
     // 	Risultati dell'esame ricavati dall'analisi semplificata, implementata nel firmware
     Report_result();		// scrive in elenco i dati calcolati dall'analisi dell'esame
-    //m_port->status();
-    m_port->Pri_Str(LINE2, 2, false); // LINE"\x3",0);
+//    m_port->Pri_Str(LINE2, 2, false); // LINE"\x3",0);
 
     //	Scrive i dati riguardanti versione firmware e date/ora ultima calibrazione
-       //m_port->Pri_justif(F_center);
        //Report_dati_macchina(numCurve);	// scrive data e ora della stampa e la versione attuale del FW
 
-    // fa avanzare la carta per consentire lo strappo
-    int npix = (int) (25 / 0.125);
-    m_port->Pri_forward(npix);
-    m_port->flushFile();
-
-//    m_port->Pri_Reset();	// resetta RAM della stampante: equivale ad un reset HW
     qDebug() << "Pri_Rep FINE file:" << m_namefile;
 }
 
@@ -735,7 +727,6 @@ stampa del grafico di flusso/volume nella versione a grafici in portrait mode
 */
 void printermanager::Report_flw(double xscale)
 {
-    qDebug("{");
     Calc_Max(xscale);	// calcolo FC curva di flusso (max_y) e FC curva di volume (max_x) cosi da individuare il giusto fondoscala
 
     imageGraph(tr("  Q (ml/s)             Flowmetry              Vol (ml)"),
@@ -745,11 +736,6 @@ void printermanager::Report_flw(double xscale)
                buffer_flw,
                buffer_vol
                );
-
-    for(int i = 0; i < 10; i++ ) {                       /* scompone la griglia in 10 righe*/
-        Pri_Rep_Gra(i);
-    }
-    qDebug("}");
 }
 
 /**
@@ -798,134 +784,6 @@ void printermanager::Calc_Max(double xscale)
     m_max_y = 150;
 
     m_max_y_gr2 = ((long) ((m_max_vol + 10) / 100) + 1) * 100;	// 05 dicembre
-}
-
-/**
-GRAFICI IN PORTRAIT MODE - modo tradizionale
-funzione chiamata ciclicamente per stampare le 10 righe in cui e suddiviso il grafico del flusso/volume
-a seconda del parametro num_rig si stampano o meno i label degli assi di flusso e volume
-*/
-void printermanager::Pri_Rep_Gra(int __num_riga)
-{
-    bool label = false;
-    unsigned short uw8;
-    short int max_y_flw, max_x_vol;
-
-    for(int i = 0; i < (LCMD + a_flw); i++ )
-        m_str_gr[i] = 0;
-
-    // setta la stampa grafica
-    int sz = 96 + 2256 + 96;    // 	num_byte = 96 + 2256 + 96 = 2448 = ( 65536 * n3 ) + ( 256 * n2 ) + n1
-    int dots = 102;             // larghezza 4+94+4=102 byte
-    set_gra_Header_str_gr(sz, 0x02, dots);    // n4	doppia altezza
-
-    // se label e' true devo scrivere i valori sugli assi di flw e vol
-    // la prima riga del grafico si compone di 24 righe di 94byte ciascuna alle quali antepongo un carattere vuoto, le 24 righe di 3 byte del dato di flw
-    // i 3 byte aggiuntivi sono per le tre cifre di dato
-    label = ((__num_riga == 0) || ((__num_riga & 1) == 0));  // scrive i label solo nelle righe 0, 2, 4, 6, 8
-    if(label) {
-#ifdef __ZERO_ASSE_FLUSSO__
-        if(__num_riga != 9)   // se e' l'ultima riga evito scrittura
-#endif
-        {
-            max_y_flw = (int) (m_max_y - (__num_riga / 2) * (m_max_y / 5));
-            printDigits(max_y_flw, 3, LCMD + CLS - 3);
-        }
-    }
-
-    // costruzione assi grafico: quattro sono i caratteri anteposti senza byte dei comandi
-    Pri_Rep_Gra_Ini_Grid(__num_riga); /*crea griglia e inizializa m_m_str_gr*/
-
-    // inserimento pixel curve
-    m_str_gr[ pos_gra + 2255 ] = (char)0xFF;
-
-#ifdef __DATI_GRAF_FLUSSO__
-    /* ********************     Grafico    ************************* */
-    if (m_tem_svu ) {
-
-        int x_pt	=	0;
-        int flow_pt	= 240;
-        int vol_pt	= 240;
-        int uw5		= m_num_sam-1;		// correzione per evitare l'andata a zero // 23-03
-        int i4		= __num_riga*24;
-
-        int graf_g_x	=752/*(10*m_max_x)*/;			//asse dei tempi in funzione della durata dell'esame
-        int graf_g_fl	=(m_max_y);
-        int graf_g_vl	=(m_max_y_gr2);
-
-//        QVector<double> tmp;
-//        for (int gg=0; gg<NUMOF_X_PRINT_DOTS;gg++)
-//            tmp.append(buffer_flw[gg]);
-
-        for (int i = 1; i < uw5; i++ ) {	     /*trovo estremi della retta passante per il campione uw6 uw6+1*/
-            int x_pt_prec = x_pt;                    /*94*8=752 punti x  i2=x1 della retta*/
-            m_x1 = x_pt;
-
-            x_pt = (int) ((752 * i) / graf_g_x);             /*x_pt=x2 retta */
-            m_y1 = flow_pt;
-
-            flow_pt = 239 - (int) ((239 * buffer_flw[i]) / graf_g_fl); /*y2*/
-
-            if (flow_pt > 239)   // flow_pt = _y1;
-                while (flow_pt <= 239) {
-                    uw8 = i - 1;
-                    flow_pt	= 239 - (int) ((239 * buffer_flw[uw8]) / (graf_g_fl));//239; modifica 31-03
-                }
-            else
-                if (flow_pt < 0)
-                    flow_pt	= 0;
-
-            /*ogni riga composta da 1 linee di stampa m_str_gr*/
-            m_x2 = x_pt;
-            m_y2 = flow_pt;
-            if( Int_Pun(i4) ) { //questa funzione utilizza m_x2 e m_y2
-                if (m_num_xy > 25)
-                    m_num_xy = 25;
-                for(int j = 0; j < m_num_xy; j++) {
-                    m_y[j] -= i4;
-                    int i33 = 24 * (m_x[j] / 8) + m_y[j];
-//                    int i6 = i33 / 24;
-//                    int i7 = i33 % 24;
-                    m_str_gr[ pos_gra + i33/*24 * i6 + i7*/] |= (0x80 >> (m_x[j] % 8));
-                }
-            }
-            m_y1 = vol_pt;
-
-            vol_pt = 239 - (int) ((239 * buffer_vol[i]) / (graf_g_vl));
-            if( vol_pt > 239 )
-                vol_pt = m_y1; // se campione sfarlocco, scrive quello precedente
-
-            m_x1 = x_pt_prec;
-            m_x2 = x_pt;
-            m_y2 = vol_pt;
-            if(Int_Pun(i4)) {
-                if (m_num_xy > 25)
-                    m_num_xy = 25;
-                for(int i22 = 0; i22 < m_num_xy; i22++) {
-                    m_y[i22] -= i4;
-                    int i33 = 24 * (m_x[i22] / 8) + m_y[i22];
-                    unsigned char ub3 = 0x80 >> (unsigned char)(m_x[i22] % 8);
-                    int i6 = i33 / 24;
-                    int i7 = i33 % 24;
-                    m_str_gr[ pos_gra + 24*i6 + i7] |= (char)ub3;
-                }
-            }
-        }
-    }
-
-    // inserimento label volume
-    if( label ) {
-        max_x_vol = (int) (m_max_y_gr2 - (__num_riga / 2) * (m_max_y_gr2 / 5));
-        // inserimento cifre volume 4 caratteri dalla posizone 'pos_lab_vol'
-        printDigits(max_x_vol, 4, pos_lab_vol);
-    }
-
-#endif
-
-    // trasposizione
-    Str_Trasposta(0, CLS, CLD); // fa la trasposta di m_str_gr che e' costruita per colonne mentre noi si stampa per righe
-
-    printBitMap_unaRigaPerVolta();
 }
 
 void printermanager::Pri_Rep_Gra_Ini_Grid(int __n_riga)
@@ -1128,20 +986,13 @@ void printermanager::Report_emg()
     Calc_Max_EMG();
     qDebug() << "m_max_emg:" << m_max_emg << "m_max_y:" << m_max_y;
 
-    m_port->Pri_Font(1);		// altezza carattere 20 punti (righe) 0x18 in HEX
-    m_port->Pri_mode(0x10);
-    char str[60];
-    QString emg_title = tr(" EMG Diagram ");
-    sprintf(str,"   EMG ( uV )              %s",emg_title.toLatin1().data());
-    m_port->Pri_Str(str, strlen(str), false);
-
-    for(int i = 0; i < 10; i++)          /*scompone la griglia in 10 righe*/
-        Pri_Rep_Gra_EMG( i );
-
-    m_port->Pri_mode(0);
-    m_port->Pri_Font(1);
-    m_port->Pri_Str((char *) str_label_time[m_i_max_x], strlen(str_label_time[m_i_max_x]), true);
-    m_port->Pri_Str(LINE2, 2, false); // LINE"\x1", 0 );// spazio singolo
+    imageGraph(QString("   EMG ( uV )              ")+tr(" EMG Diagram "),
+               str_label_time[m_i_max_x],
+               m_max_y,
+               0,
+               buffer_emg,
+               NULL
+               );
 }
 
 void printermanager::Calc_Max_EMG()
@@ -1160,88 +1011,6 @@ void printermanager::Calc_Max_EMG()
         }
     m_max_y = 3250;
     return;
-}
-
-void printermanager::Pri_Rep_Gra_EMG(int __num_riga)
-{
-    qDebug() << "Pri_Rep_Gra_EMG(" << __num_riga << ")";
-    bool label = false;
-    int max_emg = (int)(m_max_y - (__num_riga / 2) * (m_max_y / 5));	// valori in unita
-
-    for(int i = 0; i < ( LCMD + a_emg); i++ )
-        m_str_gr[ i ] = 0;
-
-    int sz = 96 + 2256 + 96;    // 	num_byte = 96 + 2256 + 96 = 2448 = ( 65536 * n3 ) + ( 256 * n2 ) + n1
-    int dots = 102;             // larghezza 4+4+94=102 byte
-    set_gra_Header_str_gr(sz, 0x02, dots);    // n4	doppia altezza
-
-    if( (__num_riga == 0) || ( !(__num_riga % 2) ) )
-        label = true;  // scrive i label solo nelle righe 0, 2, 4, 6, 8
-    else
-        label = false; // nelle righe 1, 3, 5, 7 metter caratteri vuoti
-
-    if( label )	// se label e true devo scrivere i valori sull'asse di emg, altrimenti riempio con m caratterei vuoti
-    {
-        // la prima riga del grafico si compone di 24 righe di 94byte ciascuna alle quali antepongo le 24 righe di m byte del dato di emg
-        // gli m byte aggiuntivi sono per le quattre cifre di dato
-        printDigits(max_emg, 4, LCMD);
-    }
-#ifdef __ZERO_ASSE_EMG__
-    else {                      // niente label m caratteri vuoti
-        if( __num_riga == 9 )   // se e' l'ultima riga sovrascrivo lo "0" al terzo carattere
-            for(int i = 0; i < 13; i++ )	// spazio
-                m_str_gr[ LCMD + (CLD-1)*24 + (i+10) ] = (char)print7x13Set[ 0*13 + i];
-    }
-#endif
-
-    // costruzione assi grafico
-    Pri_Rep_Gra_Ini_Grid(__num_riga); /*crea griglia e inizializa str_gr*/
-
-    // inserimento pixel curve
-    m_str_gr[ pos_gra + 2255 ] = (char)0xFF;
-
-    /*      Grafico   */
-    if( m_tem_svu )
-    {
-        int x_pt = 0;
-        int flow_pt = 240;
-        int i4 = __num_riga * 24;
-        int graf_g_x = 752/*( 10 * m_max_x )*/;
-        int graf_g_fl = ( m_max_y );
-
-        for (int ix = 1; ix < (m_num_sam - 1); ix++ ) 	     /*trovo estremi della retta passante per il campione uw6 uw6+1*/
-        {
-            m_x1 = x_pt;
-            x_pt = (int)((752 * ix) / graf_g_x);                     /*x_pt=x2 retta */
-            m_y1 = flow_pt;
-
-            flow_pt = 239 - (int)(239 * fabs(buffer_emg[ix]) / graf_g_fl); /*y2*/
-            if( flow_pt > 239 )
-                flow_pt = 239;
-            /*ogni riga composta da 1 linee di stampa str_gr*/
-            m_x2 = x_pt;
-            m_y2 = flow_pt;
-            if(Int_Pun(i4))
-            {
-                if (m_num_xy > 25)                    //Fatal_Error(FATAL_ERROR_PRI);
-                    m_num_xy = 25;
-                for(int i22 = 0; i22 < m_num_xy; i22++)
-                {
-                    m_y[i22] -= i4;
-                    int i33 = 24 * ( m_x[i22] / 8 ) + m_y[i22];
-                    unsigned char v = 0x80 >> (unsigned char)(m_x[i22] % 8);
-                    m_str_gr[ pos_gra + i33] |= (char)v;
-                }
-            }
-        }
-    }
-
-    // spazi vuoti dove invece nel grafic del flw ci andavano i label del vol
-    // niente label quattro caratteri vuoti dalla posizione xxx
-
-    Str_Trasposta( 0, CLS, CLD ); // fa la trasposta di str_gr che e costruita per colonne mentre noi si stampa per righe
-
-    m_port->Pri_Str((char *)m_str_gr, LCMD + a_emg, false );
 }
 
 /**
@@ -1369,9 +1138,9 @@ void printermanager::Report_Real_Time(short __num_sample, double xscale)
 
     // ora stampo l'asse destro del grafico
     Pri_Rep_asse_dx();
-    m_port->Pri_mode(0x00);
-    m_port->Pri_Font(1);
-    m_port->Pri_Str(LINE2, 2, false);
+//    m_port->Pri_mode(0x00);
+//    m_port->Pri_Font(1);
+//    m_port->Pri_Str(LINE2, 2, false);
 }
 
 /**
@@ -2010,7 +1779,7 @@ void printermanager::Pri_Rep_asse_dx()
         m_str_gr[ _NUM_BYTE_CMD + str_byte ] = m_str_tr[ str_byte ];
 
     // finalmente stampa
-    m_port->Pri_Str((char *)m_str_gr, dim_string_solo_ax, false);
+//    m_port->Pri_Str((char *)m_str_gr, dim_string_solo_ax, false);
 
 }
 
@@ -2022,44 +1791,29 @@ void printermanager::Report_BitMap(bool __isSiro)
     qDebug("inizio pr bitm");
     int     sz;
     char  * p;
-    if (__isSiro)
-    {
+
+    if (__isSiro) {
         sz = m_bitmapSiroky.size();
         p = m_bitmapSiroky.data();
     }
-    else
-    {
+    else {
         sz = m_bitmapLiverpool.size();
         p = m_bitmapLiverpool.data();
     }
 
-    int     szchunk = 103;  // 824/8
-    char    head[8+103];
-    qDebug("sz:%d szch:%d p:%p", sz,szchunk,p);
-
-    head[0] = ESC;	//0x1B;	// ESC
-    head[1] = '*';	//0x2A;	// *
-    head[2] = szchunk         & 0xff;	// n1
-    head[3] = (szchunk >>  8) & 0xff;	// n2
-    head[4] = (szchunk >> 16) & 0xff;	// n3
-    head[5] =  0;	// n4	singola altezza
-    head[6] =  0;	// n5	scrive a n5 byte dal bordo
-    head[7] = szchunk;	// n6
-
+    int szchunk = 103;  // 824/8
+    int row = imagePt.ry();
     for(int s = 0; s < sz; ) {
-        //for(int n = 0; (n < 1000) && (m_port->status(false) & (1 << 3)); n++);
-        //m_port->status(false);
-        memcpy(head+8, p, szchunk);
-        m_port->Pri_Str(head, 8+szchunk, false);
+        for(int i = 0; i < 103*8; i++)
+            if(p[i / 8] & (1 << (7 - (i & 7))))
+                imagePainter->drawPoint(i, row);
         p += szchunk;
         s += szchunk;
+        row++;
     }
+    imagePt.ry() = row + 50;
 
-    m_port->Pri_Font(1);
-    m_port->Pri_mode(0x00);
-    m_port->Pri_justif(F_left);
-    m_port->Pri_Str(LINE2, 2, true);
-    qDebug("fine pr bitm");
+    qDebug("fine pr bitm imagePt.ry():%d", imagePt.ry());
 }
 
 /**
@@ -2067,7 +1821,6 @@ stampa l'elenco dei dati di analisi delle curve
 */
 void printermanager::Report_result()
 {
-    qDebug("{");
     QStringList txt;
     int deltaY = imagePainter->fontMetrics().lineSpacing();
     imagePt.rx() = imagePainter->fontMetrics().width(" 1234");
@@ -2105,47 +1858,6 @@ void printermanager::Report_result()
     imagePt.rx() = 8;
     imagePt.ry() += deltaY;
     imagePainter->drawLine(imagePt, QPoint(imageBm.width()-1-8, imagePt.ry()));
-    qDebug("}");
-}
-
-/**
-      Stampa una linea del Report con :
-         -   "str_des"  =  Stringa Descrizione
-         -   "rep_dat"  =  Dato del Report
-         -   "num_dec"  =  Numero di Decimali
-         -   "str_udm"  =  Stringa Unita' di Misura
-         -   "flag_lf"  =  Flag LF Finale
-*/
-void printermanager::Pri_Rep_Lin(QString __descr, int __rep_dat, int __num_dec, const char *__str_udm, bool __flag_lf)
-{
-    char str2[40];
-
-    if(__rep_dat < 0)
-        sprintf(str2, " n.c.");
-    else {
-        if (__num_dec == 0)
-            sprintf(str2,"%5u", __rep_dat);
-        else {
-            int dec = 1;
-            for (int i = 0; i < __num_dec; i++)
-                dec *= 10;
-            sprintf(str2, "%u.%1u", __rep_dat / dec, __rep_dat % dec);
-        }
-    }
-    sprintf(m_str_gr, "  %s :", __descr.toLatin1().data());		// allontano la riga dal bordo sinistro di 2 spazi
-
-    char space_bar[21] = "                    ";
-    if (strlen(str2) > 5) {// quando esami lunghissimi, si puo arrivare a lavorare con valori in migliaia di secondi e col decimale la stringa e lunga 6
-        int d_strlen = strlen(str2) - 5; // termine di correzione in funzione della lunghezza della stringa str2
-        strcat(m_str_gr, space_bar + (15 - d_strlen) + strlen(str2));
-    }
-    else
-        strcat(m_str_gr, space_bar + 15 + strlen(str2));
-
-    strcat(m_str_gr, str2);
-    strcat(m_str_gr, "  ");
-    strcat(m_str_gr, __str_udm);
-    m_port->Pri_Str(m_str_gr, strlen(m_str_gr), __flag_lf);
 }
 
 // conversione da RGB 8*3 = 24 bit a RGB 4*3 = 12 bit
@@ -2297,10 +2009,36 @@ void printermanager::printBitMap_unaRigaPerVolta()
     char  * p = m_str_gr + LCMD;    // ptr a bitmap
     for(int i = 0; i < sz; ) {
         memcpy(tbuf+LCMD, p, ByteXline);
-        m_port->Pri_Str(tbuf, LCMD+ByteXline, false);
+//        m_port->Pri_Str(tbuf, LCMD+ByteXline);
         i += ByteXline;
         p += ByteXline;
     }
+}
+
+void printermanager::printPixLine(uchar *p, int sz)
+{
+    uchar buf[256];
+    buf[0] = ESC;   // 0x1B;	// ESC
+    buf[1] = '*';   // 0x2A;	// *
+    buf[2] = sz;    // n1
+    buf[3] = 0;     // n2
+    buf[4] = 0;     // n3
+    buf[5] = 0;     // n4
+    buf[6] = 0;     // n5	scrive a n5 byte dal bordo
+    buf[7] = sz;    // n6	larghezza dots in bytes = sz
+
+    // ottimizzazione su bytes vuoti a sinistra
+    // per ridurre il tempo di trasmissione
+    if(0)
+    while(*p == 0) {
+        p++;
+        buf[6]++;
+        buf[2]--;
+        sz--;
+    }
+
+    memcpy(buf+8, p, sz);
+    m_port->Pri_Str((char *)buf, LCMD+sz);
 }
 
 /**

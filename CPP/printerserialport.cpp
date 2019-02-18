@@ -21,21 +21,15 @@ void printerserialport::closeSerialPort()
 
 /*
    Invia alla Stampante "num_car" caratteri della stringa "str_pri"
-   Se "flag_lf" invia il carattere LF alla fine
 */
-bool printerserialport::Pri_Str(char *__str, int __str_len, bool __flag_lf)
+bool printerserialport::Pri_Str(char *__str, int __str_len)
 {
-    static char trailer[1] = { 0x03 };
-    static char s[1] = { LF };
-
-    int sz = __str_len + (__flag_lf ? 1 : 0);
-    char header[6] = { 0x5a, 0xa5, 0xa5, 0x5a, sz & 0xff, (sz >> 8) & 0xff };
-
     if(m_file->isOpen()) {
+        static char trailer[1] = { 0x03 };
+        char header[6] = { 0x5a, 0xa5, 0xa5, 0x5a, __str_len & 0xff, (__str_len >> 8) & 0xff };
+
         m_file->write(header, sizeof(header));
         m_file->write(__str, __str_len);
-        if(__flag_lf)
-            m_file->write(s, 1);
         m_file->write(trailer, sizeof(trailer));
     }
 
@@ -48,7 +42,7 @@ void printerserialport::Pri_justif(char __mode)
     // 0: centered; 1: right justified; 2: left justified
 
     char pri_str[] = { ESC, 'C', __mode} ;
-    Pri_Str(pri_str, sizeof(pri_str), false);
+//    Pri_Str(pri_str, sizeof(pri_str));
 }
 
 void printerserialport::Pri_mode(char __mode)
@@ -58,7 +52,7 @@ void printerserialport::Pri_mode(char __mode)
     // mode = 0xYY = X0XX0XX0 : <underlined> <0> <double w.> <double h.> <0> <quadruple w.> <quadruple h.> <0> */
 
     char pri_str[] = { ESC, '!', __mode };
-    Pri_Str(pri_str, sizeof(pri_str), false);
+//    Pri_Str(pri_str, sizeof(pri_str));
 }
 
 void printerserialport::Pri_forward(char __dotlines)
@@ -66,7 +60,7 @@ void printerserialport::Pri_forward(char __dotlines)
     /* fa avanzare di "dotlines" righe la carta*/
 
     char pri_str[] = { ESC, 'J', __dotlines };
-    Pri_Str(pri_str, sizeof(pri_str), false);
+    Pri_Str(pri_str, sizeof(pri_str));
 }
 
 void printerserialport::Pri_Font(char __font)
@@ -75,7 +69,7 @@ void printerserialport::Pri_Font(char __font)
     /*    0 - 8x16  1 - 12x20 2 - 7x16  */
 
     char pri_str[] = { ESC, '%', __font };
-    Pri_Str(pri_str, 3, false);
+//    Pri_Str(pri_str, 3);
 }
 
 void printerserialport::Pri_Intensity(char __intens)
@@ -85,7 +79,7 @@ void printerserialport::Pri_Intensity(char __intens)
 //   intens > 0x80 higher print
 
     char pri_str[] = { GS, 'D', __intens };
-    Pri_Str(pri_str, 3, false);
+//    Pri_Str(pri_str, 3);
 }
 
 
@@ -97,7 +91,7 @@ void printerserialport::Pri_Intensity(char __intens)
 //void printerserialport::Pri_Speed(char m_speed )
 //{
 //    char pri_str[] = { GS, '/', m_speed };     // 1 <= speed <= 32, 0 max speed
-//        Pri_Str(pri_str, 3, false);
+//        Pri_Str(pri_str);
 //}
 
 /* setta la massima velocita di stampa settando il tempo di avanzamento
@@ -108,7 +102,7 @@ void printerserialport::Pri_Intensity(char __intens)
 //void printerserialport::Pri_Max_Speed(char m_n1, char m_n2)
 //{
 //    char pri_str[] = { GS, 's', m_n1, m_n2 };
-//        Pri_Str(pri_str, 4, false);
+//        Pri_Str(pri_str, 4);
 //}
 
 //void printerserialport::waiting()
