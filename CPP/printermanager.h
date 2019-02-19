@@ -129,8 +129,10 @@ public:
 
     void imageInit();
     void imagePrint();
-    void imageGraph(QString head, QString baset, int maxL, int maxR, double *bufL, double *bufR);
+    void imageGraph(QString head, QString baset, double xscale, int maxL, int maxR, double *bufL, double *bufR);
     void imageGraphSingle(QPoint leftBottom, QPoint *pts, int npts, double kx, double ky, double *bufV);
+    void imageGraphL(QString head, QString baset, double xscale, int maxL, int maxR, double *bufL, double *bufR);
+    void imageGraphSingleL(QPoint leftBottom, QPoint *pts, int npts, double kx, double ky, double *bufV);
     void imageText(QString txt, int fontSize, bool restoreFont);
     void print();
     void closePrinter();
@@ -272,7 +274,7 @@ private:
     void Intest();
     void Report_data();
     void Report_flw(double xscale);
-    void Report_emg();
+    void Report_emg(double xscale);
     void Report_Real_Time(short __num_sample, double xscale);
 
     void Report_result();

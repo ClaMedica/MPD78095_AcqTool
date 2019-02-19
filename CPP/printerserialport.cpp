@@ -13,6 +13,10 @@ printerserialport::printerserialport(QString __namefile, QObject *parent) : QObj
 
 void printerserialport::closeSerialPort()
 {
+    if(m_file == NULL) {
+        qDebug() << "file GIA' chiuso in scrittura" << m_file->fileName();
+        return;
+    }
     qDebug() << "file chiuso in scrittura" << m_file->fileName();
     m_file->close();
     delete m_file;

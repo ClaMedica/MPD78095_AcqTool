@@ -92,6 +92,7 @@ void MDataManager::getGrabbedImage(QObject *gi, QString __nome)
     if (__nome != "grafo")
         m_mngPrint->getGrabbedImage(gi, __nome);
 }
+
 #ifndef PICOFLOW
 void MDataManager::saveImg(QQuickItem *__item, QString __nome)
 {
@@ -118,6 +119,7 @@ void MDataManager::saveImg(QQuickItem *__item, QString __nome)
 
 }
 #endif
+
 void MDataManager::setInfoList(QVariantList __list)
 {
     if(__list != m_infoList) {
