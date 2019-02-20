@@ -3,10 +3,9 @@
 
 #include <QObject>
 #include "datafilemanager.h"
-#include "printerserialport.h"
 #include <QQuickItemGrabResult>
 #include "stdint.h"
-#include <QImageWriter>
+#include <QFont>
 
 
 #define     NUMOF_X_PRINT_DOTS 752 // (96 mm - 2mm dovuti agli assi) * 8 bit al mm = 94 * 8 = 752
@@ -118,6 +117,14 @@ typedef struct{
     bool verso_curva;
 } Print_Graph_Parameters; 		// usata nella funzione di creazione stringa per stampa grafici
 
+typedef struct {
+    QString     label;
+    int         size;
+    int         weight;
+    int         charW;
+    int         charH;
+    QFont       qf;
+} T_Font;
 
 class printermanager : public QObject
 {
@@ -127,6 +134,9 @@ public:
     explicit printermanager(/*QObject *parent = 0*/) {}
     ~printermanager();
 
+    void imageFontInit(T_Font &font, QString label, int size, QFont::Weight weight = QFont::Normal, bool fixedPitch = true);
+    void imageSetFont(T_Font &font);
+    void imageTestFont();
     void imageInit();
     void imagePrint();
     void imageGraph(QString head, QString baset, double xscale, int maxL, int maxR, double *bufL, double *bufR);
@@ -135,7 +145,6 @@ public:
     void imageGraphSingleL(QPoint leftBottom, QPoint *pts, int npts, double kx, double ky, double *bufV);
     void imageText(QString txt, int fontSize, bool restoreFont);
     void print();
-    void closePrinter();
 
     void setTempoAttesa(float __val)            {m_tem_att = __val;}
     void setFlussoMax(float __val)              {m_flu_max = __val;}
@@ -168,10 +177,21 @@ public:
     void printNumber(int __val, int __ndigits, int __pos, const unsigned char *fontBm, int fontH, int fontW);
     void printBitMap_unaRigaPerVolta();
     void printPixLine(uchar *p, int sz);
+    void Pri_forward(char __dotlines);
+    bool Pri_Str(char *__str, int __str_len);
+
+    T_Font       tf_current,
+                 tf_base,
+                 tf_header22,
+                 tf_header28,
+                 tf_header20,
+                 tf_graphPortr,
+                 tf_graphLand,
+                 tf_infoLabel,
+                 tf_infoValue,
+                 tf_header;
 
     QSize        imageQsz;
-    QString      imageFont;
-    int          imageFontSize;
     QImage       imageBm;
     QPainter    *imagePainter;
     QPoint       imagePt;
@@ -183,7 +203,7 @@ signals:
 public slots:
 
 private:
-    printerserialport *m_port;
+    QFile  *m_file;
 
     QString m_namefile;
     QString m_namefilePrn;
@@ -272,6 +292,7 @@ private:
     //report
     void Pri_Rep(double xscale);
     void Intest();
+    void Report_row(QString label, QString value);
     void Report_data();
     void Report_flw(double xscale);
     void Report_emg(double xscale);

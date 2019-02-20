@@ -25,7 +25,6 @@ SOURCES += \
     CPP/nomogramma.cpp \
     CPP/parametermanager.cpp \
     CPP/printermanager.cpp \
-    CPP/printerserialport.cpp \
     CPP/TCP/SimpleTCPChannel.cpp \
     CPP/TCP/SimpleTCPClient.cpp \
     CPP/TCP/TcpServers.cpp \
@@ -58,7 +57,6 @@ HEADERS += \
     CPP/nomogramma.h \
     CPP/parametermanager.h \
     CPP/printermanager.h \
-    CPP/printerserialport.h \
     CPP/TCP/SimpleTCPChannel.h \
     CPP/TCP/SimpleTCPClient.h \
     CPP/TCP/TcpServers.h \

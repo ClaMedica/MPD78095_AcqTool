@@ -1037,7 +1037,7 @@ void MDataManager::exitFromReview()
 #endif
 
     if (getToSave() == "ret") {
-        if (m_mngPrint != NULL) m_mngPrint->closePrinter();
+//        if (m_mngPrint != NULL) m_mngPrint->closePrinter();   NON SERVE PIU CON LA VERSIONE QIMAGE
         qDebug()<<"cancellata copia all'exit"<<QFile::remove(m_copyFileName);
 #ifndef PICOFLOW
         if (QFile::exists(filenameAna))
@@ -1058,7 +1058,7 @@ void MDataManager::exitFromReview()
         emit sg_exitFromReview();
     else
     {
-        if (m_mngPrint != NULL) m_mngPrint->closePrinter();
+//        if (m_mngPrint != NULL) m_mngPrint->closePrinter();   NON SERVE PIU CON LA VERSIONE QIMAGE
         if (getToSave() == "yes")
         {
             //copio il file copy nell'originale

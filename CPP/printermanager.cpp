@@ -94,6 +94,7 @@ const unsigned char  SD[2][4][20] = {
 
 printermanager::printermanager(QString __namefile, QObject *parent) : QObject(parent)
 {
+    m_file = NULL;
     m_namefile    = __namefile;
     m_namefilePrn = __namefile.remove("_copy").remove(".pic").append(".prn");
     qDebug() << m_namefilePrn;
@@ -123,9 +124,6 @@ printermanager::printermanager(QString __namefile, QObject *parent) : QObject(pa
     m_printFirstHeader = "";
     m_printSecondHeader = "";
 
-    m_port = NULL;
-//    m_port = new printerserialport(m_namefilePrn, this);
-
     m_resultBm_w = 103*8; // 103 bytes * 8 bit
     m_resultBm_h = 300;
     m_bitmapSiroky.   resize((m_resultBm_w * m_resultBm_h) / 8);
@@ -147,31 +145,82 @@ printermanager::printermanager(QString __namefile, QObject *parent) : QObject(pa
 printermanager::~printermanager()
 {
     qDebug("uscita printermanager");
-    if (m_port != NULL)
-        m_port->closeSerialPort();
+}
+
+void printermanager::imageFontInit(T_Font &font, QString label, int size, QFont::Weight weight, bool fixedPitch)
+{
+    QFont tmp = imagePainter->font();
+
+    font.label  = label;
+    font.size   = size;
+    font.weight = weight;
+
+    font.qf     = QFont(font.label, font.size, font.weight);
+    font.qf.setFixedPitch(fixedPitch);
+
+    imagePainter->setFont(font.qf);
+    font.charH = imagePainter->fontMetrics().lineSpacing();
+    font.charW = imagePainter->fontMetrics().width('9');
+
+    imagePainter->setFont(tmp);
+}
+
+void printermanager::imageSetFont(T_Font &font)
+{
+    imagePainter->setFont(font.qf);
+    tf_current = font;
+}
+
+void printermanager::imageTestFont()
+{
+    int y = imagePt.ry();
+    imagePainter->drawLine(0,y, 800,y);
+    imageSetFont(tf_base);       y += tf_current.charH + 5; imagePainter->drawText(5, y, tf_current.label);
+    imageSetFont(tf_header22);   y += tf_current.charH + 5; imagePainter->drawText(5, y, tf_current.label);
+    imageSetFont(tf_header28);   y += tf_current.charH + 5; imagePainter->drawText(5, y, tf_current.label);
+    imageSetFont(tf_header20);   y += tf_current.charH + 5; imagePainter->drawText(5, y, tf_current.label);
+    imageSetFont(tf_graphLand);  y += tf_current.charH + 5; imagePainter->drawText(5, y, tf_current.label);
+    imageSetFont(tf_graphPortr); y += tf_current.charH + 5; imagePainter->drawText(5, y, tf_current.label);
+    imageSetFont(tf_infoLabel);  y += tf_current.charH + 5; imagePainter->drawText(5, y, tf_current.label);
+    imageSetFont(tf_infoValue);  y += tf_current.charH + 5; imagePainter->drawText(5, y, tf_current.label);
+    imagePainter->drawLine(0,y, 800,y);
+    imagePt.ry() += y;
 }
 
 void printermanager::imageInit()
 {
     qDebug("imageInit()");
-    imageFont = "Bitstream Vera Sans Mono";
-    imageFontSize = 12;
 
     imageBm.fill(Qt::white);
-    imagePainter->fillRect(0,0, imageQsz.width(),imageQsz.height(), Qt::white);
+    imagePainter->fillRect(QRect(QPoint(0,0), imageQsz), Qt::white);
 
-    QFont tFont(imageFont, imageFontSize, QFont::Normal);
-    tFont.setFixedPitch(true);
-    imagePainter->setFont(tFont);
+    // fontInit() richiede imagePainter impostato
+    imageFontInit(tf_base,       "Bitstream Vera Sans Mono", 10, QFont::Thin);
+    imageFontInit(tf_header22,   "Bitstream Vera Sans Mono", 22, QFont::Medium);
+    imageFontInit(tf_header28,   "Bitstream Vera Sans Mono", 28, QFont::Bold);
+    imageFontInit(tf_header20,   "Bitstream Vera Sans Mono", 20, QFont::Normal);
+    imageFontInit(tf_graphPortr, "Bitstream Vera Sans Mono", 12, QFont::Thin);
+    imageFontInit(tf_graphLand,  "Bitstream Vera Sans Mono", 12, QFont::Thin);
+    imageFontInit(tf_infoLabel,  "Bitstream Vera Sans Mono", 12, QFont::Bold);
+    imageFontInit(tf_infoValue,  "Bitstream Vera Sans Mono", 12, QFont::Normal);
+
+    tf_header20.qf.setUnderline(true);
+
+    imagePainter->setFont(tf_base.qf);
 
     imagePt = QPoint(0, 0);
+//    imageTestFont();
 }
 
 void printermanager::imagePrint()
 {
 #ifdef PICOFLOW
 
-    m_port = new printerserialport(m_namefilePrn, this);
+    m_file = new QFile(m_namefilePrn);
+    if(m_file->exists())
+        m_file->remove();
+    m_file->open(QIODevice::WriteOnly);
+    qDebug() << "file aperto in scrittura:" << m_namefilePrn;
 
     uchar   tmp[256];
     int lastNotEmpty = 0;
@@ -194,7 +243,7 @@ void printermanager::imagePrint()
             emptyLines++;
         else {
             if(emptyLines > 0) {    // linee vuote precedenti
-                m_port->Pri_forward(emptyLines);
+                Pri_forward(emptyLines);
                 emptyLines = 0;
             }
             printPixLine(tmp, wBytes-rightZeroED);
@@ -202,7 +251,7 @@ void printermanager::imagePrint()
         }
     }
     if(emptyLines > 0) {    // linee vuote precedenti
-        m_port->Pri_forward(emptyLines);
+        Pri_forward(emptyLines);
         emptyLines = 0;
     }
     qDebug("linee effettive:%d", lastNotEmpty);
@@ -214,9 +263,12 @@ void printermanager::imagePrint()
         tmp[i] = 0xcc;
     printPixLine(tmp, 103);
     // fa avanzare la carta 30mm per consentire lo strappo
-    m_port->Pri_forward((int) (26 / 0.125));
+    Pri_forward((int) (26 / 0.125));
 
-    closePrinter();
+    qDebug() << "file chiuso in scrittura" << m_file->fileName();
+    m_file->close();
+    delete m_file;
+    m_file = NULL;
 
     qDebug("fine print: sendSup()");
 //    udpConn.sendPrn("print:" + m_namefilePrn.toLatin1());   // diretto
@@ -248,7 +300,7 @@ void printermanager::printPixLine(uchar *p, int sz)
     buf[2] = buf[7] = sz;
 
     memcpy(buf+8, p, sz);
-    m_port->Pri_Str((char *)buf, LCMD+sz);
+    Pri_Str((char *)buf, LCMD+sz);
 }
 
 void printermanager::imageText(QString txt, int fontSize, bool restoreFont)
@@ -410,17 +462,6 @@ void printermanager::imageGraphSingleL(QPoint leftBottom, QPoint *pts, int npts,
         pts[ix] = QPoint(x, y);
     }
     imagePainter->drawPolyline(pts, npts);
-}
-
-void printermanager::closePrinter()
-{
-//    imagePrint();
-    if (m_port != NULL) {
-        m_port->closeSerialPort();
-        delete m_port;
-        m_port = NULL;
-    }
-    qDebug("printer closed");
 }
 
 /**
@@ -725,44 +766,38 @@ E' stampata l'intestazione del report, con intestazione clinica, logo and so on
 */
 void printermanager::Intest()
 {
-    QFont savedFont = imagePainter->font();
-    QFont tfont = savedFont;
-
-    QRect rect;
-    int deltaY;
     QPoint rb = QPoint(imageBm.width()-1, imagePt.ry());
-
     imagePt.rx() = 8;
-    tfont.setPointSize(22);
-    imagePainter->setFont(tfont);
-    deltaY = imagePainter->fontMetrics().lineSpacing();
-    rb.ry() += deltaY;
-    rect = QRect(imagePt, rb);
-    imagePainter->drawText(rect, Qt::AlignCenter, m_printFirstHeader);
-    imagePt.ry() += deltaY;
 
-    tfont.setPointSize(28);
-    tfont.setBold(true);
-    imagePainter->setFont(tfont);
-    deltaY = imagePainter->fontMetrics().lineSpacing();
-    rb.ry() += deltaY;
-    rect = QRect(imagePt, rb);
-    imagePainter->drawText(rect, Qt::AlignCenter, m_printSecondHeader);
-    imagePt.ry() += deltaY;
+    imageSetFont(tf_header22);
+    rb.ry() = imagePt.ry() + tf_current.charH;
+    imagePainter->drawText(QRect(imagePt, rb), Qt::AlignCenter, m_printFirstHeader);
+    imagePt.ry() = rb.y() + 10;
 
-    tfont.setPointSize(20);
-    tfont.setBold(false);
-    tfont.setUnderline(true);
-    imagePainter->setFont(tfont);
-    deltaY = imagePainter->fontMetrics().lineSpacing();
-    rb.ry() += deltaY;
-    rect = QRect(imagePt, rb);
-    imagePainter->drawText(rect, Qt::AlignCenter, tr("Urodynamic Equipment"));
-    imagePt.ry() += deltaY;
+    imageSetFont(tf_header28);
+    rb.ry() = imagePt.ry() + tf_current.charH;
+    imagePainter->drawText(QRect(imagePt, rb), Qt::AlignCenter, m_printSecondHeader);
+    imagePt.ry() = rb.y() + 10;
+
+    imageSetFont(tf_header20);
+    rb.ry() = imagePt.ry() + tf_current.charH;
+    imagePainter->drawText(QRect(imagePt, rb), Qt::AlignCenter, tr("Urodynamic Equipment"));
+    imagePt.ry() = rb.y() + 10;
 
     imagePt.ry() += 80;
+}
 
-    imagePainter->setFont(savedFont);
+void printermanager::Report_row(QString label, QString value)
+{
+    imagePt.ry() += tf_infoLabel.charH;
+
+    imageSetFont(tf_infoLabel);
+    imagePainter->drawText(imagePt, label);
+
+    imageSetFont(tf_infoValue);
+    int x = imagePt.x() + tf_infoLabel.charW * label.size();
+    int y = imagePt.y();
+    imagePainter->drawText(x, y, value);
 }
 
 /**
@@ -770,80 +805,33 @@ Sono stampati i dati del report paziente, nome, cognome, data di nascita, sesso,
 */
 void printermanager::Report_data()
 {
-    int deltaY = imagePainter->fontMetrics().lineSpacing();
-    imagePt.rx() = imagePainter->fontMetrics().width(" 1234");
+    imagePt.rx() = 5;
 
-    char str[200];
-    const char * puntini = ". . . . . . . . . . . . . . . . . . . . .";
-    const char * space_bar = "                    ";
-    QString strToWrite;
+    const char puntini[] = ". . . . . . . . . . . . . . . . . . . . .";
 
-    strToWrite = tr("Test Number ....:");
-    sprintf( str, " %s %s", strToWrite.toLatin1().data(), QString::number(m_numTest).toLatin1().data());
-    imagePainter->drawText(imagePt, str);
-    imagePt.ry() += deltaY;
+    Report_row(tr("Test Number ....: "), QString::number(m_numTest));
+    Report_row(tr("Test Date ......: "), m_dateofexam);
+    Report_row(tr("Surname ........: "), m_test_type ? puntini : m_surname);
+    Report_row(tr("Name ...........: "), m_test_type ? puntini : m_name);
+    Report_row(tr("Birth Date .....: "), m_test_type ? puntini : m_dateofbirth);
+    Report_row(tr("Gender .........: "), m_test_type ? puntini : QString(m_sex));
+    Report_row(tr("Investigator ...: "), puntini);
+    Report_row(tr("Comments .......: "), puntini);
 
-    strToWrite = tr("Test Date ......:");
-    sprintf(str," %s %s", strToWrite.toLatin1().data(), m_dateofexam.toLatin1().data());
-    imagePainter->drawText(imagePt, str);
-    imagePt.ry() += deltaY;
+    int deltaY = tf_infoLabel.charH;
+    int deltaX = tf_infoLabel.charW * tr("Comments .......: ").size();
 
-    // cognome
-    strToWrite = tr("Surname ........:");
-    sprintf( str, " %s %s", strToWrite.toLatin1().data(), m_test_type ? puntini : m_surname.toLatin1().data());
-    imagePainter->drawText(imagePt, str);
-    imagePt.ry() += deltaY;
-
-    // nome
-    strToWrite = tr("Name ...........:");
-    sprintf( str, " %s %s", strToWrite.toLatin1().data(), m_test_type ? puntini : m_name.toLatin1().data());
-    imagePainter->drawText(imagePt, str);
-    imagePt.ry() += deltaY;
-
-    // data di nascita stampata nei due formati: uno per ita e spa e uno per eng
-    strToWrite = tr("Birth Date .....:");
-    sprintf( str, " %s %s", strToWrite.toLatin1().data(), m_test_type ? puntini : m_dateofbirth.toLatin1().data());
-    imagePainter->drawText(imagePt, str);
-    imagePt.ry() += deltaY;
-
-    // sesso
-    strToWrite = tr("Gender .........:");
-    if(m_test_type)
-        sprintf( str, " %s %s", strToWrite.toLatin1().data(), puntini );
-    else
-        sprintf( str, " %s %c", strToWrite.toLatin1().data(), m_sex );
-    imagePainter->drawText(imagePt, str);
-    imagePt.ry() += deltaY;
-
-    // operatore
-    strToWrite = tr("Investigator ...:");
-    sprintf( str, " %s %s", strToWrite.toLatin1().data(), puntini );
-    imagePainter->drawText(imagePt, str);
-    imagePt.ry() += deltaY;
-
-    // commenti
-    strToWrite = tr("Comments .......:");
-    sprintf( str, " %s %s", strToWrite.toLatin1().data(), puntini );
-    imagePainter->drawText(imagePt, str);
-    imagePt.ry() += deltaY;
-    strcpy(str, space_bar);
-    strcpy(str+19, puntini);
     for (int i = 0; i < 3; i++)	{	// tre righe vuote per eventuali commenti
-        imagePainter->drawText(imagePt, str);
         imagePt.ry() += deltaY;
+        imagePainter->drawText(imagePt.x()+deltaX, imagePt.y(), puntini);
     }
 
-    imagePt.ry() += deltaY * 2;
 
     // scritta relativa al tipo di modalita
-    if(m_modal_e == 2)
-        strToWrite = tr("MANUAL   MODALITY");
-    else
-        if(m_modal_e == 0)
-            strToWrite = tr("AUTOMATIC  MODALITY ");
-    imagePainter->drawText(imagePt, strToWrite);
-
-    imagePt.ry() += deltaY * 2;
+    imageSetFont(tf_header22);
+    imagePt.ry() += tf_header22.charH * 2;
+    imagePainter->drawText(imagePt, (m_modal_e == 2) ? tr("MANUAL   MODALITY") : tr("AUTOMATIC  MODALITY "));
+    imagePt.ry() += tf_header22.charH;
 }
 
 /**
@@ -1221,7 +1209,6 @@ infine e cotruito l'asse delle ordinate destro, dove appare l'udm del volume e i
 */
 void printermanager::Report_Real_Time(short __num_sample, double xscale)
 {
-    int num_righe;
     m_init_time_to_print = 0;
     m_cursore = 0;
 
@@ -1248,6 +1235,7 @@ void printermanager::Report_Real_Time(short __num_sample, double xscale)
         Pri_Rep_Label();	// stampa label del flusso ed eventualmente anche l'emg nel caso di grafici sovrapposti
 
 //        // SCOMPONGO LA STAMPA DEL GRAFICO IN TANTE STAMPE DA 5 SECONDI CIASCUNA
+//        int num_righe;
 //        num_righe = (int)(__num_sample / NUM_POINTS) + 1;	// numero intero di blocchi da 40 righe (5sec), il restante e stampato in un altro blocco da 40
 //        Pri_Rep_Gra_Landscape(-1, xscale);      // forza init delle variabili
 //        for(int riga = 0; riga < num_righe; riga++ )                        // scompone la griglia in tante righe
@@ -1264,7 +1252,8 @@ void printermanager::Report_Real_Time(short __num_sample, double xscale)
 void printermanager::Pri_Rep_Label()
 {
     int y;
-    int txtW = imagePainter->fontMetrics().width("9999 ml/s") + 3;
+    int txtW = tf_graphLand.charW * QString("9999 ml/s").size() + 3;
+    imageSetFont(tf_graphLand);
 
     if(m_emgPresent)
         imagePainter->drawText(txtW-10, -m_pos_gra_emg*8, "0");     // stampo lo zero dell'emg senza udm
@@ -1898,43 +1887,48 @@ stampa l'elenco dei dati di analisi delle curve
 */
 void printermanager::Report_result()
 {
-    QStringList txt;
-    int deltaY = imagePainter->fontMetrics().lineSpacing();
-    imagePt.rx() = imagePainter->fontMetrics().width(" 1234");
+    imagePt.rx() = 8;
 
-    QString flures = tr("Flowmetry Results");
-    imagePainter->drawText(imagePt, flures);
-    imagePt.ry() += deltaY;
+    imageSetFont(tf_header22);
+    imagePt.ry() += tf_header22.charH;
+    imagePainter->drawText(imagePt, tr("Flowmetry Results"));
+    imagePt.ry() += tf_header22.charH;
 
-    if (m_modal_e == 2)     // il tempo di attesa e' graficato solo se esame manuale
-        txt.append(tr("Waiting time ..............") + QString::asprintf(" : %5.1f s", m_tem_att));
+    QStringList txstrList;
+    if (m_modal_e == 2) {     // il tempo di attesa e' graficato solo se esame manuale
+        txstrList.append(tr("Waiting time ..............")); txstrList.append(QString::asprintf(" : %5.1f s", m_tem_att));
+    }
 
     if (m_flu_med > m_flu_max) // piccolo controllo per gestire flussi abnormali, tipici di prove da laboratorio
         if (m_tem_flu < 30) // se la flussata e molto breve e intensa, l'algoritmo sbaglia e puo risultare flu_med > flu_max
             m_flu_med = m_flu_max;
 
-    txt.append(tr("Maximum flow rate .........") + QString::asprintf(" : %5.1f ml/s"      , m_flu_max));
-    txt.append(tr("Average flow rate .........") + QString::asprintf(" : %5.1f ml/s"      , m_flu_med));
-    txt.append(tr("Time to maximum flow ......") + QString::asprintf(" : %5.1f s"         , m_tem_max));
-    txt.append(tr("Time between 5% and 95% ...") + QString::asprintf(" : %5.1f s"         , m_tem_595));
-    txt.append(tr("Flow time .................") + QString::asprintf(" : %5.1f s"         , m_tem_flu));
-    txt.append(tr("Descent time ..............") + QString::asprintf(" : %5.1f s"         , m_tem_dis));
-    txt.append(tr("Voiding time ..............") + QString::asprintf(" : %5.1f s"         , m_tem_svu));
-    txt.append(tr("Volume to maximum flow ....") + QString::asprintf(" : %5.1f ml"        , m_vol_max));
-    txt.append(tr("Voided Volume .............") + QString::asprintf(" : %5.1f ml"        , (double) m_vol_vuo));
-    txt.append(tr("Corrected maximum flow ....") + QString::asprintf(" : %5.1f ml^(1/2)/s", m_cQ     ));
-    txt.append(tr("Flow acceleration .........") + QString::asprintf(" : %5.1f ml/s^2"    , m_flu_acc));    //?=2 apice
-    txt.append(tr("Maximum contraction speed .") + QString::asprintf(" : %5.1f mm/s"      , m_vDetMax));
-    txt.append(tr("Residual volume ...........") + QString::asprintf(" : %5.1f ml"        , (double) m_resVol ));
+    txstrList.append(tr("Maximum flow rate .........")); txstrList.append(QString::asprintf(" : %5.1f ml/s"      , m_flu_max));
+    txstrList.append(tr("Average flow rate .........")); txstrList.append(QString::asprintf(" : %5.1f ml/s"      , m_flu_med));
+    txstrList.append(tr("Time to maximum flow ......")); txstrList.append(QString::asprintf(" : %5.1f s"         , m_tem_max));
+    txstrList.append(tr("Time between 5% and 95% ...")); txstrList.append(QString::asprintf(" : %5.1f s"         , m_tem_595));
+    txstrList.append(tr("Flow time .................")); txstrList.append(QString::asprintf(" : %5.1f s"         , m_tem_flu));
+    txstrList.append(tr("Descent time ..............")); txstrList.append(QString::asprintf(" : %5.1f s"         , m_tem_dis));
+    txstrList.append(tr("Voiding time ..............")); txstrList.append(QString::asprintf(" : %5.1f s"         , m_tem_svu));
+    txstrList.append(tr("Volume to maximum flow ....")); txstrList.append(QString::asprintf(" : %5.1f ml"        , m_vol_max));
+    txstrList.append(tr("Voided Volume .............")); txstrList.append(QString::asprintf(" : %5.1f ml"        , (double) m_vol_vuo));
+    txstrList.append(tr("Corrected maximum flow ....")); txstrList.append(QString::asprintf(" : %5.1f ml^(1/2)/s", m_cQ     ));
+    txstrList.append(tr("Flow acceleration .........")); txstrList.append(QString::asprintf(" : %5.1f ml/s^2"    , m_flu_acc));    //?=2 apice
+    txstrList.append(tr("Maximum contraction speed .")); txstrList.append(QString::asprintf(" : %5.1f mm/s"      , m_vDetMax));
+    txstrList.append(tr("Residual volume ...........")); txstrList.append(QString::asprintf(" : %5.1f ml"        , (double) m_resVol ));
 
-    for(int i = 0; i < txt.size(); i++) {
-        imagePainter->drawText(imagePt, txt.at(i));
-        imagePt.ry() += deltaY;
+    for(int i = 0; i < txstrList.size(); i += 2) {
+        imagePt.rx() = 8;
+        imagePt.ry() += tf_infoLabel.charH;
+        imageSetFont(tf_infoLabel); imagePainter->drawText(imagePt, txstrList.at(i));
+        imagePt.rx() = tf_infoLabel.charW * tr("Maximum flow rate .........").size();
+        imageSetFont(tf_infoValue); imagePainter->drawText(imagePt, txstrList.at(i+1));
     }
-    imagePainter->drawLine(imagePt, QPoint(imageBm.width()-1-8, imagePt.ry()));
 
     imagePt.rx() = 8;
-    imagePt.ry() += deltaY;
+    imagePt.ry() += tf_infoLabel.charH;
+    imagePainter->drawLine(imagePt, QPoint(imageBm.width()-1-8, imagePt.ry()));
+    imagePt.ry() += tf_infoLabel.charH;
 }
 
 // conversione da RGB 8*3 = 24 bit a RGB 4*3 = 12 bit
@@ -2204,5 +2198,27 @@ void printermanager::print_udm_label(int ch_type, int __pos_in_string, int __pre
         pos += h;
         ch++;
     }
+}
+
+void printermanager::Pri_forward(char __dotlines)
+{
+    /* fa avanzare di "dotlines" righe la carta*/
+
+    char pri_str[] = { ESC, 'J', __dotlines };
+    Pri_Str(pri_str, sizeof(pri_str));
+}
+
+bool printermanager::Pri_Str(char *__str, int __str_len)
+{
+    if(m_file && m_file->isOpen()) {
+        static char trailer[1] = { 0x03 };
+        char header[6] = { 0x5a, 0xa5, 0xa5, 0x5a, __str_len & 0xff, (__str_len >> 8) & 0xff };
+
+        m_file->write(header, sizeof(header));
+        m_file->write(__str, __str_len);
+        m_file->write(trailer, sizeof(trailer));
+    }
+
+    return true;
 }
 
