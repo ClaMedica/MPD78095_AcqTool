@@ -43,9 +43,7 @@ SOURCES += \
     ../AnaUro/analysis.cpp \
     ../AnaUro/anautils.cpp \
     ../MGlobal/fileio.cpp \
-    CPP/graficmanager.cpp \
-    CPP/mdatamngpico.cpp \
-    CPP/mdatamngdesktop.cpp
+    CPP/graficmanager.cpp
 
 HEADERS += \
     CPP/alarmmanager.h \
@@ -80,9 +78,7 @@ HEADERS += \
     ../MGlobal/p7settingsmanager.h \
     ../MGlobal/systemmanager.h \
     ../MGlobal/UdmImpl.h \
-    ../MGlobal/fileio.h \
-    CPP/mdatamngpico.h \
-    CPP/mdatamngdesktop.h
+    ../MGlobal/fileio.h
 
 
 INCLUDEPATH +=  CPP \
@@ -126,6 +122,9 @@ contains(ANDROID_TARGET_ARCH,armeabi-v7a) {
 win32 {
     DEFINES += WIN32
     TARGET = acqTool
+
+    SOURCES += CPP/mdatamngdesktop.cpp
+    HEADERS += CPP/mdatamngdesktop.h
 
     INCLUDEPATH +=  ../MedicalReport
 
@@ -196,10 +195,12 @@ CLAUDIA {
     TARGET = PicoAcq
 
     SOURCES += \
-        ../MGlobal/udpmsgs.cpp
+        ../MGlobal/udpmsgs.cpp \
+        CPP/mdatamngpico.cpp
 
-    HEADERS *= \
-        ../MGlobal/udpmsgs.h
+    HEADERS += \
+        ../MGlobal/udpmsgs.h \
+        CPP/mdatamngpico.h
 
     RESOURCES += modules_picoflow.qrc
 
@@ -220,10 +221,12 @@ PICOFLOW {
     TARGET = PicoAcq
 
     SOURCES += \
-        ../MGlobal/udpmsgs.cpp
+        ../MGlobal/udpmsgs.cpp \
+        CPP/mdatamngpico.cpp
 
-    HEADERS *= \
-        ../MGlobal/udpmsgs.h
+    HEADERS += \
+        ../MGlobal/udpmsgs.h \
+        CPP/mdatamngpico.h
 
     RESOURCES += modules_picoflow.qrc
 

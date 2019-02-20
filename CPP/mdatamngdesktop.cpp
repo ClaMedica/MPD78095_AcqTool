@@ -332,7 +332,6 @@ void MDataMngDesktop::exitFromReview()
     filenameAna.append(".xml");
 
     if (getToSave() == "ret") {
-        //if (m_mngPrint != NULL) m_mngPrint->closePrinter();
         qDebug()<<"cancellata copia all'exit"<<QFile::remove(m_copyFileName);
 
         if (QFile::exists(filenameAna))
@@ -352,7 +351,6 @@ void MDataMngDesktop::exitFromReview()
         emit sg_exitFromReview();
     else
     {
-      //  if (m_mngPrint != NULL) m_mngPrint->closePrinter();
         if (getToSave() == "yes")
         {
             //copio il file copy nell'originale

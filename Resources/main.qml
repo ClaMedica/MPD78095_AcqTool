@@ -240,7 +240,8 @@ ApplicationWindow {
         id:mngData
 
         //@@@@@@@@@@    Events          @@@@@@@@@@
-        onLoadingCompleted: {
+
+       onLoadingCompleted: {
             forAna.loadConfigurationFile(mngData.plotConfigFileName())
             forAna.populate()
             forHome.whoIsVisible = forAna.name

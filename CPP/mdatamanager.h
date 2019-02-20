@@ -5,10 +5,6 @@
 #include "mstorage.h"
 #include "modelmanager.h"
 #include "mflowdatas.h"
-#include "printermanager.h"
-#include <QQuickItemGrabResult>
-#include "udpmsgs.h"
-
 
 typedef struct {
     float waiting_time;			// waiting time
@@ -48,12 +44,8 @@ public:
     Q_PROPERTY(int numAnaFlwAdv READ getNumAnaFlwAdv)
     Q_INVOKABLE int getNumAnaFlwAdv(){return m_aflwdatas.length();}
 
-    Q_INVOKABLE void getGrabbedImage(QObject *gi, QString __nome);
     Q_INVOKABLE bool getAutoPrint(){return m_autoPrint;}
     Q_INVOKABLE int getAutoFlow(){return m_autoFlow;}
-
-    //PICO
-    Q_INVOKABLE int getSpoolerQueueLen() { return spoolerQueueLen; }
 
     QStringList availableData(){return m_availableData;}
     QStringList availableTracks(){return m_data.keys();}
@@ -71,11 +63,9 @@ public:
     bool addSignal(MSignal *__pSignal);
     void storeNews(QString __family, QString __name, qulonglong __element);
 
-    void send_Command(int __command);   // replicato da macqmanager perche' non si puo' invocare l'originale
     Q_INVOKABLE mflowdatas *getFlowDatas(int __i);
 
 signals:
-    void dataNewsChanged();
     void availableDataChanged();
     void alarmsChanged();
     void availableTracksChanged();
@@ -89,16 +79,10 @@ signals:
     void infoValVolRes();
     void infoToSave();
 
-    void sg_exitFromReview();
-    void udpMdmBtStatus(enum WHO, int);
-    void udpMdmPrnStatus(enum WHO, int);
-
 public slots:
     void analysis(void);
 
-    void exitFromReview();
-    void loadFile(QString __fileName);
-    float getStartTime(){return m_start;}
+    virtual void loadFile(QString __fileName); //personalizzata da mDataMngPico
     float getEndTime(){return m_end;}
     void resetAll(void);
     void saveChanges();
@@ -109,10 +93,6 @@ public slots:
     bool changeObject(QVariantList __curObj);
     QVariant getSignal(QString __name);
     QStringList getLinks(QString __what, QStringList __filterFamily=QStringList(), QStringList __filterType=QStringList());
-    void startPrint();
-    void sendToPrint(enum WHO __from = E_NONE, int __val = -1);
-    void udpMdmBtDecode(enum WHO __from, QByteArray __msg);
-    void sendPrintTest();
 
 private:
     QVector<MSignal *> m_signalVector;
@@ -120,8 +100,7 @@ private:
     QMap<QString,QStringList> m_data;
 
     QStringList m_availableData,
-    m_possibleCategories,
-    m_filesLoaded;//contiene l'elenco di tutti i file che sono stati aperti e di cui vi sono i dati disponibili per l'utente
+    m_possibleCategories;
 
     QString m_currentSignalName;
 
@@ -129,11 +108,8 @@ private:
 
     AnalysisType m_anaType;
 
-    bool    m_updateWhenNews,
-    m_configurationFileLoaded,
-    m_changesToBeSaved;
-
-    float m_start,m_end;
+    //fine esame
+    float m_end;
 
     DatafileManager *m_copy;
 
@@ -145,21 +121,8 @@ private:
     QString m_toSave;
 
     bool    m_analized;
-    int     m_autoFlow;     //Modalita dell'esame 0=auto; 2=manual
-    bool    m_Siroky;       //se stampare Siroky
-    bool    m_Liverpool;    //se stampare Liverpool
-    bool    m_landscape;    //modalità di stampa: portrait o landascape (ture se landscape)   
-    bool    m_sexPatient;   //true se donna, false se uomo
-    int     m_etaPatient;
-    QString m_firstHead;    //primo header della stmpa personalizzabile
-    QString m_secondHead;   //secondo header della stampa personalizzabile
 
     int m_numAna; //numero di analisi --> non sappiamo se serve
-    QVector<mflowdatas*> m_aflwdatas; //array di analisi di tipo flussimetria
-
-    //PICO
-    printermanager *m_mngPrint;
-    int spoolerQueueLen;
 
     void updateAvailableData();
     bool buildInfoList();
@@ -173,11 +136,23 @@ private:
 protected:
     bool saveDataAndUpdate(QString __family, QString __name, VarMapVec*__elements,bool __whatIfAlreadyPresent=OVERWRITE);
     bool updateInfoList();
+
     bool    m_autoPrint;
     QString m_pathData;
     QString m_fileName;
     QString m_copyFileName;
     int m_testNumber;
+
+    int     m_autoFlow;     //Modalita dell'esame 0=auto; 2=manual
+    bool    m_Siroky;       //se stampare Siroky
+    bool    m_Liverpool;    //se stampare Liverpool
+    bool    m_landscape;    //modalità di stampa: portrait o landascape (ture se landscape)
+    bool    m_sexPatient;   //true se donna, false se uomo
+    int     m_etaPatient;
+    QString m_firstHead;    //primo header della stmpa personalizzabile
+    QString m_secondHead;   //secondo header della stampa personalizzabile
+
+    QVector<mflowdatas*> m_aflwdatas; //array di analisi di tipo flussimetria
 
 };
 

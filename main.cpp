@@ -9,9 +9,8 @@
 #include <global.h>
 #include <modelmanager.h>
 #include <macqmanager.h>
-//#include <mdatamanager.h>
-//#include <MDataMngPico.h>
-#include <MDataMngDesktop.h>
+#include <mdatamngpico.h>
+#include <mdatamngdesktop.h>
 #include <mflowdatas.h>
 #include <QProcess>
 #include <QtGlobal>

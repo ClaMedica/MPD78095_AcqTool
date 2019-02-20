@@ -13,6 +13,7 @@ public:
      Q_INVOKABLE void saveImg(QQuickItem* __item, QString __nome);
 
 signals:
+    void sg_exitFromReview();
 
 public slots:
     void openReport();
