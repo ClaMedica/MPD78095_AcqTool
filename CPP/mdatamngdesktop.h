@@ -3,6 +3,7 @@
 
 #include <QObject>
 #include "mdatamanager.h"
+#include <QQuickItemGrabResult>
 
 class MDataMngDesktop : public MDataManager
 {
