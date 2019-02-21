@@ -3,9 +3,9 @@
 
 #include <QObject>
 #include "datafilemanager.h"
-#include "printerserialport.h"
 #include <QQuickItemGrabResult>
 #include "stdint.h"
+#include <QFont>
 
 
 #define     NUMOF_X_PRINT_DOTS 752 // (96 mm - 2mm dovuti agli assi) * 8 bit al mm = 94 * 8 = 752
@@ -13,7 +13,7 @@
 
 #define NUM_POINTS	40 // nella versione nuova che corrispondono a 5sec, infatti 40/8 = 5 considerato che 8punti/mm e 8sample/sec
 
-#define 	Fc_FLW        			10   	// frequenza di calcolo del flusso
+#define 	Fc_FLW        		10   	// frequenza di calcolo del flusso
 #define 	FREQ_ACQ      		10 		// in Hz -  frequenza di campionamento canale di volume
 #define 	FREQ_EMG_ACQ  		100		// in Hz -  frequenza di campionamento canale di emg
 #define 	MAX_DURATA_ESAME	20
@@ -51,9 +51,7 @@
 
 // caratteristiche del font dei caratteri usati per i label (ruotati di 90?)
 #define _HEIGHT_CHAR_LABEL 8
-#define _WEIGHT_CHAR_LABEL 8
-//#define negativo  0
-//#define positivo 1
+#define _WIDTH_CHAR_LABEL  8
 
 #define _NUM_BYTE_CMD 8 // numero di char del comando di stampa grafica previsto dal protocollo APS
 #define LCMD 8 //char per comando
@@ -96,36 +94,9 @@
 #define __LABEL_SD__
 #define __POINT__
 
-//per stampare
-//#define PRI_REP_INT     1   /* Flag Stampa Report : Intestazione          */
-//#define PRI_REP_IDE     1   /* Flag Stampa Report : Identificativi Esame  */
-//#define PRI_REP_MODAL	1   /* Flag stampa Report : modalita d'esame      */
-//#define PRI_REP_GRA     1   /* Flag Stampa Report : Grafico               */
-//#define PRI_REP_SRK     1   /* Flag Stampa Report : Siroky                */
-//#define PRI_REP_RIS     1   /* Flag Stampa Report : Risultati             */
-//#define PRI_REP_POS     0   /* Flag Stampa Report : Postfazione e indicazione calibrazione, per debug */
-//#define PRI_REP_SPA     1	  /* Flag Stampa Report : Spazi per strappare   */
-
-//per le stringhe
-//#define NON_SOTTLINEA   "\x1bU\x0"	// \x 1B U \x 0 che significa 1B = ESC; U = modo sottolineatura; 0 = stampa normale
-//#define SOTTLINEA       "\x1bU\x1"
-//#define NON_RUOTA_90    "\x1bV\x0" // 1B V 0 : ESC V 0 = modo ruotato 90? non attivato
-//#define RUOTA_90        "\x1bV\x2"
-//#define REVERS_MODE     "\x1b{\x1"
-//#define NOT_REVERS_MODE "\x1b{\x0"
 #define LINE                "\n\n"          // "\x1b""d"
 #define LINE2               (char *) "\n\n"
-//#define F_16x24         "\x1bR\x02"
-//#define F_24x32         "\x1bR\x03"
-//#define DUBLE_H_L       "\x1b!\x30"
-//#define DUBLE_H         "\x1b!\x10"
-//#define UNDUBLE         "\x1b!\x00"
-//#define DUBLE_L         "\x1b!\x20"
-//#define PRI_TIMEOUT     25000
 
-//#define F_8x16			0x30
-//#define F_12x20			0x31
-//#define F_7x16			0x32
 #define F_center		0x00
 #define F_right			0x01
 #define F_left			0x02
@@ -137,11 +108,6 @@
 #define ESC               0x1B            /* Escape                         */
 #define GS				  0x1D			  /* SET impostazione				*/
 
-//#define F_LINE 			"\x0A""d"
-
-#define	LOBYTE(x)             ((unsigned char) ((x) & 0xff))
-#define	HIBYTE(x)             ((unsigned char) ((x) >> 8))
-
 
 
 typedef struct{
@@ -151,6 +117,14 @@ typedef struct{
     bool verso_curva;
 } Print_Graph_Parameters; 		// usata nella funzione di creazione stringa per stampa grafici
 
+typedef struct {
+    QString     label;
+    int         size;
+    int         weight;
+    int         charW;
+    int         charH;
+    QFont       qf;
+} T_Font;
 
 class printermanager : public QObject
 {
@@ -160,8 +134,17 @@ public:
     explicit printermanager(/*QObject *parent = 0*/) {}
     ~printermanager();
 
+    void imageFontInit(T_Font &font, QString label, int size, QFont::Weight weight = QFont::Normal, bool fixedPitch = true);
+    void imageSetFont(T_Font &font);
+    void imageTestFont();
+    void imageInit();
+    void imagePrint();
+    void imageGraph(QString head, QString baset, double xscale, int maxL, int maxR, double *bufL, double *bufR);
+    void imageGraphSingle(QPoint leftBottom, QPoint *pts, int npts, double kx, double ky, double *bufV);
+    void imageGraphL(QString head, QString baset, double xscale, int maxL, int maxR, double *bufL, double *bufR);
+    void imageGraphSingleL(QPoint leftBottom, QPoint *pts, int npts, double kx, double ky, double *bufV);
+    void imageText(QString txt, int fontSize, bool restoreFont);
     void print();
-    void closePrinter();
 
     void setTempoAttesa(float __val)            {m_tem_att = __val;}
     void setFlussoMax(float __val)              {m_flu_max = __val;}
@@ -178,23 +161,49 @@ public:
     void setVolRes(unsigned int  __val)         {m_resVol = __val;}
     void setDetContrMax(float  __val)           {m_vDetMax = __val;}
 
-    void setMode(unsigned char   __val)     {m_modal_e = __val;}
-    void setPrintSiroky(bool __val)         {m_printSiroky = __val;}
-    void setPrintLiverpool(bool __val)      {m_printLiverpool = __val;}
-    void setPrintModeUser(bool __val)       {m_printModeUser = __val;}
-    void setTipoEsame(unsigned char __val)  {m_test_type = __val;}
+    void setMode(unsigned char   __val)         {m_modal_e = __val;}
+    void setPrintSiroky(bool __val)             {m_printSiroky = __val;}
+    void setPrintLiverpool(bool __val)          {m_printLiverpool = __val;}
+    void setPrintModeUser(bool __val)           {m_printModeUser = __val;}
+    void setTipoEsame(unsigned char __val)      {m_test_type = __val;}
 
     void Report_BitMap(bool __isSiro = false);
     void getGrabbedImage(QObject *__gi, QString __nome);
     void getImage(QImage __img, QString __nome);
     void setPrintHeaders(QString __first, QString __second)     {m_printFirstHeader = __first; m_printSecondHeader = __second;}
 
+    void set_gra_Header_str_gr(int __sz, int __n4, int __dots);
+    void printDigits(int __val, int __ndigits, int __pos);
+    void printNumber(int __val, int __ndigits, int __pos, const unsigned char *fontBm, int fontH, int fontW);
+    void printBitMap_unaRigaPerVolta();
+    void printPixLine(uchar *p, int sz);
+    void Pri_forward(char __dotlines);
+    bool Pri_Str(char *__str, int __str_len);
+
+    T_Font       tf_current,
+                 tf_base,
+                 tf_header22,
+                 tf_header28,
+                 tf_header20,
+                 tf_graphPortr,
+                 tf_graphLand,
+                 tf_infoLabel,
+                 tf_infoValue,
+                 tf_header;
+
+    QSize        imageQsz;
+    QImage       imageBm;
+    QPainter    *imagePainter;
+    QPoint       imagePt;
+    QRect        imageRectFlw;
+    QRect        imageRectEmg;
+
 signals:
 
 public slots:
 
 private:
-    printerserialport *m_port;
+    QFile  *m_file;
 
     QString m_namefile;
     QString m_namefilePrn;
@@ -283,9 +292,10 @@ private:
     //report
     void Pri_Rep(double xscale);
     void Intest();
+    void Report_row(QString label, QString value);
     void Report_data();
     void Report_flw(double xscale);
-    void Report_emg();
+    void Report_emg(double xscale);
     void Report_Real_Time(short __num_sample, double xscale);
 
     void Report_result();
@@ -295,7 +305,7 @@ private:
     void Pri_Rep_Gra_Landscape(short __num_sample, double xscale);
     void Pri_Rep_asse_dx();
     void Pri_Rep_Label();
-    void Pri_Rep_Lin(char *__str_des, int __rep_dat, unsigned char __num_dec, char *__str_udm, unsigned char __flag_lf);
+    void Pri_Rep_Lin(QString __descr, int __rep_dat, int __num_dec, const char *__str_udm, bool __flag_lf);
 
     unsigned char  Int_Pun(int __i4);
     void Gra_Line();
@@ -305,8 +315,8 @@ private:
     void Calc_Max(double xscale);
     void Calc_Max_EMG();
     long Calc_Max_Flw();
-    void print_char_left_label(short __value, int __pos_in_string, short int __num_char, bool __pri_decim, short int __pre_char);
-    void print_udm_label(int __ch_type, short __pos_in_string, short int __pre_char);
+    void print_char_left_label(int __value, int __pos_in_string, int __num_char, bool __pri_decim, int __pre_char);
+    void print_udm_label(int __ch_type, int __pos_in_string, int __pre_char);
     bool check_stamp_label();
 
 };

@@ -44,6 +44,8 @@ MDataManager::~MDataManager()
     }
 }
 
+
+
 void MDataManager::setInfoList(QVariantList __list)
 {
     if(__list != m_infoList) {
