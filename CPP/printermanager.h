@@ -138,6 +138,9 @@ public:
     void imageSetFont(T_Font &font);
     void imageTestFont();
     void imageInit();
+    void imagePrintPixLine(uchar *p, int sz);
+    void imagePrintForward(int __dotlines);
+    void imagePrintStr(char *__str, int __str_len);
     void imagePrint();
     void imageGraph(QString head, QString baset, double xscale, int maxL, int maxR, double *bufL, double *bufR);
     void imageGraphSingle(QPoint leftBottom, QPoint *pts, int npts, double kx, double ky, double *bufV);
@@ -176,9 +179,6 @@ public:
     void printDigits(int __val, int __ndigits, int __pos);
     void printNumber(int __val, int __ndigits, int __pos, const unsigned char *fontBm, int fontH, int fontW);
     void printBitMap_unaRigaPerVolta();
-    void printPixLine(uchar *p, int sz);
-    void Pri_forward(char __dotlines);
-    bool Pri_Str(char *__str, int __str_len);
 
     T_Font       tf_current,
                  tf_base,
@@ -203,11 +203,10 @@ signals:
 public slots:
 
 private:
-    QFile  *m_file;
-
-    QString m_namefile;
-    QString m_namefilePrn;
     DatafileManager *m_dfm;
+    QFile     * m_file;
+    QString     m_namefile;
+    QString     m_namefilePrn;
 
     bool m_printMode;
     bool m_printModeUser;
@@ -296,7 +295,8 @@ private:
     void Report_data();
     void Report_flw(double xscale);
     void Report_emg(double xscale);
-    void Report_Real_Time(short __num_sample, double xscale);
+    void Report_Real_Time(double xscale);
+    void Pri_Rep_Label(double xscale, int y0, int n_dots, int n_label, int max_val, double * buffer, QString txt);
 
     void Report_result();
     void Pri_Rep_Gra(int __num_riga);
@@ -304,7 +304,6 @@ private:
     void Pri_Rep_Gra_EMG(int __num_riga);
     void Pri_Rep_Gra_Landscape(short __num_sample, double xscale);
     void Pri_Rep_asse_dx();
-    void Pri_Rep_Label();
     void Pri_Rep_Lin(QString __descr, int __rep_dat, int __num_dec, const char *__str_udm, bool __flag_lf);
 
     unsigned char  Int_Pun(int __i4);

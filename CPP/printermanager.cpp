@@ -200,7 +200,7 @@ void printermanager::imageInit()
     imageFontInit(tf_header28,   "Bitstream Vera Sans Mono", 28, QFont::Bold);
     imageFontInit(tf_header20,   "Bitstream Vera Sans Mono", 20, QFont::Normal);
     imageFontInit(tf_graphPortr, "Bitstream Vera Sans Mono", 12, QFont::Thin);
-    imageFontInit(tf_graphLand,  "Bitstream Vera Sans Mono", 12, QFont::Thin);
+    imageFontInit(tf_graphLand,  "Bitstream Vera Sans Mono",  9, QFont::Thin);
     imageFontInit(tf_infoLabel,  "Bitstream Vera Sans Mono", 12, QFont::Bold);
     imageFontInit(tf_infoValue,  "Bitstream Vera Sans Mono", 12, QFont::Normal);
 
@@ -210,6 +210,50 @@ void printermanager::imageInit()
 
     imagePt = QPoint(0, 0);
 //    imageTestFont();
+}
+
+void printermanager::imagePrintPixLine(uchar *p, int sz)
+{
+    uchar buf[256];
+    buf[0] = ESC;   // 0x1B;
+    buf[1] = '*';   // 0x2A;
+    buf[2] = 0;     // n1   siz
+    buf[3] = 0;     // n2   siz
+    buf[4] = 0;     // n3   siz
+    buf[5] = 0;     // n4   option
+    buf[6] = 0;     // n5	scrive a n5 byte dal bordo
+    buf[7] = 0;     // n6	larghezza dots in bytes = sz
+
+    // ottimizzazione bytes vuoti a sinistra
+    // per ridurre il tempo di trasmissione
+    int skip = 0;
+    while(p[skip] == 0)
+        skip++;
+    p      += skip;
+    buf[6]  = skip;
+    sz     -= skip;
+    buf[2] = buf[7] = sz;
+
+    memcpy(buf+8, p, sz);
+    imagePrintStr((char *)buf, LCMD+sz);
+}
+
+void printermanager::imagePrintForward(int __dotlines)
+{
+    /* fa avanzare di "dotlines" righe la carta*/
+
+    char pri_str[] = { ESC, 'J', (char) __dotlines };
+    imagePrintStr(pri_str, 3);
+}
+
+void printermanager::imagePrintStr(char *__str, int __str_len)
+{
+    static char trailer[1] = { 0x03 };
+    char header[6] = { 0x5a, 0xa5, 0xa5, 0x5a, __str_len & 0xff, (__str_len >> 8) & 0xff };
+
+    m_file->write(header, sizeof(header));
+    m_file->write(__str, __str_len);
+    m_file->write(trailer, sizeof(trailer));
 }
 
 void printermanager::imagePrint()
@@ -243,27 +287,26 @@ void printermanager::imagePrint()
             emptyLines++;
         else {
             if(emptyLines > 0) {    // linee vuote precedenti
-                Pri_forward(emptyLines);
+                imagePrintForward(emptyLines);
                 emptyLines = 0;
             }
-            printPixLine(tmp, wBytes-rightZeroED);
+            imagePrintPixLine(tmp, wBytes-rightZeroED);
             lastNotEmpty = y;
         }
     }
     if(emptyLines > 0) {    // linee vuote precedenti
-        Pri_forward(emptyLines);
+        imagePrintForward(emptyLines);
         emptyLines = 0;
     }
     qDebug("linee effettive:%d", lastNotEmpty);
     imageInit();    // immagine azzerata
 
     // riga di strappo
-    tmp[0] = 0;
-    for(int i = 1; i < 103; i++)
+    for(int i = 0; i < 103; i++)
         tmp[i] = 0xcc;
-    printPixLine(tmp, 103);
-    // fa avanzare la carta 30mm per consentire lo strappo
-    Pri_forward((int) (26 / 0.125));
+    imagePrintPixLine(tmp, 103);
+    // fa avanzare la carta 27 mm per consentire lo strappo
+    imagePrintForward((int) (27 / 0.125));
 
     qDebug() << "file chiuso in scrittura" << m_file->fileName();
     m_file->close();
@@ -275,32 +318,6 @@ void printermanager::imagePrint()
     udpConn.sendSup("Print:" + m_namefilePrn.toLatin1());   // gateway
 
 #endif
-}
-
-void printermanager::printPixLine(uchar *p, int sz)
-{
-    uchar buf[256];
-    buf[0] = ESC;   // 0x1B;
-    buf[1] = '*';   // 0x2A;
-    buf[2] = 0;     // n1   siz
-    buf[3] = 0;     // n2   siz
-    buf[4] = 0;     // n3   siz
-    buf[5] = 0;     // n4   option
-    buf[6] = 0;     // n5	scrive a n5 byte dal bordo
-    buf[7] = 0;     // n6	larghezza dots in bytes = sz
-
-    // ottimizzazione bytes vuoti a sinistra
-    // per ridurre il tempo di trasmissione
-    int skip = 0;
-    while(p[skip] == 0)
-        skip++;
-    p      += skip;
-    buf[6]  = skip;
-    sz     -= skip;
-    buf[2] = buf[7] = sz;
-
-    memcpy(buf+8, p, sz);
-    Pri_Str((char *)buf, LCMD+sz);
 }
 
 void printermanager::imageText(QString txt, int fontSize, bool restoreFont)
@@ -348,7 +365,7 @@ void printermanager::imageGraph(QString head, QString baset, double xscale, int 
         imagePainter->drawRect(imageRectFlw);
 
         // griglia
-        imagePainter->setPen(Qt::DashLine);
+        imagePainter->setPen(Qt::DotLine);
         for(int i = 1; i < 10; i++) {
             int x = lb.x() + i * (w / 10);
             imagePainter->drawLine(x,lb.y(), x, lb.y()-h);
@@ -697,7 +714,6 @@ void printermanager::smooting_PRINT_flow()
     }
 }
 
-//funzioni che erano nel file Report.cpp
 /**
 la stampa e prevista comunque sempre dopo il review, si avvale dei dati di review, cosi usiamo
 gli stessi comandi sia che ci si trovi a fine esame, sia che sia un review di esamei in MMC.
@@ -707,53 +723,46 @@ questa funzione gestisce tutta la stampa del report, sia in modalita portrait ch
 #include "QApplication"
 void printermanager::Pri_Rep(double xscale)
 {
-    //      Intestazione
-    qDebug() << "Pri_Rep file:" << m_namefile;
-    Intest();
-
-    //     Identificativi Esame
-    Report_data();		// scrive i dati del paziente e lo spazio per le note manuali
-//    m_port->Pri_Str(LINE2, 2, false);
+//    Intest();       // Intestazione
+//    Report_data();  // scrive i dati del paziente e lo spazio per le note manuali
 
     // Grafico FLW + VOL ed eventualmente EMG
     if(m_printMode == PORTRAIT_MODE)			// grafico trasversale con numero di punti fisso
     {
-        m_max_vol = buffer_vol[0];
         m_max_emg = 0;
-
+        m_max_vol = buffer_vol[0];
         for (int i = 0; i < m_num_sam; i++)	{	// cerco il massimo del buffer volume
-            if (buffer_vol[i] > m_max_vol)
-                m_max_vol = buffer_vol[i];
-            if (m_emgPresent) {
+            double v = buffer_vol[i];
+            if (v > m_max_vol)
+                m_max_vol = v;
+        }
+
+        Report_flw(xscale);	// stampa grafici di volume e flusso
+        if(m_emgPresent) {
+            for (int i = 0; i < m_num_sam; i++)	{	// cerco il massimo del buffer emg
                 double v = buffer_emg[i];
                 if (v > m_max_emg)
                     m_max_emg = v;
             }
-        }
-        qDebug() << "m_max_emg:"<<m_max_emg;
-
-        Report_flw(xscale);	// finalmente stampiamo i grafici di volume e flusso
-        if(m_emgPresent)
+            qDebug() << "m_max_emg:"<<m_max_emg;
             Report_emg(xscale);						// EMG
+        }
     }
     else {              // print_mode = LANDSCAPE_MODE - grafico longitudinale, con lunghezza legata alla lunghezza dell'esame
         m_max_y = Calc_Max_Flw();			// fondo scala del flusso
-        qDebug("dopo Calc_Max_Flw()");
         Calc_Max_RealReport_rel2(m_num_sam);
-        Report_Real_Time(m_num_sam, xscale);		// finalmente stampa
-        qDebug("dopo Report_Real_Time()");
+        Report_Real_Time(xscale);
     }
 
     // Grafico Liverpool
     if(m_printLiverpool)
-        Report_BitMap();
-    // Grafico Siroky, stampato solo se paziente maschio oppure generico (cioe dove non indicato il sesso)
+        Report_BitMap(false);
+    // Grafico Siroky, solo se paziente maschio oppure generico (sesso non indicato)
      if(m_printSiroky && m_sex != 'F')
          Report_BitMap(true);
 
     // 	Risultati dell'esame ricavati dall'analisi semplificata, implementata nel firmware
-    Report_result();		// scrive in elenco i dati calcolati dall'analisi dell'esame
-//    m_port->Pri_Str(LINE2, 2, false); // LINE"\x3",0);
+//    Report_result();    // scrive in elenco i dati calcolati dall'analisi dell'esame
 
     //	Scrive i dati riguardanti versione firmware e date/ora ultima calibrazione
        //Report_dati_macchina(numCurve);	// scrive data e ora della stampa e la versione attuale del FW
@@ -762,7 +771,7 @@ void printermanager::Pri_Rep(double xscale)
 }
 
 /**
-E' stampata l'intestazione del report, con intestazione clinica, logo and so on
+Intestazione del report, con intestazione clinica, logo and so on
 */
 void printermanager::Intest()
 {
@@ -787,6 +796,9 @@ void printermanager::Intest()
     imagePt.ry() += 80;
 }
 
+/**
+Sono stampati i dati del report paziente, nome, cognome, data di nascita, sesso, data esame, ....
+*/
 void printermanager::Report_row(QString label, QString value)
 {
     imagePt.ry() += tf_infoLabel.charH;
@@ -799,10 +811,6 @@ void printermanager::Report_row(QString label, QString value)
     int y = imagePt.y();
     imagePainter->drawText(x, y, value);
 }
-
-/**
-Sono stampati i dati del report paziente, nome, cognome, data di nascita, sesso, data esame, ....
-*/
 void printermanager::Report_data()
 {
     imagePt.rx() = 5;
@@ -852,246 +860,6 @@ void printermanager::Report_flw(double xscale)
 }
 
 /**
-Calcola "i_max_x" , "max_x" e "max_y"
-*/
-void printermanager::Calc_Max(double xscale)
-{
-    static int v_max_x[] = {
-                                // 30, 45, 60,
-                                75, 90, 105, 120, 135, 150, 180,
-                                210, 240, 270, 300, 360, 420, 480, 540, 600, 660,
-                                720, 780, 840, 900, 960, 1020, 1080, 1140, 1200,
-                                -1
-                            };
-    int max_x = (m_num_sam / xscale) / 10;
-    m_i_max_x = 0;
-    qDebug("m_num_sam:%d m_max_x:%d",m_num_sam,max_x);
-
-    if(max_x < 0)
-        max_x = 1;
-    if(max_x > 1200)
-        max_x = 1200;
-    for(int i = 0; v_max_x[i] > 0; i++)
-        if(max_x <= v_max_x[i]) {
-            max_x = v_max_x[i];
-            m_i_max_x = i;
-            break;
-        }
-    qDebug("m_max_x:%d m_i_max_x:%d",max_x,m_i_max_x);
-    qDebug("label time >>%s<<",str_label_time[m_i_max_x]);
-
-    int decina = m_flu_max / 10;
-    m_max_y = (decina + 1) * 10;			// trovo la decina minima superiore al valore max
-
-    if (m_max_y <=  10) m_max_y =  10; else
-    if (m_max_y <=  15) m_max_y =  15; else
-    if (m_max_y <=  20) m_max_y =  20; else
-    if (m_max_y <=  25) m_max_y =  25; else
-    if (m_max_y <=  30) m_max_y =  30; else
-    if (m_max_y <=  40) m_max_y =  40; else
-    if (m_max_y <=  50) m_max_y =  50; else
-    if (m_max_y <=  65) m_max_y =  65; else
-    if (m_max_y <=  80) m_max_y =  80; else
-    if (m_max_y <= 100) m_max_y = 100; else
-    if (m_max_y <= 120) m_max_y = 120; else
-    m_max_y = 150;
-
-    m_max_y_gr2 = ((long) ((m_max_vol + 10) / 100) + 1) * 100;	// 05 dicembre
-}
-
-void printermanager::Pri_Rep_Gra_Ini_Grid(int __n_riga)
-{
-    m_uw3 = 24 * 94;	// dimensioni in byte della riga n-esima dell'area grafico
-
-    // azzeriamo tutto lo stringone
-    for(int i = 0; i < m_uw3; i++)
-        m_str_gr[ pos_gra + i ] = 0;
-
-    // ognuna delle 10 fascie e' costruita per 94 colonne da 24 punti, dove da str_gr[0] a str_gr[23] e' la prima colonna e cosi via
-    for(int i = 0; i < 24; i++)	{
-        m_str_gr[ pos_gra + i ] = (char)0x80;  /*     Bordo Verticale Sinistro   */
-        m_str_gr[ pos_gra + m_uw3 - 24 + i ] = (char)0x01;   /*    Bordo Verticale Destro   */
-    }
-    /*    Bordo Superiore   */
-    if(__n_riga == 0) {
-        for(int i = 0; i < m_uw3; i += 24 )
-            m_str_gr[ pos_gra + i ] = (char)0xFF;
-    }
-    /*     Bordo Inferiore   */
-    if(__n_riga == 9) {
-        for(int i = 23; i < m_uw3; i += 24 )
-            m_str_gr[ pos_gra + i ] = (char)0xFF;
-    }
-    /*      Griglia Verticale   */
-    for(int i = 1; i < 10; i++) {
-        int i2 = (int) (((94 * 8) * i + 5) / 10);
-        for(int i3 = 0; i3 < 24; i3 += 4) {
-            int i4 = 24 * (i2 / 8) + i3;
-            unsigned char ub3 = 0x80 >> (i2 & 7);// 10000000 >> byte(752%8)
-            m_str_gr[ pos_gra + i4 ] |= (char)ub3;
-        }
-    }
-    /*      Griglia Orizzontale   */
-    if((__n_riga & 1) == 0) {
-        for(int i = 0; i < m_uw3; i += 24 )
-            m_str_gr[ pos_gra + i] |= (char)0x10;
-    }
-}
-
-unsigned char printermanager::Int_Pun(int __i4)
-{
-    /*
-        Interpola i Punti ("x1","_y1") e ("x2","y2") rispetto alla Banda
-      di Ordinate "i4" e "i4"+48.
-      Ritorna :
-         -   1  :  Se la Banda     e' Interessata dai Punti
-         -   0  :  Se la Banda non e' Interessata dai Punti
-   */
-    /*  Entrambi i Punti Dentro   */
-    if ((m_y1 >= __i4) && (m_y1 < (__i4+24)) && (m_y2 >= __i4) && (m_y2 < (__i4+24))) {
-        Gra_Line();
-        return(1);
-    }
-    /* Entrambi i Punti Fuori dalla Stessa Parte   */
-    if (((m_y1 < __i4) && (m_y2 < __i4)) || ((m_y1 >= (__i4+24)) && (m_y2 >= (__i4+24))))
-        return(0);
-
-    if (m_y1 < __i4) {
-        /* Primo Punto Sotto  */
-        if (m_y2 < (__i4+24)) {
-            /*  Secondo Punto Dentro */
-            m_x1 = m_x1+((m_x2-m_x1)*(__i4-m_y1))/(m_y2-m_y1);
-            m_y1 = __i4;
-        }
-        else {
-            /*  Secondo Punto Sopra  */
-            int i6 = (m_x2 - m_x1);
-            int i7 = (m_y2 - m_y1);
-            m_x1 = m_x1 + (i6 * (__i4 - m_y1)) / i7;
-            m_x2 = m_x2 + (i6 * (__i4 + 23 - m_y2)) / i7;
-            m_y1 = __i4;
-            m_y2 = __i4 + 23;
-        }
-        Gra_Line();
-        return(1);
-    }
-    if (m_y1 < (__i4 + 24)) {
-        /* Primo Punto Dentro */
-        if (m_y2 < __i4){
-            /*   Secondo Punto Sotto  */
-            m_x2 = m_x2 + (m_x1 - m_x2) * (__i4 - m_y2) / (m_y1 - m_y2);
-            m_y2 = __i4;
-        }
-        else {
-            /*  Secondo Punto Sopra  */
-            m_x2 = m_x2 + (m_x1 - m_x2) * (__i4 + 23 - m_y2) / (m_y1 - m_y2);
-            m_y2 = __i4+23;
-        }
-        Gra_Line();
-        return(1);
-    }
-    /*   Primo Punto Sopra   */
-    if (m_y2 < __i4) {
-        /*   Secondo Punto Sotto   */
-        int i6 = (m_x2 - m_x1);
-        int i7 = (m_y2 - m_y1);
-        m_x2 = m_x2 + (i6 * (__i4 - m_y2)) / i7;
-        m_x1 = m_x1 + (i6 * (__i4 + 23 - m_y1)) / i7;
-        m_y2 = __i4;
-        m_y1 = __i4 + 23;
-    }
-    else {
-        /*     Secondo Punto Dentro   */
-        m_x1 = m_x1 + (m_x2 - m_x1) * (__i4 + 23 - m_y1) / (m_y2 - m_y1);
-        m_y1 = __i4 + 23;
-    }
-    Gra_Line();
-    return(1);
-}
-
-void printermanager::Gra_Line()
-{
-    /*
-      Disegna il Segmento definito da ["x1","_y1"] - ["x2","y2"]
-   */
-    int xmin,xmax,ymin,ymax;
-    if ((m_x2 == m_x1) && (m_y2 == m_y1)) {
-        m_num_xy = 1;
-        m_x[0] = m_x1;
-        m_y[0] = m_y1;
-        return;
-    }
-    m_num_xy = 0;
-    unsigned char flag_incr = 0;
-    if (m_y2 != m_y1) {
-        if ((abs(m_x2 - m_x1) / abs(m_y2 - m_y1)) < 1)
-            flag_incr = 1;
-    }
-    if (flag_incr == 0) {
-        if (m_x2 > m_x1) {
-            xmin = m_x1; ymin = m_y1;
-            xmax = m_x2; ymax = m_y2;
-        }
-        else {
-            xmin = m_x2; ymin = m_y2;
-            xmax = m_x1; ymax = m_y1;
-        }
-        for (int i5 = xmin; i5 <= xmax; i5++) {
-            int i6 = (i5 - xmin) * (ymax - ymin);
-            i6 /= (xmax - xmin);
-            int i7 = ymin + i6;
-            m_x[m_num_xy] = i5;
-            m_y[m_num_xy] = i7;
-            m_num_xy++;
-        }
-    }
-    else {
-        if (m_y2 > m_y1) {
-            ymin = m_y1; xmin = m_x1;
-            ymax = m_y2; xmax = m_x2;
-        }
-        else {
-            ymin = m_y2; xmin = m_x2;
-            ymax = m_y1; xmax = m_x1;
-        }
-        for (int i5 = ymin; i5 <= ymax; i5++) {
-            int i6 = (i5 - ymin) * (xmax - xmin);
-            i6 /= (ymax - ymin);
-            int i7 = xmin + i6;
-            m_x[m_num_xy] = i7;
-            m_y[m_num_xy] = i5;
-            m_num_xy++;
-        }
-    }
-}
-
-// crea la trasposta della stringa str_gr, ottenendo una matrice scritta per righe
-void printermanager::Str_Trasposta(unsigned char __type, unsigned short __sx_byte, unsigned short __dx_byte)
-{
-    int num_byte;
-
-    if( __type == 0 )				// trasposizione della stringa del grafico di flusso o emg
-        num_byte = __sx_byte + 94 + __dx_byte;	// numero di byte della riga orizzontale del grafico comprensivo dei label
-    else                                        //  if( __type == 1 ) trasposizione della stringa dei grafici di siroky
-        num_byte = __sx_byte + w_ave + w_SD + __sx_byte + w_max + w_SD;
-
-
-    for(int j = 0; j < (num_byte * 24); j++ )
-        m_str_tr[j] = 0;	// azzero tutta questa stringona
-
-    for(int num_col = 0; num_col < 24; num_col++) {
-        for(int num_rig = 0; num_rig < num_byte; num_rig++) {
-            int src = LCMD + (24 * num_rig) + num_col;
-            int dst = (num_byte * num_col) + num_rig;
-            m_str_tr[dst] = m_str_gr[src];
-        }
-    }
-
-    for(int j = 0; j < (num_byte * 24); j++)
-        m_str_gr[ LCMD + j ] = m_str_tr[ j ];
-}
-
-/**
 stampa del grafico di EMG nella versione a grafici in portrait mode
 */
 void printermanager::Report_emg(double xscale)
@@ -1109,130 +877,47 @@ void printermanager::Report_emg(double xscale)
                );
 }
 
-void printermanager::Calc_Max_EMG()
-{
-    static int v_max_y[] = {
-                            50,   100,   150,   200,   250,   300,   350,   400,   450,
-                           500,   550,   600,   650,   700,   750,   800,   850,   900,   950,
-                          1000,  1100,  1200,  1300,  1400,  1500,  1600,  1700,  1800,  1900,
-                          2000,  2250,  2500,  2750,  3000,    -1
-                        };
-
-    for(int i = 0; v_max_y[i] > 0; i++)
-        if(m_max_emg <= v_max_y[i]) {
-            m_max_y = v_max_y[i];
-            return;
-        }
-    m_max_y = 3250;
-    return;
-}
-
-/**
-Nella stampa del report tipo reale, individuo il fondoscala del flusso, parametro che serve per adattare i valori
-degli array dati volume e emg (e anche flusso)
-*/
-long printermanager::Calc_Max_Flw()
-{
-    long flw_max = (long)m_flu_max;
-
-    flw_max = ((flw_max/10)+1)*10;	// trovo la decina minima superiore al valore max
-
-    // FS del grafico del flusso	// puo assumere i valori 25, 50, 75, 100
-    if(flw_max <= 25)
-        flw_max = 25;
-    else if(flw_max <= 50)
-        flw_max = 50;
-    else if(flw_max <= 75)
-        flw_max = 75;
-    else //if(flw_max <= 160)
-        flw_max = 100;
-    return flw_max;	// mi servira per la graficazione dei dati
-}
-
-/**
-Nella stampa del report tipo reale, qui si cercano i massimi dei vari array per settare i fondoscala dei grafici
-*/
-void printermanager::Calc_Max_RealReport_rel2(short __num_sample)
-{
-    short vol_max = 0;
-
-    for(int j = 0; j < __num_sample; j++)		// calcolo FC curva di flusso (max_y) e FC curva di volume (max_x) cosi da individuare il giusto fondoscala
-        if(buffer_vol[j] > vol_max)
-            vol_max = buffer_vol[j];
-
-    // FS del grafico volume
-    if( vol_max <= 250)
-        vol_max = 250;
-    else if( vol_max <= 500)
-        vol_max = 500;
-    else if( vol_max <= 750)
-        vol_max = 750;
-    else
-        vol_max = 1000;
-    m_max_vol = vol_max;
-    qDebug("vmax:%d", vol_max);
-
-    if(m_emgPresent) {
-        short emg_max = 0;
-        for(int j = 0; j < __num_sample; j++) {
-            short v = buffer_emg[j];
-            if(v < 0)
-                v = -v;
-            if(v > emg_max)
-                emg_max = v;
-        }
-
-        if(emg_max <= 250)
-            emg_max = 250;
-        else if(emg_max <= 500)
-            emg_max = 500;
-        else if(emg_max <= 1000)
-            emg_max = 1000;
-        else if(emg_max <= 2000)
-            emg_max = 2000;
-        else if(emg_max <= 2500)
-            emg_max = 2500;
-        else if(emg_max <= 3000)
-            emg_max = 3000;
-        else if(emg_max <= 3500)
-            emg_max = 3500;
-        m_max_emg = emg_max;
-        qDebug("emgMax:%d", emg_max);
-    }
-}
-
 /**
 disegna il/i grafici. prima costruisce il/gli asse/i delle ordinate della parte sinistra del grafico, dove saranno mostrati i fondoscala di flusso ed emg,
 con 3 valori intermedi (1/4 FS, 1/2 FS, 3/4 FS).
 poi viene costruito il grafico a pezzi di 5secondi ciascuno (40righe)
 infine e cotruito l'asse delle ordinate destro, dove appare l'udm del volume e ik suo fs
 */
-void printermanager::Report_Real_Time(short __num_sample, double xscale)
+void printermanager::Report_Real_Time(double xscale)
 {
     m_init_time_to_print = 0;
     m_cursore = 0;
 
     // STAMPA DELLE LABEL E DELL'ASSE SINISTRO (label EMG E FLUSSO)
-    m_pos_gra_emg        = 0;
-    m_pos_gra_vol        = (m_emgPresent) ?  20 :   0;
-    m_pos_gra_flw        = 50;
-    m_num_dots_gra_emg   = (m_emgPresent) ? 160 :   0;
-    m_num_dots_gra_vol   = (m_emgPresent) ? 240 : 400;
-    m_num_dots_gra_flw   = 400;
-    m_num_byte_x_gra_emg = (m_emgPresent) ?  20 :   0;
-    m_num_byte_x_gra_vol = (m_emgPresent) ?  30 :  50;
-    m_num_byte_x_gra_flw = 50;
     m_num_byte_x_gra = 800;
 
     {
         QPoint psave = imagePt;
-        imagePt.rx() = 10;
+        imagePt.rx() = 16;
         imagePt.ry() += 10;
         imagePainter->save();
         imagePainter->translate(imagePt);
         imagePainter->rotate(90);
 
-        Pri_Rep_Label();	// stampa label del flusso ed eventualmente anche l'emg nel caso di grafici sovrapposti
+        int txtW = tf_graphLand.charW * QString("9999 ml/s").size() + 10;
+        imageSetFont(tf_graphLand);
+        imagePainter->drawLine(txtW, 0, txtW, -(800-1));
+        imagePainter->drawLine(txtW, -(800), txtW +40, -(800));
+
+        Pri_Rep_Label(xscale, 400,  400,  5,  m_max_y,   buffer_flw, " mL/s");
+        if(m_emgPresent) {
+            Pri_Rep_Label(xscale, 160,  240,  3,  m_max_vol, buffer_vol,   " mL");
+            Pri_Rep_Label(xscale,   0,  160,  2,  m_max_emg, buffer_emg,   " μV");
+        }
+        else
+            Pri_Rep_Label(xscale,   0,  400,  5,  m_max_vol, buffer_vol,   " mL");
+
+        imagePainter->drawLine(txtW, -(800), txtW+m_num_sam*xscale, -(800));
+        imagePainter->setPen(Qt::DashLine);
+        imagePainter->drawLine(txtW + m_num_sam*xscale, 0, txtW+m_num_sam*xscale, -(800-1));
+        imagePainter->setPen(Qt::SolidLine);
+
+        imagePt.rx() = txtW+m_num_sam*xscale+3;
 
 //        // SCOMPONGO LA STAMPA DEL GRAFICO IN TANTE STAMPE DA 5 SECONDI CIASCUNA
 //        int num_righe;
@@ -1247,39 +932,35 @@ void printermanager::Report_Real_Time(short __num_sample, double xscale)
         imagePt = psave;
     }
     imagePt.ry() += 90;
+    qDebug("fine Report_Real_Time()");
 }
 
-void printermanager::Pri_Rep_Label()
+void printermanager::Pri_Rep_Label(double xscale, int y0, int n_dots, int n_label, int max_val, double * buffer, QString txt)
 {
-    int y;
-    int txtW = tf_graphLand.charW * QString("9999 ml/s").size() + 3;
-    imageSetFont(tf_graphLand);
+    int cw = tf_graphLand.charW;
+    int ch = tf_graphLand.charH;
+    int txtW = tf_graphLand.charW * QString("9999 ml/s").size() + 10;
 
-    if(m_emgPresent)
-        imagePainter->drawText(txtW-10, -m_pos_gra_emg*8, "0");     // stampo lo zero dell'emg senza udm
-    imagePainter->drawText(txtW-10, -m_pos_gra_vol*8, "0");         // stampo lo zero del  vol senza udm
-    imagePainter->drawText(txtW-14, -m_pos_gra_flw*8, "0");         // stampo lo zero del  flw senza udm
+    int nl  = n_label;
+    int nd  = (n_dots / nl);
+    imagePainter->drawText(txtW-20, -(y0), "0");     // stampo lo zero senza udm
+    for(int i = 1; i <= nl; i++) {
+        int val = (max_val * i) / nl; // NB: ( *i)/nl per evitare probl.arrotondamento con i == nl
+        QString label = QString::number(val) + txt;
+        int y = y0 + nd * i;
+        imagePainter->drawText((txtW - 10) - (cw * label.size()), -(y - ch), label);
 
-    imagePainter->drawLine(txtW, 0, txtW, -(800-1));
-    imagePainter->drawLine(txtW, -(800), txtW +40, -(800));
-    for(int i = 1; i <= _NUM_LABEL; i++) {
-        int val = (m_max_y / _NUM_LABEL ) * i;
-        QString txt = QString::asprintf("%4d ml/s", val);
-        y = m_pos_gra_flw*8 + (m_num_dots_gra_flw / _NUM_LABEL) * i;
-        imagePainter->drawText(0, -y, txt);
-        imagePainter->setPen(Qt::DashLine);
-        imagePainter->drawLine(txtW, -y, txtW + 40, -y);
+        imagePainter->setPen(Qt::DotLine);
+        imagePainter->drawLine(txtW, -y, txtW + m_num_sam*xscale, -y);
+
         imagePainter->setPen(Qt::SolidLine);
+        imagePainter->drawLine(txtW, -y0, txtW + m_num_sam*xscale, -y0);
     }
-    y = m_pos_gra_flw*8;
-    imagePainter->drawLine(txtW, -y, txtW + 40, -y);
-    imagePainter->drawLine(txtW, -(800), txtW +40, -(800));
 
-    imagePainter->setPen(Qt::DashLine);
-    imagePainter->drawLine(txtW + 40, 0, txtW + 40, -(800-1));
-    imagePainter->setPen(Qt::SolidLine);
+    QPoint * points = new QPoint[ (int) (m_num_sam/**xscale*/) ];
+    imageGraphSingle(QPoint(txtW,-y0), points, m_num_sam, xscale, n_dots/(double)max_val, buffer);
+    delete points;
 
-    imagePt.rx() = txtW+43;
     return;
 
     int num_char_to_print, max_y;
@@ -1762,94 +1443,6 @@ void printermanager::Pri_Rep_Gra_Landscape(short __num_sample, double xscale)
 }
 
 /**
-a seconda del massimo del flusso, si sceglie un fondo scala verticale e il conseguente asse dei tempi.
-A seconda dei sample fin qui stampati,
-si risale al tempo per comandare la stampa del label (in secondi) o meno
-*/
-bool printermanager::check_stamp_label()
-{
-    int num_sec;
-
-    switch(m_max_y)	// i F.S. previsti per il flusso in ml/sec
-    {
-    case 25:	// ml/sec
-        num_sec = (m_cursore / 16);         // 1 secondo ogni 16 punti
-        if((num_sec % 5) == 0) {            // e numero divisibile per 5sec quindi e uno dei label da stampare
-            m_init_time_to_print = num_sec; // puo assumere i valori 5,10,15,20,25,30....
-            return true;
-        }
-        break;
-    case 50:
-        num_sec = (m_cursore / 8);          // 1 secondo ogni 8 punti
-        if((num_sec % 10) == 0) {           // e numero divisibile per 10sec quindi e uno dei label da stampare
-            m_init_time_to_print = num_sec; // puo assumere i valori 10,20,30,40....
-            return true;
-        }
-        break;
-    case 75:
-        num_sec = (m_cursore * 3 / 16);     // 3 second1 ogni 16 punti
-        if((num_sec % 15) == 0) {           // e numero divisibile per 10sec quindi e uno dei label da stampare
-            m_init_time_to_print = num_sec; // puo assumere i valori 10,20,30,40....
-            return true;
-        }
-        break;
-    case 100:
-        num_sec = (m_cursore / 4);          // 3 second1 ogni 16 punti
-        if((num_sec % 20) == 0) {           // e numero divisibile per 10sec quindi e uno dei label da stampare
-            m_init_time_to_print = num_sec;		// puo assumere i valori 10,20,30,40....
-            return true;
-        }
-        break;
-    }
-    return false;
-}
-
-/**
-Deve stampare l'asse che chiude il grafico e sopra stmpare l label del volume
-*/
-void printermanager::Pri_Rep_asse_dx()
-{
-    // riempio la stringa di zeri
-    for(int i = 0; i < dim_string_solo_ax; i++ )
-        m_str_gr[ i ] = 0;
-
-    // setta la stampa grafica
-    int sz   = 816;    // 	num_byte = dim_string_solo_ax - 8 = 816
-    int dots = 102;     // larghezza 816 dots = 102 byte
-    set_gra_Header_str_gr(sz, 0, dots);
-
-    // aggiungo la linea dell'asse  delle ordinate, in ogni colonna il primo bit viene acceso
-    m_str_gr[_NUM_BYTE_CMD] = (char)0x01;
-    m_str_gr[_NUM_BYTE_CMD + 1] = (char)0x01;
-    for(int i = 2; i < 105; i++)
-    {	// riga doppia
-        m_str_gr[_NUM_BYTE_CMD + i*(_NUM_CHAR_X_AXES_DX * _HEIGHT_CHAR_LABEL)] = (char)0xFF;
-        m_str_gr[_NUM_BYTE_CMD + i*(_NUM_CHAR_X_AXES_DX * _HEIGHT_CHAR_LABEL) + 1] = (char)0xFF;
-    }
-    m_str_gr[_NUM_BYTE_CMD + 101*(_NUM_CHAR_X_AXES_DX * _HEIGHT_CHAR_LABEL)] = (char)0xc0;
-    m_str_gr[_NUM_BYTE_CMD + 101*(_NUM_CHAR_X_AXES_DX * _HEIGHT_CHAR_LABEL) + 1] = (char)0xc0;
-    // trasposizione
-    unsigned short num_col_max = _HEIGHT_CHAR_LABEL * _NUM_CHAR_X_AXES_DX;	// 32
-    unsigned short num_rig_max = (dim_string_solo_ax - 8) / num_col_max;	// 50
-
-    for(int i = 0; i < (dim_string_solo_ax - 8); i++ )
-        m_str_tr[i] = 0;	// azzero tutta questa stringona
-    for(int num_col = 0; num_col < num_col_max; num_col++ )
-    {
-        for(int num_rig = 0; num_rig < num_rig_max; num_rig++)
-        {
-            m_str_tr[ ( num_rig_max * num_col ) + num_rig ] = m_str_gr[ _NUM_BYTE_CMD + ( num_col_max * num_rig ) + num_col ];
-        }
-    }
-    for(int str_byte = 0; str_byte < (dim_string_solo_ax - 8); str_byte++ )
-        m_str_gr[ _NUM_BYTE_CMD + str_byte ] = m_str_tr[ str_byte ];
-
-    // finalmente stampa
-//    m_port->Pri_Str((char *)m_str_gr, dim_string_solo_ax, false);
-
-}
-
-/**
 Stampa dei nomogrammi
 */
 void printermanager::Report_BitMap(bool __isSiro)
@@ -1931,11 +1524,11 @@ void printermanager::Report_result()
     imagePt.ry() += tf_infoLabel.charH;
 }
 
-// conversione da RGB 8*3 = 24 bit a RGB 4*3 = 12 bit
-// ignorati i 4 bit bassi di ogni colore * ridurre le sfumature ad un colore di base
 #define NCOLORS 16*16*16
 inline uint16_t decimazioneColore(uint32_t rgb24)
 {
+    // conversione da RGB 8*3 = 24 bit a RGB 4*3 = 12 bit
+    // ignorati i 4 bit bassi di ogni colore * ridurre le sfumature ad un colore di base
     uint32_t  colormask = 0x00f0f0f0;
     uint32_t rgb12 = rgb24 & colormask;
 
@@ -2041,6 +1634,190 @@ void printermanager::getImage(QImage __img, QString __nome)
 
     free(bm);
     qDebug("fine getGrabbed, nblack:%d", nblack);
+}
+
+/**
+a seconda del massimo del flusso, si sceglie un fondo scala verticale e il conseguente asse dei tempi.
+A seconda dei sample fin qui stampati,
+si risale al tempo per comandare la stampa del label (in secondi) o meno
+*/
+bool printermanager::check_stamp_label()
+{
+    int num_sec;
+
+    switch(m_max_y)	// i F.S. previsti per il flusso in ml/sec
+    {
+    case 25:	// ml/sec
+        num_sec = (m_cursore / 16);         // 1 secondo ogni 16 punti
+        if((num_sec % 5) == 0) {            // e numero divisibile per 5sec quindi e uno dei label da stampare
+            m_init_time_to_print = num_sec; // puo assumere i valori 5,10,15,20,25,30....
+            return true;
+        }
+        break;
+    case 50:
+        num_sec = (m_cursore / 8);          // 1 secondo ogni 8 punti
+        if((num_sec % 10) == 0) {           // e numero divisibile per 10sec quindi e uno dei label da stampare
+            m_init_time_to_print = num_sec; // puo assumere i valori 10,20,30,40....
+            return true;
+        }
+        break;
+    case 75:
+        num_sec = (m_cursore * 3 / 16);     // 3 second1 ogni 16 punti
+        if((num_sec % 15) == 0) {           // e numero divisibile per 10sec quindi e uno dei label da stampare
+            m_init_time_to_print = num_sec; // puo assumere i valori 10,20,30,40....
+            return true;
+        }
+        break;
+    case 100:
+        num_sec = (m_cursore / 4);          // 3 second1 ogni 16 punti
+        if((num_sec % 20) == 0) {           // e numero divisibile per 10sec quindi e uno dei label da stampare
+            m_init_time_to_print = num_sec;		// puo assumere i valori 10,20,30,40....
+            return true;
+        }
+        break;
+    }
+    return false;
+}
+
+/**
+Calcola "i_max_x" , "max_x" e "max_y"
+*/
+void printermanager::Calc_Max(double xscale)
+{
+    static int v_max_x[] = {
+                                // 30, 45, 60,
+                                75, 90, 105, 120, 135, 150, 180,
+                                210, 240, 270, 300, 360, 420, 480, 540, 600, 660,
+                                720, 780, 840, 900, 960, 1020, 1080, 1140, 1200,
+                                -1
+                            };
+    int max_x = (m_num_sam / xscale) / 10;
+    m_i_max_x = 0;
+    qDebug("m_num_sam:%d m_max_x:%d",m_num_sam,max_x);
+
+    if(max_x < 0)
+        max_x = 1;
+    if(max_x > 1200)
+        max_x = 1200;
+    for(int i = 0; v_max_x[i] > 0; i++)
+        if(max_x <= v_max_x[i]) {
+            max_x = v_max_x[i];
+            m_i_max_x = i;
+            break;
+        }
+    qDebug("m_max_x:%d m_i_max_x:%d",max_x,m_i_max_x);
+    qDebug("label time >>%s<<",str_label_time[m_i_max_x]);
+
+    int decina = m_flu_max / 10;
+    m_max_y = (decina + 1) * 10;			// trovo la decina minima superiore al valore max
+
+    if (m_max_y <=  10) m_max_y =  10; else
+    if (m_max_y <=  15) m_max_y =  15; else
+    if (m_max_y <=  20) m_max_y =  20; else
+    if (m_max_y <=  25) m_max_y =  25; else
+    if (m_max_y <=  30) m_max_y =  30; else
+    if (m_max_y <=  40) m_max_y =  40; else
+    if (m_max_y <=  50) m_max_y =  50; else
+    if (m_max_y <=  65) m_max_y =  65; else
+    if (m_max_y <=  80) m_max_y =  80; else
+    if (m_max_y <= 100) m_max_y = 100; else
+    if (m_max_y <= 120) m_max_y = 120; else
+    m_max_y = 150;
+
+    m_max_y_gr2 = ((long) ((m_max_vol + 10) / 100) + 1) * 100;	// 05 dicembre
+}
+
+void printermanager::Calc_Max_EMG()
+{
+    static int v_max_y[] = {
+                            50,   100,   150,   200,   250,   300,   350,   400,   450,
+                           500,   550,   600,   650,   700,   750,   800,   850,   900,   950,
+                          1000,  1100,  1200,  1300,  1400,  1500,  1600,  1700,  1800,  1900,
+                          2000,  2250,  2500,  2750,  3000,    -1
+                        };
+
+    for(int i = 0; v_max_y[i] > 0; i++)
+        if(m_max_emg <= v_max_y[i]) {
+            m_max_y = v_max_y[i];
+            return;
+        }
+    m_max_y = 3250;
+    return;
+}
+
+/**
+Nella stampa del report tipo reale, individuo il fondoscala del flusso, parametro che serve per adattare i valori
+degli array dati volume e emg (e anche flusso)
+*/
+long printermanager::Calc_Max_Flw()
+{
+    long flw_max = ((((long)m_flu_max)/10) + 1) * 10;	// decina minima superiore al valore max
+
+    // FS del grafico del flusso	// puo assumere i valori 25, 50, 75, 100
+    if(flw_max <= 25)
+        flw_max = 25;
+    else if(flw_max <= 50)
+        flw_max = 50;
+    else if(flw_max <= 75)
+        flw_max = 75;
+    else //if(flw_max <= 160)
+        flw_max = 100;
+
+    qDebug("fine Calc_Max_Flw()");
+    return flw_max;
+}
+
+/**
+Nella stampa del report tipo reale, qui si cercano i massimi dei vari array per settare i fondoscala dei grafici
+*/
+void printermanager::Calc_Max_RealReport_rel2(short __num_sample)
+{
+    int vol_max = 0;
+    int emg_max = 0;
+
+    for(int j = 0; j < __num_sample; j++) {		// calcolo FC curva di flusso (max_y) e FC curva di volume (max_x) cosi da individuare il giusto fondoscala
+        int v = buffer_vol[j];
+        if(v > vol_max)
+            vol_max = v;
+    }
+
+    // FS del grafico volume
+    if( vol_max <= 250)
+        vol_max = 250;
+    else if( vol_max <= 500)
+        vol_max = 500;
+    else if( vol_max <= 750)
+        vol_max = 750;
+    else
+        vol_max = 1000;
+
+    if(m_emgPresent) {
+        for(int j = 0; j < __num_sample; j++) {
+            int v = buffer_emg[j];
+            if(v < 0)
+                v = -v;
+            if(v > emg_max)
+                emg_max = v;
+        }
+
+        if(emg_max <= 250)
+            emg_max = 250;
+        else if(emg_max <= 500)
+            emg_max = 500;
+        else if(emg_max <= 1000)
+            emg_max = 1000;
+        else if(emg_max <= 2000)
+            emg_max = 2000;
+        else if(emg_max <= 2500)
+            emg_max = 2500;
+        else if(emg_max <= 3000)
+            emg_max = 3000;
+        else if(emg_max <= 3500)
+            emg_max = 3500;
+    }
+    m_max_vol = vol_max;
+    m_max_emg = emg_max;
+    qDebug("vmax:%d emgMax:%d", vol_max, emg_max);
 }
 
 void printermanager::set_gra_Header_str_gr(int __sz, int __n4, int __dots)
@@ -2200,25 +1977,240 @@ void printermanager::print_udm_label(int ch_type, int __pos_in_string, int __pre
     }
 }
 
-void printermanager::Pri_forward(char __dotlines)
+void printermanager::Pri_Rep_Gra_Ini_Grid(int __n_riga)
 {
-    /* fa avanzare di "dotlines" righe la carta*/
+    m_uw3 = 24 * 94;	// dimensioni in byte della riga n-esima dell'area grafico
 
-    char pri_str[] = { ESC, 'J', __dotlines };
-    Pri_Str(pri_str, sizeof(pri_str));
+    // azzeriamo tutto lo stringone
+    for(int i = 0; i < m_uw3; i++)
+        m_str_gr[ pos_gra + i ] = 0;
+
+    // ognuna delle 10 fascie e' costruita per 94 colonne da 24 punti, dove da str_gr[0] a str_gr[23] e' la prima colonna e cosi via
+    for(int i = 0; i < 24; i++)	{
+        m_str_gr[ pos_gra + i ] = (char)0x80;  /*     Bordo Verticale Sinistro   */
+        m_str_gr[ pos_gra + m_uw3 - 24 + i ] = (char)0x01;   /*    Bordo Verticale Destro   */
+    }
+    /*    Bordo Superiore   */
+    if(__n_riga == 0) {
+        for(int i = 0; i < m_uw3; i += 24 )
+            m_str_gr[ pos_gra + i ] = (char)0xFF;
+    }
+    /*     Bordo Inferiore   */
+    if(__n_riga == 9) {
+        for(int i = 23; i < m_uw3; i += 24 )
+            m_str_gr[ pos_gra + i ] = (char)0xFF;
+    }
+    /*      Griglia Verticale   */
+    for(int i = 1; i < 10; i++) {
+        int i2 = (int) (((94 * 8) * i + 5) / 10);
+        for(int i3 = 0; i3 < 24; i3 += 4) {
+            int i4 = 24 * (i2 / 8) + i3;
+            unsigned char ub3 = 0x80 >> (i2 & 7);// 10000000 >> byte(752%8)
+            m_str_gr[ pos_gra + i4 ] |= (char)ub3;
+        }
+    }
+    /*      Griglia Orizzontale   */
+    if((__n_riga & 1) == 0) {
+        for(int i = 0; i < m_uw3; i += 24 )
+            m_str_gr[ pos_gra + i] |= (char)0x10;
+    }
 }
 
-bool printermanager::Pri_Str(char *__str, int __str_len)
+unsigned char printermanager::Int_Pun(int __i4)
 {
-    if(m_file && m_file->isOpen()) {
-        static char trailer[1] = { 0x03 };
-        char header[6] = { 0x5a, 0xa5, 0xa5, 0x5a, __str_len & 0xff, (__str_len >> 8) & 0xff };
+    /*
+        Interpola i Punti ("x1","_y1") e ("x2","y2") rispetto alla Banda
+      di Ordinate "i4" e "i4"+48.
+      Ritorna :
+         -   1  :  Se la Banda     e' Interessata dai Punti
+         -   0  :  Se la Banda non e' Interessata dai Punti
+   */
+    /*  Entrambi i Punti Dentro   */
+    if ((m_y1 >= __i4) && (m_y1 < (__i4+24)) && (m_y2 >= __i4) && (m_y2 < (__i4+24))) {
+        Gra_Line();
+        return(1);
+    }
+    /* Entrambi i Punti Fuori dalla Stessa Parte   */
+    if (((m_y1 < __i4) && (m_y2 < __i4)) || ((m_y1 >= (__i4+24)) && (m_y2 >= (__i4+24))))
+        return(0);
 
-        m_file->write(header, sizeof(header));
-        m_file->write(__str, __str_len);
-        m_file->write(trailer, sizeof(trailer));
+    if (m_y1 < __i4) {
+        /* Primo Punto Sotto  */
+        if (m_y2 < (__i4+24)) {
+            /*  Secondo Punto Dentro */
+            m_x1 = m_x1+((m_x2-m_x1)*(__i4-m_y1))/(m_y2-m_y1);
+            m_y1 = __i4;
+        }
+        else {
+            /*  Secondo Punto Sopra  */
+            int i6 = (m_x2 - m_x1);
+            int i7 = (m_y2 - m_y1);
+            m_x1 = m_x1 + (i6 * (__i4 - m_y1)) / i7;
+            m_x2 = m_x2 + (i6 * (__i4 + 23 - m_y2)) / i7;
+            m_y1 = __i4;
+            m_y2 = __i4 + 23;
+        }
+        Gra_Line();
+        return(1);
+    }
+    if (m_y1 < (__i4 + 24)) {
+        /* Primo Punto Dentro */
+        if (m_y2 < __i4){
+            /*   Secondo Punto Sotto  */
+            m_x2 = m_x2 + (m_x1 - m_x2) * (__i4 - m_y2) / (m_y1 - m_y2);
+            m_y2 = __i4;
+        }
+        else {
+            /*  Secondo Punto Sopra  */
+            m_x2 = m_x2 + (m_x1 - m_x2) * (__i4 + 23 - m_y2) / (m_y1 - m_y2);
+            m_y2 = __i4+23;
+        }
+        Gra_Line();
+        return(1);
+    }
+    /*   Primo Punto Sopra   */
+    if (m_y2 < __i4) {
+        /*   Secondo Punto Sotto   */
+        int i6 = (m_x2 - m_x1);
+        int i7 = (m_y2 - m_y1);
+        m_x2 = m_x2 + (i6 * (__i4 - m_y2)) / i7;
+        m_x1 = m_x1 + (i6 * (__i4 + 23 - m_y1)) / i7;
+        m_y2 = __i4;
+        m_y1 = __i4 + 23;
+    }
+    else {
+        /*     Secondo Punto Dentro   */
+        m_x1 = m_x1 + (m_x2 - m_x1) * (__i4 + 23 - m_y1) / (m_y2 - m_y1);
+        m_y1 = __i4 + 23;
+    }
+    Gra_Line();
+    return(1);
+}
+
+void printermanager::Gra_Line()
+{
+    /*
+      Disegna il Segmento definito da ["x1","_y1"] - ["x2","y2"]
+   */
+    int xmin,xmax,ymin,ymax;
+    if ((m_x2 == m_x1) && (m_y2 == m_y1)) {
+        m_num_xy = 1;
+        m_x[0] = m_x1;
+        m_y[0] = m_y1;
+        return;
+    }
+    m_num_xy = 0;
+    unsigned char flag_incr = 0;
+    if (m_y2 != m_y1) {
+        if ((abs(m_x2 - m_x1) / abs(m_y2 - m_y1)) < 1)
+            flag_incr = 1;
+    }
+    if (flag_incr == 0) {
+        if (m_x2 > m_x1) {
+            xmin = m_x1; ymin = m_y1;
+            xmax = m_x2; ymax = m_y2;
+        }
+        else {
+            xmin = m_x2; ymin = m_y2;
+            xmax = m_x1; ymax = m_y1;
+        }
+        for (int i5 = xmin; i5 <= xmax; i5++) {
+            int i6 = (i5 - xmin) * (ymax - ymin);
+            i6 /= (xmax - xmin);
+            int i7 = ymin + i6;
+            m_x[m_num_xy] = i5;
+            m_y[m_num_xy] = i7;
+            m_num_xy++;
+        }
+    }
+    else {
+        if (m_y2 > m_y1) {
+            ymin = m_y1; xmin = m_x1;
+            ymax = m_y2; xmax = m_x2;
+        }
+        else {
+            ymin = m_y2; xmin = m_x2;
+            ymax = m_y1; xmax = m_x1;
+        }
+        for (int i5 = ymin; i5 <= ymax; i5++) {
+            int i6 = (i5 - ymin) * (xmax - xmin);
+            i6 /= (ymax - ymin);
+            int i7 = xmin + i6;
+            m_x[m_num_xy] = i7;
+            m_y[m_num_xy] = i5;
+            m_num_xy++;
+        }
+    }
+}
+
+/**
+Deve stampare l'asse che chiude il grafico e sopra stampare le label del volume
+*/
+void printermanager::Pri_Rep_asse_dx()
+{
+    // riempio la stringa di zeri
+    for(int i = 0; i < dim_string_solo_ax; i++ )
+        m_str_gr[ i ] = 0;
+
+    // setta la stampa grafica
+    int sz   = 816;    // 	num_byte = dim_string_solo_ax - 8 = 816
+    int dots = 102;     // larghezza 816 dots = 102 byte
+    set_gra_Header_str_gr(sz, 0, dots);
+
+    // aggiungo la linea dell'asse  delle ordinate, in ogni colonna il primo bit viene acceso
+    m_str_gr[_NUM_BYTE_CMD] = (char)0x01;
+    m_str_gr[_NUM_BYTE_CMD + 1] = (char)0x01;
+    for(int i = 2; i < 105; i++)
+    {	// riga doppia
+        m_str_gr[_NUM_BYTE_CMD + i*(_NUM_CHAR_X_AXES_DX * _HEIGHT_CHAR_LABEL)] = (char)0xFF;
+        m_str_gr[_NUM_BYTE_CMD + i*(_NUM_CHAR_X_AXES_DX * _HEIGHT_CHAR_LABEL) + 1] = (char)0xFF;
+    }
+    m_str_gr[_NUM_BYTE_CMD + 101*(_NUM_CHAR_X_AXES_DX * _HEIGHT_CHAR_LABEL)] = (char)0xc0;
+    m_str_gr[_NUM_BYTE_CMD + 101*(_NUM_CHAR_X_AXES_DX * _HEIGHT_CHAR_LABEL) + 1] = (char)0xc0;
+    // trasposizione
+    unsigned short num_col_max = _HEIGHT_CHAR_LABEL * _NUM_CHAR_X_AXES_DX;	// 32
+    unsigned short num_rig_max = (dim_string_solo_ax - 8) / num_col_max;	// 50
+
+    for(int i = 0; i < (dim_string_solo_ax - 8); i++ )
+        m_str_tr[i] = 0;	// azzero tutta questa stringona
+    for(int num_col = 0; num_col < num_col_max; num_col++ )
+    {
+        for(int num_rig = 0; num_rig < num_rig_max; num_rig++)
+        {
+            m_str_tr[ ( num_rig_max * num_col ) + num_rig ] = m_str_gr[ _NUM_BYTE_CMD + ( num_col_max * num_rig ) + num_col ];
+        }
+    }
+    for(int str_byte = 0; str_byte < (dim_string_solo_ax - 8); str_byte++ )
+        m_str_gr[ _NUM_BYTE_CMD + str_byte ] = m_str_tr[ str_byte ];
+
+    // finalmente stampa
+//    m_port->Pri_Str((char *)m_str_gr, dim_string_solo_ax, false);
+
+}
+
+// crea la trasposta della stringa str_gr, ottenendo una matrice scritta per righe
+void printermanager::Str_Trasposta(unsigned char __type, unsigned short __sx_byte, unsigned short __dx_byte)
+{
+    int num_byte;
+
+    if( __type == 0 )				// trasposizione della stringa del grafico di flusso o emg
+        num_byte = __sx_byte + 94 + __dx_byte;	// numero di byte della riga orizzontale del grafico comprensivo dei label
+    else                                        //  if( __type == 1 ) trasposizione della stringa dei grafici di siroky
+        num_byte = __sx_byte + w_ave + w_SD + __sx_byte + w_max + w_SD;
+
+
+    for(int j = 0; j < (num_byte * 24); j++ )
+        m_str_tr[j] = 0;	// azzero tutta questa stringona
+
+    for(int num_col = 0; num_col < 24; num_col++) {
+        for(int num_rig = 0; num_rig < num_byte; num_rig++) {
+            int src = LCMD + (24 * num_rig) + num_col;
+            int dst = (num_byte * num_col) + num_rig;
+            m_str_tr[dst] = m_str_gr[src];
+        }
     }
 
-    return true;
+    for(int j = 0; j < (num_byte * 24); j++)
+        m_str_gr[ LCMD + j ] = m_str_tr[ j ];
 }
 
