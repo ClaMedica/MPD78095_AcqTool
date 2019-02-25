@@ -89,7 +89,7 @@ void MDataMngPico::sendPrintTest()
 
 void MDataMngPico::udpMdmBtDecode(enum WHO __from, QByteArray __msg)
 {
-   qDebug() << "udpMdmBtDecode" << __from << __msg;
+ //  qDebug() << "udpMdmBtDecode" << __from << __msg;
 
     char cmd = __msg.at(0);
     switch(__from) {
