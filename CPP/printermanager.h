@@ -178,7 +178,7 @@ private:
     void Report_flw(double xscale);
     void Report_emg(double xscale);
     void Report_Real_Time(double xscale);
-    void Report_Real_TimeSingle(QPoint *points, double xscale, int dotXtratt, int boxW, int y0, int n_dots, int n_label, int max_val, double * buffer, QString txt);
+    void Report_Real_TimeSingle(QString msg, QPoint *points, double xscale, int dotXtratt, int boxW, int y0, int n_dots, int n_label, int max_val, double * buffer, QString txt);
 
     void Pri_Rep_Gra(int __num_riga);
     void Pri_Rep_Gra_EMG(int __num_riga);
