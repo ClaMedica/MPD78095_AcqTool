@@ -760,13 +760,13 @@ void printermanager::Report_Real_Time(double xscale)
     QPoint * points = new QPoint[m_num_sam];
 
     imagePainter->drawRect(txtW,-800, boxW*xscale,800);
-    Report_Real_TimeSingle(    points, xscale, dotXtratt, boxW, 400,  400,  5,  m_max_y,   buffer_flw, " mL/s");
+    Report_Real_TimeSingle(    "Flow",   points, xscale, dotXtratt, boxW, 400,  400,  5,  m_max_y,   buffer_flw, " mL/s");
     if(m_emgPresent) {
-        Report_Real_TimeSingle(points, xscale, dotXtratt, boxW, 160,  240,  3,  m_max_vol, buffer_vol,   " mL");
-        Report_Real_TimeSingle(points, xscale, dotXtratt, boxW,   0,  160,  2,  m_max_emg, buffer_emg,   " μV");
+        Report_Real_TimeSingle("Volume", points, xscale, dotXtratt, boxW, 160,  240,  3,  m_max_vol, buffer_vol,   " mL");
+        Report_Real_TimeSingle("Emg",    points, xscale, dotXtratt, boxW,   0,  160,  2,  m_max_emg, buffer_emg,   " μV");
     }
     else
-        Report_Real_TimeSingle(points, xscale, dotXtratt, boxW,   0,  400,  5,  m_max_vol, buffer_vol,   " mL");
+        Report_Real_TimeSingle("Volume", points, xscale, dotXtratt, boxW,   0,  400,  5,  m_max_vol, buffer_vol,   " mL");
 
     delete points;
 
@@ -780,25 +780,26 @@ void printermanager::Report_Real_Time(double xscale)
     qDebug("fine Report_Real_Time()");
 }
 
-void printermanager::Report_Real_TimeSingle(QPoint * points, double xscale, int dotXtratt, int boxW, int y0, int n_dots, int n_label, int max_val, double * buffer, QString txt)
+void printermanager::Report_Real_TimeSingle(QString msg, QPoint * points, double xscale, int dotXtratt, int boxW, int y0, int n_dots, int n_label, int max_val, double * buffer, QString txt)
 {
     int nl  = n_label;
     int nd  = (n_dots / nl);
     int cw  = tf_graphLand.charW;
     int ch  = tf_graphLand.charH;
-    int txtW = cw * QString("9999 ml/s").size() + 10;   // label piu lunga
+    int txtW = cw * QString("9999 ml/s").size() + 10;               // larghezza label piu lunga
 
-    imagePainter->drawText(txtW-20, -(y0), "0");     // stampo lo zero senza udm
+    imagePainter->drawText(txtW-20, -(y0), "0");                    // stampo lo zero senza udm
+    imagePainter->drawText(txtW+5, -(y0+n_dots-ch-2), msg);         // stampo lo zero senza udm
     imagePainter->setPen(Qt::DotLine);
     for(int i = 1; i <= nl; i++) {
         int val = (max_val * i) / nl; // NB: ( *i)/nl per evitare probl.arrotondamento con i == nl
         QString label = QString::number(val) + txt;
         int y = y0 + nd * i;
         imagePainter->drawText((txtW - 10) - (cw * label.size()), -(y - ch), label);
-        imagePainter->drawLine(txtW, -y, txtW + boxW*xscale, -y);  // tratteggio orizz. allineato a label
+        imagePainter->drawLine(txtW, -y, txtW + boxW*xscale, -y);   // tratteggio orizz. allineato a label
     }
     imagePainter->setPen(Qt::SolidLine);
-    imagePainter->drawLine(txtW, -y0, txtW + boxW*xscale, -y0);    // riga orizz. dello 0
+    imagePainter->drawLine(txtW, -y0, txtW + boxW*xscale, -y0);     // riga orizz. dello 0
 
     if(y0 == 0) {
         for(int i = FREQ_ACQ; i < boxW; i += FREQ_ACQ) {
@@ -818,6 +819,10 @@ void printermanager::Report_Real_TimeSingle(QPoint * points, double xscale, int 
             int y = (y0 - dotXtratt - ch);
             imagePainter->drawText(x, -y, label);
         }
+        int x = txtW + m_num_sam*xscale;
+        imagePainter->setPen(Qt::DashLine);
+        imagePainter->drawLine(x, -(y0), x, -(y0 + 800));               // tratteggio fine esame
+        imagePainter->setPen(Qt::SolidLine);
     }
 
     imageGraphSingle(QPoint(txtW,-y0), points, m_num_sam, xscale, n_dots/(double)max_val, buffer);

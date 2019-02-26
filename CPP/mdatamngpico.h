@@ -18,8 +18,8 @@ public:
     void send_Command(int __command);   // replicato da macqmanager perche' non si puo' invocare l'originale
 
 signals:
-    void udpMdmBtStatus(enum WHO, int);
-    void udpMdmPrnStatus(enum WHO, int);
+//    void udpMdmBtStatus(enum WHO, int);
+//    void udpMdmPrnStatus(enum WHO, int);
 
     void sg_exitFromReview();
 

@@ -94,16 +94,16 @@ void MDataMngPico::udpMdmBtDecode(enum WHO __from, QByteArray __msg)
     char cmd = __msg.at(0);
     switch(__from) {
     case E_SUP:
-                if((cmd == 'S') && (__msg == "Suspended")) emit udpMdmBtStatus(__from, cmd);
-                if((cmd == 'R') && (__msg == "Restarted")) emit udpMdmBtStatus(__from, cmd);
-                if((cmd == 'U') && (__msg == "UseBt"))     emit udpMdmBtStatus(__from, cmd);
-                if((cmd == 'N') && (__msg == "NoBt"))      emit udpMdmBtStatus(__from, cmd);
+//                if((cmd == 'S') && (__msg == "Suspended")) emit udpMdmBtStatus(__from, cmd);
+//                if((cmd == 'R') && (__msg == "Restarted")) emit udpMdmBtStatus(__from, cmd);
+//                if((cmd == 'U') && (__msg == "UseBt"))     emit udpMdmBtStatus(__from, cmd);
+//                if((cmd == 'N') && (__msg == "NoBt"))      emit udpMdmBtStatus(__from, cmd);
                 if((cmd == 'q') && __msg.startsWith("queue:")) spoolerQueueLen = __msg.remove(0,6).toInt();
                 break;
     case E_PRN:
-                if((cmd == 'R') && (__msg == "Ready"))     emit udpMdmPrnStatus(__from, cmd);
-                if((cmd == 'F') && (__msg == "Fail"))      emit udpMdmPrnStatus(__from, cmd);
-                if((cmd == 'D') && (__msg == "Done"))      emit udpMdmPrnStatus(__from, cmd);
+//                if((cmd == 'R') && (__msg == "Ready"))     emit udpMdmPrnStatus(__from, cmd);
+//                if((cmd == 'F') && (__msg == "Fail"))      emit udpMdmPrnStatus(__from, cmd);
+//                if((cmd == 'D') && (__msg == "Done"))      emit udpMdmPrnStatus(__from, cmd);
                 break;
     case E_MED:
                 break;
