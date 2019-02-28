@@ -875,32 +875,32 @@ void printermanager::Report_result()
 
     QStringList txstrList;
     if (m_modal_e == 2) {     // il tempo di attesa e' graficato solo se esame manuale
-        txstrList.append(tr("Waiting time ..............")); txstrList.append(QString::asprintf(" : %5.1f s", m_tem_att));
+        txstrList.append(tr("Waiting time ................")); txstrList.append(QString::asprintf(" : %5.1f s", m_tem_att));
     }
 
     if (m_flu_med > m_flu_max) // piccolo controllo per gestire flussi abnormali, tipici di prove da laboratorio
         if (m_tem_flu < 30) // se la flussata e molto breve e intensa, l'algoritmo sbaglia e puo risultare flu_med > flu_max
             m_flu_med = m_flu_max;
 
-    txstrList.append(tr("Maximum flow rate .........")); txstrList.append(QString::asprintf(" : %5.1f ml/s"      , m_flu_max));
-    txstrList.append(tr("Average flow rate .........")); txstrList.append(QString::asprintf(" : %5.1f ml/s"      , m_flu_med));
-    txstrList.append(tr("Time to maximum flow ......")); txstrList.append(QString::asprintf(" : %5.1f s"         , m_tem_max));
-    txstrList.append(tr("Time between 5% and 95% ...")); txstrList.append(QString::asprintf(" : %5.1f s"         , m_tem_595));
-    txstrList.append(tr("Flow time .................")); txstrList.append(QString::asprintf(" : %5.1f s"         , m_tem_flu));
-    txstrList.append(tr("Descent time ..............")); txstrList.append(QString::asprintf(" : %5.1f s"         , m_tem_dis));
-    txstrList.append(tr("Voiding time ..............")); txstrList.append(QString::asprintf(" : %5.1f s"         , m_tem_svu));
-    txstrList.append(tr("Volume to maximum flow ....")); txstrList.append(QString::asprintf(" : %5.1f ml"        , m_vol_max));
-    txstrList.append(tr("Voided Volume .............")); txstrList.append(QString::asprintf(" : %5.1f ml"        , (double) m_vol_vuo));
-    txstrList.append(tr("Corrected maximum flow ....")); txstrList.append(QString::asprintf(" : %5.1f ml^(1/2)/s", m_cQ     ));
-    txstrList.append(tr("Flow acceleration .........")); txstrList.append(QString::asprintf(" : %5.1f ml/s^2"    , m_flu_acc));    //?=2 apice
-    txstrList.append(tr("Maximum contraction speed .")); txstrList.append(QString::asprintf(" : %5.1f mm/s"      , m_vDetMax));
-    txstrList.append(tr("Residual volume ...........")); txstrList.append(QString::asprintf(" : %5.1f ml"        , (double) m_resVol ));
+    txstrList.append(tr("Maximum flow rate ...........")); txstrList.append(QString::asprintf(" : %5.1f ml/s"      , m_flu_max));
+    txstrList.append(tr("Average flow rate ...........")); txstrList.append(QString::asprintf(" : %5.1f ml/s"      , m_flu_med));
+    txstrList.append(tr("Time to maximum flow ........")); txstrList.append(QString::asprintf(" : %5.1f s"         , m_tem_max));
+    txstrList.append(tr("Time between 5% and 95% .....")); txstrList.append(QString::asprintf(" : %5.1f s"         , m_tem_595));
+    txstrList.append(tr("Flow time ...................")); txstrList.append(QString::asprintf(" : %5.1f s"         , m_tem_flu));
+    txstrList.append(tr("Descent time ................")); txstrList.append(QString::asprintf(" : %5.1f s"         , m_tem_dis));
+    txstrList.append(tr("Voiding time ................")); txstrList.append(QString::asprintf(" : %5.1f s"         , m_tem_svu));
+    txstrList.append(tr("Volume to maximum flow ......")); txstrList.append(QString::asprintf(" : %5.1f ml"        , m_vol_max));
+    txstrList.append(tr("Voided Volume ...............")); txstrList.append(QString::asprintf(" : %5.1f ml"        , (double) m_vol_vuo));
+    txstrList.append(tr("Corrected maximum flow ......")); txstrList.append(QString::asprintf(" : %5.1f ml^(1/2)/s", m_cQ     ));
+    txstrList.append(tr("Flow acceleration ...........")); txstrList.append(QString::asprintf(" : %5.1f ml/s^2"    , m_flu_acc));    //?=2 apice
+    txstrList.append(tr("Maximum contraction speed ...")); txstrList.append(QString::asprintf(" : %5.1f mm/s"      , m_vDetMax));
+    txstrList.append(tr("Residual volume .............")); txstrList.append(QString::asprintf(" : %5.1f ml"        , (double) m_resVol ));
 
     for(int i = 0; i < txstrList.size(); i += 2) {
         imagePt.rx() = 8;
         imagePt.ry() += tf_infoLabel.charH;
-        imageSetFont(tf_infoLabel); imagePainter->drawText(imagePt, txstrList.at(i));
-        imagePt.rx() = tf_infoLabel.charW * tr("Maximum flow rate .........").size();
+        imageSetFont(tf_infoLabel); imagePainter->drawText(imagePt, txstrList.at(i));        
+        imagePt.rx() = tf_infoLabel.charW *txstrList.at(i).size();
         imageSetFont(tf_infoValue); imagePainter->drawText(imagePt, txstrList.at(i+1));
     }
 
