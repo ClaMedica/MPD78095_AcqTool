@@ -31,13 +31,16 @@ MAcqManager::MAcqManager(QObject *parent)
 
     m_startAcqManuale = false; //non ancora premuto tasto start
 
-
+//Questa parte va fatta solo in caso di Pico, il file Config_Acq.xml viene creato nel main di Medica.
+//Negli altri casi il Config_Acq viene creato da Medica alla creazione del file in fase di acquisizione,
+//a seconda del protocollo scelto e della scheda di acquisizione. Di conseguenza in questa parte di codice
+//il file di config_acq non esiste ancora e queste istruzioni vanno effettuate nella funzione NewAcquisition
+#ifdef PICOFLOW
     if(!m_configAcq.loadFromXML(g_P7SettingsManager.progPath() + "/Config_Acq.xml"))
         qCritical() << "Error on acq configuration file";
     //carico info di connettivitA
     loadConnectivityInfo(m_configAcq.getSafeChild(XML_CONNECTIONS));
 
-#ifdef PICOFLOW
     QTimer::singleShot(1000, this, SLOT(connectToServers()));
 
     //connetto il gestore degli allarmi alla proprietA  alarms
@@ -244,7 +247,7 @@ bool MAcqManager::newAcquisition(QString __dataFile)
         m_alarmMng.manageAlarm(ALA_NOT_ACQUIRING, DISABLE);
 
 
-        //mi connetto ai server del supe e del programma di gestione archivi
+        //connessioni
         connectToServers();
     }
     //faccio partire il timer per l'allarme di stato
