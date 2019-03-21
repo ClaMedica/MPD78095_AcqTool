@@ -79,6 +79,9 @@ printermanager::printermanager(QString __namefile, QObject *parent) : QObject(pa
     buffer_flw = NULL;
     buffer_vol = NULL;
 
+
+    m_tem_att = -999;
+
     qDebug("new imageBm");
     imageQsz = QSize(832, 6000);
     imageBm = QImage(imageQsz, QImage::Format_Mono);

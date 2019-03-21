@@ -316,15 +316,17 @@ MForm {
             }
 
             pagesSameAna[firstPageSameAna].visible = true
+            btnPrint.dataSent = false
             timPrint.start()
         }
     }
 
     Timer{
         id:timPrint
-        interval:1000
+        interval:500
         onTriggered: {
             mngData.startPrint()
+            btnPrint.dataSent = true
         }
     }
 
@@ -332,6 +334,7 @@ MForm {
 
     MButton{
         id: btnPrint
+        property bool dataSent: true
         text: qsTr("print")
         anchors.left: parent.left
         anchors.bottom: parent.bottom
@@ -341,7 +344,7 @@ MForm {
         height: screenH*grafic.valueOf("Button","height")
         labelSize: grafic.valueOf("Button","labelSize")
         visible: PicoFlow ? true : false
-        enabled: mngData.getSpoolerQueueLen() === 0
+        enabled: mngData.getSpoolerQueueLen() === 0 && dataSent
         onClicked: {
             console.log("do print")
             mngData.sendToPrint()
