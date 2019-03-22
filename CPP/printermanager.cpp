@@ -897,7 +897,7 @@ void printermanager::Report_result()
     txstrList.append(tr("Corrected maximum flow ......")); txstrList.append(QString::asprintf(" : %5.1f ml^(1/2)/s", m_cQ     ));
     txstrList.append(tr("Flow acceleration ...........")); txstrList.append(QString::asprintf(" : %5.1f ml/s^2"    , m_flu_acc));    //?=2 apice
     txstrList.append(tr("Maximum contraction speed ...")); txstrList.append(QString::asprintf(" : %5.1f mm/s"      , m_vDetMax));
-    txstrList.append(tr("Residual volume .............")); txstrList.append(QString::asprintf(" : %5.1f ml"        , (double) m_resVol ));
+    txstrList.append(tr("Residual volume .............")); txstrList.append(QString::asprintf(" : %5.0f ml"        , (double) m_resVol ));
 
     for(int i = 0; i < txstrList.size(); i += 2) {
         imagePt.rx() = 8;

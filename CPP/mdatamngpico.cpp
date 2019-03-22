@@ -114,7 +114,7 @@ void MDataMngPico::udpMdmBtDecode(enum WHO __from, QByteArray __msg)
 
 void MDataMngPico::exitFromReview()
 {
-    qDebug() << "Exit" << getToSave();
+   qDebug() << "Exit" << getToSave();
 
     //devo resettare il parametro di flusso automatico a false per non far partire sempre l'analisi in automatico all'apertura in review di un file
     Ancestry *autoflow = m_configUser.getSafeChild("AutomaticFlow");
@@ -127,38 +127,24 @@ void MDataMngPico::exitFromReview()
         m_configUser.saveToXML(configUser);
     }
 
-    if (getToSave() == "ret") {
-        //if (m_mngPrint != NULL) m_mngPrint->closePrinter(); NON SERVE PIU' CON LA VERSIONE QIMAGE
+    if (getToSave() == "ret")  //non ci sono state modifiche
+    {
         qDebug()<<"cancellata copia all'exit"<<QFile::remove(m_copyFileName);
 
         send_Command(5);   // STARTBT
         g_mainAppBridge->sendExitReview();
         g_mainAppBridge->sendSwitch();  //send(MEX_SHOW);
-
-        return;
     }
-
-    if (getToSave() == "")
-        emit sg_exitFromReview();
-    else
+    else //devo salvare
     {
-      //  if (m_mngPrint != NULL) m_mngPrint->closePrinter(); NON SERVE PIU' CON LA VERSIONE QIMAGE
-        if (getToSave() == "yes")
+        //copio il file copy nell'originale
+        if (QFile::exists(m_copyFileName))
         {
-            //copio il file copy nell'originale
-            if (QFile::exists(m_copyFileName))
-            {
-                saveChanges();
-                qDebug()<<"cancello vecchio file"<<QFile::remove(m_fileName);
-                qDebug()<<"copio le modifiche"<<QFile::rename(m_copyFileName,m_fileName);
-            }
+            saveChanges();
+            qDebug()<<"cancello vecchio file"<<QFile::remove(m_fileName);
+            qDebug()<<"copio le modifiche"<<QFile::rename(m_copyFileName,m_fileName);
         }
-        else //"no"
-        {
-            //cancello il file copy
-            qDebug()<<"cancellata copia all'exit"<<QFile::remove(m_copyFileName);
 
-        }
         send_Command(5);   // STARTBT
         g_mainAppBridge->sendExitReview();
         g_mainAppBridge->sendSwitch(); //poi dovra tornare al modulo database

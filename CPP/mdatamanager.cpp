@@ -104,6 +104,7 @@ void MDataManager::loadFile(QString __fileName)
         QFile::remove(m_copyFileName);
     }
     QFile::copy(m_fileName, m_copyFileName);
+    m_toSave = "ret";//quando lo apro non devo salvare niente
 
     //devo pulire tutti i vettori utilizzati
     resetAll();
