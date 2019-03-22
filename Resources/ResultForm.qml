@@ -367,26 +367,46 @@ MForm {
         }
     }
 
+
     MButton {
         id:btnBack
         text: qsTr("back to graphs")
-        anchors.right: parent.right
         anchors.bottom: parent.bottom
         anchors.bottomMargin: 10
-        anchors.rightMargin: 10
+        anchors.horizontalCenter: parent.horizontalCenter
         width:  screenW*grafic.valueOf("Button","width")
         height: screenH*grafic.valueOf("Button","height")
         labelSize: grafic.valueOf("Button","labelSize")//layout.value("F4")
-        onClicked: {            
-            for (var i = 0; i < pagesLocal.length; i++) {
-                if (pagesLocal[i].visible)
-                    pagesLocal[i].visible = false;
-            }
-            forAna.visible = true
-            resultForm.visible = false
-            timBtAvail = true
-            btStopped = false
+        onClicked:exitFromResult()
+    }
+
+    MButton{
+        id: btnExit
+        text: qsTr("exit")
+        anchors.right: parent.right
+        anchors.bottom: parent.bottom
+        anchors.bottomMargin: 10
+        anchors.leftMargin: 10
+        width: screenW*grafic.valueOf("Button","width")
+        height: screenH*grafic.valueOf("Button","height")
+        labelSize: grafic.valueOf("Button","labelSize")
+        onClicked: {
+            exitFromResult()
+            mngData.exitFromReview()
         }
     }
+
+    function exitFromResult()
+    {
+        for (var i = 0; i < pagesLocal.length; i++) {
+            if (pagesLocal[i].visible)
+                pagesLocal[i].visible = false;
+        }
+        forAna.visible = true
+        resultForm.visible = false
+        timBtAvail = true
+        btStopped = false
+    }
+
 }
 
