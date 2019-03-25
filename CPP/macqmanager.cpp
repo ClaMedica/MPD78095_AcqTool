@@ -86,7 +86,7 @@ MAcqManager::~MAcqManager()
 
 void MAcqManager::udpBtDecode(enum WHO __from, QByteArray __msg)
 {
-   // qDebug() << __from << __msg;
+//    qDebug() << __from << __msg;
 
     switch(__from) {
     case E_SUP:
@@ -94,6 +94,9 @@ void MAcqManager::udpBtDecode(enum WHO __from, QByteArray __msg)
                 if((__msg.at(0) == 'R') && (__msg == "Restarted")) emit udpBtRestarted();
                 if((__msg.at(0) == 'U') && (__msg == "UseBt"))     emit udpBtUsable(true);
                 if((__msg.at(0) == 'N') && (__msg == "NoBt"))      emit udpBtUsable(false);
+                if((__msg.at(0) == 'C') && (__msg.startsWith("CALIB:"))) {
+                    qDebug() << "calibration data:" << __msg.mid(6);
+                }
                 break;
     case E_PRN:
                 if((__msg.at(0) == 'R') && (__msg == "Ready"))     emit udpPrnStatus(__msg.at(0));
