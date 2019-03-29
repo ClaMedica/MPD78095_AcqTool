@@ -335,12 +335,13 @@ void printermanager::imageGraph(QString head, QString baset, double xscale, int 
         imagePainter->setPen(Qt::SolidLine);
         imagePt = lb;
 
-        QPoint * points = new QPoint[w];
+//        QPoint * points = new QPoint[w];
+        QPoint points[103*8];
         xscale *= (w / 752.0);
         imageGraphSingle(lb, points, m_num_sam, xscale, (double)h/maxL, bufL);
         if(maxR > 0)
             imageGraphSingle(lb, points, m_num_sam, xscale, (double)h/maxR, bufR);
-        delete points;
+//        delete points;
     }
     imagePainter->setFont(savedFont);
 
@@ -613,6 +614,7 @@ void printermanager::Pri_Rep(double xscale)
         Calc_Max_RealReport_rel2(m_num_sam);
         Report_Real_Time(xscale);
     }
+    qDebug() << "dopo Report XXX";
 
     if(m_printLiverpool)
         Report_BitMap(false);           // Grafico Liverpool
