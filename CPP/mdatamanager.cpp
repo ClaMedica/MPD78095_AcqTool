@@ -168,6 +168,7 @@ void MDataManager::loadFile(QString __fileName)
         qDebug() << "Durata esame = " << m_end;
         qDebug() << "NA? di canali = "<< m_mng->GetChanNum();
 
+
         //------ Aggiungo i markers operativi, sono comuni a tutti i canali
 
         qDebug() << "Marker Operativi = " << m_mng->GetNumOperativeMarkers();
@@ -180,10 +181,12 @@ void MDataManager::loadFile(QString __fileName)
 //            qDebug() << numSamp[2];
 //            qDebug() << numSamp[3];
             double val = (double) numSamp[0] / m_mng->GetNAS(0);
-            qDebug() << "Marker" << key << val;
+            qDebug() << "Marker" << key << val << descr;
 
             if(m_markerMap.keys().contains(key)) {   //marker conosciuto le info ce le ho giA
                 (*mrk) = m_markerMap[key];
+                if ((*mrk)[ATT_TYPE] == 2)//di sistema
+                    (*mrk)["lock"] = true;
             }
             else {  //me lo costruisco
                 (*mrk)["code"] = "USR";
@@ -308,6 +311,7 @@ void MDataManager::loadFile(QString __fileName)
         //------ Aggiungo i markers analitici, sono associati ad un definitore
         //con questo controllo evitiamo i problemi dovuti ad un salvataggio errato del file,
         //dove risulta nessun definitore ma markers analitici salvati
+
         if (numDefinitori > 0)
         {
             qDebug() << "Marker Analitici = " << m_mng->GetNumAnalyticalMarkers();
