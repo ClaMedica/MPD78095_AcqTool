@@ -8,11 +8,14 @@ import QtQuick.Dialogs 1.2
 import MComponents 1.0
 
 Rectangle {
-    property var date:Date(edYear.text,cbMonth.currentIndex,cbDay.currentIndex+1)
+    property var date:Date(edYear.text,cbMonth.text,cbDay.text)
     property int labelSize:2
     readonly property int marginPerc:1
     property int offset:0
     property string year: "1900"
+    property bool erDay: false
+    property bool erMonth: false
+    property bool doUppa: false
     height:50
     width:200
     id:rootDateEdit
@@ -22,57 +25,71 @@ Rectangle {
 
     Component.onCompleted: {
         var d=new Date()
-        cbMonth.currentIndex=d.getMonth()
-        uppa(d.getMonth())
-        cbDay.currentIndex=d.getDate()-1
+        cbMonth.text=d.getMonth()+1
+        cbDay.text=d.getDate()
         edYear.text=d.getFullYear()
+        doUppa = true
+        uppa(cbMonth.text)
+
     }
 
     function setDate(newDate){//accetta una stringa dal formato MM/dd/yyyy
         var d=new Date(String(newDate))
         edYear.text=d.getFullYear()
-        cbMonth.currentIndex=d.getMonth()
-        uppa(d.cbMonth)
-        cbDay.currentIndex=d.getDate() - 1
+        cbMonth.text=d.getMonth()+1
+        cbDay.text=d.getDate()
+        uppa(cbMonth.text)
     }
 
     function uppa(month)
     {
-        var old
-        //console.log(month)
+   //     console.log("DAY",cbDay.text,month)
+        if (!doUppa) return
+
+        erDay = false
+        erMonth = false
         if(month===undefined)
             return
-        switch(month){
+        switch(month*1){
         case 0:
-        case 2:
-        case 4:
-        case 6:
-        case 7:
-        case 9:
-        case 11:
-            old=cbDay.currentIndex
-            cbDay.model=cbDay.mod31;          
-            break;
+            erMonth = true
+            break
+        case 1:
         case 3:
         case 5:
+        case 7:
         case 8:
         case 10:
-            old=cbDay.currentIndex
-            cbDay.model=cbDay.mod30;
+        case 12:
+            if (cbDay.text > 31)
+                erDay = true
             break;
-        case 1:
-            old=cbDay.currentIndex
-            if(edYear.text%4===0)
-                cbDay.model=cbDay.mod29
-            else
-                cbDay.model=cbDay.mod28
+        case 4:
+        case 6:
+        case 9:
+        case 11:
+            if (cbDay.text > 30)
+                erDay = true
             break;
-        default:console.error("Wrong month",month)
-        }
-        if(old<cbDay.model.length)
-            cbDay.currentIndex=old
+        case 2:
+            if(edYear.text%4===0){
+                if (cbDay.text > 29)
+                    erDay = true
+            }
+            else{
+                if (cbDay.text > 28)
+                    erDay = true
+            }
+            break;
+        default:
+            erMonth = true
+           //console.log("Wrong month",month)
 
-        date=new Date(edYear.text,cbMonth.currentIndex,cbDay.currentIndex+1)
+        }
+        if (cbDay.text === "")
+            erDay = true
+
+        date=new Date(edYear.text,cbMonth.text-1,cbDay.text)
     }
 
     Row{
@@ -82,36 +99,51 @@ Rectangle {
         anchors.bottom:parent.bottom
         spacing:width*0.01
         id:recDate
-        MComboBox{
-            property var mod28:["01","02","03","04","05","06","07","08","09","10",
-                "11","12","13","14","15","16","17","18","19","20",
-                "21","22","23","24","25","26","27","28"]
-            property var mod29:["01","02","03","04","05","06","07","08","09","10",
-                "11","12","13","14","15","16","17","18","19","20",
-                "21","22","23","24","25","26","27","28","29"]
-            property var mod30:["01","02","03","04","05","06","07","08","09","10",
-                "11","12","13","14","15","16","17","18","19","20",
-                "21","22","23","24","25","26","27","28","29","30"]
-            property var mod31:["01","02","03","04","05","06","07","08","09","10",
-                "11","12","13","14","15","16","17","18","19","20",
-                "21","22","23","24","25","26","27","28","29","30","31"]
+        MTextField{
             id:cbDay
             anchors.verticalCenter: parent.verticalCenter
             height: parent.height
             width:parent.width*0.3
             labelSize: rootDateEdit.labelSize
-            onCurrentIndexChanged: date=new Date(edYear.text,cbMonth.currentIndex,cbDay.currentIndex+1)
-            onClicked: if(isTouch) rootDateEdit.clicked()
+            onTextChanged: uppa(cbMonth.text)
+            onFocusChanged:
+            {
+                if(focus && isTouch)
+                {
+                    mngSys.startSound()
+                    if (keyboardNum !== undefined)
+                    {
+                        keyboardNum.testo = cbDay.text
+                        keyboardNum.target = cbDay
+                        DataEngine.putItemOnTop(keyboardNum)
+                        keyboardNum.show()
+                    }
+                    rootDateEdit.clicked()
+                }
+            }
         }
-        MComboBox{
+        MTextField{
             id:cbMonth
             anchors.verticalCenter: parent.verticalCenter
             height: parent.height
             width:parent.width*0.3
-            model:["01","02","03","04","05","06","07","08","09","10","11","12"]
-            onCurrentIndexChanged: uppa(currentIndex)
             labelSize: rootDateEdit.labelSize
-            onClicked: if(isTouch) rootDateEdit.clicked()
+            onTextChanged: uppa(cbMonth.text)
+            onFocusChanged:
+            {
+                if(focus && isTouch)
+                {
+                    mngSys.startSound()
+                    if (keyboardNum !== undefined)
+                    {
+                        keyboardNum.testo = cbMonth.text
+                        keyboardNum.target = cbMonth
+                        DataEngine.putItemOnTop(keyboardNum)
+                        keyboardNum.show()
+                    }
+                    rootDateEdit.clicked()
+                }
+            }
         }
         MTextField{
             id:edYear
@@ -126,7 +158,7 @@ Rectangle {
             property string oldYear
             onTextChanged:{
                 year = text
-                uppa(cbMonth.currentIndex)
+                uppa(cbMonth.text)
             }
             onFocusChanged:
             {
@@ -180,7 +212,7 @@ Rectangle {
 
         function open()
         {
-            calendar.selectedDate = new Date(edYear.text*1,cbMonth.currentIndex,cbDay.currentIndex+1)
+            calendar.selectedDate = new Date(edYear.text*1,cbMonth.text-1,cbDay.text)
             DataEngine.putItemOnTop(this)
             btnSaveDialog.enabled = false
             visible=true
@@ -220,8 +252,8 @@ Rectangle {
             text:qsTr("Save")
             onClicked: {
                 var date=new Date(calendar.selectedDate)
-                cbMonth.currentIndex=date.getMonth()
-                cbDay.currentIndex=date.getDate()-1//cbDay parte da 0
+                cbMonth.text=date.getMonth() +1
+                cbDay.text=date.getDate()
                 edYear.text=date.getFullYear()
                 dialog.accepted()
             }

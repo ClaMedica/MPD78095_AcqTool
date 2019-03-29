@@ -103,12 +103,12 @@ ApplicationWindow {
             forAna.setDefinersInfo(mngData.definersInfo())
             forAna.setCommandsInfo(mngData.commandsInfo())
         }
-        else if (mode === "sta")
-        {
-            if (PicoFlow) suspendBt()
-            console.log("Start stampa prova")
-            mngData.sendPrintTest()
-        }
+//        else if (mode === "sta")
+//        {
+//            if (PicoFlow) suspendBt()
+//            console.log("Start stampa prova")
+//            mngData.sendPrintTest()
+//        }
 
         console.log("Application Ready!")
         if (mode !== "sta")
