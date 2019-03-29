@@ -84,7 +84,8 @@ void MDataMngPico::startPrint()
 void MDataMngPico::sendPrintTest()
 {
     qDebug() << "inizio stampa";
-    udpConn.sendPrn("print:/root/PicoFlow/urodata/UDSData/printTest.prn");
+//    udpConn.sendPrn("print:/root/PicoFlow/urodata/UDSData/printTest.prn");
+    udpConn.sendSup("Print:/root/PicoFlow/urodata/UDSData/printTest.prn");
 }
 
 void MDataMngPico::udpMdmBtDecode(enum WHO __from, QByteArray __msg)
