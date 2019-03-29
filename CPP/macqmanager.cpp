@@ -320,6 +320,9 @@ void MAcqManager::endAcquisition(bool discard)
         qDebug() << m_mng->GetFileName() << m_mng->GetFileType() << m_mng->GetChanNum() ;
         bool cvres = m_mng->CommitValues();
         qDebug() << "Commit Values?" << cvres;
+        cvres = m_mng->CommitParameters();
+        qDebug() << "Commit Parameters?" << cvres;
+
     }
 
     m_acqFileOpened = false;    //nessuna acquisizione in atto
@@ -686,6 +689,9 @@ void MAcqManager::analyzeStatus(uint8_t __currState, bool __isBT)
     case ESTATE_ACQUIRING:
         //inizio acquisizione attivo allarme "non sto acquisendo"
         if(m_oldState == ESTATE_IDLE_CONNECTED) {
+            //devo inserire il marker di sistema per acquisizione interrotta
+            qDebug()<<"inserisco marker per interruzione";
+            addMarker(MRK_E3);
             //avviso l'utente che l'acquisizione è ripartita
             resetAlarms();
             emit systemInAcqStatus();
