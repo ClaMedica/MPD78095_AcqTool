@@ -361,18 +361,26 @@ void MAcqManager::endAcquisition(bool discard)
 }
 
 void MAcqManager::addMarker(QVariant __key)
-{
+{    
     if(m_acqFileOpened) {
-        VarMap mrk;
-        mrk = m_markerMap[__key];
+        float sec = (float) m_mng->GetSamplesNumber(0) / m_mng->GetNAS(0);
+        //lo inserisco solo se non siamo all'inizio
+        //se fossimo all'inizio vuol dire che è capitato di prendere il messaggio di riconnessione BT
+        //dopo una chiusura del file a allo start di nuova acquisizione
+        if (sec > 0)
+        {
+            VarMap mrk;
+            mrk = m_markerMap[__key];
+            mrk["val"] = sec;
+            m_acqMarker.append(mrk);
 
-        m_mng->AppendOpMarker(mrk[ATT_KEY].toUInt(), mrk[ATT_DESCR].toString());
+            m_mng->AppendOpMarker(mrk[ATT_KEY].toUInt(), mrk[ATT_DESCR].toString());
 
-        mrk["val"] = (float) m_mng->GetSamplesNumber(0) / m_mng->GetNAS(0);
-        m_acqMarker.append(mrk);
-        updateAcqData();
 
-        qDebug() << "Marker key:" << mrk["key"] << "appended at" << mrk["val"].toString() << "sec";
+            updateAcqData();
+
+            qDebug() << "Marker key:" << mrk["key"] << "appended at" << mrk["val"].toString() << "sec";
+        }
     }
 }
 
@@ -663,6 +671,8 @@ void MAcqManager::analyzeStatus(uint8_t __currState, bool __isBT)
     static const char * names[] = { "st_IDLE_NOT_CONNECTED", "st_IDLE_CONNECTED", "st_ACQUIRING" };
     qDebug("new:%s olstate:%s %s", names[__currState], names[m_oldState], __isBT ? "BT" : "Cavo");
 
+    static bool interruption = false;
+
     switch(__currState)
     {
     case ESTATE_IDLE_NOT_CONNECTED:
@@ -671,8 +681,10 @@ void MAcqManager::analyzeStatus(uint8_t __currState, bool __isBT)
             m_alarmMng.startTimeoutAlarm(ALA_NOT_CONNECTED, 1000);
 
         //quando durante un'acquisizione si spegne la cella
-        if(m_oldState == ESTATE_ACQUIRING)
+        if(m_oldState == ESTATE_ACQUIRING) {
             m_alarmMng.addAlarm(ALA_NOT_CONNECTED);
+            interruption = true;
+        }
         break;
 
     case ESTATE_IDLE_CONNECTED:
@@ -681,17 +693,26 @@ void MAcqManager::analyzeStatus(uint8_t __currState, bool __isBT)
             m_alarmMng.stopTimeoutAlarm(ALA_NOT_CONNECTED);
 
         //se improvvisamente non acquisisco più
-        if(m_oldState == ESTATE_ACQUIRING)
+        if(m_oldState == ESTATE_ACQUIRING){
             m_alarmMng.addAlarm(ALA_NOT_ACQUIRING);
+            interruption = true;
+        }
 
         break;
 
     case ESTATE_ACQUIRING:
         //inizio acquisizione attivo allarme "non sto acquisendo"
-        if(m_oldState == ESTATE_IDLE_CONNECTED) {
-            //devo inserire il marker di sistema per acquisizione interrotta
-            qDebug()<<"inserisco marker per interruzione";
-            addMarker(MRK_E3);
+        if(m_oldState == ESTATE_IDLE_CONNECTED || m_oldState == ESTATE_IDLE_NOT_CONNECTED) {
+            //se c'è stata un'interruzione di connessione (vera o dovuta a apri/chiudi review)
+            if (interruption){
+                interruption = false;
+                //e un 'esame aperto (interruzione vera)
+                if (m_acqFileOpened){
+                    //devo inserire il marker di sistema per acquisizione interrotta
+                    qDebug()<<"inserisco marker per interruzione";
+                    addMarker(MRK_E3);
+                }
+            }
             //avviso l'utente che l'acquisizione è ripartita
             resetAlarms();
             emit systemInAcqStatus();
