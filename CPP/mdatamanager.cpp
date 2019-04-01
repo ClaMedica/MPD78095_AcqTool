@@ -313,7 +313,7 @@ void MDataManager::loadFile(QString __fileName)
         //------ Aggiungo i markers analitici, sono associati ad un definitore
         //con questo controllo evitiamo i problemi dovuti ad un salvataggio errato del file,
         //dove risulta nessun definitore ma markers analitici salvati
-
+#ifndef PICOFLOW
         if (numDefinitori > 0)
         {
             qDebug() << "Marker Analitici = " << m_mng->GetNumAnalyticalMarkers();
@@ -363,6 +363,7 @@ void MDataManager::loadFile(QString __fileName)
                 saveDataAndUpdate(family, name, mrkAnVec);
             }
         }
+#endif
 
         //        for(int32_t nc=0;nc<m_mng->GetChanNum();nc++)
         //        {
@@ -1304,7 +1305,7 @@ void MDataManager::InitPageGraphs(int __anaType)
         (void) def;
         bool ret = InitArraysFLW(evStart, evEnd, enCh, evMarkOpIn->value("num").toInt(), evAuto);
         (void) ret;
-
+#ifndef PICOFLOW
         //se gli anMarker li trovo per la prima volta li inserisco in grafica
         if (evAuto != 0) {
             VarMapVec *mrkAnVec = new VarMapVec;
@@ -1357,6 +1358,7 @@ void MDataManager::InitPageGraphs(int __anaType)
             updateInfoList();
             emit reloadingCompleted();
         }
+#endif
     }
 }
 
