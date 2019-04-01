@@ -1076,9 +1076,7 @@ void printermanager::Calc_Max(double xscale)
     if (m_max_y <=  50) m_max_y =  50; else
     if (m_max_y <=  65) m_max_y =  65; else
     if (m_max_y <=  80) m_max_y =  80; else
-    if (m_max_y <= 100) m_max_y = 100; else
-    if (m_max_y <= 120) m_max_y = 120; else
-    m_max_y = 150;
+    m_max_y = 100;
 
     m_max_y_gr2 = ((long) ((m_max_vol + 10) / 100) + 1) * 100;	// 05 dicembre
 }

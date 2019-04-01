@@ -30,6 +30,7 @@ MAcqManager::MAcqManager(QObject *parent)
 
 
     m_startAcqManuale = false; //non ancora premuto tasto start
+    m_calibCella = "";
 
 //Questa parte va fatta solo in caso di Pico, il file Config_Acq.xml viene creato nel main di Medica.
 //Negli altri casi il Config_Acq viene creato da Medica alla creazione del file in fase di acquisizione,
@@ -95,7 +96,8 @@ void MAcqManager::udpBtDecode(enum WHO __from, QByteArray __msg)
                 if((__msg.at(0) == 'U') && (__msg == "UseBt"))     emit udpBtUsable(true);
                 if((__msg.at(0) == 'N') && (__msg == "NoBt"))      emit udpBtUsable(false);
                 if((__msg.at(0) == 'C') && (__msg.startsWith("CALIB:"))) {
-                    qDebug() << "calibration data:" << __msg.mid(6);
+                    m_calibCella = __msg.mid(6) + ";";
+                    qDebug() << "calibration data:" << m_calibCella;
                 }
                 break;
     case E_PRN:
@@ -233,11 +235,13 @@ bool MAcqManager::newAcquisition(QString __dataFile)
         qDebug() << "Updating datafile...";
         handleDataFile();
 
+        //dati di calibrazione
+        m_mng->SetOther(m_calibCella);
+
         //ripristino il file in acquisizione
         bool res = m_mng->Continue();
         qDebug() << "Continue ..." << res;
 
-//        m_oldState = 255;
         m_newStateQ.clear();
 
         //dico a medica di salvare il file nel db

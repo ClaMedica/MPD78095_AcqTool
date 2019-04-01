@@ -28,6 +28,8 @@ MDataManager::MDataManager(QObject *parent)
     m_secondHead = "Pico Flow 2";
     m_etaPatient = -1;
 
+    m_datiCalib = "";
+
     setValVolRes(-999);
 }
 
@@ -930,10 +932,10 @@ bool MDataManager::checkForVolRes()
 
     //gestione campo Other del file .pic
     QString otherString = m_mng->GetOther();
-
-    if (otherString == "")
+    qDebug()<<"Check OTHER"<<otherString.split(";").at(0)<<otherString.split(";").at(1);
+    if (otherString.split(";").length() == 2)
     {
-        otherString  = "0;" + QString::number(m_autoFlow) + ";";
+        otherString  += "0;" + QString::number(m_autoFlow) + ";";
         setValVolRes(0);
         m_mng->SetOther(otherString);
         m_mng->CommitParameters();
@@ -943,8 +945,9 @@ bool MDataManager::checkForVolRes()
     }
     else
     {
-        setValVolRes(otherString.split(";").at(0).toInt());
-        m_autoFlow = otherString.split(";").at(1).toInt();
+        qDebug()<<"Check OTHER"<<otherString.split(";").at(1)<<otherString.split(";").at(2);
+        setValVolRes(otherString.split(";").at(1).toInt());
+        m_autoFlow = otherString.split(";").at(2).toInt();
     }
 
     //ciclo per individuare se e necessario aprire la dlg del volume residuo
@@ -999,14 +1002,15 @@ qDebug() << "INIZIO";
     //mi salvo nel campo other il valore del volume residuo nel caso l'utente lo avesse cambiato
     QString other = m_mng->GetOther();
     QStringList otherList = other.split(";");
+    m_datiCalib = other.at(0);//stringa per dati calibrazione da stampare
     other.clear();
-    int valResOld = otherList.at(0).toInt();
+    int valResOld = otherList.at(1).toInt();
     int valResNew = getValVolRes();
     if (valResNew != valResOld) {
-        otherList[0] = QString::number(valResNew);
+        otherList[1] = QString::number(valResNew);
         for (int j=0; j<otherList.length()-1;j++)
             other += otherList.at(j) + ";";
-
+        qDebug()<<"OTHER ANALISI"<<other;
         m_mng->SetOther(other);
         m_mng->CommitParameters();
         setToSave("");  //necessario chiedere se salvare
