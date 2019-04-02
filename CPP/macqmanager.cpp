@@ -1054,6 +1054,8 @@ void MAcqManager::applyOperations()
                         for (int i=0; i<m_lenDifFilter; i++)
                             somma += m_buffer_DigFilter.at(i)*COEFDigFilter[i];
                         double flusso = somma/m_sommaCoef;
+                        if (flusso > 100)
+                            flusso = 100;
                         m_channelMap[type].at(index)->append(flusso);
 
                     }
