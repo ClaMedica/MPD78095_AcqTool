@@ -142,6 +142,7 @@ protected:
     QString m_fileName;
     QString m_copyFileName;
     int m_testNumber;
+    QString m_datiCalib;
 
     int     m_autoFlow;     //Modalita dell'esame 0=auto; 2=manual
     bool    m_Siroky;       //se stampare Siroky

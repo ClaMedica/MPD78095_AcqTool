@@ -43,7 +43,6 @@ printermanager::printermanager(QString __namefile, QObject *parent) : QObject(pa
     m_file = NULL;
     m_namefile    = __namefile;
     m_namefilePrn = __namefile.remove("_copy").remove(".pic").append(".prn");
-    qDebug() << m_namefilePrn;
 
     m_dfm = new DatafileManager();
     m_dfm->SetFileName(m_namefile);
@@ -78,7 +77,6 @@ printermanager::printermanager(QString __namefile, QObject *parent) : QObject(pa
     buffer_emg = NULL;
     buffer_flw = NULL;
     buffer_vol = NULL;
-
 
     m_tem_att = -999;
 
@@ -361,8 +359,10 @@ void printermanager::imageGraphSingle(QPoint leftBottom, QPoint *pts, int npts, 
 /**
 Stampa automatica alla fine dell'esame: al momento della pressione dello stop, i dati sono analizzati, salvati e poi mandati in stampa.
 */
-void printermanager::print()
+void printermanager::print(QString __datiCalib)
 {
+    m_datiCalib = __datiCalib;
+    qDebug() << m_namefilePrn << "calib:" << __datiCalib;
     //dati paziente e esame
     m_dfm->Open();
     m_dfm->GetParameters();
@@ -900,6 +900,7 @@ void printermanager::Report_result()
     txstrList.append(tr("Flow acceleration ...........")); txstrList.append(QString::asprintf(" : %5.1f ml/s^2"    , m_flu_acc));    //?=2 apice
     txstrList.append(tr("Maximum contraction speed ...")); txstrList.append(QString::asprintf(" : %5.1f mm/s"      , m_vDetMax));
     txstrList.append(tr("Residual volume .............")); txstrList.append(QString::asprintf(" : %5.0f ml"        , (double) m_resVol ));
+    txstrList.append(tr("Calibration date.............")); txstrList.append(QString::asprintf(" : %s"              , m_datiCalib.toLatin1().data() ));
 
     for(int i = 0; i < txstrList.size(); i += 2) {
         imagePt.rx() = 8;

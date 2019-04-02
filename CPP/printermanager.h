@@ -48,7 +48,7 @@ public:
     void imageGraph(QString head, QString baset, double xscale, int maxL, int maxR, double *bufL, double *bufR);
     void imageGraphSingle(QPoint leftBottom, QPoint *pts, int npts, double kx, double ky, double *bufV);
     void imageText(QString txt, int fontSize, bool restoreFont);
-    void print();
+    void print(QString __datiCalib);
 
     void setTempoAttesa(float __val)            {m_tem_att = __val;}
     void setFlussoMax(float __val)              {m_flu_max = __val;}
@@ -127,6 +127,7 @@ private:
     int     m_num_VOLsample;  	// scrive il val count_sample, che serve in print report
     bool    m_test_type;			// discrimina se esame veloce oppure completo di dati paziente (servira nel report di stampa)
     int     m_numTest;
+    QString m_datiCalib;
 
     int     m_num_sam; //numero campioni minimo nas (vol)
 

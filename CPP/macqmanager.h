@@ -133,6 +133,8 @@ private:
 
     //codice software
     int m_codSoft;
+    //stringa calibrazione
+    QString m_calibCella;
 };
 
 
