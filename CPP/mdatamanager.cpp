@@ -933,10 +933,10 @@ bool MDataManager::checkForVolRes()
 
     //gestione campo Other del file .pic
     QString otherString = m_mng->GetOther();
-    qDebug()<<"Check OTHER"<<otherString.split(";").at(0)<<otherString.split(";").at(1);
-    if (otherString.split(";").length() == 2)
+    QStringList stringSplit = otherString.split(";");
+    if (otherString == "")
     {
-        otherString  += "0;" + QString::number(m_autoFlow) + ";";
+        otherString  = "0;" + QString::number(m_autoFlow) + ";";
         setValVolRes(0);
         m_mng->SetOther(otherString);
         m_mng->CommitParameters();
@@ -944,11 +944,30 @@ bool MDataManager::checkForVolRes()
         if (m_autoFlow == 0)
             m_autoPrint =  true;
     }
+    else if (otherString.split(";").length() == 2)
+    {
+        QString first = stringSplit.at(0);
+        if (first.contains("none") || first.length() > 5)
+        {
+            otherString  += "0;" + QString::number(m_autoFlow) + ";";
+            setValVolRes(0);
+            m_mng->SetOther(otherString);
+            m_mng->CommitParameters();
+            //se è la prima volta che apro un esame di flussimetria automatica la stampa è automatica
+            if (m_autoFlow == 0)
+                m_autoPrint =  true;
+        }
+        else
+        {
+            setValVolRes(stringSplit.at(0).toInt());
+            m_autoFlow = stringSplit.at(1).toInt();
+        }
+    }
     else
     {
         qDebug()<<"Check OTHER"<<otherString.split(";").at(1)<<otherString.split(";").at(2);
-        setValVolRes(otherString.split(";").at(1).toInt());
-        m_autoFlow = otherString.split(";").at(2).toInt();
+        setValVolRes(stringSplit.at(1).toInt());
+        m_autoFlow = stringSplit.at(2).toInt();
     }
 
     //ciclo per individuare se e necessario aprire la dlg del volume residuo
@@ -1003,7 +1022,7 @@ qDebug() << "INIZIO";
     //mi salvo nel campo other il valore del volume residuo nel caso l'utente lo avesse cambiato
     QString other = m_mng->GetOther();
     QStringList otherList = other.split(";");
-    m_datiCalib = other.at(0);//stringa per dati calibrazione da stampare
+    m_datiCalib = otherList.at(0);//stringa per dati calibrazione da stampare
     other.clear();
     int valResOld = otherList.at(1).toInt();
     int valResNew = getValVolRes();

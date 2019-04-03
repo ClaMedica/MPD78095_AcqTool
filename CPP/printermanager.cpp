@@ -335,13 +335,15 @@ void printermanager::imageGraph(QString head, QString baset, double xscale, int 
         imagePainter->setPen(Qt::SolidLine);
         imagePt = lb;
 
-//        QPoint * points = new QPoint[w];
-        QPoint points[103*8];
+        int f = 103*8;
+        if (w < f)
+            w = f;
+        QPoint * points = new QPoint[w];
         xscale *= (w / 752.0);
         imageGraphSingle(lb, points, m_num_sam, xscale, (double)h/maxL, bufL);
         if(maxR > 0)
             imageGraphSingle(lb, points, m_num_sam, xscale, (double)h/maxR, bufR);
-//        delete points;
+        delete points;
     }
     imagePainter->setFont(savedFont);
 
