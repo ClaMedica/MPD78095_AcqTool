@@ -37,7 +37,7 @@ void MDataMngPico::initPrinter()
 
 void MDataMngPico::sendToPrint()
 {
-    m_mngPrint->print();
+    m_mngPrint->print(m_datiCalib);
     qDebug() << "stampato";
 }
 

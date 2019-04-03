@@ -933,7 +933,7 @@ bool MDataManager::checkForVolRes()
 
     //gestione campo Other del file .pic
     QString otherString = m_mng->GetOther();
-    qDebug()<<"Check OTHER"<<otherString.split(";").at(0)<<otherString.split(";").at(1);
+    qDebug()<<"Check OTHER"<<otherString;
     if (otherString.split(";").length() == 2)
     {
         otherString  += "0;" + QString::number(m_autoFlow) + ";";
