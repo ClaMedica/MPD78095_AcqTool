@@ -934,6 +934,7 @@ bool MDataManager::checkForVolRes()
     //gestione campo Other del file .pic
     QString otherString = m_mng->GetOther();
     QStringList stringSplit = otherString.split(";");
+    qDebug()<<"Check OTHER"<<otherString;
     if (otherString == "")
     {
         otherString  = "0;" + QString::number(m_autoFlow) + ";";
@@ -965,10 +966,10 @@ bool MDataManager::checkForVolRes()
     }
     else
     {
-        qDebug()<<"Check OTHER"<<otherString.split(";").at(1)<<otherString.split(";").at(2);
         setValVolRes(stringSplit.at(1).toInt());
         m_autoFlow = stringSplit.at(2).toInt();
     }
+    qDebug()<<"Check OTHER DOPO"<<otherString;
 
     //ciclo per individuare se e necessario aprire la dlg del volume residuo
     bool volRes = false;

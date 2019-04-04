@@ -236,6 +236,7 @@ bool MAcqManager::newAcquisition(QString __dataFile)
         handleDataFile();
 
         //dati di calibrazione
+        qDebug()<<"calibsave"<<m_calibCella;
         m_mng->SetOther(m_calibCella);
 
         //ripristino il file in acquisizione
