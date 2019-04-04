@@ -821,7 +821,8 @@ void printermanager::Report_Real_TimeSingle(QString msg, QPoint * points, double
             imagePainter->drawLine(x, -(y0), x, -(y0 + 800));           // tratteggio vert. allineato a label
             imagePainter->setPen(Qt::SolidLine);
 
-            QString label = QString::number(i/10);                      // label multipli 10 secondi
+            int ndec = i / 10;                                          // label multipli 10 secondi
+            QString label = QString::number(ndec / 60) + ":" + QString::number(ndec % 60);
             x -= (tf_graphLand.charW * label.size()) / 2;
             int y = (y0 - dotXtratt - ch);
             imagePainter->drawText(x, -y, label);
@@ -902,7 +903,6 @@ void printermanager::Report_result()
     txstrList.append(tr("Flow acceleration ...........")); txstrList.append(QString::asprintf(" : %5.1f ml/s^2"    , m_flu_acc));    //?=2 apice
     txstrList.append(tr("Maximum contraction speed ...")); txstrList.append(QString::asprintf(" : %5.1f mm/s"      , m_vDetMax));
     txstrList.append(tr("Residual volume .............")); txstrList.append(QString::asprintf(" : %5.0f ml"        , (double) m_resVol ));
-    txstrList.append(tr("Calibration date.............")); txstrList.append(QString::asprintf(" : %s"              , m_datiCalib.toLatin1().data() ));
 
     for(int i = 0; i < txstrList.size(); i += 2) {
         imagePt.rx() = 8;
@@ -911,6 +911,16 @@ void printermanager::Report_result()
         imagePt.rx() = tf_infoLabel.charW *txstrList.at(i).size();
         imageSetFont(tf_infoValue); imagePainter->drawText(imagePt, txstrList.at(i+1));
     }
+
+    QString now;
+    now = "<< " + QDateTime::currentDateTime().toString("yyyy-MM-dd_hh:mm:ss") + " Rev: ? >>";
+    imageSetFont(tf_infoLabel);
+    imagePt.ry() += 2*tf_infoLabel.charH;
+    imagePt.rx() = (103*8 - tf_graphPortr.charW *now.size()) / 2;
+    imagePainter->drawText(imagePt, now);
+    now = "<< " + tr("Calibration date") + ": " + m_datiCalib.replace(".weight", "") + " >>";
+    imagePt.rx() = (103*8 - tf_graphPortr.charW *now.size()) / 2;
+    imagePainter->drawText(imagePt, now);
 
     imagePt.rx() = 8;
     imagePt.ry() += tf_infoLabel.charH;
