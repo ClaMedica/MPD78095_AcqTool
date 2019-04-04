@@ -166,6 +166,36 @@ void MDataManager::loadFile(QString __fileName)
         if (m_mng->GetPatient().section(";", 12, 12) == "F")
             m_sexPatient = true;
 
+        //dati calibrazione
+        //In questo caso se si decide di cambiare i file di esempio con esami acquisiti
+        //nuovi, non avremmo più necessita del controllo di seguito
+        m_datiCalib = "none";
+        QString otherString = m_mng->GetOther();
+        QStringList stringSplit = otherString.split(";");
+        if (otherString == "")
+        {
+            //inserisco dati calibrazione per esami vecchi
+            otherString = "none;";
+            m_mng->SetOther(otherString);
+            m_mng->CommitParameters();
+        }
+        else if (otherString.split(";").length() == 2)
+        {
+            QString first = stringSplit.at(0);
+            if (first.contains("none") || first.length() > 5)
+            {
+                m_datiCalib = otherString;
+            }
+            else
+            {
+                QString newOther = "none;" + otherString;
+                m_mng->SetOther(newOther);
+                m_mng->CommitParameters();
+            }
+        }
+
+        qDebug()<<"Check OTHER Load"<<otherString;
+
         m_end = m_mng->GetDuration() / 1000;
         qDebug() << "Durata esame = " << m_end;
         qDebug() << "NA? di canali = "<< m_mng->GetChanNum();
@@ -934,10 +964,9 @@ bool MDataManager::checkForVolRes()
     //gestione campo Other del file .pic
     QString otherString = m_mng->GetOther();
     QStringList stringSplit = otherString.split(";");
-    qDebug()<<"Check OTHER"<<otherString;
-    if (otherString == "")
+    if (otherString.split(";").length() == 2)
     {
-        otherString  = "0;" + QString::number(m_autoFlow) + ";";
+        otherString  += "0;" + QString::number(m_autoFlow) + ";";
         setValVolRes(0);
         m_mng->SetOther(otherString);
         m_mng->CommitParameters();
@@ -945,31 +974,11 @@ bool MDataManager::checkForVolRes()
         if (m_autoFlow == 0)
             m_autoPrint =  true;
     }
-    else if (otherString.split(";").length() == 2)
-    {
-        QString first = stringSplit.at(0);
-        if (first.contains("none") || first.length() > 5)
-        {
-            otherString  += "0;" + QString::number(m_autoFlow) + ";";
-            setValVolRes(0);
-            m_mng->SetOther(otherString);
-            m_mng->CommitParameters();
-            //se è la prima volta che apro un esame di flussimetria automatica la stampa è automatica
-            if (m_autoFlow == 0)
-                m_autoPrint =  true;
-        }
-        else
-        {
-            setValVolRes(stringSplit.at(0).toInt());
-            m_autoFlow = stringSplit.at(1).toInt();
-        }
-    }
     else
     {
         setValVolRes(stringSplit.at(1).toInt());
         m_autoFlow = stringSplit.at(2).toInt();
     }
-    qDebug()<<"Check OTHER DOPO"<<otherString;
 
     //ciclo per individuare se e necessario aprire la dlg del volume residuo
     bool volRes = false;
@@ -1023,7 +1032,6 @@ qDebug() << "INIZIO";
     //mi salvo nel campo other il valore del volume residuo nel caso l'utente lo avesse cambiato
     QString other = m_mng->GetOther();
     QStringList otherList = other.split(";");
-    m_datiCalib = otherList.at(0);//stringa per dati calibrazione da stampare
     other.clear();
     int valResOld = otherList.at(1).toInt();
     int valResNew = getValVolRes();
@@ -1031,7 +1039,6 @@ qDebug() << "INIZIO";
         otherList[1] = QString::number(valResNew);
         for (int j=0; j<otherList.length()-1;j++)
             other += otherList.at(j) + ";";
-        qDebug()<<"OTHER ANALISI"<<other;
         m_mng->SetOther(other);
         m_mng->CommitParameters();
         setToSave("");  //necessario chiedere se salvare
