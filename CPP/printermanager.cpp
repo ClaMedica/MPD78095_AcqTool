@@ -919,6 +919,7 @@ void printermanager::Report_result()
     imagePt.rx() = (103*8 - tf_graphPortr.charW *now.size()) / 2;
     imagePainter->drawText(imagePt, now);
     now = "<< " + tr("Calibration date") + ": " + m_datiCalib.replace(".weight", "") + " >>";
+    imagePt.ry() += tf_infoLabel.charH;
     imagePt.rx() = (103*8 - tf_graphPortr.charW *now.size()) / 2;
     imagePainter->drawText(imagePt, now);
 
