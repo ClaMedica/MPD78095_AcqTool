@@ -597,7 +597,7 @@ void MAcqManager::handleTCP(SimpleTCPClient *__client, QByteArray __block)
         }
         else if(who == "CMD") {
             qDebug() << "CMD __block[4]" << __block[4];
-            if(__block[4] == '5') {
+            if(__block[4] == '5' && m_acqFileOpened) {
                 if(!m_saving) {
                     //parte immediatamente l'acquisizione
                     //azzero
