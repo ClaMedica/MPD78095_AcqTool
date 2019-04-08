@@ -31,6 +31,7 @@ MAcqManager::MAcqManager(QObject *parent)
 
     m_startAcqManuale = false; //non ancora premuto tasto start
     m_calibCella = "";
+    m_startWithZero = false;
 
 //Questa parte va fatta solo in caso di Pico, il file Config_Acq.xml viene creato nel main di Medica.
 //Negli altri casi il Config_Acq viene creato da Medica alla creazione del file in fase di acquisizione,
@@ -399,6 +400,7 @@ void MAcqManager::addDefiner(bool __startEnd, QVariantList __info)
 bool MAcqManager::sendStartAcq()
 {
     qDebug() << "sendStartAcq()";
+    m_startWithZero = true;
     return sendCommand(ETCP_CMD_START_WITH_ZERO);
 }
 
@@ -1133,14 +1135,35 @@ void MAcqManager::fillBuffers(QByteArray __block)
         for(int k = 0; k < numChan; k++) {
             in >> currChan;
             in >> numChanData;
-//            qDebug() << "currChan:" << currChan;
+            qDebug() << "currChan:" << currChan;
 
             if((currChan < maxNumChan) && (currChan >= 0)) {    //se e' un canale con del senso
                 if(m_bufferMap.keys().contains(QString::number(currChan))) {
                     for(int i = 0; i < numChanData; i++) {
                         in >> sample;
-                        m_bufferMap[QString::number(currChan)]->append(sample);
-                        //qDebug("samples(ch:%d, nd:%d):%f",currChan,numChanData,sample);
+                        QString tipo = "";
+                        foreach (QString type, m_HWChansMap.keys()) {
+                            if (m_HWChansMap[type].contains(QString::number(currChan)))
+                            {
+                                QStringList op = m_operationMap[type];
+                                QStringList opData = op[0].split("@");
+                                QString name = opData.at(0);
+                                if (name == "none")
+                                    tipo = type;
+                            }
+                        }
+                        qDebug()<<"TIPO"<< tipo<<m_startWithZero;
+                        if (tipo == "VV" && m_startWithZero && (sample < -0.11 || sample > 0.11))
+                        {
+                            qDebug()<<"LASCIO";
+                        }
+                        else
+                        {
+                            m_startWithZero = false;
+                                m_bufferMap[QString::number(currChan)]->append(sample);
+                                qDebug()<<"PRENDO";
+                        }
+                        qDebug("samples(ch:%d, nd:%d):%f",currChan,numChanData,sample);
                     }
 
                     //qDebug() << currChan << m_bufferMap[QString::number(currChan)]->size();
