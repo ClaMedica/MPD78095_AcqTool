@@ -1140,7 +1140,8 @@ void MAcqManager::fillBuffers(QByteArray __block)
             if((currChan < maxNumChan) && (currChan >= 0)) {    //se e' un canale con del senso
                 if(m_bufferMap.keys().contains(QString::number(currChan))) {
                     for(int i = 0; i < numChanData; i++) {
-                        in >> sample;
+                        in >> sample;                        
+
                         QString tipo = "";
                         foreach (QString type, m_HWChansMap.keys()) {
                             if (m_HWChansMap[type].contains(QString::number(currChan)))
@@ -1159,9 +1160,9 @@ void MAcqManager::fillBuffers(QByteArray __block)
                         }
                         else
                         {
-                            m_startWithZero = false;
-                                m_bufferMap[QString::number(currChan)]->append(sample);
-                                qDebug()<<"PRENDO";
+                            if (tipo == "VV") m_startWithZero = false;
+                            m_bufferMap[QString::number(currChan)]->append(sample);
+                            qDebug()<<"PRENDO";
                         }
                         qDebug("samples(ch:%d, nd:%d):%f",currChan,numChanData,sample);
                     }
