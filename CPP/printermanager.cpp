@@ -291,7 +291,7 @@ void printermanager::imageGraph(QString head, QString baset, double xscale, int 
 
     QFont savedFont, tfont;
     tfont = savedFont = imagePainter->font();
-    imageText(head, -1, false);
+    imageText(head, 12, true);
     tfont.setPixelSize(15);
     imagePainter->setFont(tfont);
     {
@@ -653,7 +653,7 @@ void printermanager::Intest()
 
     imageSetFont(tf_header20);
     rb.ry() = imagePt.ry() + tf_current.charH;
-    imagePainter->drawText(QRect(imagePt, rb), Qt::AlignCenter, tr("Urodynamic Equipment"));
+    imagePainter->drawText(QRect(imagePt, rb), Qt::AlignCenter, tr("UROFLOWMETER"));
     imagePt.ry() = rb.y() + 10;
 
     imagePt.ry() += 80;

@@ -1154,16 +1154,18 @@ void MAcqManager::fillBuffers(QByteArray __block)
                             }
                         }
                         qDebug()<<"TIPO"<< tipo<<m_startWithZero;
-                        if (tipo == "VV" && m_startWithZero && (sample < -0.11 || sample > 0.11))
-                        {
-                            qDebug()<<"LASCIO";
+
+                        if (tipo == "VV" && m_startWithZero) {
+                            if (!(sample <= -0.1 || sample >= 0.1))
+                                m_startWithZero = false;
                         }
-                        else
+                        if (!m_startWithZero)
                         {
-                            if (tipo == "VV") m_startWithZero = false;
                             m_bufferMap[QString::number(currChan)]->append(sample);
                             qDebug()<<"PRENDO";
                         }
+                        else qDebug()<<"lascio";
+
                         qDebug("samples(ch:%d, nd:%d):%f",currChan,numChanData,sample);
                     }
 
