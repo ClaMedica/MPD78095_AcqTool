@@ -37,6 +37,7 @@ void MDataMngPico::initPrinter()
 
 void MDataMngPico::sendToPrint()
 {
+    qDebug()<<"Check OTHER Load" << "sendToPrint() m_datiCalib:" << m_datiCalib;
     m_mngPrint->print(m_datiCalib);
     qDebug() << "stampato";
 }

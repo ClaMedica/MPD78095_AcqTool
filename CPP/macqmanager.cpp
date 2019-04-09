@@ -31,6 +31,7 @@ MAcqManager::MAcqManager(QObject *parent)
 
     m_startAcqManuale = false; //non ancora premuto tasto start
     m_calibCella = "";
+    m_startWithZero = false;
 
 //Questa parte va fatta solo in caso di Pico, il file Config_Acq.xml viene creato nel main di Medica.
 //Negli altri casi il Config_Acq viene creato da Medica alla creazione del file in fase di acquisizione,
@@ -236,6 +237,7 @@ bool MAcqManager::newAcquisition(QString __dataFile)
         handleDataFile();
 
         //dati di calibrazione
+        qDebug()<<"calibsave"<<m_calibCella;
         m_mng->SetOther(m_calibCella);
 
         //ripristino il file in acquisizione
@@ -398,6 +400,7 @@ void MAcqManager::addDefiner(bool __startEnd, QVariantList __info)
 bool MAcqManager::sendStartAcq()
 {
     qDebug() << "sendStartAcq()";
+    m_startWithZero = true;
     return sendCommand(ETCP_CMD_START_WITH_ZERO);
 }
 
@@ -596,7 +599,7 @@ void MAcqManager::handleTCP(SimpleTCPClient *__client, QByteArray __block)
         }
         else if(who == "CMD") {
             qDebug() << "CMD __block[4]" << __block[4];
-            if(__block[4] == '5') {
+            if(__block[4] == '5' && m_acqFileOpened) {
                 if(!m_saving) {
                     //parte immediatamente l'acquisizione
                     //azzero
@@ -1054,6 +1057,8 @@ void MAcqManager::applyOperations()
                         for (int i=0; i<m_lenDifFilter; i++)
                             somma += m_buffer_DigFilter.at(i)*COEFDigFilter[i];
                         double flusso = somma/m_sommaCoef;
+                        if (flusso > 100)
+                            flusso = 100;
                         m_channelMap[type].at(index)->append(flusso);
 
                     }
@@ -1130,14 +1135,38 @@ void MAcqManager::fillBuffers(QByteArray __block)
         for(int k = 0; k < numChan; k++) {
             in >> currChan;
             in >> numChanData;
-//            qDebug() << "currChan:" << currChan;
+            qDebug() << "currChan:" << currChan;
 
             if((currChan < maxNumChan) && (currChan >= 0)) {    //se e' un canale con del senso
                 if(m_bufferMap.keys().contains(QString::number(currChan))) {
                     for(int i = 0; i < numChanData; i++) {
-                        in >> sample;
-                        m_bufferMap[QString::number(currChan)]->append(sample);
-                        //qDebug("samples(ch:%d, nd:%d):%f",currChan,numChanData,sample);
+                        in >> sample;                        
+
+                        QString tipo = "";
+                        foreach (QString type, m_HWChansMap.keys()) {
+                            if (m_HWChansMap[type].contains(QString::number(currChan)))
+                            {
+                                QStringList op = m_operationMap[type];
+                                QStringList opData = op[0].split("@");
+                                QString name = opData.at(0);
+                                if (name == "none")
+                                    tipo = type;
+                            }
+                        }
+                        qDebug()<<"TIPO"<< tipo<<m_startWithZero;
+
+                        if (tipo == "VV" && m_startWithZero) {
+                            if (!(sample <= -0.1 || sample >= 0.1))
+                                m_startWithZero = false;
+                        }
+                        if (!m_startWithZero)
+                        {
+                            m_bufferMap[QString::number(currChan)]->append(sample);
+                            qDebug()<<"PRENDO";
+                        }
+                        else qDebug()<<"lascio";
+
+                        qDebug("samples(ch:%d, nd:%d):%f",currChan,numChanData,sample);
                     }
 
                     //qDebug() << currChan << m_bufferMap[QString::number(currChan)]->size();

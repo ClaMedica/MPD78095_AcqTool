@@ -166,6 +166,36 @@ void MDataManager::loadFile(QString __fileName)
         if (m_mng->GetPatient().section(";", 12, 12) == "F")
             m_sexPatient = true;
 
+        //dati calibrazione
+        //In questo caso se si decide di cambiare i file di esempio con esami acquisiti
+        //nuovi, non avremmo più necessita del controllo di seguito
+        m_datiCalib = "none";
+        QString otherString = m_mng->GetOther();
+        QStringList stringSplit = otherString.split(";");
+        if (otherString == "")
+        {
+            //inserisco dati calibrazione per esami vecchi
+            otherString = "none;";
+            m_mng->SetOther(otherString);
+            m_mng->CommitParameters();
+        }
+        else if (otherString.split(";").length() >= 2)
+        {
+            QString first = stringSplit.at(0);
+            if (first.contains("none") || first.length() > 5)
+            {
+                m_datiCalib = first;
+            }
+            else
+            {
+                QString newOther = "none;" + otherString;
+                m_mng->SetOther(newOther);
+                m_mng->CommitParameters();
+            }
+        }
+
+        qDebug()<<"Check OTHER Load"<<otherString << "cal:" << m_datiCalib;
+
         m_end = m_mng->GetDuration() / 1000;
         qDebug() << "Durata esame = " << m_end;
         qDebug() << "NA? di canali = "<< m_mng->GetChanNum();
@@ -313,7 +343,7 @@ void MDataManager::loadFile(QString __fileName)
         //------ Aggiungo i markers analitici, sono associati ad un definitore
         //con questo controllo evitiamo i problemi dovuti ad un salvataggio errato del file,
         //dove risulta nessun definitore ma markers analitici salvati
-
+#ifndef PICOFLOW
         if (numDefinitori > 0)
         {
             qDebug() << "Marker Analitici = " << m_mng->GetNumAnalyticalMarkers();
@@ -363,6 +393,7 @@ void MDataManager::loadFile(QString __fileName)
                 saveDataAndUpdate(family, name, mrkAnVec);
             }
         }
+#endif
 
         //        for(int32_t nc=0;nc<m_mng->GetChanNum();nc++)
         //        {
@@ -932,7 +963,7 @@ bool MDataManager::checkForVolRes()
 
     //gestione campo Other del file .pic
     QString otherString = m_mng->GetOther();
-    qDebug()<<"Check OTHER"<<otherString;
+    QStringList stringSplit = otherString.split(";");
     if (otherString.split(";").length() == 2)
     {
         otherString  += "0;" + QString::number(m_autoFlow) + ";";
@@ -945,8 +976,8 @@ bool MDataManager::checkForVolRes()
     }
     else
     {
-//        qDebug()<<"Check OTHER"<<otherString.split(";").at(1)<<otherString.split(";").at(2);
-        setValVolRes(otherString.split(";").at(1).toInt());
+        setValVolRes(stringSplit.at(1).toInt());
+        m_autoFlow = stringSplit.at(2).toInt();
         m_autoFlow = otherString.split(";").at(2).toInt();
     }
 
@@ -1304,7 +1335,7 @@ void MDataManager::InitPageGraphs(int __anaType)
         (void) def;
         bool ret = InitArraysFLW(evStart, evEnd, enCh, evMarkOpIn->value("num").toInt(), evAuto);
         (void) ret;
-
+#ifndef PICOFLOW
         //se gli anMarker li trovo per la prima volta li inserisco in grafica
         if (evAuto != 0) {
             VarMapVec *mrkAnVec = new VarMapVec;
@@ -1357,6 +1388,7 @@ void MDataManager::InitPageGraphs(int __anaType)
             updateInfoList();
             emit reloadingCompleted();
         }
+#endif
     }
 }
 

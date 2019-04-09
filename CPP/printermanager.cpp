@@ -85,6 +85,7 @@ printermanager::printermanager(QString __namefile, QObject *parent) : QObject(pa
     imageBm = QImage(imageQsz, QImage::Format_Mono);
     imagePainter = new QPainter(&imageBm);
     imageInit();
+    qDebug("fine init");
 }
 
 printermanager::~printermanager()
@@ -105,7 +106,7 @@ void printermanager::imageFontInit(T_Font &font, QString label, int size, QFont:
 
     imagePainter->setFont(font.qf);
     font.charH = imagePainter->fontMetrics().lineSpacing();
-    font.charW = imagePainter->fontMetrics().width('9');
+    font.charW = imagePainter->fontMetrics().width('A');
 
     imagePainter->setFont(tmp);
 }
@@ -148,6 +149,7 @@ void printermanager::imageInit()
     imageFontInit(tf_graphLand,  "Bitstream Vera Sans Mono",  8, QFont::Thin);
     imageFontInit(tf_infoLabel,  "Bitstream Vera Sans Mono", 12, QFont::Bold);
     imageFontInit(tf_infoValue,  "Bitstream Vera Sans Mono", 12, QFont::Normal);
+    imageFontInit(tf_calDate,    "Bitstream Vera Sans Mono",  9, QFont::Bold);
 
     tf_header20.qf.setUnderline(true);
 
@@ -291,7 +293,7 @@ void printermanager::imageGraph(QString head, QString baset, double xscale, int 
 
     QFont savedFont, tfont;
     tfont = savedFont = imagePainter->font();
-    imageText(head, -1, false);
+    imageText(head, 12, true);
     tfont.setPixelSize(15);
     imagePainter->setFont(tfont);
     {
@@ -333,13 +335,15 @@ void printermanager::imageGraph(QString head, QString baset, double xscale, int 
         imagePainter->setPen(Qt::SolidLine);
         imagePt = lb;
 
-//        QPoint * points = new QPoint[w];
-        QPoint points[103*8];
+        int f = 103*8;
+        if (w < f)
+            w = f;
+        QPoint * points = new QPoint[w];
         xscale *= (w / 752.0);
         imageGraphSingle(lb, points, m_num_sam, xscale, (double)h/maxL, bufL);
         if(maxR > 0)
             imageGraphSingle(lb, points, m_num_sam, xscale, (double)h/maxR, bufR);
-//        delete points;
+        delete points;
     }
     imagePainter->setFont(savedFont);
 
@@ -651,7 +655,7 @@ void printermanager::Intest()
 
     imageSetFont(tf_header20);
     rb.ry() = imagePt.ry() + tf_current.charH;
-    imagePainter->drawText(QRect(imagePt, rb), Qt::AlignCenter, tr("Urodynamic Equipment"));
+    imagePainter->drawText(QRect(imagePt, rb), Qt::AlignCenter, tr("UROFLOWMETER"));
     imagePt.ry() = rb.y() + 10;
 
     imagePt.ry() += 80;
@@ -819,7 +823,8 @@ void printermanager::Report_Real_TimeSingle(QString msg, QPoint * points, double
             imagePainter->drawLine(x, -(y0), x, -(y0 + 800));           // tratteggio vert. allineato a label
             imagePainter->setPen(Qt::SolidLine);
 
-            QString label = QString::number(i/10);                      // label multipli 10 secondi
+            int ndec = i / 10;                                          // label multipli 10 secondi
+            QString label = QString::number(ndec / 60) + ":" + QString::number(ndec % 60);
             x -= (tf_graphLand.charW * label.size()) / 2;
             int y = (y0 - dotXtratt - ch);
             imagePainter->drawText(x, -y, label);
@@ -913,7 +918,22 @@ void printermanager::Report_result()
     imagePt.rx() = 8;
     imagePt.ry() += tf_infoLabel.charH;
     imagePainter->drawLine(imagePt, QPoint(imageBm.width()-1-8, imagePt.ry()));
-    imagePt.ry() += tf_infoLabel.charH;
+
+    QString now;
+    now = "<< " + QDateTime::currentDateTime().toString("yyyy-MM-dd_hh:mm:ss") + " Rev: ? >>";
+    imageSetFont(tf_calDate);
+    imagePt.ry() += 1.5 * tf_calDate.charH;
+    imagePt.rx() = (102*8 - tf_calDate.charW *now.size()) / 2;
+    imagePainter->drawText(imagePt, now);
+    now = "<< " + tr("Calibration date") + ": " + m_datiCalib.replace(".weight", "") + " >>";
+    imagePt.ry() += tf_calDate.charH;
+    imagePt.rx() = (102*8 - tf_calDate.charW *now.size()) / 2;
+    imagePainter->drawText(imagePt, now);
+
+    imagePt.rx() = 8;
+    imagePt.ry() += tf_calDate.charH;
+    imagePainter->drawLine(imagePt, QPoint(imageBm.width()-1-8, imagePt.ry()));
+    imagePt.ry() += tf_calDate.charH;
 }
 
 #define NCOLORS 16*16*16
@@ -1077,9 +1097,7 @@ void printermanager::Calc_Max(double xscale)
     if (m_max_y <=  50) m_max_y =  50; else
     if (m_max_y <=  65) m_max_y =  65; else
     if (m_max_y <=  80) m_max_y =  80; else
-    if (m_max_y <= 100) m_max_y = 100; else
-    if (m_max_y <= 120) m_max_y = 120; else
-    m_max_y = 150;
+    m_max_y = 100;
 
     m_max_y_gr2 = ((long) ((m_max_vol + 10) / 100) + 1) * 100;	// 05 dicembre
 }
