@@ -117,7 +117,7 @@ private:
     QString m_name;
     QString m_surname;
     QString m_dateofbirth;
-    unsigned char  m_sex;				// M o F (+ eventualmente finestringa)
+    QString m_sex;				// M o F
     QString m_ID;
 
     //dati esame

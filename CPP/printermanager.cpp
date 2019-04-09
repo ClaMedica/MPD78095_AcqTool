@@ -376,8 +376,9 @@ void printermanager::print(QString __datiCalib)
     m_name = dataPaz.section(";", 0, 0);
     m_surname = dataPaz.section(";", 1, 1);
     m_dateofbirth = dataPaz.section(";", 2, 2);
-    m_sex = *(dataPaz.section(";", 12, 12).toLatin1().data());
+    m_sex = dataPaz.section(";", 12, 12);
     m_ID = dataPaz.section(";", 3, 3);
+    qDebug()<<"DATI PAZIENTE"<<dataPaz<<m_sex;
     //esame
     m_numchan = m_dfm->GetChanNum();
     m_numTest = m_dfm->GetTestNum();
@@ -623,7 +624,7 @@ void printermanager::Pri_Rep(double xscale)
     if(m_printLiverpool)
         Report_BitMap(false);           // Grafico Liverpool
 
-    if(m_printSiroky && m_sex != 'F')
+    if(m_printSiroky && m_sex != "F")
         Report_BitMap(true);            // Grafico Siroky, solo se paziente maschio oppure generico (sesso non indicato)
 
     // 	Risultati dell'esame ricavati dall'analisi semplificata, implementata nel firmware
@@ -687,7 +688,7 @@ void printermanager::Report_data()
     Report_row(tr("Surname ........: "), m_test_type ? puntini : m_surname);
     Report_row(tr("Name ...........: "), m_test_type ? puntini : m_name);
     Report_row(tr("Birth Date .....: "), m_test_type ? puntini : m_dateofbirth);
-    Report_row(tr("Gender .........: "), m_test_type ? puntini : QString(m_sex));
+    Report_row(tr("Gender .........: "), m_test_type ? puntini : m_sex);
     Report_row(tr("Investigator ...: "), puntini);
     Report_row(tr("Comments .......: "), puntini);
 

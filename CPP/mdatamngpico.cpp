@@ -77,8 +77,10 @@ void MDataMngPico::startPrint()
     m_mngPrint->setDetContrMax((float)(qRound(m_aflwdatas.at(0)->getVDetMax()*10))/10);
 
     //stampo
-    if (m_autoPrint)
+    if (m_autoPrint) {
         sendToPrint();
+        m_autoPrint = false; //non deve ristampare se l'utente riapre subito l'esame
+    }
 }
 
 

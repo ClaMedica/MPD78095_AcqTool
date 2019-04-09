@@ -976,9 +976,11 @@ bool MDataManager::checkForVolRes()
     }
     else
     {
+        //nel caso non fosse la prima volta che apro l'esame (appena dopo l'acquisizione)
+        //non devo considerare la stampa automatica
+        m_autoPrint =  false;
         setValVolRes(stringSplit.at(1).toInt());
         m_autoFlow = stringSplit.at(2).toInt();
-        m_autoFlow = otherString.split(";").at(2).toInt();
     }
 
     //ciclo per individuare se e necessario aprire la dlg del volume residuo
