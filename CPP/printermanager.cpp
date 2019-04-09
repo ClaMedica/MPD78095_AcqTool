@@ -85,6 +85,7 @@ printermanager::printermanager(QString __namefile, QObject *parent) : QObject(pa
     imageBm = QImage(imageQsz, QImage::Format_Mono);
     imagePainter = new QPainter(&imageBm);
     imageInit();
+    qDebug("fine init");
 }
 
 printermanager::~printermanager()
@@ -105,7 +106,7 @@ void printermanager::imageFontInit(T_Font &font, QString label, int size, QFont:
 
     imagePainter->setFont(font.qf);
     font.charH = imagePainter->fontMetrics().lineSpacing();
-    font.charW = imagePainter->fontMetrics().width('9');
+    font.charW = imagePainter->fontMetrics().width('A');
 
     imagePainter->setFont(tmp);
 }
@@ -148,6 +149,7 @@ void printermanager::imageInit()
     imageFontInit(tf_graphLand,  "Bitstream Vera Sans Mono",  8, QFont::Thin);
     imageFontInit(tf_infoLabel,  "Bitstream Vera Sans Mono", 12, QFont::Bold);
     imageFontInit(tf_infoValue,  "Bitstream Vera Sans Mono", 12, QFont::Normal);
+    imageFontInit(tf_calDate,    "Bitstream Vera Sans Mono",  9, QFont::Bold);
 
     tf_header20.qf.setUnderline(true);
 
@@ -912,21 +914,25 @@ void printermanager::Report_result()
         imageSetFont(tf_infoValue); imagePainter->drawText(imagePt, txstrList.at(i+1));
     }
 
-    QString now;
-    now = "<< " + QDateTime::currentDateTime().toString("yyyy-MM-dd_hh:mm:ss") + " Rev: ? >>";
-    imageSetFont(tf_infoLabel);
-    imagePt.ry() += 2*tf_infoLabel.charH;
-    imagePt.rx() = (103*8 - tf_graphPortr.charW *now.size()) / 2;
-    imagePainter->drawText(imagePt, now);
-    now = "<< " + tr("Calibration date") + ": " + m_datiCalib.replace(".weight", "") + " >>";
-    imagePt.ry() += tf_infoLabel.charH;
-    imagePt.rx() = (103*8 - tf_graphPortr.charW *now.size()) / 2;
-    imagePainter->drawText(imagePt, now);
-
     imagePt.rx() = 8;
     imagePt.ry() += tf_infoLabel.charH;
     imagePainter->drawLine(imagePt, QPoint(imageBm.width()-1-8, imagePt.ry()));
-    imagePt.ry() += tf_infoLabel.charH;
+
+    QString now;
+    now = "<< " + QDateTime::currentDateTime().toString("yyyy-MM-dd_hh:mm:ss") + " Rev: ? >>";
+    imageSetFont(tf_calDate);
+    imagePt.ry() += 1.5 * tf_calDate.charH;
+    imagePt.rx() = (102*8 - tf_calDate.charW *now.size()) / 2;
+    imagePainter->drawText(imagePt, now);
+    now = "<< " + tr("Calibration date") + ": " + m_datiCalib.replace(".weight", "") + " >>";
+    imagePt.ry() += tf_calDate.charH;
+    imagePt.rx() = (102*8 - tf_calDate.charW *now.size()) / 2;
+    imagePainter->drawText(imagePt, now);
+
+    imagePt.rx() = 8;
+    imagePt.ry() += tf_calDate.charH;
+    imagePainter->drawLine(imagePt, QPoint(imageBm.width()-1-8, imagePt.ry()));
+    imagePt.ry() += tf_calDate.charH;
 }
 
 #define NCOLORS 16*16*16
