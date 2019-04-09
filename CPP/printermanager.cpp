@@ -730,7 +730,8 @@ void printermanager::Report_emg(double xscale)
     Calc_Max_EMG();
     qDebug() << "m_max_emg:" << m_max_emg << "m_max_y:" << m_max_y;
 
-    imageGraph(QString("   EMG ( uV )              ")+tr(" EMG Diagram "),
+    QString EMGTitle = " EMG (uV)             "+tr("EMG Diagram");
+    imageGraph(EMGTitle,
                str_label_time[m_i_max_x],
                xscale,
                m_max_y,
