@@ -179,12 +179,12 @@ void MDataManager::loadFile(QString __fileName)
             m_mng->SetOther(otherString);
             m_mng->CommitParameters();
         }
-        else if (otherString.split(";").length() == 2)
+        else if (otherString.split(";").length() >= 2)
         {
             QString first = stringSplit.at(0);
             if (first.contains("none") || first.length() > 5)
             {
-                m_datiCalib = otherString;
+                m_datiCalib = first;
             }
             else
             {
@@ -194,7 +194,7 @@ void MDataManager::loadFile(QString __fileName)
             }
         }
 
-        qDebug()<<"Check OTHER Load"<<otherString;
+        qDebug()<<"Check OTHER Load"<<otherString << "cal:" << m_datiCalib;
 
         m_end = m_mng->GetDuration() / 1000;
         qDebug() << "Durata esame = " << m_end;
@@ -978,6 +978,7 @@ bool MDataManager::checkForVolRes()
     {
         setValVolRes(stringSplit.at(1).toInt());
         m_autoFlow = stringSplit.at(2).toInt();
+        m_autoFlow = otherString.split(";").at(2).toInt();
     }
 
     //ciclo per individuare se e necessario aprire la dlg del volume residuo
@@ -1032,6 +1033,7 @@ qDebug() << "INIZIO";
     //mi salvo nel campo other il valore del volume residuo nel caso l'utente lo avesse cambiato
     QString other = m_mng->GetOther();
     QStringList otherList = other.split(";");
+    m_datiCalib = other.at(0);//stringa per dati calibrazione da stampare
     other.clear();
     int valResOld = otherList.at(1).toInt();
     int valResNew = getValVolRes();
@@ -1039,6 +1041,7 @@ qDebug() << "INIZIO";
         otherList[1] = QString::number(valResNew);
         for (int j=0; j<otherList.length()-1;j++)
             other += otherList.at(j) + ";";
+        qDebug()<<"OTHER ANALISI"<<other;
         m_mng->SetOther(other);
         m_mng->CommitParameters();
         setToSave("");  //necessario chiedere se salvare

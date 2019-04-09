@@ -85,7 +85,8 @@ public:
                  tf_graphLand,
                  tf_infoLabel,
                  tf_infoValue,
-                 tf_header;
+                 tf_header,
+                 tf_calDate;
 
     QSize        imageQsz;
     QImage       imageBm;
