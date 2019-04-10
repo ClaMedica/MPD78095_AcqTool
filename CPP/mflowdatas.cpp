@@ -88,7 +88,7 @@ void mflowdatas::buildTable()
     m_datasInfo->setData(count+12,"value",QString::number((float)(qRound(getVDetMax()*10))/10, 'f', 1));
 
     m_datasInfo->setData(count+13,"descr",tr(" Residual volume (ml)"));
-    m_datasInfo->setData(count+13,"value",QString::number(getResidualVolume(), 'f', 1));
+    m_datasInfo->setData(count+13,"value",QString::number(getResidualVolume(), 'f', 0));
 
 }
 

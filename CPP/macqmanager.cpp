@@ -30,14 +30,19 @@ MAcqManager::MAcqManager(QObject *parent)
 
 
     m_startAcqManuale = false; //non ancora premuto tasto start
+    m_calibCella = "";
+    m_startWithZero = false;
 
-
+//Questa parte va fatta solo in caso di Pico, il file Config_Acq.xml viene creato nel main di Medica.
+//Negli altri casi il Config_Acq viene creato da Medica alla creazione del file in fase di acquisizione,
+//a seconda del protocollo scelto e della scheda di acquisizione. Di conseguenza in questa parte di codice
+//il file di config_acq non esiste ancora e queste istruzioni vanno effettuate nella funzione NewAcquisition
+#ifdef PICOFLOW
     if(!m_configAcq.loadFromXML(g_P7SettingsManager.progPath() + "/Config_Acq.xml"))
         qCritical() << "Error on acq configuration file";
     //carico info di connettivitA
     loadConnectivityInfo(m_configAcq.getSafeChild(XML_CONNECTIONS));
 
-#ifdef PICOFLOW
     QTimer::singleShot(1000, this, SLOT(connectToServers()));
 
     //connetto il gestore degli allarmi alla proprietA  alarms
@@ -83,7 +88,7 @@ MAcqManager::~MAcqManager()
 
 void MAcqManager::udpBtDecode(enum WHO __from, QByteArray __msg)
 {
-   // qDebug() << __from << __msg;
+//    qDebug() << __from << __msg;
 
     switch(__from) {
     case E_SUP:
@@ -91,6 +96,10 @@ void MAcqManager::udpBtDecode(enum WHO __from, QByteArray __msg)
                 if((__msg.at(0) == 'R') && (__msg == "Restarted")) emit udpBtRestarted();
                 if((__msg.at(0) == 'U') && (__msg == "UseBt"))     emit udpBtUsable(true);
                 if((__msg.at(0) == 'N') && (__msg == "NoBt"))      emit udpBtUsable(false);
+                if((__msg.at(0) == 'C') && (__msg.startsWith("CALIB:"))) {
+                    m_calibCella = __msg.mid(6) + ";";
+                    qDebug() << "calibration data:" << m_calibCella;
+                }
                 break;
     case E_PRN:
                 if((__msg.at(0) == 'R') && (__msg == "Ready"))     emit udpPrnStatus(__msg.at(0));
@@ -227,11 +236,14 @@ bool MAcqManager::newAcquisition(QString __dataFile)
         qDebug() << "Updating datafile...";
         handleDataFile();
 
+        //dati di calibrazione
+        qDebug()<<"calibsave"<<m_calibCella;
+        m_mng->SetOther(m_calibCella);
+
         //ripristino il file in acquisizione
         bool res = m_mng->Continue();
         qDebug() << "Continue ..." << res;
 
-//        m_oldState = 255;
         m_newStateQ.clear();
 
         //dico a medica di salvare il file nel db
@@ -244,7 +256,7 @@ bool MAcqManager::newAcquisition(QString __dataFile)
         m_alarmMng.manageAlarm(ALA_NOT_ACQUIRING, DISABLE);
 
 
-        //mi connetto ai server del supe e del programma di gestione archivi
+        //connessioni
         connectToServers();
     }
     //faccio partire il timer per l'allarme di stato
@@ -314,6 +326,9 @@ void MAcqManager::endAcquisition(bool discard)
         qDebug() << m_mng->GetFileName() << m_mng->GetFileType() << m_mng->GetChanNum() ;
         bool cvres = m_mng->CommitValues();
         qDebug() << "Commit Values?" << cvres;
+        cvres = m_mng->CommitParameters();
+        qDebug() << "Commit Parameters?" << cvres;
+
     }
 
     m_acqFileOpened = false;    //nessuna acquisizione in atto
@@ -352,18 +367,26 @@ void MAcqManager::endAcquisition(bool discard)
 }
 
 void MAcqManager::addMarker(QVariant __key)
-{
+{    
     if(m_acqFileOpened) {
-        VarMap mrk;
-        mrk = m_markerMap[__key];
+        float sec = (float) m_mng->GetSamplesNumber(0) / m_mng->GetNAS(0);
+        //lo inserisco solo se non siamo all'inizio
+        //se fossimo all'inizio vuol dire che è capitato di prendere il messaggio di riconnessione BT
+        //dopo una chiusura del file a allo start di nuova acquisizione
+        if (sec > 0)
+        {
+            VarMap mrk;
+            mrk = m_markerMap[__key];
+            mrk["val"] = sec;
+            m_acqMarker.append(mrk);
 
-        m_mng->AppendOpMarker(mrk[ATT_KEY].toUInt(), mrk[ATT_DESCR].toString());
+            m_mng->AppendOpMarker(mrk[ATT_KEY].toUInt(), mrk[ATT_DESCR].toString());
 
-        mrk["val"] = (float) m_mng->GetSamplesNumber(0) / m_mng->GetNAS(0);
-        m_acqMarker.append(mrk);
-        updateAcqData();
 
-        qDebug() << "Marker key:" << mrk["key"] << "appended at" << mrk["val"].toString() << "sec";
+            updateAcqData();
+
+            qDebug() << "Marker key:" << mrk["key"] << "appended at" << mrk["val"].toString() << "sec";
+        }
     }
 }
 
@@ -377,6 +400,7 @@ void MAcqManager::addDefiner(bool __startEnd, QVariantList __info)
 bool MAcqManager::sendStartAcq()
 {
     qDebug() << "sendStartAcq()";
+    m_startWithZero = true;
     return sendCommand(ETCP_CMD_START_WITH_ZERO);
 }
 
@@ -575,7 +599,7 @@ void MAcqManager::handleTCP(SimpleTCPClient *__client, QByteArray __block)
         }
         else if(who == "CMD") {
             qDebug() << "CMD __block[4]" << __block[4];
-            if(__block[4] == '5') {
+            if(__block[4] == '5' && m_acqFileOpened) {
                 if(!m_saving) {
                     //parte immediatamente l'acquisizione
                     //azzero
@@ -654,6 +678,8 @@ void MAcqManager::analyzeStatus(uint8_t __currState, bool __isBT)
     static const char * names[] = { "st_IDLE_NOT_CONNECTED", "st_IDLE_CONNECTED", "st_ACQUIRING" };
     qDebug("new:%s olstate:%s %s", names[__currState], names[m_oldState], __isBT ? "BT" : "Cavo");
 
+    static bool interruption = false;
+
     switch(__currState)
     {
     case ESTATE_IDLE_NOT_CONNECTED:
@@ -662,8 +688,10 @@ void MAcqManager::analyzeStatus(uint8_t __currState, bool __isBT)
             m_alarmMng.startTimeoutAlarm(ALA_NOT_CONNECTED, 1000);
 
         //quando durante un'acquisizione si spegne la cella
-        if(m_oldState == ESTATE_ACQUIRING)
+        if(m_oldState == ESTATE_ACQUIRING) {
             m_alarmMng.addAlarm(ALA_NOT_CONNECTED);
+            interruption = true;
+        }
         break;
 
     case ESTATE_IDLE_CONNECTED:
@@ -672,14 +700,26 @@ void MAcqManager::analyzeStatus(uint8_t __currState, bool __isBT)
             m_alarmMng.stopTimeoutAlarm(ALA_NOT_CONNECTED);
 
         //se improvvisamente non acquisisco più
-        if(m_oldState == ESTATE_ACQUIRING)
+        if(m_oldState == ESTATE_ACQUIRING){
             m_alarmMng.addAlarm(ALA_NOT_ACQUIRING);
+            interruption = true;
+        }
 
         break;
 
     case ESTATE_ACQUIRING:
         //inizio acquisizione attivo allarme "non sto acquisendo"
-        if(m_oldState == ESTATE_IDLE_CONNECTED) {
+        if(m_oldState == ESTATE_IDLE_CONNECTED || m_oldState == ESTATE_IDLE_NOT_CONNECTED) {
+            //se c'è stata un'interruzione di connessione (vera o dovuta a apri/chiudi review)
+            if (interruption){
+                interruption = false;
+                //e un 'esame aperto (interruzione vera)
+                if (m_acqFileOpened){
+                    //devo inserire il marker di sistema per acquisizione interrotta
+                    qDebug()<<"inserisco marker per interruzione";
+                    addMarker(MRK_E3);
+                }
+            }
             //avviso l'utente che l'acquisizione è ripartita
             resetAlarms();
             emit systemInAcqStatus();
@@ -1017,6 +1057,8 @@ void MAcqManager::applyOperations()
                         for (int i=0; i<m_lenDifFilter; i++)
                             somma += m_buffer_DigFilter.at(i)*COEFDigFilter[i];
                         double flusso = somma/m_sommaCoef;
+                        if (flusso > 100)
+                            flusso = 100;
                         m_channelMap[type].at(index)->append(flusso);
 
                     }
@@ -1093,14 +1135,36 @@ void MAcqManager::fillBuffers(QByteArray __block)
         for(int k = 0; k < numChan; k++) {
             in >> currChan;
             in >> numChanData;
-//            qDebug() << "currChan:" << currChan;
+            qDebug() << "currChan:" << currChan;
 
             if((currChan < maxNumChan) && (currChan >= 0)) {    //se e' un canale con del senso
                 if(m_bufferMap.keys().contains(QString::number(currChan))) {
                     for(int i = 0; i < numChanData; i++) {
-                        in >> sample;
-                        m_bufferMap[QString::number(currChan)]->append(sample);
-                        //qDebug("samples(ch:%d, nd:%d):%f",currChan,numChanData,sample);
+                        in >> sample;                        
+
+                        QString tipo = "";
+                        foreach (QString type, m_HWChansMap.keys()) {
+                            if (m_HWChansMap[type].contains(QString::number(currChan)))
+                            {
+                                QStringList op = m_operationMap[type];
+                                QStringList opData = op[0].split("@");
+                                QString name = opData.at(0);
+                                if (name == "none")
+                                    tipo = type;
+                            }
+                        }
+
+                        if (tipo == "VV" && m_startWithZero) {
+                            if (!(sample <= -0.1 || sample >= 0.1))
+                                m_startWithZero = false;
+                        }
+
+                        if (!m_startWithZero)
+                        {
+                            m_bufferMap[QString::number(currChan)]->append(sample);
+                            qDebug("samples(ch:%d, nd:%d):%f",currChan,numChanData,sample);
+                        }
+
                     }
 
                     //qDebug() << currChan << m_bufferMap[QString::number(currChan)]->size();

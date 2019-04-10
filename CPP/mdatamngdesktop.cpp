@@ -351,9 +351,11 @@ void MDataMngDesktop::startPrint()
     xmlFile->close();
     delete xmlFile;
 
-    //stampo
-    if (m_autoPrint)
+    //stampo: apro il file in word
+    if (m_autoPrint) {
         openReport();
+        m_autoPrint = false; //non deve ristampare se l'utente riapre subito l'esame
+    }
 }
 
 void MDataMngDesktop::exitFromReview()

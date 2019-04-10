@@ -37,7 +37,8 @@ void MDataMngPico::initPrinter()
 
 void MDataMngPico::sendToPrint()
 {
-    m_mngPrint->print();
+    qDebug()<<"Check OTHER Load" << "sendToPrint() m_datiCalib:" << m_datiCalib;
+    m_mngPrint->print(m_datiCalib);
     qDebug() << "stampato";
 }
 
@@ -76,34 +77,35 @@ void MDataMngPico::startPrint()
     m_mngPrint->setDetContrMax((float)(qRound(m_aflwdatas.at(0)->getVDetMax()*10))/10);
 
     //stampo
-    if (m_autoPrint)
+    if (m_autoPrint) {
         sendToPrint();
+        m_autoPrint = false; //non deve ristampare se l'utente riapre subito l'esame
+    }
 }
 
 
 void MDataMngPico::sendPrintTest()
 {
-    qDebug() << "inizio stampa";
-    udpConn.sendPrn("print:/root/PicoFlow/urodata/UDSData/printTest.prn");
+//    udpConn.sendSup("Print:/root/PicoFlow/urodata/UDSData/printTest.prn");
 }
 
 void MDataMngPico::udpMdmBtDecode(enum WHO __from, QByteArray __msg)
 {
-   qDebug() << "udpMdmBtDecode" << __from << __msg;
+ //  qDebug() << "udpMdmBtDecode" << __from << __msg;
 
     char cmd = __msg.at(0);
     switch(__from) {
     case E_SUP:
-                if((cmd == 'S') && (__msg == "Suspended")) emit udpMdmBtStatus(__from, cmd);
-                if((cmd == 'R') && (__msg == "Restarted")) emit udpMdmBtStatus(__from, cmd);
-                if((cmd == 'U') && (__msg == "UseBt"))     emit udpMdmBtStatus(__from, cmd);
-                if((cmd == 'N') && (__msg == "NoBt"))      emit udpMdmBtStatus(__from, cmd);
+//                if((cmd == 'S') && (__msg == "Suspended")) emit udpMdmBtStatus(__from, cmd);
+//                if((cmd == 'R') && (__msg == "Restarted")) emit udpMdmBtStatus(__from, cmd);
+//                if((cmd == 'U') && (__msg == "UseBt"))     emit udpMdmBtStatus(__from, cmd);
+//                if((cmd == 'N') && (__msg == "NoBt"))      emit udpMdmBtStatus(__from, cmd);
                 if((cmd == 'q') && __msg.startsWith("queue:")) spoolerQueueLen = __msg.remove(0,6).toInt();
                 break;
     case E_PRN:
-                if((cmd == 'R') && (__msg == "Ready"))     emit udpMdmPrnStatus(__from, cmd);
-                if((cmd == 'F') && (__msg == "Fail"))      emit udpMdmPrnStatus(__from, cmd);
-                if((cmd == 'D') && (__msg == "Done"))      emit udpMdmPrnStatus(__from, cmd);
+//                if((cmd == 'R') && (__msg == "Ready"))     emit udpMdmPrnStatus(__from, cmd);
+//                if((cmd == 'F') && (__msg == "Fail"))      emit udpMdmPrnStatus(__from, cmd);
+//                if((cmd == 'D') && (__msg == "Done"))      emit udpMdmPrnStatus(__from, cmd);
                 break;
     case E_MED:
                 break;
@@ -114,7 +116,7 @@ void MDataMngPico::udpMdmBtDecode(enum WHO __from, QByteArray __msg)
 
 void MDataMngPico::exitFromReview()
 {
-    qDebug() << "Exit" << getToSave();
+   qDebug() << "Exit" << getToSave();
 
     //devo resettare il parametro di flusso automatico a false per non far partire sempre l'analisi in automatico all'apertura in review di un file
     Ancestry *autoflow = m_configUser.getSafeChild("AutomaticFlow");
@@ -127,38 +129,24 @@ void MDataMngPico::exitFromReview()
         m_configUser.saveToXML(configUser);
     }
 
-    if (getToSave() == "ret") {
-        //if (m_mngPrint != NULL) m_mngPrint->closePrinter(); NON SERVE PIU' CON LA VERSIONE QIMAGE
+    if (getToSave() == "ret")  //non ci sono state modifiche
+    {
         qDebug()<<"cancellata copia all'exit"<<QFile::remove(m_copyFileName);
 
         send_Command(5);   // STARTBT
         g_mainAppBridge->sendExitReview();
         g_mainAppBridge->sendSwitch();  //send(MEX_SHOW);
-
-        return;
     }
-
-    if (getToSave() == "")
-        emit sg_exitFromReview();
-    else
+    else //devo salvare
     {
-      //  if (m_mngPrint != NULL) m_mngPrint->closePrinter(); NON SERVE PIU' CON LA VERSIONE QIMAGE
-        if (getToSave() == "yes")
+        //copio il file copy nell'originale
+        if (QFile::exists(m_copyFileName))
         {
-            //copio il file copy nell'originale
-            if (QFile::exists(m_copyFileName))
-            {
-                saveChanges();
-                qDebug()<<"cancello vecchio file"<<QFile::remove(m_fileName);
-                qDebug()<<"copio le modifiche"<<QFile::rename(m_copyFileName,m_fileName);
-            }
+            saveChanges();
+            qDebug()<<"cancello vecchio file"<<QFile::remove(m_fileName);
+            qDebug()<<"copio le modifiche"<<QFile::rename(m_copyFileName,m_fileName);
         }
-        else //"no"
-        {
-            //cancello il file copy
-            qDebug()<<"cancellata copia all'exit"<<QFile::remove(m_copyFileName);
 
-        }
         send_Command(5);   // STARTBT
         g_mainAppBridge->sendExitReview();
         g_mainAppBridge->sendSwitch(); //poi dovra tornare al modulo database

@@ -29,6 +29,8 @@ MDataManager::MDataManager(QObject *parent)
     m_secondHead = "Pico Flow 2";
     m_etaPatient = -1;
 
+    m_datiCalib = "";
+
     setValVolRes(-999);
 }
 
@@ -103,6 +105,7 @@ void MDataManager::loadFile(QString __fileName)
         QFile::remove(m_copyFileName);
     }
     QFile::copy(m_fileName, m_copyFileName);
+    m_toSave = "ret";//quando lo apro non devo salvare niente
 
     //devo pulire tutti i vettori utilizzati
     resetAll();
@@ -162,10 +165,41 @@ void MDataManager::loadFile(QString __fileName)
         if (m_mng->GetPatient().section(";", 12, 12) == "F")
             m_sexPatient = true;
 
+        //dati calibrazione
+        //In questo caso se si decide di cambiare i file di esempio con esami acquisiti
+        //nuovi, non avremmo più necessita del controllo di seguito
+        m_datiCalib = "none";
+        QString otherString = m_mng->GetOther();
+        QStringList stringSplit = otherString.split(";");
+        if (otherString == "")
+        {
+            //inserisco dati calibrazione per esami vecchi
+            otherString = "none;";
+            m_mng->SetOther(otherString);
+            m_mng->CommitParameters();
+        }
+        else if (otherString.split(";").length() >= 2)
+        {
+            QString first = stringSplit.at(0);
+            if (first.contains("none") || first.length() > 5)
+            {
+                m_datiCalib = first;
+            }
+            else
+            {
+                QString newOther = "none;" + otherString;
+                m_mng->SetOther(newOther);
+                m_mng->CommitParameters();
+            }
+        }
+
+        qDebug()<<"Check OTHER Load"<<otherString << "cal:" << m_datiCalib;
+
         m_end = m_mng->GetDuration() / 1000;
         qDebug() << "Durata esame = " << m_end;
         m_numChannels = m_mng->GetChanNum();
         qDebug() << "NA? di canali = "<< m_numChannels;
+
 
         //------ Aggiungo i markers operativi, sono comuni a tutti i canali
 
@@ -179,10 +213,12 @@ void MDataManager::loadFile(QString __fileName)
 //            qDebug() << numSamp[2];
 //            qDebug() << numSamp[3];
             double val = (double) numSamp[0] / m_mng->GetNAS(0);
-            qDebug() << "Marker" << key << val;
+            qDebug() << "Marker" << key << val << descr;
 
             if(m_markerMap.keys().contains(key)) {   //marker conosciuto le info ce le ho giA
                 (*mrk) = m_markerMap[key];
+                if ((*mrk)[ATT_TYPE] == 2)//di sistema
+                    (*mrk)["lock"] = true;
             }
             else {  //me lo costruisco
                 (*mrk)["code"] = "USR";
@@ -307,6 +343,7 @@ void MDataManager::loadFile(QString __fileName)
         //------ Aggiungo i markers analitici, sono associati ad un definitore
         //con questo controllo evitiamo i problemi dovuti ad un salvataggio errato del file,
         //dove risulta nessun definitore ma markers analitici salvati
+#ifndef PICOFLOW
         if (numDefinitori > 0)
         {
             qDebug() << "Marker Analitici = " << m_mng->GetNumAnalyticalMarkers();
@@ -356,6 +393,7 @@ void MDataManager::loadFile(QString __fileName)
                 saveDataAndUpdate(family, name, mrkAnVec);
             }
         }
+#endif
 
         //        for(int32_t nc=0;nc<m_numChannels;nc++)
         //        {
@@ -926,10 +964,10 @@ bool MDataManager::checkForVolRes()
 
     //gestione campo Other del file .pic
     QString otherString = m_mng->GetOther();
-
-    if (otherString == "")
+    QStringList stringSplit = otherString.split(";");
+    if (otherString.split(";").length() == 2)
     {
-        otherString  = "0;" + QString::number(m_autoFlow) + ";";
+        otherString  += "0;" + QString::number(m_autoFlow) + ";";
         setValVolRes(0);
         m_mng->SetOther(otherString);
         m_mng->CommitParameters();
@@ -939,8 +977,11 @@ bool MDataManager::checkForVolRes()
     }
     else
     {
-        setValVolRes(otherString.split(";").at(0).toInt());
-        m_autoFlow = otherString.split(";").at(1).toInt();
+        //nel caso non fosse la prima volta che apro l'esame (appena dopo l'acquisizione)
+        //non devo considerare la stampa automatica
+        m_autoPrint =  false;
+        setValVolRes(stringSplit.at(1).toInt());
+        m_autoFlow = stringSplit.at(2).toInt();
     }
 
     //ciclo per individuare se e necessario aprire la dlg del volume residuo
@@ -995,14 +1036,15 @@ qDebug() << "INIZIO";
     //mi salvo nel campo other il valore del volume residuo nel caso l'utente lo avesse cambiato
     QString other = m_mng->GetOther();
     QStringList otherList = other.split(";");
+    m_datiCalib = other.at(0);//stringa per dati calibrazione da stampare
     other.clear();
-    int valResOld = otherList.at(0).toInt();
+    int valResOld = otherList.at(1).toInt();
     int valResNew = getValVolRes();
     if (valResNew != valResOld) {
-        otherList[0] = QString::number(valResNew);
+        otherList[1] = QString::number(valResNew);
         for (int j=0; j<otherList.length()-1;j++)
             other += otherList.at(j) + ";";
-
+        qDebug()<<"OTHER ANALISI"<<other;
         m_mng->SetOther(other);
         m_mng->CommitParameters();
         setToSave("");  //necessario chiedere se salvare
@@ -1292,7 +1334,7 @@ void MDataManager::InitPageGraphs(int __anaType)
         (void) def;
         bool ret = InitArraysFLW(evStart, evEnd, enCh, evMarkOpIn->value("num").toInt(), evAuto);
         (void) ret;
-
+#ifndef PICOFLOW
         //se gli anMarker li trovo per la prima volta li inserisco in grafica
         if (evAuto != 0) {
             VarMapVec *mrkAnVec = new VarMapVec;
@@ -1345,6 +1387,7 @@ void MDataManager::InitPageGraphs(int __anaType)
             updateInfoList();
             emit reloadingCompleted();
         }
+#endif
     }
 }
 

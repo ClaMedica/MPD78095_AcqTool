@@ -133,6 +133,10 @@ private:
 
     //codice software
     int m_codSoft;
+    //stringa calibrazione
+    QString m_calibCella;
+    //bool per sapere se è stato mandato uno startwithzero
+    bool m_startWithZero;
 };
 
 

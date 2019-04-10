@@ -138,6 +138,7 @@ protected:
     QString m_fileName;
     QString m_copyFileName;
     int m_testNumber;
+    QString m_datiCalib;
     int m_numChannels;
 
     MStorage m_storage;

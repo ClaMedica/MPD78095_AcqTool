@@ -316,15 +316,17 @@ MForm {
             }
 
             pagesSameAna[firstPageSameAna].visible = true
+            btnPrint.dataSent = false
             timPrint.start()
         }
     }
 
     Timer{
         id:timPrint
-        interval:1000
+        interval:500
         onTriggered: {
             mngData.startPrint()
+            btnPrint.dataSent = true
         }
     }
 
@@ -332,6 +334,7 @@ MForm {
 
     MButton{
         id: btnPrint
+        property bool dataSent: true
         text: qsTr("print")
         anchors.left: parent.left
         anchors.bottom: parent.bottom
@@ -341,7 +344,7 @@ MForm {
         height: screenH*grafic.valueOf("Button","height")
         labelSize: grafic.valueOf("Button","labelSize")
         visible: PicoFlow ? true : false
-        enabled: PicoFlow ? mngData.getSpoolerQueueLen() === 0 : false
+        enabled: PicoFlow ? mngData.getSpoolerQueueLen() === 0 && dataSent : false
         onClicked: {
             console.log("do print")
             mngData.sendToPrint()
@@ -364,26 +367,46 @@ MForm {
         }
     }
 
+
     MButton {
         id:btnBack
         text: qsTr("back to graphs")
-        anchors.right: parent.right
         anchors.bottom: parent.bottom
         anchors.bottomMargin: 10
-        anchors.rightMargin: 10
+        anchors.horizontalCenter: parent.horizontalCenter
         width:  screenW*grafic.valueOf("Button","width")
         height: screenH*grafic.valueOf("Button","height")
         labelSize: grafic.valueOf("Button","labelSize")//layout.value("F4")
-        onClicked: {            
-            for (var i = 0; i < pagesLocal.length; i++) {
-                if (pagesLocal[i].visible)
-                    pagesLocal[i].visible = false;
-            }
-            forAna.visible = true
-            resultForm.visible = false
-            timBtAvail = true
-            btStopped = false
+        onClicked:exitFromResult()
+    }
+
+    MButton{
+        id: btnExit
+        text: qsTr("exit")
+        anchors.right: parent.right
+        anchors.bottom: parent.bottom
+        anchors.bottomMargin: 10
+        anchors.leftMargin: 10
+        width: screenW*grafic.valueOf("Button","width")
+        height: screenH*grafic.valueOf("Button","height")
+        labelSize: grafic.valueOf("Button","labelSize")
+        onClicked: {
+            exitFromResult()
+            mngData.exitFromReview()
         }
     }
+
+    function exitFromResult()
+    {
+        for (var i = 0; i < pagesLocal.length; i++) {
+            if (pagesLocal[i].visible)
+                pagesLocal[i].visible = false;
+        }
+        forAna.visible = true
+        resultForm.visible = false
+        timBtAvail = true
+        btStopped = false
+    }
+
 }
 
