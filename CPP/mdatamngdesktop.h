@@ -19,6 +19,7 @@ signals:
 public slots:
     void openReport();
     void addOpMarker(QVariant __key, QVariant __posX);
+    void addDefiner(QVariant __key, QVector<double> __pos);
     QString getNameOfObj(QVariantList __whoAmI);
     void startPrint();
     void exitFromReview();

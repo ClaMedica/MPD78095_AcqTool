@@ -83,6 +83,7 @@ MForm{
         plotProp:mngCon.plotSetting
 
         property real opMarkerKey: -1
+        property real definerKey: -1
         //@@@@@@@@@@    Events          @@@@@@@@@@
 
         onCurObjChanged: {
@@ -97,9 +98,13 @@ MForm{
         }
 
         onOpMarkerPosChanged:{
-            //console.log("Analysi insert opmarker",opMarkerPos)
-            mngData.addOpMarker(opMarkerKey,opMarkerPos);
+            mngData.addOpMarker(opMarkerKey,opMarkerPos)
         }
+
+        onDefinerPosChanged:{
+            mngData.addDefiner(definerKey,definerPos)
+        }
+
     }
 
     MLabel{
@@ -157,7 +162,7 @@ MForm{
         delegate: MMarkerButton {
             onClick: {
                 plot.newDefiner = true
-
+                plot.definerKey = value
             }
         }
         visible: PicoFlow ? false : true

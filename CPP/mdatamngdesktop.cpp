@@ -86,6 +86,55 @@ void MDataMngDesktop::addOpMarker(QVariant __key,QVariant __posX)
     emit reloadingCompleted();
 }
 
+void MDataMngDesktop::addDefiner(QVariant __key, QVector<double> __pos)
+{
+    //prendo il definer corrispondete al __key
+    VarMap defKey = m_markerMap[__key];
+    VarMapVec* elements = m_storage.getAll(CAT_DEFINER);
+    QVariantList En;
+    int posQ = -1, posV = -1;
+    int i = 0;
+    foreach(MSignal *sig, m_signalVector) {
+        QString name = sig->getName();
+        if (name.startsWith("Q"))
+            posQ = i;
+        if (name.startsWith("VV") || name ==  "VLMv")
+            posV = i;
+        i++;
+    }
+
+    for (int i = 0; i < m_numChannels; i++)
+        En << 0;
+
+    En[posQ] = 1;
+    if (posV > -1)
+        En[posV] = 1;
+
+    QString family = "Definers";
+    QString name = defKey.value(ATT_DESCR).toString();
+    VarMap *def = new VarMap;
+    (*def)["key"] = __key;
+    (*def)["family"] = family;
+    (*def)["name"] = name;
+    (*def)["xMin"] = __pos[0];
+    (*def)["xMax"] = __pos[2];
+    (*def)["yMin"] = __pos[1];
+    (*def)["yMax"] = __pos[3];
+    (*def)["num"] = elements->length();
+    (*def)["enCh"] = En;
+    (*def)["descr"] = name;
+    (*def)["color"] = COLOR_DEFINER;
+    (*def)["category"] = CAT_DEFINER;
+    (*def)["resizeable"] = 1;
+
+    VarMapVec *defVec = new VarMapVec;
+    defVec->append(def);
+    saveDataAndUpdate(family, name, defVec);
+
+    updateInfoList();
+    emit reloadingCompleted();
+}
+
 void MDataMngDesktop::openReport()
 {
     QLibrary reportLib("MedicalReport.dll");

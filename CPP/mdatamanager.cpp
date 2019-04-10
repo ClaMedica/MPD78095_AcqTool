@@ -12,6 +12,7 @@ MDataManager::MDataManager(QObject *parent)
     m_copy = NULL;
     m_currentSignalName = "custom_signal";
     m_pCurrentSignal = NULL;
+    m_numChannels = 0;
 
     m_end = 3600;   //fine esame di default a 1 ora
 
@@ -43,8 +44,6 @@ MDataManager::~MDataManager()
         m_ana = NULL;
     }
 }
-
-
 
 void MDataManager::setInfoList(QVariantList __list)
 {
@@ -165,7 +164,8 @@ void MDataManager::loadFile(QString __fileName)
 
         m_end = m_mng->GetDuration() / 1000;
         qDebug() << "Durata esame = " << m_end;
-        qDebug() << "NA? di canali = "<< m_mng->GetChanNum();
+        m_numChannels = m_mng->GetChanNum();
+        qDebug() << "NA? di canali = "<< m_numChannels;
 
         //------ Aggiungo i markers operativi, sono comuni a tutti i canali
 
@@ -208,7 +208,7 @@ void MDataManager::loadFile(QString __fileName)
         //------Aggiungo i canali
         qDebug()<<"aggiungo i canali";
 
-        for(int h = 0; h < m_mng->GetChanNum(); h++) {
+        for(int h = 0; h < m_numChannels; h++) {
             MSignal *sig  = new MSignal;
             sig->resize(m_mng->GetSamplesNumber(h));
             for(int i = 0; i < m_mng->GetSamplesNumber(h); i++)
@@ -266,7 +266,7 @@ void MDataManager::loadFile(QString __fileName)
         for(int i = 0; i < numDefinitori; i++) {
             VarMap *def = new VarMap;
             m_mng->GetOpMarkerAn(i, &key, tStart, tEnd, chEn, &descr);
-            for(int nc = 0; nc < m_mng->GetChanNum(); nc++)
+            for(int nc = 0; nc < m_numChannels; nc++)
                 defEn[i] << chEn[nc];
 
             (*def)["key"] = key;
@@ -295,7 +295,7 @@ void MDataManager::loadFile(QString __fileName)
         //mi genera un crash dell'acqtool alla ripaertura dell'esame analizzato
         //il ciclo associa i definitori ai canali abilitati
         //non so se mi servirà in seguito
-/*        for(int nc = 0; nc < m_mng->GetChanNum(); nc++) {
+/*        for(int nc = 0; nc < m_numChannels; nc++) {
             VarMapVec *subVec = new VarMapVec;
             for(int i = 0; i < m_mng->GetNumDefiners(); i++)
                 if(defEn[i].at(nc).toBool())
@@ -357,7 +357,7 @@ void MDataManager::loadFile(QString __fileName)
             }
         }
 
-        //        for(int32_t nc=0;nc<m_mng->GetChanNum();nc++)
+        //        for(int32_t nc=0;nc<m_numChannels;nc++)
         //        {
         //            VarMapVec *subVec=new VarMapVec;
         //            for(i=0;i<numChVec.size();i++)
@@ -493,8 +493,8 @@ void MDataManager::saveChanges()
         qDebug() << "Inizio salvataggio";
 
         QVector<int32_t> numCamp;
-        numCamp.resize(m_copy->GetChanNum());
-        for(int i = 0; i < m_copy->GetChanNum(); i++)
+        numCamp.resize(m_numChannels);
+        for(int i = 0; i < m_numChannels; i++)
             numCamp[i] = curMap->value("val").toFloat() * m_copy->GetNAS(i) + 0.5;
 
         if(curMap->value("color").toString() == COLOR_OPERATIVE) {
@@ -514,11 +514,11 @@ void MDataManager::saveChanges()
 
     foreach (VarMap *curMap, (*elements)) {
         qDebug() << "Inizio salvataggio definer";
-        int32_t * start = new int32_t[m_copy->GetChanNum()];
-        int32_t * end   = new int32_t[m_copy->GetChanNum()];
-        unsigned char *enCh = new unsigned char[m_copy->GetChanNum()];
+        int32_t * start = new int32_t[m_numChannels];
+        int32_t * end   = new int32_t[m_numChannels];
+        unsigned char *enCh = new unsigned char[m_numChannels];
 
-        for(int i = 0; i < m_copy->GetChanNum(); i++) {
+        for(int i = 0; i < m_numChannels; i++) {
             start[i] = curMap->value("xMin").toFloat() * m_copy->GetNAS(i);
             end[i]   = curMap->value("xMax").toFloat() * m_copy->GetNAS(i);
             enCh[i]  = curMap->value("enCh").toList().at(i).toBool();
@@ -902,6 +902,7 @@ bool MDataManager::saveDataAndUpdate(QString __family, QString __name, VarMapVec
             if(!m_data[__family].contains(__name))
                 m_data[__family].append(__name);
         updateAvailableData();
+        setToSave("");  //necessario chiedere se salvare
         return true;
     }
     else
@@ -1021,9 +1022,7 @@ qDebug() << "INIZIO";
             bool found = false;
             VarMapVec* elements = m_storage.getAll(CAT_DEFINER);
             foreach (VarMap *curMap, (*elements)) {
-                QChar tempChar = curMap->value("key").toChar();
-                unsigned char key = tempChar.toLatin1();
-                if (key == MK_FLOWMETRY) {
+                if (curMap->value("key") == MK_FLOWMETRY) {
                     mkOpAnIn = *curMap;
                     found = true;
                 }
@@ -1048,7 +1047,7 @@ qDebug() << "INIZIO";
                 if ((m_numAna == 1) || (posQ > -1)) {
                     //se non c'e' il defintore, ma questa e' l'unica analisi,
                     //viene inserito automaticamente sul canale del flusso.
-                    for (int i = 0; i < m_mng->GetChanNum(); i++)
+                    for (int i = 0; i < m_numChannels; i++)
                         En << 0;
 
                     En[posQ] = 1;
@@ -1070,7 +1069,7 @@ qDebug() << "INIZIO";
                     (*def)["num"] = elements->length();
                     (*def)["enCh"] = En;
                     (*def)["descr"] = name;
-                    (*def)["color"] = "green";
+                    (*def)["color"] = COLOR_DEFINER;
                     (*def)["category"] = CAT_DEFINER;
                     (*def)["resizeable"] = 1;
 
@@ -1101,7 +1100,7 @@ qDebug() << "INIZIO";
                 //                            if (key == MK_FREEFLOW)
                 //                            {
                 //                                int defEnd = m_end;
-                //                                for (int i=0;i<m_mng->GetChanNum();i++)
+                //                                for (int i=0;i<m_numChannels;i++)
                 //                                    En << 0;
 
                 //                                En[posQ] = 1;
@@ -1239,9 +1238,7 @@ void MDataManager::InitPageGraphs(int __anaType)
 
         VarMapVec* elements = m_storage.getAll(CAT_DEFINER);
         foreach (VarMap *curMap, (*elements)) {
-            QChar tempChar = curMap->value("key").toChar();
-            unsigned char key = tempChar.toLatin1();
-            if (key == MK_FLOWMETRY) {
+            if (curMap->value("key") == MK_FLOWMETRY) {
                 evStart = curMap->value("xMin").toInt()*1000;
                 evEnd = curMap->value("xMax").toInt()*1000;
                 evMarkOpIn = curMap;
@@ -1264,7 +1261,7 @@ void MDataManager::InitPageGraphs(int __anaType)
 
 
 
-                for(int i = 0; i < m_mng->GetChanNum(); i++)
+                for(int i = 0; i < m_numChannels; i++)
                     enCh.append(curMap->value("enCh").toList().at(i).toBool());
 
                 // marker analitici

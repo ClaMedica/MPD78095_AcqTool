@@ -95,8 +95,6 @@ public slots:
     QStringList getLinks(QString __what, QStringList __filterFamily=QStringList(), QStringList __filterType=QStringList());
 
 private:
-    QVector<MSignal *> m_signalVector;
-
     QMap<QString,QStringList> m_data;
 
     QStringList m_availableData,
@@ -112,8 +110,6 @@ private:
     float m_end;
 
     DatafileManager *m_copy;
-
-    MStorage m_storage;
 
     QMap<QString,QStringList> m_modelMap;
 
@@ -142,6 +138,10 @@ protected:
     QString m_fileName;
     QString m_copyFileName;
     int m_testNumber;
+    int m_numChannels;
+
+    MStorage m_storage;
+    QVector<MSignal *> m_signalVector;
 
     int     m_autoFlow;     //Modalita dell'esame 0=auto; 2=manual
     bool    m_Siroky;       //se stampare Siroky
