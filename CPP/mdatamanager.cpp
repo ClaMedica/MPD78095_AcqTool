@@ -179,7 +179,7 @@ void MDataManager::loadFile(QString __fileName)
             m_mng->SetOther(otherString);
             m_mng->CommitParameters();
         }
-        else if (otherString.split(";").length() >= 2)
+        else if (stringSplit.length() >= 2)
         {
             QString first = stringSplit.at(0);
             if (first.contains("none") || first.length() > 5)
@@ -194,7 +194,7 @@ void MDataManager::loadFile(QString __fileName)
             }
         }
 
-        qDebug()<<"Check OTHER Load"<<otherString << "cal:" << m_datiCalib;
+        qDebug()<<"Check OTHER Load"<<otherString << "calib:" << m_datiCalib;
 
         m_end = m_mng->GetDuration() / 1000;
         qDebug() << "Durata esame = " << m_end;
