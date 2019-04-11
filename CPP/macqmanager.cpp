@@ -1,5 +1,7 @@
 ﻿#include "macqmanager.h"
 
+QString g_calibCella;
+
 MAcqManager::MAcqManager(QObject *parent)
 {
     (void) parent;
@@ -97,8 +99,8 @@ void MAcqManager::udpBtDecode(enum WHO __from, QByteArray __msg)
                 if((__msg.at(0) == 'U') && (__msg == "UseBt"))     emit udpBtUsable(true);
                 if((__msg.at(0) == 'N') && (__msg == "NoBt"))      emit udpBtUsable(false);
                 if((__msg.at(0) == 'C') && (__msg.startsWith("CALIB:"))) {
-                    m_calibCella = __msg.mid(6) + ";";
-                    qDebug() << "calibration data:" << m_calibCella;
+                    g_calibCella = __msg.mid(6) + ";";
+                    qDebug() << "calibration data:" << g_calibCella;
                 }
                 break;
     case E_PRN:
@@ -237,8 +239,8 @@ bool MAcqManager::newAcquisition(QString __dataFile)
         handleDataFile();
 
         //dati di calibrazione
-        qDebug()<<"calibsave"<<m_calibCella;
-        m_mng->SetOther(m_calibCella);
+        qDebug()<<"calibsave"<<g_calibCella;
+        m_mng->SetOther(g_calibCella);
 
         //ripristino il file in acquisizione
         bool res = m_mng->Continue();
