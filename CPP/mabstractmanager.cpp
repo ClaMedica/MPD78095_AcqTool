@@ -221,6 +221,32 @@ QVariantList MAbstractManager::definersInfo()
     return list;
 }
 
+QVariantList MAbstractManager::actionsInfo()
+{
+    //leggiamo il file di configurazione e riempiamo le info
+    QVariantList list;
+
+//    //spazio vuoto
+//   list << "$GridElement";
+//   list << "descr" << "";
+//   list << "img" << "";
+//   list << "key" << 0;
+//   list << "visible" << false;
+//   list << "&GridElement";
+
+//    //aggiungo pulsante cancella markers analiti
+
+   list << "$GridElement";
+   list << "descr" << tr("delete analytical markers");
+   list << "img" << "qrc:/danger";
+   list << "key" << 116;
+   list << "visible" << true;
+   list << "&GridElement";
+
+    return list;
+}
+
+
 QVariantList MAbstractManager::commandsInfo()
 {
     QVariantList list;
@@ -265,21 +291,29 @@ QVariantList MAbstractManager::commandsInfo()
     list << "visible" << true;
     list << "&GridElement";
 
-     //spazio vuoto
-    list << "$GridElement";
-    list << "descr" << "";
-    list << "img" << "";
-    list << "key" << 0;
-    list << "visible" << false;
-    list << "&GridElement";
+    for (int i=0; i<2; i++)
+    {
+        //spazio vuoto
+        list << "$GridElement";
+        list << "descr" << "";
+        list << "img" << "";
+        list << "key" << 0;
+        list << "visible" << false;
+        list << "&GridElement";
+    }
 
-    //spazio vuoto
-    list << "$GridElement";
-    list << "descr" << "";
-    list << "img" << "";
-    list << "key" << 0;
-    list << "visible" << false;
-    list << "&GridElement";
+#ifndef PICOFLOW
+    for (int i=0; i<11; i++)
+    {
+        //spazio vuoto
+        list << "$GridElement";
+        list << "descr" << "";
+        list << "img" << "";
+        list << "key" << 0;
+        list << "visible" << false;
+        list << "&GridElement";
+    }
+#endif
 
     //salva e chiudi
     list << "$GridElement";

@@ -59,6 +59,7 @@ ApplicationWindow {
                  mngData.loadFile("/mnt/sdcard/Medica/pv000461A.pic")
              forAna.setMarkersInfo(mngData.markersInfo("type", [1, 6]))
              forAna.setDefinersInfo(mngData.definersInfo())
+             forAna.setActionsInfo(mngData.actionsInfo())
              forAna.setCommandsInfo(mngData.commandsInfo())
          }
          console.log("Application Ready!")

@@ -54,6 +54,12 @@ MForm{
         gridDefiners.items=info
     }
 
+    function setActionsInfo(info)
+    {
+        console.log(info)
+        gridActions.items=info
+    }
+
     function setCommandsInfo(info)
     {
         console.log(info)
@@ -67,8 +73,6 @@ MForm{
         plot.completed=true;
         mngCon.read()
     }
-
-
 
     //@@@@@@@@@@    Objects     @@@@@@@@@@
     MPlot2DStack{
@@ -146,6 +150,17 @@ MForm{
                 plot.opMarkerKey = value
                 plot.newOpMarker = true
             }
+            onTooltipActive: {
+                if (testo === "")
+                    toolTip.visible = false
+                else
+                {
+                    toolTip.y = posY
+                    toolTip.text = testo
+                    toolTip.grid = gridMarker
+                    toolTip.visible = true
+                }
+            }
         }
         visible: PicoFlow ? false : true
     }
@@ -155,7 +170,7 @@ MForm{
         id:gridDefiners
         anchors.right: gridMarker.left
         anchors.top: parent.top
-        anchors.bottom: parent.bottom
+        anchors.bottom: rectBreak.top
         width:PicoFlow ? 0 : 60
         owner:"Definers"
         itemsInRow:1
@@ -163,6 +178,57 @@ MForm{
             onClick: {
                 plot.newDefiner = true
                 plot.definerKey = value
+            }
+            onTooltipActive: {
+                if (testo === "")
+                    toolTip.visible = false
+                else
+                {
+                    toolTip.y = posY
+                    toolTip.text = testo
+                    toolTip.grid = gridDefiners
+                    toolTip.visible = true
+                }
+            }
+        }
+        visible: PicoFlow ? false : true
+    }
+
+    Rectangle
+    {
+        id: rectBreak
+        height: 2
+        width: 60
+        anchors.right: gridMarker.left
+        y: PicoFlow ? parent.height : parent.height/2
+        color: "black"
+        visible: true
+    }
+
+    MGridView{
+        //@@@@@@@@@@    Properties      @@@@@@@@@@
+        id:gridActions
+        anchors.right: gridMarker.left
+        anchors.top: rectBreak.bottom
+        anchors.bottom: parent.bottom
+        width:PicoFlow ? 0 : 60
+
+        owner:"Actions"
+        itemsInRow:1
+        delegate: MMarkerButton {
+            onClick: {
+                mngData.deleteAnMArkers()
+            }
+            onTooltipActive: {
+                if (testo === "")
+                    toolTip.visible = false
+                else
+                {
+                    toolTip.y = gridDefiners.height + posY
+                    toolTip.text = testo
+                    toolTip.grid = gridActions
+                    toolTip.visible = true
+                }
             }
         }
         visible: PicoFlow ? false : true
@@ -196,7 +262,6 @@ MForm{
                 }
 
                 if (value === "112") {
-//                    if (PicoFlow) restartBt()
                     mngData.exitFromReview()
                 }
 
@@ -219,6 +284,7 @@ MForm{
                 {
                     toolTip.y = posY
                     toolTip.text = testo
+                    toolTip.grid = gridComand
                     toolTip.visible = true
                 }
             }
@@ -230,10 +296,18 @@ MForm{
 
     Rectangle{
         property string text: ""
+        property var grid:gridComand
         id: toolTip
         width: toolTipText.width *1.1
         height: toolTipText.height *1.1
-        anchors.right: gridDefiners.left
+        anchors.right: {
+            if (grid === gridComand)
+                gridDefiners.left
+            else if (grid === gridDefiners || grid === gridActions)
+                gridMarker.left
+            else if (grid === gridMarker)
+                rootAna.right
+        }
         y: 0
         color: "whitesmoke"
         border.color: "blue"

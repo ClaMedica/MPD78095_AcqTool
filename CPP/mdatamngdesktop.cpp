@@ -135,6 +135,23 @@ void MDataMngDesktop::addDefiner(QVariant __key, QVector<double> __pos)
     emit reloadingCompleted();
 }
 
+void MDataMngDesktop::deleteAnMArkers()
+{
+    //-Cancellazione tutti AnMarkers
+    VarMapVec *elements = m_storage.getAll(CAT_MARKER);
+
+    foreach (VarMap *curMap, (*elements)) {
+        if((curMap->value("color").toString() == COLOR_ANALYTICAL) && (curMap->value("visible").toBool() == true))
+        {
+            QVariantList mrk;
+            mrk.append((qulonglong)curMap);
+            changeObject(mrk);
+        }
+    }
+    qDebug() << "Fine cancello tuttu gli anmarker";
+
+}
+
 void MDataMngDesktop::openReport()
 {
     QLibrary reportLib("MedicalReport.dll");

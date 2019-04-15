@@ -33,6 +33,7 @@ public:
                                          QVariantList __filterValues = QVariantList());
     Q_INVOKABLE QVariantList commandsInfo();
     Q_INVOKABLE QVariantList definersInfo();
+    Q_INVOKABLE QVariantList actionsInfo();
     Q_INVOKABLE QVariantList acqInfo();
 
     Q_PROPERTY(QString patientInfo READ patientInfo NOTIFY patientInfoChanged)

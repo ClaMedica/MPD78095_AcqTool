@@ -27,5 +27,8 @@
         <file>discard_off.png</file>
         <file>cmDefFlo_click.jpg</file>
         <file>cmDefFlo_off.jpg</file>
+        <file>danger.png</file>
+        <file>danger_click.png</file>
+        <file>danger_off.png</file>
     </qresource>
 </RCC>
