@@ -1,7 +1,5 @@
 ﻿#include "macqmanager.h"
 
-QString g_calibCella;
-
 MAcqManager::MAcqManager(QObject *parent)
 {
     (void) parent;
@@ -99,8 +97,8 @@ void MAcqManager::udpBtDecode(enum WHO __from, QByteArray __msg)
                 if((__msg.at(0) == 'U') && (__msg == "UseBt"))     emit udpBtUsable(true);
                 if((__msg.at(0) == 'N') && (__msg == "NoBt"))      emit udpBtUsable(false);
                 if((__msg.at(0) == 'C') && (__msg.startsWith("CALIB:"))) {
-                    g_calibCella = __msg.mid(6) + ";";
-                    qDebug() << "calibration data:" << g_calibCella;
+                    m_calibCella = __msg.mid(6) + ";";
+                    qDebug() << "calibration data:" << m_calibCella;
                 }
                 break;
     case E_PRN:
@@ -239,8 +237,8 @@ bool MAcqManager::newAcquisition(QString __dataFile)
         handleDataFile();
 
         //dati di calibrazione
-        qDebug()<<"calibsave"<<g_calibCella;
-        m_mng->SetOther(g_calibCella);
+        qDebug()<<"calibsave"<<m_calibCella;
+        m_mng->SetOther(m_calibCella);
 
         //ripristino il file in acquisizione
         bool res = m_mng->Continue();
@@ -325,6 +323,8 @@ void MAcqManager::endAcquisition(bool discard)
 
     if(m_acqFileOpened)    //se siamo in acq facciamo un commit
     {
+        m_mng->SetOther(m_calibCella);
+        qDebug() << "m_calibCella:" << m_calibCella;
         qDebug() << m_mng->GetFileName() << m_mng->GetFileType() << m_mng->GetChanNum() ;
         bool cvres = m_mng->CommitValues();
         qDebug() << "Commit Values?" << cvres;
