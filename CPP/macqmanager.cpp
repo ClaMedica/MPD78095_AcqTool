@@ -403,14 +403,19 @@ bool MAcqManager::sendStartAcq()
 {
     qDebug() << "sendStartAcq()";
     m_startWithZero = true;
-    return sendCommand(ETCP_CMD_START_WITH_ZERO);
+    bool ret = sendCommand(ETCP_CMD_START_WITH_ZERO);
+    system("/root/PicoFlow/beep 15");
+    udpConn.sendSup("ButtonStStEnable");
+    return ret;
 }
 
 bool MAcqManager::sendStopAcq()
 {
     qDebug() << "sendStopAcq()";
     m_alarmMng.manageAlarm(ALA_NOT_ACQUIRING, DISABLE);
-    return sendCommand(ETCP_CMD_STOP);
+    bool ret = sendCommand(ETCP_CMD_STOP);
+    udpConn.sendSup("ButtonStStDisable");
+    return ret;
 }
 
 void MAcqManager::resetAlarms()
