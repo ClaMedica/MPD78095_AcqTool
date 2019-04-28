@@ -18,6 +18,7 @@ MDataManager::MDataManager(QObject *parent)
 
     m_analized = false;
     m_autoPrint = false;
+    m_autoFlow = 2;
     m_Siroky = false;
     m_Liverpool = false;
     m_landscape = false;
@@ -94,8 +95,8 @@ void MDataManager::loadFile(QString __fileName)
     }
 
     m_fileName = __fileName;
-    QString path = m_fileName.left(m_fileName.lastIndexOf("\\"));
-    m_pathData = path.left(path.lastIndexOf("/")+1);
+    m_pathData = m_fileName.left(m_fileName.lastIndexOf("/")+1);
+
 
     //la prima volta che salvo mi faccio la copia del file originale
     m_copyFileName = m_fileName;
