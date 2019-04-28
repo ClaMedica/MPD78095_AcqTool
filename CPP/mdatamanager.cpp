@@ -179,10 +179,10 @@ void MDataManager::loadFile(QString __fileName)
             m_mng->SetOther(otherString);
             m_mng->CommitParameters();
         }
-        else if (otherString.split(";").length() >= 2)
+        else if (stringSplit.length() >= 2)
         {
             QString first = stringSplit.at(0);
-            if (first.contains("none") || first.length() > 5)
+            if (first.contains("none") || first.length() >= 5)  // giorgio >=
             {
                 m_datiCalib = first;
             }
@@ -194,7 +194,7 @@ void MDataManager::loadFile(QString __fileName)
             }
         }
 
-        qDebug()<<"Check OTHER Load"<<otherString << "cal:" << m_datiCalib;
+        qDebug()<<"Check OTHER Load"<<otherString << "calib:" << m_datiCalib;
 
         m_end = m_mng->GetDuration() / 1000;
         qDebug() << "Durata esame = " << m_end;
@@ -966,7 +966,8 @@ bool MDataManager::checkForVolRes()
     //gestione campo Other del file .pic
     QString otherString = m_mng->GetOther();
     QStringList stringSplit = otherString.split(";");
-    if (otherString.split(";").length() == 2)
+    qDebug() << "m_mng->GetOther() ==" << otherString;
+    if (stringSplit.length() == 2)
     {
         otherString  += "0;" + QString::number(m_autoFlow) + ";";
         setValVolRes(0);
@@ -1037,7 +1038,8 @@ qDebug() << "INIZIO";
     //mi salvo nel campo other il valore del volume residuo nel caso l'utente lo avesse cambiato
     QString other = m_mng->GetOther();
     QStringList otherList = other.split(";");
-    m_datiCalib = other.at(0);//stringa per dati calibrazione da stampare
+    m_datiCalib = otherList.at(0);//stringa per dati calibrazione da stampare
+    qDebug() << "m_mng->GetOther() ==" << other;
     other.clear();
     int valResOld = otherList.at(1).toInt();
     int valResNew = getValVolRes();

@@ -288,6 +288,7 @@ void printermanager::imageText(QString txt, int fontSize, bool restoreFont)
 
 void printermanager::imageGraph(QString head, QString baset, double xscale, int maxL, int maxR, double *bufL, double *bufR)
 {
+    qDebug()<<"head,baset,xscale:"<<head<<baset<<xscale;
     QStringList baseLst = baset.split(" ", QString::SkipEmptyParts);
     imagePt.rx() = 5;
 
@@ -303,7 +304,7 @@ void printermanager::imageGraph(QString head, QString baset, double xscale, int 
         int digitsW = imagePainter->fontMetrics().width("9999");
         int left = (digitsW + 1);
         int h = 240;
-        int w = (imageQsz.width()-imagePt.rx()) - (left + digitsW+5 /* destra */ );
+        int w = (imageQsz.width()-imagePt.rx()) - (left + digitsW+5 /* destra */ ); // logical width
         qDebug("digitsW:%d w:%d",digitsW,w);
 
         QPoint lt(imagePt.rx() + left, imagePt.ry());         // leftTop
@@ -335,11 +336,15 @@ void printermanager::imageGraph(QString head, QString baset, double xscale, int 
         imagePainter->setPen(Qt::SolidLine);
         imagePt = lb;
 
-        int f = 103*8;
-        if (w < f)
-            w = f;
+//        xscale *= (w / 752.0);
+        if(m_printMode == PORTRAIT_MODE) {
+            const int f = 103*8;  // max physical pixel
+            if (w < f)
+                w = f;
+            xscale = ((double)(NUMOF_X_PRINT_DOTS) / w);
+        }
         QPoint * points = new QPoint[w];
-        xscale *= (w / 752.0);
+        qDebug()<<"w,m_num_sam:"<<w<<m_num_sam<<" --> xscale:"<<xscale;
         imageGraphSingle(lb, points, m_num_sam, xscale, (double)h/maxL, bufL);
         if(maxR > 0)
             imageGraphSingle(lb, points, m_num_sam, xscale, (double)h/maxR, bufR);
@@ -352,6 +357,7 @@ void printermanager::imageGraph(QString head, QString baset, double xscale, int 
 
 void printermanager::imageGraphSingle(QPoint leftBottom, QPoint *pts, int npts, double kx, double ky, double *bufV)
 {
+    qDebug()<<"npts,kx:"<<npts<<kx;
     for (int ix = 0; ix < npts; ix++ ) {
         int x = leftBottom.rx() + (int)(kx * ix);
         int y = leftBottom.ry() - (int)(ky * bufV[ix]);
@@ -605,19 +611,22 @@ questa funzione gestisce tutta la stampa del report, sia in modalita portrait ch
 #include "QApplication"
 void printermanager::Pri_Rep(double xscale)
 {
+    qDebug("xscale:%f",xscale);
     Intest();       // Intestazione
     Report_data();  // scrive i dati del paziente e lo spazio per le note manuali
 
     // Grafico FLW + VOL ed eventualmente EMG
     if(m_printMode == PORTRAIT_MODE) {			// grafico trasversale con numero di punti fisso
+        qDebug("Pri_Rep Portrait");
         Report_flw(xscale);	// stampa grafici di volume e flusso
         if(m_emgPresent)
             Report_emg(xscale);						// EMG
     }
     else {              // print_mode = LANDSCAPE_MODE - grafico longitudinale, con lunghezza legata alla lunghezza dell'esame
+        qDebug("Pri_Rep Landscape");
         m_max_y = Calc_Max_Flw();			// fondo scala del flusso
         Calc_Max_RealReport_rel2(m_num_sam);
-        Report_Real_Time(xscale);
+        Report_Real_Time(/*xscale*/ 1.0);
     }
     qDebug() << "dopo Report XXX";
 
@@ -798,6 +807,7 @@ void printermanager::Report_Real_TimeSingle(QString msg, QPoint * points, double
     int cw  = tf_graphLand.charW;
     int ch  = tf_graphLand.charH;
     int txtW = cw * QString("9999 ml/s").size() + 10;               // larghezza label piu lunga
+    int freqXscale = FREQ_ACQ * 0.8;
 
     imagePainter->drawText(txtW-20, -(y0), "0");                    // stampo lo zero senza udm
     imagePainter->drawText(txtW+5, -(y0+n_dots-ch-2), msg);         // stampo lo zero senza udm
@@ -813,31 +823,31 @@ void printermanager::Report_Real_TimeSingle(QString msg, QPoint * points, double
     imagePainter->drawLine(txtW, -y0, txtW + boxW*xscale, -y0);     // riga orizz. dello 0
 
     if(y0 == 0) {
-        for(int i = FREQ_ACQ; i < boxW; i += FREQ_ACQ) {
-            int x = txtW + i*xscale;
+        for(int i = freqXscale; i < boxW; i += freqXscale) {
+            int x = txtW + i;
             imagePainter->drawLine(x, -(y0), x, -(y0 - dotXtratt));     // trattini verticali dei secondi
         }
-        for(int i = (10*FREQ_ACQ); i < boxW; i += (10*FREQ_ACQ)) {
-            int x = txtW + i*xscale;
+        for(int i = (10*freqXscale); i < boxW; i += (10*freqXscale)) {
+            int x = txtW + i;
             imagePainter->drawLine(x, -(y0), x, -(y0 - dotXtratt*2));   // trattini verticali multipli 10 secondi
 
             imagePainter->setPen(Qt::DotLine);
             imagePainter->drawLine(x, -(y0), x, -(y0 + 800));           // tratteggio vert. allineato a label
             imagePainter->setPen(Qt::SolidLine);
 
-            int ndec = i / 10;                                          // label multipli 10 secondi
+            int ndec = (i / 0.8) / 10;                                          // label multipli 10 secondi
             QString label = QString::number(ndec / 60) + ":" + QString::number(ndec % 60);
             x -= (tf_graphLand.charW * label.size()) / 2;
             int y = (y0 - dotXtratt - ch);
             imagePainter->drawText(x, -y, label);
         }
-        int x = txtW + m_num_sam*xscale;
+        int x = txtW + m_num_sam ;
         imagePainter->setPen(Qt::DashLine);
         imagePainter->drawLine(x, -(y0), x, -(y0 + 800));               // tratteggio fine esame
         imagePainter->setPen(Qt::SolidLine);
     }
 
-    imageGraphSingle(QPoint(txtW,-y0), points, m_num_sam, xscale, n_dots/(double)max_val, buffer);
+    imageGraphSingle(QPoint(txtW,-y0), points, m_num_sam, 1.0, n_dots/(double)max_val, buffer);
 }
 
 /**
@@ -907,7 +917,6 @@ void printermanager::Report_result()
     txstrList.append(tr("Flow acceleration ...........")); txstrList.append(QString::asprintf(" : %5.1f ml/s^2"    , m_flu_acc));    //?=2 apice
     txstrList.append(tr("Maximum contraction speed ...")); txstrList.append(QString::asprintf(" : %5.1f mm/s"      , m_vDetMax));
     txstrList.append(tr("Residual volume .............")); txstrList.append(QString::asprintf(" : %5.0f ml"        , (double) m_resVol ));
-    txstrList.append(tr("Calibration date.............")); txstrList.append(QString::asprintf(" : %s"              , m_datiCalib.toLatin1().data() ));
 
     for(int i = 0; i < txstrList.size(); i += 2) {
         imagePt.rx() = 8;
@@ -922,7 +931,7 @@ void printermanager::Report_result()
     imagePainter->drawLine(imagePt, QPoint(imageBm.width()-1-8, imagePt.ry()));
 
     QString now;
-    now = "<< " + QDateTime::currentDateTime().toString("yyyy-MM-dd_hh:mm:ss") + " Rev: ? >>";
+    now = "<< " + QDateTime::currentDateTime().toString("yyyy-MM-dd_hh:mm:ss") + " Rev: 1.0.0.13 >>";
     imageSetFont(tf_calDate);
     imagePt.ry() += 1.5 * tf_calDate.charH;
     imagePt.rx() = (102*8 - tf_calDate.charW *now.size()) / 2;

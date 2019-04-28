@@ -323,6 +323,8 @@ void MAcqManager::endAcquisition(bool discard)
 
     if(m_acqFileOpened)    //se siamo in acq facciamo un commit
     {
+        m_mng->SetOther(m_calibCella);
+        qDebug() << "m_calibCella:" << m_calibCella;
         qDebug() << m_mng->GetFileName() << m_mng->GetFileType() << m_mng->GetChanNum() ;
         bool cvres = m_mng->CommitValues();
         qDebug() << "Commit Values?" << cvres;
