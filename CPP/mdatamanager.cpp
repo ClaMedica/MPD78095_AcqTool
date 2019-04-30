@@ -888,11 +888,10 @@ bool MDataManager::changeObject(QVariantList __curObj)
 
        // qDebug() << "Richiesta di modifica per " << whoAmI;
         if(m_storage.modifyElement(whoAmI, __curObj)) {
-            if(__curObj.length() == 0) {
-                saveChanges();
-                updateInfoList();
-                emit reloadingCompleted();
-           }
+            //una volta applicate le modifiche le salvo e aggiorno la grafica
+            saveChanges();
+            updateInfoList();
+            emit reloadingCompleted();
         }
         return true;
     }
