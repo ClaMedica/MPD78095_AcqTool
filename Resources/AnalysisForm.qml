@@ -66,6 +66,14 @@ MForm{
         gridComand.items=info
     }
 
+    function setCommandsInfoBottom(info)
+    {
+        console.log(info)
+        gridComandBottom.items=info
+        for(var i=0;i<info.length;i++)
+            if(info[i]==="$GridElement")
+                gridComandBottom.count++
+    }
 
     function loadConfigurationFile(configurationFile)
     {
@@ -202,7 +210,7 @@ MForm{
         anchors.right: gridMarker.left
         y: PicoFlow ? parent.height : parent.height/2
         color: "black"
-        visible: true
+        visible: PicoFlow ? false : true
     }
 
     MGridView{
@@ -224,7 +232,7 @@ MForm{
                     toolTip.visible = false
                 else
                 {
-                    toolTip.y = gridDefiners.height + posY
+                    toolTip.y = posY + rectBreak.y
                     toolTip.text = testo
                     toolTip.grid = gridActions
                     toolTip.visible = true
@@ -248,7 +256,7 @@ MForm{
         id:gridComand
         anchors.right: gridDefiners.left
         anchors.top: parent.top
-        anchors.bottom: parent.bottom
+        anchors.bottom: rectBreakCommands.bottom
         width:60
         owner:"Commands"
         itemsInRow:1
@@ -261,9 +269,9 @@ MForm{
                     mngData.analysis();
                 }
 
-                if (value === "112") {
-                    mngData.exitFromReview()
-                }
+//                if (value === "112") {
+//                    mngData.exitFromReview()
+//                }
 
                 if (value === "113")
                     //zoom in
@@ -292,7 +300,54 @@ MForm{
         visible:true
     }
 
+    Rectangle
+    {
+        id: rectBreakCommands
+        property real buttonHeight: 0
+        height: 2
+        width: 60
+        anchors.right: gridDefiners.left
+        y: PicoFlow ? parent.height : parent.height - buttonHeight*gridComandBottom.count
+        color: "black"
+        visible: false
+    }
 
+    MGridView{
+        //@@@@@@@@@@    Properties      @@@@@@@@@@
+        id:gridComandBottom
+        property int count: 0
+        anchors.right: gridDefiners.left
+        anchors.top: rectBreakCommands.top
+        anchors.bottom: parent.bottom
+        width:60
+        owner:"CommandsBottom"
+        itemsInRow:1
+
+        delegate: MMarkerButton{
+            id:button
+            onHeightChanged: {
+                   if (rectBreakCommands.buttonHeight === 0)
+                       rectBreakCommands.buttonHeight = button.height*1.4
+            }
+            onClick: {
+                if (value === "112") {
+                    mngData.exitFromReview()
+                }
+            }
+            onTooltipActive: {
+                if (testo === "")
+                    toolTip.visible = false
+                else
+                {
+                    toolTip.y = posY + rectBreakCommands.y
+                    toolTip.text = testo
+                    toolTip.grid = gridComandBottom
+                    toolTip.visible = true
+                }
+            }
+        }
+        visible:true
+    }
 
     Rectangle{
         property string text: ""
@@ -300,14 +355,7 @@ MForm{
         id: toolTip
         width: toolTipText.width *1.1
         height: toolTipText.height *1.1
-        anchors.right: {
-            if (grid === gridComand)
-                gridDefiners.left
-            else if (grid === gridDefiners || grid === gridActions)
-                gridMarker.left
-            else if (grid === gridMarker)
-                rootAna.right
-        }
+        anchors.horizontalCenter: grid.horizontalCenter
         y: 0
         color: "whitesmoke"
         border.color: "blue"
@@ -335,7 +383,8 @@ MForm{
             case dialogDelete:break;
             case plot:
                 var name = mngData.getNameOfObj(obj)
-                message=qsTr("Do you really want to delete the " + name + "?")
+                var testo = qsTr("Do you really want to delete the ")
+                message=qsTr(testo + name + "?")
                 break
 
             default:console.error("Owner sconosciuto",owner)

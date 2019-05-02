@@ -61,6 +61,7 @@ ApplicationWindow {
              forAna.setDefinersInfo(mngData.definersInfo())
              forAna.setActionsInfo(mngData.actionsInfo())
              forAna.setCommandsInfo(mngData.commandsInfo())
+             forAna.setCommandsInfoBottom(mngData.commandsInfoBottom())
          }
          console.log("Application Ready!")
      }
@@ -104,6 +105,7 @@ ApplicationWindow {
             forAna.setDefinersInfo(mngData.definersInfo())
             forAna.setActionsInfo(mngData.actionsInfo())
             forAna.setCommandsInfo(mngData.commandsInfo())
+            forAna.setCommandsInfoBottom(mngData.commandsInfoBottom())
         }
 //        else if (mode === "sta")
 //        {
