@@ -55,7 +55,8 @@ QString MDataMngDesktop::getNameOfObj(QVariantList __whoAmI)
     qulonglong whoAmI = __whoAmI.first().toULongLong();
     VarMap *elementToModify = (VarMap *) whoAmI;
     QString toRet = elementToModify->value("category").toString();
-    return toRet.toLower();
+    QString trad = translate(toRet);
+    return trad;
 }
 
 void MDataMngDesktop::addOpMarker(QVariant __key,QVariant __posX)
@@ -148,7 +149,7 @@ void MDataMngDesktop::deleteAnMArkers()
             changeObject(mrk);
         }
     }
-    qDebug() << "Fine cancello tuttu gli anmarker";
+    qDebug() << "Fine cancello tutti gli anmarker";
 
 }
 
@@ -315,7 +316,10 @@ bool MDataMngDesktop::checkReportFileOpen()
         QMessageBox msgBox;
         msgBox.setText("MDataManager:checkReportFileOpen() ERROR !");
         msgBox.exec();
+
     }
+
+    return false;
 }
 
 void MDataMngDesktop::startPrint()

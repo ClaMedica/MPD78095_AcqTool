@@ -315,7 +315,7 @@ void MDataManager::loadFile(QString __fileName)
             (*def)["yMax"] = sigMax;
             (*def)["num"] = i;
             (*def)["enCh"] = defEn[i];
-            (*def)["descr"] = descr;
+            (*def)["descr"] = translate(descr);
             (*def)["color"] = "cyan";
             (*def)["category"] = CAT_DEFINER;
             (*def)["resizeable"] = 1;
@@ -1367,7 +1367,7 @@ void MDataManager::InitPageGraphs(int __anaType)
                 (*mrk)["descr"] = descr;
                 (*mrk)["lock"] = false;
                 (*mrk)["channel"] = numCh;
-                (*mrk)["defCode"] = (qulonglong)evMarkOpIn->value("whoAmI").toInt();
+                (*mrk)["defCode"] = (qulonglong)evMarkOpIn->value("whoAmI").toULongLong();
                 (*mrk)["key"] = key;
                 (*mrk)["color"] = COLOR_ANALYTICAL;
                 (*mrk)["visible"] = true;

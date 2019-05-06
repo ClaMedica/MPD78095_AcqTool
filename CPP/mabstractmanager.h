@@ -29,6 +29,10 @@ public:
     explicit MAbstractManager(QObject *parent = 0);
     ~MAbstractManager();
 
+    //per traduzioni
+    QString translate(QString __string);
+    QMap <QString, QString> trMap;
+
     Q_INVOKABLE QVariantList markersInfo(QString __filterType = "",
                                          QVariantList __filterValues = QVariantList());
     Q_INVOKABLE QVariantList commandsInfo();

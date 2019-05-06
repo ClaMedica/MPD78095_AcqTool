@@ -70,6 +70,7 @@ MForm{
     {
         console.log(info)
         gridComandBottom.items=info
+        gridComandBottom.count = 0
         for(var i=0;i<info.length;i++)
             if(info[i]==="$GridElement")
                 gridComandBottom.count++
@@ -359,7 +360,7 @@ MForm{
         y: 0
         color: "whitesmoke"
         border.color: "blue"
-        border.width: 2
+        border.width: 1
         radius: 5
         visible:false
         Text{
@@ -368,7 +369,7 @@ MForm{
             color:"blue"
             font.family:  (layout !== undefined) ? layout.value("FFamily") : "ubuntu"
             font.bold: false
-            font.pixelSize:screenH * 0.02
+            font.pixelSize:screenH * 0.015
             text:toolTip.text
             anchors.horizontalCenter: parent.horizontalCenter
         }

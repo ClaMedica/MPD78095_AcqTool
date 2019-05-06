@@ -71,7 +71,7 @@ int main(int argc, char *argv[])
 
     qDebug() << "Start. log:" << gPath_log;
     //dirotto il debug log
-    MyMessageOutput::init(gPath_log);
+   // MyMessageOutput::init(gPath_log);
 
     //carico i settaggi
     g_P7SettingsManager.loadSettings();
@@ -80,6 +80,9 @@ int main(int argc, char *argv[])
     qDebug()<<"Language to load: "<<g_P7SettingsManager.appPath() + "/acqtool_" + local;
     QTranslator translator;
     qDebug() << translator.load(g_P7SettingsManager.appPath() + "/acqtool_" + local);
+    QTranslator translatorPlotter;
+    translatorPlotter.load(g_P7SettingsManager.appPath() + "/QmlPlotter_" + local);
+    app.installTranslator(&translatorPlotter);
     app.installTranslator(&translator);
 
     QStringList arguments;

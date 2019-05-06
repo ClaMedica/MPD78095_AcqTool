@@ -1,4 +1,4 @@
-#include "mstorage.h"
+﻿#include "mstorage.h"
 #include "qmath.h"
 
 MStorage::MStorage(QObject *parent) :
@@ -161,21 +161,25 @@ bool MStorage::modifyElement(qulonglong __whoAmI, QVariantList __news)
                 QList<QVariant> anM = elementToModify->value("anMarkers").toList();
                 for (int j = 0; j < anM.length(); j++) {
                     VarMap *anMarkerToDelete = (VarMap *) anM.at(j).toULongLong();
-                    (*anMarkerToDelete)["visible"] = false;
+                    if(!m_allMap[CAT_MARKER]->removeOne(anMarkerToDelete))
+                        qCritical() << "Data corrupted";
 
-//                    foreach(QString catAn,m_allMap.keys())
-//                    {
-//                        if(!m_allMap[catAn]->contains(anMarkerToDelete))
-//                            continue;
-//                        if(!m_allMap[catAn]->removeOne(anMarkerToDelete))
-//                            qCritical()<<"Data corrupted";
-
-//                        QString fmAn = anMarkerToDelete->value("family").toString();
-//                        QString nmAn = anMarkerToDelete->value("name").toString();
-//                        m_storage[fmAn][nmAn]->removeOne(anMarkerToDelete);
-//                        delete anMarkerToDelete;
-//                    }
+                    QString fmAn = anMarkerToDelete->value("family").toString();
+                    QString nmAn = anMarkerToDelete->value("name").toString();
+                    m_storage[fmAn][nmAn]->removeOne(anMarkerToDelete);
+                    delete anMarkerToDelete;
                 }
+                QList<QVariant> empty;
+                anM.clear();
+                (*elementToModify)["anMarkers"] = anM;
+            }
+            //se ho cancellato un amrker analitico devo toglierlo dal definitore associato
+            if (fm == "Markers" && nm == "Analitical") {
+                VarMap *defToMod = (VarMap *) elementToModify->value("defCode").toULongLong();
+                QList<QVariant> anM = defToMod->value("anMarkers").toList();
+                if (anM.contains(elementToModify->value("whoAmI")))
+                    anM.removeOne(elementToModify->value("whoAmI"));
+                (*defToMod)["anMarkers"] = anM;
             }
 
             m_storage[fm][nm]->removeOne(elementToModify);
