@@ -33,6 +33,10 @@ MAcqManager::MAcqManager(QObject *parent)
     m_calibCella = "";
     m_startWithZero = false;
 
+#ifdef PICOFLOW
+    m_fileVerifica = "/tmp/disableDebounce";
+#endif
+
 //Questa parte va fatta solo in caso di Pico, il file Config_Acq.xml viene creato nel main di Medica.
 //Negli altri casi il Config_Acq viene creato da Medica alla creazione del file in fase di acquisizione,
 //a seconda del protocollo scelto e della scheda di acquisizione. Di conseguenza in questa parte di codice
@@ -291,8 +295,20 @@ void MAcqManager::connectToServers()
 void MAcqManager::endAcquisitionSave()
 {
     qDebug() << "endAcquisitionSave()";
+#ifdef PICOFLOW
+    QFile tempVerifica;
+    tempVerifica.setFileName(m_fileVerifica);
+    if (tempVerifica.exists())
+        endAcquisitionDiscard();
+    else {
+        endAcquisition();
+        g_mainAppBridge->sendOpen();
+    }
+#else
     endAcquisition();
     g_mainAppBridge->sendOpen();
+#endif
+
 }
 
 void MAcqManager::endAcquisitionDiscard()
@@ -304,6 +320,13 @@ void MAcqManager::endAcquisitionDiscard()
 
 void MAcqManager::endAcquisition(bool discard)
 {
+#ifdef PICOFLOW
+    QFile tempVerifica;
+    tempVerifica.setFileName(m_fileVerifica);
+    if (tempVerifica.exists())
+        tempVerifica.remove();
+#endif
+
     //disabilito gli allarmi
     m_alarmMng.disableAll();
 
