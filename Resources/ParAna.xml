@@ -4,7 +4,7 @@
     <AnaType Type="102" Desc="Flowmetry">
       <Q>
         <StartTh>
-          <value>0</value>
+          <value>0.5</value>
           <udm>ml/sec</udm>
           <Desc>Start Threshold &gt;</Desc>
           <FullDesc>Threshold to determine flow start</FullDesc>
