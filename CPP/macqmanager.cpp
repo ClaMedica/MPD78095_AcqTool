@@ -35,6 +35,7 @@ MAcqManager::MAcqManager(QObject *parent)
 
 #ifdef PICOFLOW
     m_fileVerifica = "/tmp/disableDebounce";
+    m_disableWeightFilt = false;
 #endif
 
 //Questa parte va fatta solo in caso di Pico, il file Config_Acq.xml viene creato nel main di Medica.
@@ -262,6 +263,8 @@ bool MAcqManager::newAcquisition(QString __dataFile)
 
         //connessioni
         connectToServers();
+
+        m_disableWeightFilt = QFile::exists(m_fileVerifica);    // "/tmp/disableDebounce"
     }
     //faccio partire il timer per l'allarme di stato
     //m_alarmMng.startTimeoutAlarm();
@@ -1050,9 +1053,12 @@ void MAcqManager::applyOperations()
                             //controllo valori monotoni, i valori di volume non devono decrescere
                             if (m_valPrecVolume < 0) //impostiamo la prima volta il valore precedente
                                 m_valPrecVolume = mediato;
-                            if (m_valPrecVolume > mediato)
-                                mediato = m_valPrecVolume;
-                            qDebug()<<"media volume applicata in "<<v<<"ris "<<mediato;
+
+                            if(m_disableWeightFilt == false) {
+                                if (m_valPrecVolume > mediato)
+                                    mediato = m_valPrecVolume;
+                                qDebug()<<"media volume applicata in "<<v<<"ris "<<mediato;
+                            }
 
                             m_channelMap[type].at(index)->append(mediato);
                             m_valPrecVolume = mediato;
