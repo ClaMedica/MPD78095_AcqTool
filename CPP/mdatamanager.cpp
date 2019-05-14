@@ -1112,7 +1112,7 @@ qDebug() << "INIZIO";
                     (*def)["yMax"] = 100;
                     (*def)["num"] = elements->length();
                     (*def)["enCh"] = En;
-                    (*def)["descr"] = name;
+                    (*def)["descr"] = translate(name);
                     (*def)["color"] = COLOR_DEFINER;
                     (*def)["category"] = CAT_DEFINER;
                     (*def)["resizeable"] = 1;
