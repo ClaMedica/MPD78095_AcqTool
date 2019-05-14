@@ -137,6 +137,9 @@ private:
     QString m_calibCella;
     //bool per sapere se è stato mandato uno startwithzero
     bool m_startWithZero;
+    QString m_fileVerifica;
+    bool m_disableWeightFilt;
+
 };
 
 

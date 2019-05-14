@@ -33,6 +33,11 @@ MAcqManager::MAcqManager(QObject *parent)
     m_calibCella = "";
     m_startWithZero = false;
 
+#ifdef PICOFLOW
+    m_fileVerifica = "/tmp/disableDebounce";
+    m_disableWeightFilt = false;
+#endif
+
 //Questa parte va fatta solo in caso di Pico, il file Config_Acq.xml viene creato nel main di Medica.
 //Negli altri casi il Config_Acq viene creato da Medica alla creazione del file in fase di acquisizione,
 //a seconda del protocollo scelto e della scheda di acquisizione. Di conseguenza in questa parte di codice
@@ -258,6 +263,8 @@ bool MAcqManager::newAcquisition(QString __dataFile)
 
         //connessioni
         connectToServers();
+
+        m_disableWeightFilt = QFile::exists(m_fileVerifica);    // "/tmp/disableDebounce"
     }
     //faccio partire il timer per l'allarme di stato
     //m_alarmMng.startTimeoutAlarm();
@@ -291,8 +298,20 @@ void MAcqManager::connectToServers()
 void MAcqManager::endAcquisitionSave()
 {
     qDebug() << "endAcquisitionSave()";
+#ifdef PICOFLOW
+    QFile tempVerifica;
+    tempVerifica.setFileName(m_fileVerifica);
+    if (tempVerifica.exists())
+        endAcquisitionDiscard();
+    else {
+        endAcquisition();
+        g_mainAppBridge->sendOpen();
+    }
+#else
     endAcquisition();
     g_mainAppBridge->sendOpen();
+#endif
+
 }
 
 void MAcqManager::endAcquisitionDiscard()
@@ -304,6 +323,13 @@ void MAcqManager::endAcquisitionDiscard()
 
 void MAcqManager::endAcquisition(bool discard)
 {
+#ifdef PICOFLOW
+    QFile tempVerifica;
+    tempVerifica.setFileName(m_fileVerifica);
+    if (tempVerifica.exists())
+        tempVerifica.remove();
+#endif
+
     //disabilito gli allarmi
     m_alarmMng.disableAll();
 
@@ -403,14 +429,19 @@ bool MAcqManager::sendStartAcq()
 {
     qDebug() << "sendStartAcq()";
     m_startWithZero = true;
-    return sendCommand(ETCP_CMD_START_WITH_ZERO);
+    bool ret = sendCommand(ETCP_CMD_START_WITH_ZERO);
+    system("/root/PicoFlow/beep 15");
+    udpConn.sendSup("ButtonStStEnable");
+    return ret;
 }
 
 bool MAcqManager::sendStopAcq()
 {
     qDebug() << "sendStopAcq()";
     m_alarmMng.manageAlarm(ALA_NOT_ACQUIRING, DISABLE);
-    return sendCommand(ETCP_CMD_STOP);
+    bool ret = sendCommand(ETCP_CMD_STOP);
+    udpConn.sendSup("ButtonStStDisable");
+    return ret;
 }
 
 void MAcqManager::resetAlarms()
@@ -1022,9 +1053,12 @@ void MAcqManager::applyOperations()
                             //controllo valori monotoni, i valori di volume non devono decrescere
                             if (m_valPrecVolume < 0) //impostiamo la prima volta il valore precedente
                                 m_valPrecVolume = mediato;
-                            if (m_valPrecVolume > mediato)
-                                mediato = m_valPrecVolume;
-                            qDebug()<<"media volume applicata in "<<v<<"ris "<<mediato;
+
+                            if(m_disableWeightFilt == false) {
+                                if (m_valPrecVolume > mediato)
+                                    mediato = m_valPrecVolume;
+                                qDebug()<<"media volume applicata in "<<v<<"ris "<<mediato;
+                            }
 
                             m_channelMap[type].at(index)->append(mediato);
                             m_valPrecVolume = mediato;
