@@ -6,16 +6,32 @@ GraficManager::GraficManager(QObject *parent) : QObject(parent)
     //costruisco il path
 #ifdef PICOFLOW
     path = g_P7SettingsManager.dataPath() + SUBDIR_CONFIG + GRAFIC_CONFIG_PICO;
-    if(!QFile::exists(path)) {
-        qDebug() << "Il file non esiste copio quello dalle risorse";
-        QFile::copy(":/Config/Config_Grafic_pico.xml", path);
+    QFile f, f2;
+    f.setFileName(":/Config/Config_Grafic_pico.xml");
+    f2.setFileName(path);
+    if(!f2.exists()) {  //se non esiste lo creo
+        qDebug() << "Creo file" << f2.fileName();
+        f2.open(QIODevice::WriteOnly);
+        f.open(QIODevice::ReadOnly);
+        f2.write(f.readAll());
+        f.close();
+        f2.close();
     }
+
 #else
     path= g_P7SettingsManager.dataPath() + SUBDIR_CONFIG + GRAFIC_CONFIG;
-    if(!QFile::exists(path)) {
-        qDebug() << "Il file non esiste copio quello dalle risorse";
-        QFile::copy(":/Config/Config_Grafic.xml", path);
+    QFile f, f2;
+    f.setFileName(":/Config/Config_Grafic.xml");
+    f2.setFileName(path);
+    if(!f2.exists()) {  //se non esiste lo creo
+        qDebug() << "Creo file" << f2.fileName();
+        f2.open(QIODevice::WriteOnly);
+        f.open(QIODevice::ReadOnly);
+        f2.write(f.readAll());
+        f.close();
+        f2.close();
     }
+
 #endif
 
     //e riempo la mia classe
