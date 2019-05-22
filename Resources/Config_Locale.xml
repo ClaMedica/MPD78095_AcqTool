@@ -1,5 +1,4 @@
 ﻿<Configuration>
-        <Locale value="it"/>
         <DataFolders>
             <imx6-qsdl      value="/root/PicoFlow/urodata"/>
         </DataFolders>

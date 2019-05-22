@@ -430,8 +430,10 @@ bool MAcqManager::sendStartAcq()
     qDebug() << "sendStartAcq()";
     m_startWithZero = true;
     bool ret = sendCommand(ETCP_CMD_START_WITH_ZERO);
+#ifdef PICOFLOW
     system("/root/PicoFlow/beep 15");
     udpConn.sendSup("ButtonStStEnable");
+#endif
     return ret;
 }
 
@@ -440,7 +442,9 @@ bool MAcqManager::sendStopAcq()
     qDebug() << "sendStopAcq()";
     m_alarmMng.manageAlarm(ALA_NOT_ACQUIRING, DISABLE);
     bool ret = sendCommand(ETCP_CMD_STOP);
+#ifdef PICOFLOW
     udpConn.sendSup("ButtonStStDisable");
+#endif
     return ret;
 }
 
