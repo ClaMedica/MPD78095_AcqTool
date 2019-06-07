@@ -430,7 +430,7 @@ bool MAcqManager::sendStartAcq()
     qDebug() << "sendStartAcq()";
     m_startWithZero = true;
     bool ret = sendCommand(ETCP_CMD_START_WITH_ZERO);
-    system("/root/PicoFlow/beep 15");
+    //system("/root/PicoFlow/beep 15");
     udpConn.sendSup("ButtonStStEnable");
     return ret;
 }
