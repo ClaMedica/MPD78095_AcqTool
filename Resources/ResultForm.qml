@@ -344,7 +344,7 @@ MForm {
         height: screenH*grafic.valueOf("Button","height")
         labelSize: grafic.valueOf("Button","labelSize")
         visible: PicoFlow ? true : false
-        enabled: mngData.getSpoolerQueueLen() === 0 && dataSent
+        enabled: PicoFlow ? mngData.getSpoolerQueueLen() === 0 && dataSent : false
         onClicked: {
             console.log("do print")
             mngData.sendToPrint()

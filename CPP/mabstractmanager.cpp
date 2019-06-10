@@ -4,11 +4,30 @@
 MAbstractManager::MAbstractManager(QObject *parent) : QObject(parent)
 {
     m_applicationPath = QApplication::applicationDirPath();
+    // Stringhe necessarie per la traduzione delle descrizioni dei definitori e markers caricati
+    //dai file xml
+    trMap["Flowmetry"] = tr("Flowmetry");
+    trMap["Cough"] = tr("Cough");
+    trMap["Speak"] = tr("Speak");
+    trMap["definer"] = tr("definer");
+    trMap["marker"] = tr("marker");
+
+
 }
 
 MAbstractManager::~MAbstractManager()
 {
 }
+
+
+QString MAbstractManager::translate(QString __string)
+{
+    if(trMap.contains(__string))
+        return trMap[__string];
+    else
+        return __string;
+}
+
 
 QVariantList MAbstractManager::markersInfo(QString __filterType,
                                            QVariantList __filterValues)
@@ -189,7 +208,10 @@ QVariantList MAbstractManager::markersInfo(QString __filterType,
             list << "$GridElement";
             foreach(QString key, marker.keys()) {
                 list << key;
-                list << marker.value(key);
+                if (key == "descr")
+                    list << translate(marker.value(key).toString());
+                else
+                    list << marker.value(key);
             }
             list << "&GridElement";
         }
@@ -212,7 +234,10 @@ QVariantList MAbstractManager::definersInfo()
                 list << "$GridElement";
                 foreach(QString key, marker.keys()) {
                     list << key;
-                    list << marker.value(key);
+                    if (key == "descr")
+                        list << translate(marker.value(key).toString());
+                    else
+                        list << marker.value(key);
                 }
                 list << "&GridElement";
             }
@@ -220,6 +245,24 @@ QVariantList MAbstractManager::definersInfo()
 
     return list;
 }
+
+QVariantList MAbstractManager::actionsInfo()
+{
+    //leggiamo il file di configurazione e riempiamo le info
+    QVariantList list;
+
+//    //aggiungo pulsante cancella markers analitici
+
+   list << "$GridElement";
+   list << "descr" << tr("delete analytical markers");
+   list << "img" << "qrc:/danger";
+   list << "key" << 116;
+   list << "visible" << true;
+   list << "&GridElement";
+
+    return list;
+}
+
 
 QVariantList MAbstractManager::commandsInfo()
 {
@@ -265,21 +308,17 @@ QVariantList MAbstractManager::commandsInfo()
     list << "visible" << true;
     list << "&GridElement";
 
-     //spazio vuoto
-    list << "$GridElement";
-    list << "descr" << "";
-    list << "img" << "";
-    list << "key" << 0;
-    list << "visible" << false;
-    list << "&GridElement";
-
-    //spazio vuoto
-    list << "$GridElement";
-    list << "descr" << "";
-    list << "img" << "";
-    list << "key" << 0;
-    list << "visible" << false;
-    list << "&GridElement";
+#ifdef PICOFLOW
+    for (int i=0; i<2; i++)
+    {
+        //spazio vuoto
+        list << "$GridElement";
+        list << "descr" << "";
+        list << "img" << "";
+        list << "key" << 0;
+        list << "visible" << false;
+        list << "&GridElement";
+    }
 
     //salva e chiudi
     list << "$GridElement";
@@ -288,7 +327,22 @@ QVariantList MAbstractManager::commandsInfo()
     list << "key" << 112;
     list << "visible" << true;
     list << "&GridElement";
+#endif
+    return list;
+}
 
+QVariantList MAbstractManager::commandsInfoBottom()
+{
+    QVariantList list;
+#ifndef PICOFLOW
+    //salva e chiudi
+    list << "$GridElement";
+    list << "descr" << tr("save&exit");
+    list << "img" << "qrc:/salvaChiudi";
+    list << "key" << 112;
+    list << "visible" << true;
+    list << "&GridElement";
+#endif
     return list;
 }
 

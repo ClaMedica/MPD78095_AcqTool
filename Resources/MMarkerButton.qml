@@ -1,4 +1,4 @@
-import QtQuick 2.0
+﻿import QtQuick 2.0
 import MPlotModule 1.0
 import QtQuick.Controls 1.4
 
@@ -29,8 +29,7 @@ Rectangle{
     states:[
         State {name: "nul"; },
         State {name: "hov"; PropertyChanges{target: img; imageName: modM.img}
-            PropertyChanges{target: rootMarkerButton; zoom: 0.2 }
-            PropertyChanges{target: toolTip; font.pixelSize: 12}},
+            PropertyChanges{target: rootMarkerButton; zoom: 0.2 }},
         State {name: "idl"; PropertyChanges{target: img; imageName: modM.img}
             PropertyChanges{target: rootMarkerButton; zoom: 0}},
         State {name: "pre"; PropertyChanges{target: img; imageName: modM.img+"_click" }
@@ -98,25 +97,6 @@ Rectangle{
         radius:parent.width/2
     }
 
-    Text{
-        //@@@@@@@@@@    Properties      @@@@@@@@@@
-        id:toolTip
-        color:"black"
-        font.family: (layout !== undefined) ? layout.value("FFamily") : "ubuntu"
-        font.bold: false
-        font.pixelSize: 12
-        anchors.top:img.top
-
-        //        anchors.bottom: parent.bottom
-        //        anchors.right: parent.right
-        //        anchors.left: parent.right
-        visible:false
-        text:modM.descr
-        horizontalAlignment : Text.AlignHCenter
-        verticalAlignment: Text.AlignVCenter
-    }
-
-
     BuzzMouseArea{
         //@@@@@@@@@@    Properties      @@@@@@@@@@
         id:area
@@ -131,7 +111,6 @@ Rectangle{
             }
         }
         onReleased: {
-            //if(!isTouch)
                 rootMarkerButton.state="hov"
         }
         onExited:    {
@@ -141,7 +120,6 @@ Rectangle{
             }
         }
         onPressed:  {
-            //if(!isTouch)
                 rootMarkerButton.state="pre"
         }
         onClicked:  {
