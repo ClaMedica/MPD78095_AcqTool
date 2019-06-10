@@ -80,17 +80,17 @@ public:
     void setVolAtQqmax(float __val)     {m_volAtQqmax = __val;}
     void addVolAtQqmax(float __val)     {m_volAtQqmax += __val;}
 
-    float getVoidedVolume()             {return m_voidedVolume;}
-    void setVoidedVolume(float __val)   {m_voidedVolume = __val;}
-    void addVoidedVolume(float __val)   {m_voidedVolume += __val;}
+    int getVoidedVolume()               {return m_voidedVolume;}
+    void setVoidedVolume(int __val)   {m_voidedVolume = __val;}
+    void addVoidedVolume(int __val)   {m_voidedVolume += __val;}
 
     float getAcceleration()             {return m_acceleration;}
     void setAcceleration(float __val)   {m_acceleration = __val;}
     void addAcceleration(float __val)   {m_acceleration += __val;}
 
-    float getResidualVolume()           {return m_residualVolume;}
-    void setResidualVolume(float __val) {m_residualVolume = __val;}
-    void addResidualVolume(float __val) {m_residualVolume += __val;}
+    int getResidualVolume()             {return m_residualVolume;}
+    void setResidualVolume(int __val) {m_residualVolume = __val;}
+    void addResidualVolume(int __val) {m_residualVolume += __val;}
 
     float getVDetMax()                  {return m_vDetMax;}
     void setVDetMax(float __val)        {m_vDetMax = __val;}
