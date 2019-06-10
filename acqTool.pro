@@ -93,7 +93,8 @@ include(deployment.pri)
 
 TRANSLATIONS += acqtool.xlf \
                # acqtool_en.xlf \
-                acqtool_it.xlf
+                acqtool_it.xlf \
+                acqtool_no.xlf
 
 lupdate_only{
     SOURCES += Resources/*.qml \
