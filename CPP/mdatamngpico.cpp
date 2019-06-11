@@ -68,10 +68,10 @@ void MDataMngPico::startPrint()
     m_mngPrint->setTempoDisc((float)(qRound(m_aflwdatas.at(0)->getDescTime()*10))/10);
     m_mngPrint->setTempoSvuot((float)(qRound(m_aflwdatas.at(0)->getVoidingTime()*10))/10);
     m_mngPrint->setVolFlussoMax((float)(qRound(m_aflwdatas.at(0)->getVolAtQqmax()*10))/10);
-    m_mngPrint->setVolVuotato((float)(qRound(m_aflwdatas.at(0)->getVoidedVolume()*10))/10);
+    m_mngPrint->setVolVuotato((float)(m_aflwdatas.at(0)->getVoidedVolume()*10)/10);
     m_mngPrint->setAccelerazione((float)(qRound(m_aflwdatas.at(0)->getAcceleration()*10))/10);
     m_mngPrint->setFlussoCor((float)(qRound(m_aflwdatas.at(0)->getCQ()*10))/10);
-    m_mngPrint->setVolRes((float)(qRound(m_aflwdatas.at(0)->getResidualVolume()*10))/10);
+    m_mngPrint->setVolRes((float)(m_aflwdatas.at(0)->getResidualVolume()*10)/10);
     m_mngPrint->setDetContrMax((float)(qRound(m_aflwdatas.at(0)->getVDetMax()*10))/10);
     //mi dice se la flussimetria automatica o manuale
     m_mngPrint->setMode(m_autoFlow);

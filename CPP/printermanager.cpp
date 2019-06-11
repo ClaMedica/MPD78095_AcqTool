@@ -931,7 +931,7 @@ void printermanager::Report_result()
     imagePainter->drawLine(imagePt, QPoint(imageBm.width()-1-8, imagePt.ry()));
 
     QString now;
-    now = "<< " + QDateTime::currentDateTime().toString("yyyy-MM-dd_hh:mm:ss") + " Rev: 1.0.0.13 >>";
+    now = "<< " + QDateTime::currentDateTime().toString("yyyy-MM-dd_hh:mm:ss") + " Rev: 1.0.0.15 >>";
     imageSetFont(tf_calDate);
     imagePt.ry() += 1.5 * tf_calDate.charH;
     imagePt.rx() = (102*8 - tf_calDate.charW *now.size()) / 2;

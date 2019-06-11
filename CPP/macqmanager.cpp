@@ -431,7 +431,7 @@ bool MAcqManager::sendStartAcq()
     m_startWithZero = true;
     bool ret = sendCommand(ETCP_CMD_START_WITH_ZERO);
 #ifdef PICOFLOW
-    system("/root/PicoFlow/beep 15");
+ //   system("/root/PicoFlow/beep 15");
     udpConn.sendSup("ButtonStStEnable");
 #endif
     return ret;
