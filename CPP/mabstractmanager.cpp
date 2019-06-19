@@ -524,7 +524,6 @@ bool MAbstractManager::buildConfigurationFile()
             if(ch != NULL) {
                 trkN->setAttribute(ATT_THICK,      ch->getSafeChild(ATT_THICK)->getSafeAttribute(ATT_VALUE));
                 trkN->setAttribute(ATT_COLOR,      ch->getSafeChild(ATT_COLOR)->getSafeAttribute(ATT_VALUE));
-                trkN->setAttribute(ATT_WIDTH,      ch->getSafeChild(ATT_WIDTH)->getSafeAttribute(ATT_VALUE));
                 axis->setAttribute(ATT_YAUTOSCALE, ch->getSafeChild(ATT_YAUTOSCALE)->getSafeAttribute(ATT_VALUE));
                 axis->setAttribute(ATT_RANGE, ch->getSafeChild(ATT_RANGE)->getSafeAttribute(ATT_MODEL));
                 axis->setAttribute(ATT_RANGEVALUE, ch->getSafeChild(ATT_RANGE)->getSafeAttribute(ATT_VALUE));

@@ -1,4 +1,4 @@
-import QtQuick 2.4
+﻿import QtQuick 2.4
 import QtQuick.Controls 1.2
 import QtQuick.Dialogs 1.2
 import MComponents 1.0
@@ -156,6 +156,9 @@ Column {
                 pchild = ancestry.getChildAt(i)
                 //console.log(pchild,i,childrenCount,ancestry)
 
+                if (pchild.getAttribute("label") === "width track")
+                    continue
+
                 if(pchild.isYoungest()) {//creo un parametro modificabile
                     //controllo se devo visualizzarlo o no
                     var vis = pchild.getAttribute("visible")
@@ -190,6 +193,7 @@ Column {
 
                     parChildren.push(pchild)
                     parameters[parameters.length] = c
+
                 }
                 else
                 {

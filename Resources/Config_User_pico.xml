@@ -96,13 +96,7 @@
          </ChannelsAbilitation>
         <ChannelsProp>
             <VV>
-                <width
-                   label="width track"
-                   type="TextField"
-                   unit=""
-                   value="1"
-                />
-                <thick
+            <thick
                     label="thick"
                     type="TextField"
                     unit=""
@@ -131,13 +125,7 @@
 
             </VV>
             <Q>
-                <width
-                   label="width track"
-                   type="TextField"
-                   unit=""
-                   value="1"
-                />
-                <thick
+            <thick
                     label="thick"
                     type="TextField"
                     unit=""
@@ -166,13 +154,7 @@
 
             </Q>
             <EMG>
-                <width
-                   label="width track"
-                   type="TextField"
-                   unit=""
-                   value="1"
-                />
-                <thick
+            <thick
                     label="thick"
                     type="TextField"
                     unit=""
