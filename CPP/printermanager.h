@@ -70,6 +70,7 @@ public:
     void setPrintLiverpool(bool __val)          {m_printLiverpool = __val;}
     void setPrintModeUser(bool __val)           {m_printModeUser = __val;}
     void setTipoEsame(unsigned char __val)      {m_test_type = __val;}
+    void setVersione(QString __vers)            {m_versione = __vers;}
 
     void Report_BitMap(bool __isSiro = false);
     void getGrabbedImage(QObject *__gi, QString __nome);
@@ -129,6 +130,7 @@ private:
     bool    m_test_type;			// discrimina se esame veloce oppure completo di dati paziente (servira nel report di stampa)
     int     m_numTest;
     QString m_datiCalib;
+    QString m_versione; //versione del Pico
 
     int     m_num_sam; //numero campioni minimo nas (vol)
 

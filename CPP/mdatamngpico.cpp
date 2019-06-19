@@ -73,6 +73,10 @@ void MDataMngPico::startPrint()
     m_mngPrint->setFlussoCor((float)(qRound(m_aflwdatas.at(0)->getCQ()*10))/10);
     m_mngPrint->setVolRes((float)(m_aflwdatas.at(0)->getResidualVolume()*10)/10);
     m_mngPrint->setDetContrMax((float)(qRound(m_aflwdatas.at(0)->getVDetMax()*10))/10);
+
+    QString vers = g_P7SettingsManager.getVersione();
+    m_mngPrint->setVersione(vers);
+
     //mi dice se la flussimetria automatica o manuale
     m_mngPrint->setMode(m_autoFlow);
     //stampo

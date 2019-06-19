@@ -84,6 +84,8 @@ int main(int argc, char *argv[])
     translatorPlotter.load(g_P7SettingsManager.appPath() + "/QmlPlotter_" + local);
     app.installTranslator(&translatorPlotter);
     app.installTranslator(&translator);
+    //versione
+    g_P7SettingsManager.loadVersione();
 
     QStringList arguments;
     //leggiamo gli argomenti
