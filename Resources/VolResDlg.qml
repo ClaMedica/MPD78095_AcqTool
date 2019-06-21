@@ -70,7 +70,7 @@ MForm {
 
     MButton {
         id:btnOK
-        text: qsTr("Ok")
+        text: qsTr("OK")
         //anchors.top:parVolResVal.bottom
         anchors.horizontalCenter: parent.horizontalCenter
         anchors.bottom: parent.bottom

@@ -129,7 +129,7 @@ MForm {
                 buttonT.anchors.leftMargin = btnLeftMargin
                 buttonT.width = screenW*grafic.valueOf("Button","width")
                 buttonT.height = screenH*grafic.valueOf("Button","height")
-                buttonT.labelSize= layout.value("F3")
+                buttonT.labelSize= layout.value("F4")-1
                 buttonT.myText = qsTr("Table")
                 buttonT.clicked.connect(clickButton)
                 resultForm.buttonTable = buttonT.buttonId

@@ -58,7 +58,7 @@ Rectangle{
         //@@@@@@@@@@    Properties      @@@@@@@@@@
         id:popText
         color:"black"
-        font.family: (layout !== undefined) ? layout.value("FFamily") : "ubuntu"
+        font.family: (layout !== undefined) ? layout.value("FFamily") : "utopia"
         font.bold: true
         font.pixelSize: 16
         anchors.centerIn: rootPopUp

@@ -23,7 +23,7 @@ BuzzTableView{
             color: styleData.selected ? "#000" : "#000"
             elide: styleData.elideMode
             text: (styleData.value !== undefined) ? styleData.value : ""
-            font.family:  (layout !== undefined) ? layout.value("FFamily") : "ubuntu"
+            font.family:  (layout !== undefined) ? layout.value("FFamily") : "utopia"
             font.bold: false
             font.pixelSize: rootTable.height * grafic.valueOf("TableRis","size")
         }
@@ -46,7 +46,7 @@ BuzzTableView{
             anchors.verticalCenter: parent.verticalCenter
             color: styleData.selected ? "#000" : "#000"
             text: styleData.value
-            font.family:  (layout !== undefined) ? layout.value("FFamily") : "ubuntu"
+            font.family:  (layout !== undefined) ? layout.value("FFamily") : "utopia"
             font.bold: true
             font.pixelSize:rootTable.height *0.045
         }

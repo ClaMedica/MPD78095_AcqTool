@@ -45,7 +45,7 @@ Rectangle{
         Text{
             id:text
             font.pixelSize: screenH*0.02*labelSize
-            font.family: (layout !== undefined) ? layout.value("FFamily") : "ubuntu"
+            font.family: (layout !== undefined) ? layout.value("FFamily") : "utopia"
             anchors.centerIn: parent
         }
         MouseArea{

@@ -10,7 +10,7 @@ Text {
     height: 100
     width: 200
     text: ""
-    font.family: (layout !== undefined) ? layout.value("FFamily") : "ubuntu"
+    font.family: (layout !== undefined) ? layout.value("FFamily") : "utopia"
     font.bold: true
     font.pixelSize: screenH * 0.01 * labelSize
     fontSizeMode: Text.Fit

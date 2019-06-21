@@ -23,49 +23,17 @@
             dt="string"
             unit=""
             model=""
-            value="ubuntu"
-            />
-            <F1
-            label="Font 1"
-            type="ComboBox"
-            dt="height"
-            unit="pt"
-            model="1#2#3#4#5#6#7#8#9#10"
-            value="1"
-            />
-            <F2
-            label="Font 2"
-            type="ComboBox"
-            dt="height"
-            unit="pt"
-            model="1#2#3#4#5#6#7#8#9#10"
-            value="2"
-            />
-            <F3
-            label="Font 3"
-            type="ComboBox"
-            dt="height"
-            unit="pt"
-            model="1#2#3#4#5#6#7#8#9#10"
-            value="3"
+            value="utopia"
             />
             <F4
-            label="Font 4"
+            label="Font"
             type="ComboBox"
             dt="height"
             unit="pt"
             model="1#2#3#4#5#6#7#8#9#10"
             value="4"
             />
-            <F5
-            label="Font 5"
-            type="ComboBox"
-            dt="height"
-            unit="pt"
-            model="1#2#3#4#5#6#7#8#9#10"
-            value="5"
-            />
-        </Fonts>
+            </Fonts>
         <Tables label="Tables Layout">
             <THF
             label="Table Header Dim."

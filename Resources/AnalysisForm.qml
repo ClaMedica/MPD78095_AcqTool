@@ -367,7 +367,7 @@ MForm{
             //@@@@@@@@@@    Properties      @@@@@@@@@@
             id:toolTipText
             color:"blue"
-            font.family:  (layout !== undefined) ? layout.value("FFamily") : "ubuntu"
+            font.family:  (layout !== undefined) ? layout.value("FFamily") : "utopia"
             font.bold: false
             font.pixelSize:screenH * 0.015
             text:toolTip.text

@@ -75,7 +75,7 @@ Rectangle {
             //@@@@@@@@@@    Properties      @@@@@@@@@@
             id:mex
             color:"white"
-            font.family:  (layout !== undefined) ? layout.value("FFamily") : "ubuntu"
+            font.family:  (layout !== undefined) ? layout.value("FFamily") : "utopia"
             font.bold: true
             font.pixelSize: 16
             anchors.fill:parent
@@ -114,7 +114,7 @@ Rectangle {
             id:mexHelp
             visible:helpRec.height>0?true:false
             color:"black"
-            font.family:  (layout !== undefined) ? layout.value("FFamily") : "ubuntu"
+            font.family:  (layout !== undefined) ? layout.value("FFamily") : "utopia"
             font.bold: true
             font.pixelSize: 12
             anchors.fill:parent

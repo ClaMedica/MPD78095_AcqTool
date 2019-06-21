@@ -121,7 +121,7 @@ Rectangle  {
         anchors.right: container.right
         color: "white"
         text: container.text.toString()
-        font.family: (layout !== undefined) ? layout.value("FFamily") : "ubuntu"
+        font.family: (layout !== undefined) ? layout.value("FFamily") : "utopia"
         font.bold: true
         horizontalAlignment: Text.AlignHCenter
         verticalAlignment: Text.AlignVCenter

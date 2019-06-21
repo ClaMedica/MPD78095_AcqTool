@@ -156,7 +156,8 @@ Column {
                 pchild = ancestry.getChildAt(i)
                 //console.log(pchild,i,childrenCount,ancestry)
 
-                if (pchild.getAttribute("label") === "width track")
+                var labelAttr = pchild.getAttribute("label")
+                if (labelAttr === "width track" || labelAttr === "Margin" || labelAttr === "Fonts")
                     continue
 
                 if(pchild.isYoungest()) {//creo un parametro modificabile

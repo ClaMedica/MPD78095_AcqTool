@@ -15,7 +15,7 @@ TextField {
             text = safeText
     }
     text: ""
-    font.family: (layout !== undefined) ? layout.value("FFamily") : "ubuntu"
+    font.family: (layout !== undefined) ? layout.value("FFamily") : "utopia"
     font.bold: true
     font.pixelSize: screenH * 0.01 * labelSize
     verticalAlignment: Text.AlignVCenter
