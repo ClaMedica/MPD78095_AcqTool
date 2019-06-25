@@ -152,6 +152,7 @@ Rectangle {
         anchors.right: rootPlot.right
 
         Text {
+            id: text1
             text: nome
             color: colorTesti
             x: rootPlot.width/2 - nome.length*4
@@ -160,14 +161,15 @@ Rectangle {
             {
                 if (PicoFlow)
                     if (layout !== undefined)
-                        nome.font.family = layout.value("FFamily")
+                        text1.font.family = layout.value("FFamily")
                     else
-                        nome.font.family ="utopia"
+                        text1.font.family ="utopia"
                 else if (layout !== undefined)
-                    nome.font.family = layout.value("FFamilyW")
+                    text1.font.family = layout.value("FFamilyW")
                 else
-                    nome.font.family = "Calibri"
-            }font.pixelSize: screenH * 0.01 * labelSize
+                    text1.font.family = "Calibri"
+            }
+            font.pixelSize: screenH * 0.01 * labelSize
         }
     }
 
@@ -179,6 +181,7 @@ Rectangle {
         anchors.top: rootPlot.top
         anchors.left: rootPlot.left
         Text {
+            id: text2
             text: udmY
             color: colorTesti
             x: 5
@@ -187,13 +190,13 @@ Rectangle {
             {
                 if (PicoFlow)
                     if (layout !== undefined)
-                        udmY.font.family = layout.value("FFamily")
+                        text2.font.family = layout.value("FFamily")
                     else
-                        udmY.font.family ="utopia"
+                        text2.font.family ="utopia"
                 else if (layout !== undefined)
-                    udmY.font.family = layout.value("FFamilyW")
+                    text2.font.family = layout.value("FFamilyW")
                 else
-                    udmY.font.family = "Calibri"
+                    text2.font.family = "Calibri"
             }
             font.pixelSize: screenH * 0.01 * labelSize
             transform: Rotation {
@@ -210,6 +213,7 @@ Rectangle {
         anchors.left: rootPlot.left
         anchors.right: rootPlot.right
         Text {
+            id: text3
             text: udmX
             color: colorTesti
             x: rootPlot.width/2 - udmX.length*4
@@ -218,13 +222,13 @@ Rectangle {
             {
                 if (PicoFlow)
                     if (layout !== undefined)
-                        udmY.font.family = layout.value("FFamily")
+                        text3.font.family = layout.value("FFamily")
                     else
-                        udmY.font.family ="utopia"
+                        text3.font.family ="utopia"
                 else if (layout !== undefined)
-                    udmY.font.family = layout.value("FFamilyW")
+                    text3.font.family = layout.value("FFamilyW")
                 else
-                    udmY.font.family = "Calibri"
+                    text3.font.family = "Calibri"
             }
             font.pixelSize: screenH * 0.01 * labelSize
         }

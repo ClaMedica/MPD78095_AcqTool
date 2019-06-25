@@ -5,8 +5,8 @@ import MComponents 1.0
 
 MForm {
     id:volResDlg
-    height:screenH*0.4
-    width:screenW*0.4
+    height:screenH*grafic.valueOf("Dialog","height")
+    width:screenW*grafic.valueOf("Dialog","width")
     anchors.centerIn: parent
     visible: false
     color : layout.value("BackgroundColor")

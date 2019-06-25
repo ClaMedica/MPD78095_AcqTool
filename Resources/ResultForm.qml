@@ -342,7 +342,7 @@ MForm {
         anchors.leftMargin: 10
         width: screenW*grafic.valueOf("Button","width")
         height: screenH*grafic.valueOf("Button","height")
-        labelSize: layout.value("F4")-1//grafic.valueOf("Button","labelSize")
+        labelSize: layout.value("F4")
         visible: PicoFlow ? true : false
         enabled: PicoFlow ? mngData.getSpoolerQueueLen() === 0 && dataSent : false
         onClicked: {

@@ -98,6 +98,7 @@ Rectangle{
             //@@@@@@@@@@    Properties      @@@@@@@@@@
             label:
                 Label {
+                id:label1
                 //@@@@@@@@@@    Properties      @@@@@@@@@@
                 verticalAlignment: Qt.AlignVCenter
                 anchors.left: parent.left
@@ -110,13 +111,13 @@ Rectangle{
                 {
                     if (PicoFlow)
                         if (layout !== undefined)
-                            rootLabel.font.family = layout.value("FFamily")
+                            label1.font.family = layout.value("FFamily")
                         else
-                            rootLabel.font.family ="utopia"
+                            label1.font.family ="utopia"
                     else if (layout !== undefined)
-                        rootLabel.font.family = layout.value("FFamilyW")
+                        label1.font.family = layout.value("FFamilyW")
                     else
-                        rootLabel.font.family = "Calibri"
+                        label1.font.family = "Calibri"
                 }
             }
             selectedTextColor: "steelblue"

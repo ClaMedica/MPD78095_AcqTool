@@ -49,13 +49,13 @@ Rectangle{
             {
                 if (PicoFlow)
                     if (layout !== undefined)
-                        rootLabel.font.family = layout.value("FFamily")
+                        text.font.family = layout.value("FFamily")
                     else
-                        rootLabel.font.family ="utopia"
+                        text.font.family ="utopia"
                 else if (layout !== undefined)
-                    rootLabel.font.family = layout.value("FFamilyW")
+                    text.font.family = layout.value("FFamilyW")
                 else
-                    rootLabel.font.family = "Calibri"
+                    text.font.family = "Calibri"
             }
             anchors.centerIn: parent
         }
