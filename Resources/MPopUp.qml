@@ -62,13 +62,13 @@ Rectangle{
         {
             if (PicoFlow)
                 if (layout !== undefined)
-                    rootLabel.font.family = layout.value("FFamily")
+                    popText.font.family = layout.value("FFamily")
                 else
-                    rootLabel.font.family ="utopia"
+                    popText.font.family ="utopia"
             else if (layout !== undefined)
-                rootLabel.font.family = layout.value("FFamilyW")
+                popText.font.family = layout.value("FFamilyW")
             else
-                rootLabel.font.family = "Calibri"
+                popText.font.family = "Calibri"
         }
         font.bold: true
         font.pixelSize: 16

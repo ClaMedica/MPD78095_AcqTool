@@ -129,7 +129,7 @@ MForm {
                 buttonT.anchors.leftMargin = btnLeftMargin
                 buttonT.width = screenW*grafic.valueOf("Button","width")
                 buttonT.height = screenH*grafic.valueOf("Button","height")
-                buttonT.labelSize= layout.value("F4")-1
+                buttonT.labelSize= layout.value("F4")
                 buttonT.myText = qsTr("Table")
                 buttonT.clicked.connect(clickButton)
                 resultForm.buttonTable = buttonT.buttonId
@@ -172,7 +172,7 @@ MForm {
                 buttonLQM.anchors.leftMargin = btnLeftMargin
                 buttonLQM.width = screenW*grafic.valueOf("Button","width")
                 buttonLQM.height = screenH*grafic.valueOf("Button","height")
-                buttonLQM.labelSize= grafic.valueOf("Button","labelSize")
+                buttonLQM.labelSize= layout.value("F4")
                 buttonLQM.myText = nameNomo
                 buttonLQM.clicked.connect(clickButton)
                 btnLeftMargin += buttonLQM.width + 5
@@ -213,7 +213,7 @@ MForm {
                 buttonLQA.anchors.leftMargin = btnLeftMargin
                 buttonLQA.height = screenH*grafic.valueOf("Button","height")
                 buttonLQA.width = screenW*grafic.valueOf("Button","width")
-                buttonLQA.labelSize= grafic.valueOf("Button","labelSize")
+                buttonLQA.labelSize= layout.value("F4")
                 buttonLQA.myText = nameNomo
                 buttonLQA.clicked.connect(clickButton)
                 btnLeftMargin += buttonLQA.width + 5
@@ -261,7 +261,7 @@ MForm {
                     buttonSQM.anchors.leftMargin = btnLeftMargin
                     buttonSQM.width = screenW*grafic.valueOf("Button","width")
                     buttonSQM.height = screenH*grafic.valueOf("Button","height")
-                    buttonSQM.labelSize= layout.value("F4")-1//grafic.valueOf("Button","labelSize")
+                    buttonSQM.labelSize= layout.value("F4")
                     buttonSQM.myText = nameNomo
                     buttonSQM.clicked.connect(clickButton)
                     btnLeftMargin += buttonSQM.width + 5
@@ -307,7 +307,7 @@ MForm {
                     buttonSQA.anchors.leftMargin = btnLeftMargin
                     buttonSQA.width = screenW*grafic.valueOf("Button","width")
                     buttonSQA.height = screenH*grafic.valueOf("Button","height")
-                    buttonSQA.labelSize= layout.value("F4")-1//grafic.valueOf("Button","labelSize")
+                    buttonSQA.labelSize= layout.value("F4")
                     buttonSQA.myText = nameNomo
                     buttonSQA.clicked.connect(clickButton)
                     //btnLeftMargin += 110
@@ -360,7 +360,7 @@ MForm {
         anchors.leftMargin: 10
         width: screenW*grafic.valueOf("Button","width")
         height: screenH*grafic.valueOf("Button","height")
-        labelSize: layout.value("F4")-1//grafic.valueOf("Button","labelSize")
+        labelSize: layout.value("F4")
         visible: PicoFlow ? false : true
         onClicked: {
             mngData.openReport()
@@ -376,7 +376,7 @@ MForm {
         anchors.horizontalCenter: parent.horizontalCenter
         width:  screenW*grafic.valueOf("Button","width")
         height: screenH*grafic.valueOf("Button","height")
-        labelSize: layout.value("F4")-1//grafic.valueOf("Button","labelSize")//layout.value("F4")
+        labelSize: layout.value("F4")
         onClicked:exitFromResult()
     }
 
@@ -389,7 +389,7 @@ MForm {
         anchors.leftMargin: 10
         width: screenW*grafic.valueOf("Button","width")
         height: screenH*grafic.valueOf("Button","height")
-        labelSize: layout.value("F4")-1//grafic.valueOf("Button","labelSize")
+        labelSize: layout.value("F4")
         onClicked: {
             exitFromResult()
             mngData.exitFromReview()

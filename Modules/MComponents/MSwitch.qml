@@ -1,4 +1,4 @@
-import QtQuick 2.4
+﻿import QtQuick 2.4
 import QtQuick.Controls 1.4
 import MComponents 1.0 //import "qrc:/Components"
 import "qrc:/GeneralData.js" as DataEngine
@@ -29,14 +29,15 @@ Rectangle {
         anchors.margins: parent.border.width
         width:Math.round(parent.width*0.5)
         color:col1
-        Text{
-            id:txt1
+        MLabel {
+            id: txt1
             anchors.fill:parent
             font.bold:true
             verticalAlignment: Text.AlignVCenter
             horizontalAlignment: Text.AlignHCenter
             text:opt1
             color:!choose?"black":"white"
+            labelSize: layout.value("F4")-1
             Behavior on color {ColorAnimation{duration: 200}}
         }
     }
@@ -49,7 +50,7 @@ Rectangle {
         anchors.margins: parent.border.width
         width:Math.round(parent.width*0.5)
         color:col2
-        Text{
+        MLabel{
             id:txt2
             anchors.fill:parent
             font.bold:true
@@ -57,6 +58,7 @@ Rectangle {
             horizontalAlignment: Text.AlignHCenter
             text:opt2
             color:choose?"black":"white"
+            labelSize: layout.value("F4")-1
             Behavior on color {ColorAnimation{duration: 200}}
         }
 

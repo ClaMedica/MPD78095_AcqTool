@@ -160,13 +160,13 @@ Rectangle {
             {
                 if (PicoFlow)
                     if (layout !== undefined)
-                        rootLabel.font.family = layout.value("FFamily")
+                        nome.font.family = layout.value("FFamily")
                     else
-                        rootLabel.font.family ="utopia"
+                        nome.font.family ="utopia"
                 else if (layout !== undefined)
-                    rootLabel.font.family = layout.value("FFamilyW")
+                    nome.font.family = layout.value("FFamilyW")
                 else
-                    rootLabel.font.family = "Calibri"
+                    nome.font.family = "Calibri"
             }font.pixelSize: screenH * 0.01 * labelSize
         }
     }
@@ -187,13 +187,13 @@ Rectangle {
             {
                 if (PicoFlow)
                     if (layout !== undefined)
-                        rootLabel.font.family = layout.value("FFamily")
+                        udmY.font.family = layout.value("FFamily")
                     else
-                        rootLabel.font.family ="utopia"
+                        udmY.font.family ="utopia"
                 else if (layout !== undefined)
-                    rootLabel.font.family = layout.value("FFamilyW")
+                    udmY.font.family = layout.value("FFamilyW")
                 else
-                    rootLabel.font.family = "Calibri"
+                    udmY.font.family = "Calibri"
             }
             font.pixelSize: screenH * 0.01 * labelSize
             transform: Rotation {
@@ -218,13 +218,13 @@ Rectangle {
             {
                 if (PicoFlow)
                     if (layout !== undefined)
-                        rootLabel.font.family = layout.value("FFamily")
+                        udmY.font.family = layout.value("FFamily")
                     else
-                        rootLabel.font.family ="utopia"
+                        udmY.font.family ="utopia"
                 else if (layout !== undefined)
-                    rootLabel.font.family = layout.value("FFamilyW")
+                    udmY.font.family = layout.value("FFamilyW")
                 else
-                    rootLabel.font.family = "Calibri"
+                    udmY.font.family = "Calibri"
             }
             font.pixelSize: screenH * 0.01 * labelSize
         }

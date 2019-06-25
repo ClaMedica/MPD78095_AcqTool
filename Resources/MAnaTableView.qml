@@ -19,6 +19,7 @@ BuzzTableView{
     itemDelegate: Item {
         anchors.leftMargin: 100
         Text {
+            id: text1
             anchors.verticalCenter: parent.verticalCenter
             color: styleData.selected ? "#000" : "#000"
             elide: styleData.elideMode
@@ -27,13 +28,13 @@ BuzzTableView{
             {
                 if (PicoFlow)
                     if (layout !== undefined)
-                        rootLabel.font.family = layout.value("FFamily")
+                        text1.font.family = layout.value("FFamily")
                     else
-                        rootLabel.font.family ="utopia"
+                        text1.font.family ="utopia"
                 else if (layout !== undefined)
-                    rootLabel.font.family = layout.value("FFamilyW")
+                    text1.font.family = layout.value("FFamilyW")
                 else
-                    rootLabel.font.family = "Calibri"
+                    text1.font.family = "Calibri"
             }
             font.bold: false
             font.pixelSize: rootTable.height * grafic.valueOf("TableRis","size")
@@ -54,6 +55,7 @@ BuzzTableView{
         color: "#E0E0E0"
         height: rootTable.height*0.1
         Text {
+            id:text
             anchors.verticalCenter: parent.verticalCenter
             color: styleData.selected ? "#000" : "#000"
             text: styleData.value
@@ -61,13 +63,13 @@ BuzzTableView{
             {
                 if (PicoFlow)
                     if (layout !== undefined)
-                        rootLabel.font.family = layout.value("FFamily")
+                        text.font.family = layout.value("FFamily")
                     else
-                        rootLabel.font.family ="utopia"
+                        text.font.family ="utopia"
                 else if (layout !== undefined)
-                    rootLabel.font.family = layout.value("FFamilyW")
+                    text.font.family = layout.value("FFamilyW")
                 else
-                    rootLabel.font.family = "Calibri"
+                    text.font.family = "Calibri"
             }
             font.bold: true
             font.pixelSize:rootTable.height *0.045

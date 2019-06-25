@@ -371,13 +371,13 @@ MForm{
             {
                 if (PicoFlow)
                     if (layout !== undefined)
-                        rootLabel.font.family = layout.value("FFamily")
+                        toolTipText.font.family = layout.value("FFamily")
                     else
-                        rootLabel.font.family ="utopia"
+                        toolTipText.font.family ="utopia"
                 else if (layout !== undefined)
-                    rootLabel.font.family = layout.value("FFamilyW")
+                    toolTipText.font.family = layout.value("FFamilyW")
                 else
-                    rootLabel.font.family = "Calibri"
+                    toolTipText.font.family = "Calibri"
             }
             font.bold: false
             font.pixelSize:screenH * 0.015
