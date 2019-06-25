@@ -23,7 +23,18 @@ BuzzTableView{
             color: styleData.selected ? "#000" : "#000"
             elide: styleData.elideMode
             text: (styleData.value !== undefined) ? styleData.value : ""
-            font.family:  (layout !== undefined) ? layout.value("FFamily") : "utopia"
+            font.family:
+            {
+                if (PicoFlow)
+                    if (layout !== undefined)
+                        rootLabel.font.family = layout.value("FFamily")
+                    else
+                        rootLabel.font.family ="utopia"
+                else if (layout !== undefined)
+                    rootLabel.font.family = layout.value("FFamilyW")
+                else
+                    rootLabel.font.family = "Calibri"
+            }
             font.bold: false
             font.pixelSize: rootTable.height * grafic.valueOf("TableRis","size")
         }
@@ -46,7 +57,18 @@ BuzzTableView{
             anchors.verticalCenter: parent.verticalCenter
             color: styleData.selected ? "#000" : "#000"
             text: styleData.value
-            font.family:  (layout !== undefined) ? layout.value("FFamily") : "utopia"
+            font.family:
+            {
+                if (PicoFlow)
+                    if (layout !== undefined)
+                        rootLabel.font.family = layout.value("FFamily")
+                    else
+                        rootLabel.font.family ="utopia"
+                else if (layout !== undefined)
+                    rootLabel.font.family = layout.value("FFamilyW")
+                else
+                    rootLabel.font.family = "Calibri"
+            }
             font.bold: true
             font.pixelSize:rootTable.height *0.045
         }

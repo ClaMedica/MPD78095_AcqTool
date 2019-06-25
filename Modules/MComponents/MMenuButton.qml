@@ -1,4 +1,4 @@
-import QtQuick 2.5
+﻿import QtQuick 2.5
 import QtQuick.Window 2.0
 Rectangle  {
     //@@@@@@@@@@    Definitions     @@@@@@@@@@
@@ -121,7 +121,18 @@ Rectangle  {
         anchors.right: container.right
         color: "white"
         text: container.text.toString()
-        font.family: (layout !== undefined) ? layout.value("FFamily") : "utopia"
+        font.family:
+        {
+            if (PicoFlow)
+                if (layout !== undefined)
+                    rootLabel.font.family = layout.value("FFamily")
+                else
+                    rootLabel.font.family ="utopia"
+            else if (layout !== undefined)
+                rootLabel.font.family = layout.value("FFamilyW")
+            else
+                rootLabel.font.family = "Calibri"
+        }
         font.bold: true
         horizontalAlignment: Text.AlignHCenter
         verticalAlignment: Text.AlignVCenter

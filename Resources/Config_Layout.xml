@@ -1,4 +1,4 @@
-<Layout>
+﻿<Layout>
         <Windows label="Windows Layout">
             <BackgroundColor
             label="Background Color"
@@ -24,6 +24,14 @@
             unit=""
             model=""
             value="utopia"
+            />
+            <FFamilyW
+            label="Font Family"
+            type="ComboBox"
+            dt="string"
+            unit=""
+            model=""
+            value="MS Sans Serif"
             />
             <F4
             label="Font"

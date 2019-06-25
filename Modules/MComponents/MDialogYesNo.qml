@@ -9,6 +9,8 @@ Rectangle {
     anchors.centerIn: parent
     visible: false
     color : layout.value("BackgroundColor")
+    border.color: "white"
+    border.width: 5
     property string message: "Message"
     property string yesText:"Yes"
     property string noText:"No"

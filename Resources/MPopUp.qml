@@ -1,4 +1,4 @@
-import QtQuick 2.0
+﻿import QtQuick 2.0
  
 Rectangle{
     //@@@@@@@@@@    Definitions     @@@@@@@@@@
@@ -58,7 +58,18 @@ Rectangle{
         //@@@@@@@@@@    Properties      @@@@@@@@@@
         id:popText
         color:"black"
-        font.family: (layout !== undefined) ? layout.value("FFamily") : "utopia"
+        font.family:
+        {
+            if (PicoFlow)
+                if (layout !== undefined)
+                    rootLabel.font.family = layout.value("FFamily")
+                else
+                    rootLabel.font.family ="utopia"
+            else if (layout !== undefined)
+                rootLabel.font.family = layout.value("FFamilyW")
+            else
+                rootLabel.font.family = "Calibri"
+        }
         font.bold: true
         font.pixelSize: 16
         anchors.centerIn: rootPopUp

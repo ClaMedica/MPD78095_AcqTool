@@ -1,9 +1,9 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <Desktop>
-  <Button height="0.06" width="0.15" labelSize="3"/>
-  <Nomogrammi height="0.7" width="0.7" labelSize="3" margin="70" dimPoint="2"/>
+  <Button height="0.06" width="0.15" />
+  <Nomogrammi height="0.7" width="0.7" margin="70" dimPoint="2"/>
   <TableRis height="0.6" width="0.5" size="0.04"/>
-  <Dialog height="0.4" width="0.4" labelSize="3"/>
+  <Dialog height="0.4" width="0.4" />
   <Parameter height="0.06" width="0.3" />
 </Desktop>
 

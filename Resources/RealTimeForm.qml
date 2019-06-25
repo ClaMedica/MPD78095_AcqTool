@@ -1,4 +1,4 @@
-import QtQuick 2.3
+﻿import QtQuick 2.3
 import QtQuick.Controls 1.3
 import QtQuick.Dialogs 1.2
 import MComponents 1.0
@@ -191,7 +191,7 @@ MForm{
              anchors.left: parent.left
              anchors.right:parent.right
              height:parent.height*0.8
-             labelSize: grafic.valueOf("Dialog","labelSize")
+             labelSize: layout.value("F4")
              color: "white"
              horizontalAlignment: Text.AlignHCenter
              verticalAlignment: Text.AlignVCenter

@@ -261,7 +261,7 @@ MForm {
                     buttonSQM.anchors.leftMargin = btnLeftMargin
                     buttonSQM.width = screenW*grafic.valueOf("Button","width")
                     buttonSQM.height = screenH*grafic.valueOf("Button","height")
-                    buttonSQM.labelSize= grafic.valueOf("Button","labelSize")
+                    buttonSQM.labelSize= layout.value("F4")-1//grafic.valueOf("Button","labelSize")
                     buttonSQM.myText = nameNomo
                     buttonSQM.clicked.connect(clickButton)
                     btnLeftMargin += buttonSQM.width + 5
@@ -307,7 +307,7 @@ MForm {
                     buttonSQA.anchors.leftMargin = btnLeftMargin
                     buttonSQA.width = screenW*grafic.valueOf("Button","width")
                     buttonSQA.height = screenH*grafic.valueOf("Button","height")
-                    buttonSQA.labelSize= grafic.valueOf("Button","labelSize")
+                    buttonSQA.labelSize= layout.value("F4")-1//grafic.valueOf("Button","labelSize")
                     buttonSQA.myText = nameNomo
                     buttonSQA.clicked.connect(clickButton)
                     //btnLeftMargin += 110
@@ -342,7 +342,7 @@ MForm {
         anchors.leftMargin: 10
         width: screenW*grafic.valueOf("Button","width")
         height: screenH*grafic.valueOf("Button","height")
-        labelSize: grafic.valueOf("Button","labelSize")
+        labelSize: layout.value("F4")-1//grafic.valueOf("Button","labelSize")
         visible: PicoFlow ? true : false
         enabled: PicoFlow ? mngData.getSpoolerQueueLen() === 0 && dataSent : false
         onClicked: {
@@ -360,7 +360,7 @@ MForm {
         anchors.leftMargin: 10
         width: screenW*grafic.valueOf("Button","width")
         height: screenH*grafic.valueOf("Button","height")
-        labelSize: grafic.valueOf("Button","labelSize")
+        labelSize: layout.value("F4")-1//grafic.valueOf("Button","labelSize")
         visible: PicoFlow ? false : true
         onClicked: {
             mngData.openReport()
@@ -376,7 +376,7 @@ MForm {
         anchors.horizontalCenter: parent.horizontalCenter
         width:  screenW*grafic.valueOf("Button","width")
         height: screenH*grafic.valueOf("Button","height")
-        labelSize: grafic.valueOf("Button","labelSize")//layout.value("F4")
+        labelSize: layout.value("F4")-1//grafic.valueOf("Button","labelSize")//layout.value("F4")
         onClicked:exitFromResult()
     }
 
@@ -389,7 +389,7 @@ MForm {
         anchors.leftMargin: 10
         width: screenW*grafic.valueOf("Button","width")
         height: screenH*grafic.valueOf("Button","height")
-        labelSize: grafic.valueOf("Button","labelSize")
+        labelSize: layout.value("F4")-1//grafic.valueOf("Button","labelSize")
         onClicked: {
             exitFromResult()
             mngData.exitFromReview()

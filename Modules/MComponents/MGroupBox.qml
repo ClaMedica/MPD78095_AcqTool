@@ -1,4 +1,4 @@
-import QtQuick.Controls 1.4
+﻿import QtQuick.Controls 1.4
 import QtQuick.Controls.Styles 1.4
 import QtQuick 2.5
 import QtQuick.Window 2.0
@@ -45,7 +45,18 @@ Rectangle{
         Text{
             id:text
             font.pixelSize: screenH*0.02*labelSize
-            font.family: (layout !== undefined) ? layout.value("FFamily") : "utopia"
+            font.family:
+            {
+                if (PicoFlow)
+                    if (layout !== undefined)
+                        rootLabel.font.family = layout.value("FFamily")
+                    else
+                        rootLabel.font.family ="utopia"
+                else if (layout !== undefined)
+                    rootLabel.font.family = layout.value("FFamilyW")
+                else
+                    rootLabel.font.family = "Calibri"
+            }
             anchors.centerIn: parent
         }
         MouseArea{

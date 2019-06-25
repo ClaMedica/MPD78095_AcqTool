@@ -5,8 +5,8 @@ import MComponents 1.0
 
 MForm {
     id:volResDlg
-    height:screenH*grafic.valueOf("Dialog","height")
-    width:screenW*grafic.valueOf("Dialog","width")
+    height:screenH*0.4
+    width:screenW*0.4
     anchors.centerIn: parent
     visible: false
     color : layout.value("BackgroundColor")
@@ -47,7 +47,7 @@ MForm {
             anchors.verticalCenter: parent.verticalCenter
             text: titleDlg
             horizontalAlignment: Text.AlignHCenter
-            labelSize: grafic.valueOf("Dialog","labelSize")
+            labelSize: layout.value("F4")
             verticalAlignment: Text.AlignVCenter
             color : "white"
         }
@@ -62,7 +62,7 @@ MForm {
         anchors.margins: layout.value("Margin")
         type:typTextField
         labelColor: "white"
-        labelSize: grafic.valueOf("Dialog","labelSize")
+        labelSize: layout.value("F4")
         viewPerc:0.75
         role:qsTr("Insert Residual Volume")
         keyboardAlfaNum: false
@@ -77,7 +77,7 @@ MForm {
         height:screenH*grafic.valueOf("Button","height")
         width: screenW*grafic.valueOf("Button","width")
         anchors.margins: parent.height*0.02
-        labelSize: grafic.valueOf("Button","labelSize")
+        labelSize: layout.value("F4")
         onClicked: okbutton()
     }
 
