@@ -99,9 +99,9 @@ void mflowdatas::buildNomogrammi(bool __sex, int __age)
         __age = 40;
     }
     //Liverpool MAX
-    m_liverpoolMax->setTitle(tr("Liverpool (Q Max)"));
-    m_liverpoolMax->setUnitx(tr("Vol. (ml)"));
-    m_liverpoolMax->setUnity(tr("Q (ml/sec)"));
+    m_liverpoolMax->setTitle("Liverpool (Q Max)");
+    m_liverpoolMax->setUnitx("Vol. (ml)");
+    m_liverpoolMax->setUnity("Q (ml/sec)");
     m_liverpoolMax->setXmin(0);
     m_liverpoolMax->setYmin(0);
     m_liverpoolMax->setXmax(600);
@@ -203,9 +203,9 @@ void mflowdatas::buildNomogrammi(bool __sex, int __age)
     }
 
     //Liverpool AVE
-    m_liverpoolAve->setTitle(tr("Liverpool (Q Ave)"));
-    m_liverpoolAve->setUnitx(tr("Vol. (ml)"));
-    m_liverpoolAve->setUnity(tr("Q (ml/sec)"));
+    m_liverpoolAve->setTitle("Liverpool (Q Ave)");
+    m_liverpoolAve->setUnitx("Vol. (ml)");
+    m_liverpoolAve->setUnity("Q (ml/sec)");
     m_liverpoolAve->setXmin(0);
     m_liverpoolAve->setYmin(0);
     m_liverpoolAve->setXmax(600);
@@ -303,9 +303,9 @@ void mflowdatas::buildNomogrammi(bool __sex, int __age)
     //siroky Max - Ave
     if (!__sex) {
         //max
-        m_sirokyMax->setTitle(tr("Siroky (Q Max)"));
-        m_sirokyMax->setUnitx(tr("Vol. (ml)"));
-        m_sirokyMax->setUnity(tr("Q (ml/sec)"));
+        m_sirokyMax->setTitle("Siroky (Q Max)");
+        m_sirokyMax->setUnitx("Vol. (ml)");
+        m_sirokyMax->setUnity("Q (ml/sec)");
         m_sirokyMax->setXmin(0);
         m_sirokyMax->setYmin(0);
         m_sirokyMax->setXmax(500);
@@ -362,9 +362,9 @@ void mflowdatas::buildNomogrammi(bool __sex, int __age)
         }
 
         //ave
-        m_sirokyAve->setTitle(tr("Siroky (Q Ave)"));
-        m_sirokyAve->setUnitx(tr("Vol. (ml)"));
-        m_sirokyAve->setUnity(tr("Q (ml/sec)"));
+        m_sirokyAve->setTitle("Siroky (Q Ave)");
+        m_sirokyAve->setUnitx("Vol. (ml)");
+        m_sirokyAve->setUnity("Q (ml/sec)");
         m_sirokyAve->setXmin(0);
         m_sirokyAve->setYmin(0);
         m_sirokyAve->setXmax(500);
