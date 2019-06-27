@@ -1,4 +1,4 @@
-import QtQuick.Controls 1.4
+﻿import QtQuick.Controls 1.4
 import QtQuick.Controls.Styles 1.4
 import QtQuick 2.5
 import QtQuick.Window 2.0
@@ -69,7 +69,6 @@ Rectangle{
         anchors.leftMargin: rootComboBox.border.width
         height: oriH
         labelSize: rootComboBox.labelSize
-        font.family: layout.value("FFamily")
         text: font.family
         horizontalAlignment: (text.length > 5) ? Text.AlignLeft : Text.AlignHCenter
     }

@@ -1,4 +1,4 @@
-import QtQuick 2.4
+﻿import QtQuick 2.4
 import QtQuick.Controls 1.2
 import QtQuick.Controls.Styles 1.3
 import MPlotModule 1.0
@@ -98,6 +98,7 @@ Rectangle{
             //@@@@@@@@@@    Properties      @@@@@@@@@@
             label:
                 Label {
+                id:label1
                 //@@@@@@@@@@    Properties      @@@@@@@@@@
                 verticalAlignment: Qt.AlignVCenter
                 anchors.left: parent.left
@@ -106,7 +107,18 @@ Rectangle{
                 color: !control.enabled ? "#DADAD9" : "#6F6E6E"
                 anchors.fill: parent
                 font.pixelSize: 12
-                font.family: (layout !== undefined) ? layout.value("FFamily") : "utopia"
+                font.family:
+                {
+                    if (PicoFlow)
+                        if (layout !== undefined)
+                            label1.font.family = layout.value("FFamily")
+                        else
+                            label1.font.family ="utopia"
+                    else if (layout !== undefined)
+                        label1.font.family = layout.value("FFamilyW")
+                    else
+                        label1.font.family = "Calibri"
+                }
             }
             selectedTextColor: "steelblue"
         }

@@ -5,8 +5,8 @@ import MComponents 1.0
 
 Rectangle {
     id: exitDlg
-    height:screenH*grafic.valueOf("Dialog","height")
-    width:screenW*grafic.valueOf("Dialog","width")
+    height:screenH*0.4
+    width:screenW*0.4
     anchors.centerIn: parent
     visible: false
     color : layout.value("BackgroundColor")
@@ -29,7 +29,7 @@ Rectangle {
         height:parent.height*0.8
         text: qsTr("Do you want save changes?")
         horizontalAlignment: Text.AlignHCenter
-        labelSize: grafic.valueOf("Dialog","labelSize")
+        labelSize: layout.value("F4")
         verticalAlignment: Text.AlignVCenter
         color : "white"
         wrapMode: Text.WordWrap
@@ -43,7 +43,7 @@ Rectangle {
         anchors.bottom: parent.bottom
         width: parent.width/3.1
         anchors.margins: parent.height*0.02
-        labelSize: grafic.valueOf("Button","labelSize")
+        labelSize: layout.value("F4")
         onClicked: {
 //            if (PicoFlow) restartBt()
             exitDlg.visible = false
@@ -60,7 +60,7 @@ Rectangle {
         anchors.bottom: parent.bottom
         width: parent.width/3.1
         anchors.margins: parent.height*0.02
-        labelSize: grafic.valueOf("Button","labelSize")
+        labelSize: layout.value("F4")
         onClicked: {
 //            if (PicoFlow) restartBt()
             exitDlg.visible = false
@@ -77,7 +77,7 @@ Rectangle {
         anchors.bottom: parent.bottom
         width: parent.width/3.1
         anchors.margins: parent.height*0.02
-        labelSize: grafic.valueOf("Button","labelSize")
+        labelSize: layout.value("F4")
         onClicked: {
             exitDlg.visible = false
             mngData.toSave = ""

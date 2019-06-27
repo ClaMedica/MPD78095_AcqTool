@@ -19,11 +19,23 @@ BuzzTableView{
     itemDelegate: Item {
         anchors.leftMargin: 100
         Text {
+            id: text1
             anchors.verticalCenter: parent.verticalCenter
             color: styleData.selected ? "#000" : "#000"
             elide: styleData.elideMode
             text: (styleData.value !== undefined) ? styleData.value : ""
-            font.family:  (layout !== undefined) ? layout.value("FFamily") : "utopia"
+            font.family:
+            {
+                if (PicoFlow)
+                    if (layout !== undefined)
+                        text1.font.family = layout.value("FFamily")
+                    else
+                        text1.font.family ="utopia"
+                else if (layout !== undefined)
+                    text1.font.family = layout.value("FFamilyW")
+                else
+                    text1.font.family = "Calibri"
+            }
             font.bold: false
             font.pixelSize: rootTable.height * grafic.valueOf("TableRis","size")
         }
@@ -43,10 +55,22 @@ BuzzTableView{
         color: "#E0E0E0"
         height: rootTable.height*0.1
         Text {
+            id:text
             anchors.verticalCenter: parent.verticalCenter
             color: styleData.selected ? "#000" : "#000"
             text: styleData.value
-            font.family:  (layout !== undefined) ? layout.value("FFamily") : "utopia"
+            font.family:
+            {
+                if (PicoFlow)
+                    if (layout !== undefined)
+                        text.font.family = layout.value("FFamily")
+                    else
+                        text.font.family ="utopia"
+                else if (layout !== undefined)
+                    text.font.family = layout.value("FFamilyW")
+                else
+                    text.font.family = "Calibri"
+            }
             font.bold: true
             font.pixelSize:rootTable.height *0.045
         }

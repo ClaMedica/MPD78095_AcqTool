@@ -1,4 +1,4 @@
-import QtQuick 2.0
+﻿import QtQuick 2.0
 //import Resources 1.0
 import "qrc:/Models"
 
@@ -75,7 +75,18 @@ Rectangle {
             //@@@@@@@@@@    Properties      @@@@@@@@@@
             id:mex
             color:"white"
-            font.family:  (layout !== undefined) ? layout.value("FFamily") : "utopia"
+            font.family:
+            {
+                if (PicoFlow)
+                    if (layout !== undefined)
+                        mex.font.family = layout.value("FFamily")
+                    else
+                        mex.font.family ="utopia"
+                else if (layout !== undefined)
+                    mex.font.family = layout.value("FFamilyW")
+                else
+                    mex.font.family = "Calibri"
+            }
             font.bold: true
             font.pixelSize: 16
             anchors.fill:parent
@@ -114,7 +125,18 @@ Rectangle {
             id:mexHelp
             visible:helpRec.height>0?true:false
             color:"black"
-            font.family:  (layout !== undefined) ? layout.value("FFamily") : "utopia"
+            font.family:
+            {
+                if (PicoFlow)
+                    if (layout !== undefined)
+                        rootLabel.font.family = layout.value("FFamily")
+                    else
+                        rootLabel.font.family ="utopia"
+                else if (layout !== undefined)
+                    rootLabel.font.family = layout.value("FFamilyW")
+                else
+                    rootLabel.font.family = "Calibri"
+            }
             font.bold: true
             font.pixelSize: 12
             anchors.fill:parent

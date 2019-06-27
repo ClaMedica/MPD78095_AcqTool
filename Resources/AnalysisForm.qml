@@ -367,7 +367,18 @@ MForm{
             //@@@@@@@@@@    Properties      @@@@@@@@@@
             id:toolTipText
             color:"blue"
-            font.family:  (layout !== undefined) ? layout.value("FFamily") : "utopia"
+            font.family:
+            {
+                if (PicoFlow)
+                    if (layout !== undefined)
+                        toolTipText.font.family = layout.value("FFamily")
+                    else
+                        toolTipText.font.family ="utopia"
+                else if (layout !== undefined)
+                    toolTipText.font.family = layout.value("FFamilyW")
+                else
+                    toolTipText.font.family = "Calibri"
+            }
             font.bold: false
             font.pixelSize:screenH * 0.015
             text:toolTip.text
