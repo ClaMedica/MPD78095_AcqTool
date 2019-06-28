@@ -167,26 +167,25 @@ void MDataManager::loadFile(QString __fileName)
             m_sexPatient = true;
 
         //dati calibrazione
-        //In questo caso se si decide di cambiare i file di esempio con esami acquisiti
-        //nuovi, non avremmo più necessita del controllo di seguito
         m_datiCalib = "none";
         QString otherString = m_mng->GetOther();
         QStringList stringSplit = otherString.split(";");
         if (otherString == "")
         {
-            //inserisco dati calibrazione per esami vecchi
-            otherString = "none;";
+            //c'è qualche problema e manca la calibrazione
+            //la inseriamo
+            otherString = m_datiCalib;
             m_mng->SetOther(otherString);
             m_mng->CommitParameters();
         }
-        else if (stringSplit.length() >= 2)
+        else if (stringSplit.length() >= 2)//qui è tutto ok
         {
             QString first = stringSplit.at(0);
-            if (first.contains("none") || first.length() >= 5)  // giorgio >=
+            if (first.contains("none") || first.length() >= 5)
             {
                 m_datiCalib = first;
             }
-            else
+            else //nel caso avessimo valori sul campo other ma non dati sulla calibrazione
             {
                 QString newOther = "none;" + otherString;
                 m_mng->SetOther(newOther);

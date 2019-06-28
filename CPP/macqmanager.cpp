@@ -30,7 +30,7 @@ MAcqManager::MAcqManager(QObject *parent)
 
 
     m_startAcqManuale = false; //non ancora premuto tasto start
-    m_calibCella = "";
+    m_calibCella = "none;";
     m_startWithZero = false;
 
 #ifdef PICOFLOW
@@ -240,10 +240,6 @@ bool MAcqManager::newAcquisition(QString __dataFile)
         //aggiorno il datafile con i dati relativi alla mia configurazione #BUG da togliere non appena il file verrA  scritto correttamente
         qDebug() << "Updating datafile...";
         handleDataFile();
-
-        //dati di calibrazione
-        qDebug()<<"calibsave"<<m_calibCella;
-        m_mng->SetOther(m_calibCella);
 
         //ripristino il file in acquisizione
         bool res = m_mng->Continue();
