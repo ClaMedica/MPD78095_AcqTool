@@ -127,7 +127,7 @@ Rectangle  {
                 if (layout !== undefined)
                     buttonLabel.font.family = layout.value("FFamily")
                 else
-                    buttonLabel.font.family ="utopia"
+                    buttonLabel.font.family ="Luxi Serif"
             else if (layout !== undefined)
                 buttonLabel.font.family = layout.value("FFamilyW")
             else

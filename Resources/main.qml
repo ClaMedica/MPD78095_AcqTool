@@ -199,6 +199,10 @@ ApplicationWindow {
             console.log("Stampa di prova");
             launch("sta","")
         }
+        onClosePico:
+        {
+            mngData.exitFromReview()
+        }
         onAnaAutomatica:
         {
             if (vis && mngData.getAutoFlow() === 0){
@@ -220,11 +224,11 @@ ApplicationWindow {
             console.log("Go Go Go");
             forReal.displayMessage(qsTr("start"),3000,6)
         }
-        onAcquisitionEnded:
-        {
-            console.log("ENDED")
-            forReal.endAcq()
-        }
+//        onAcquisitionEnded:
+//        {
+//            console.log("ENDED")
+//            forReal.endAcq()
+//        }
         onUdpBtStopped:
         {
             console.log("udp BtStopped")

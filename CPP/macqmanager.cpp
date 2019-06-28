@@ -391,7 +391,7 @@ void MAcqManager::endAcquisition(bool discard)
         }
     }
 
-    emit acquisitionEnded();
+   // emit acquisitionEnded();
 }
 
 void MAcqManager::addMarker(QVariant __key)
