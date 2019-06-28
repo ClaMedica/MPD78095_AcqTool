@@ -64,7 +64,7 @@ Rectangle{
                 if (layout !== undefined)
                     popText.font.family = layout.value("FFamily")
                 else
-                    popText.font.family ="utopia"
+                    popText.font.family ="Luxi Serif"
             else if (layout !== undefined)
                 popText.font.family = layout.value("FFamilyW")
             else

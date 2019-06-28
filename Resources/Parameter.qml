@@ -113,7 +113,7 @@ Rectangle{
                         if (layout !== undefined)
                             label1.font.family = layout.value("FFamily")
                         else
-                            label1.font.family ="utopia"
+                            label1.font.family ="Luxi Serif"
                     else if (layout !== undefined)
                         label1.font.family = layout.value("FFamilyW")
                     else

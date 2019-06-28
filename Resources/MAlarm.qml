@@ -81,7 +81,7 @@ Rectangle {
                     if (layout !== undefined)
                         mex.font.family = layout.value("FFamily")
                     else
-                        mex.font.family ="utopia"
+                        mex.font.family ="Luxi Serif"
                 else if (layout !== undefined)
                     mex.font.family = layout.value("FFamilyW")
                 else
@@ -131,7 +131,7 @@ Rectangle {
                     if (layout !== undefined)
                         rootLabel.font.family = layout.value("FFamily")
                     else
-                        rootLabel.font.family ="utopia"
+                        rootLabel.font.family ="Luxi Serif"
                 else if (layout !== undefined)
                     rootLabel.font.family = layout.value("FFamilyW")
                 else

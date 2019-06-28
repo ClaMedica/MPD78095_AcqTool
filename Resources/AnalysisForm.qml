@@ -373,7 +373,7 @@ MForm{
                     if (layout !== undefined)
                         toolTipText.font.family = layout.value("FFamily")
                     else
-                        toolTipText.font.family ="utopia"
+                        toolTipText.font.family ="Luxi Serif"
                 else if (layout !== undefined)
                     toolTipText.font.family = layout.value("FFamilyW")
                 else

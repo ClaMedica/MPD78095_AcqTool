@@ -163,7 +163,7 @@ Rectangle {
                     if (layout !== undefined)
                         text1.font.family = layout.value("FFamily")
                     else
-                        text1.font.family ="utopia"
+                        text1.font.family ="Luxi Serif"
                 else if (layout !== undefined)
                     text1.font.family = layout.value("FFamilyW")
                 else
@@ -192,7 +192,7 @@ Rectangle {
                     if (layout !== undefined)
                         text2.font.family = layout.value("FFamily")
                     else
-                        text2.font.family ="utopia"
+                        text2.font.family ="Luxi Serif"
                 else if (layout !== undefined)
                     text2.font.family = layout.value("FFamilyW")
                 else
@@ -224,7 +224,7 @@ Rectangle {
                     if (layout !== undefined)
                         text3.font.family = layout.value("FFamily")
                     else
-                        text3.font.family ="utopia"
+                        text3.font.family ="Luxi Serif"
                 else if (layout !== undefined)
                     text3.font.family = layout.value("FFamilyW")
                 else
@@ -251,7 +251,7 @@ Rectangle {
         format:            AxisSettings.EFORMAT_INT
         decimalsMaj:       1
         //Y Proprietà del testo Major
-        fontMajFamily:     "utopia"
+        fontMajFamily:     "Luxi Serif"
         fontMajColor:      colorLabelAssi
         fontMajSize:       8
         textMajDist:       2
