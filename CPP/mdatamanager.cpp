@@ -962,7 +962,7 @@ bool MDataManager::checkForVolRes()
     m_numAna = m_mng->GetAnalysiNum();
 
     //gestione campo Other del file .pic
-    QString otherString = m_mng->GetOther();
+    QString otherString = m_mng->GetOther() + ";;;";
     QStringList stringSplit = otherString.split(";");
     qDebug() << "m_mng->GetOther() ==" << otherString;
     if (stringSplit.length() == 2)

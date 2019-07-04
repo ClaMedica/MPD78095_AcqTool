@@ -678,7 +678,7 @@ int MAcqManager::manAutoQml()
                 retv = 1;
         }
     }
-    qDebug("manauto:%d", retv);
+//    qDebug("manauto:%d", retv);
     return retv;
 }
 
