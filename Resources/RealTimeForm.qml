@@ -163,9 +163,6 @@ MForm{
             //@@@@@@@@@@    Properties      @@@@@@@@@@
             id:gridAcq
             anchors.fill: parent
-//            anchors.top: parent.top
-//            anchors.left: parent.left
-//            anchors.right: parent.right
             owner:"Acq"
             itemsInRow:1
             delegate: MMarkerButton {
@@ -181,11 +178,8 @@ MForm{
 
         MLabel {
             id: idMan
-//            text: (manAuto == 1) ? "Man" : "Auto"
             opacity: (((manAuto == 1) || (manAuto == 2)) & manAutoBlink) ? 1 : 0.5
             labelSize: layout.value("F4")
-//            anchors.top: gridAcq.bottom
-//            anchors.bottom: idRun.top
             anchors.bottom: parent.verticalCenter
             anchors.left: parent.left
         }
@@ -196,7 +190,6 @@ MForm{
             opacity: ((manAuto == 3) & manAutoBlink) ? 1 : 0.5
             labelSize: layout.value("F4")
             anchors.top: idMan.bottom
-//            anchors.bottom: parent.bottom
             anchors.left: parent.left
         }
     }
