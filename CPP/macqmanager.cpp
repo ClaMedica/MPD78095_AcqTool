@@ -378,13 +378,19 @@ void MAcqManager::endAcquisition(bool discard)
         //devo resettare il parametro di flusso automatico a false per non far partire sempre l'analisi in automatico all'apertura in review di un file
         Ancestry *autoflow = m_configUser.getSafeChild("AutomaticFlow");
         Ancestry *child = autoflow->getSafeChild("Auto");
-        QString valueAuto = child->getAttribute("value");
-        if (valueAuto == "true")
-        {
-            child->setAttribute("value","false");
+        //QString valueAuto = child->getAttribute("value");
+        child->setAttribute("value","false");
+        //devo resettare il parametro di loop a false per non far partire una nuova acquisiszione alla successiva acquisizione
+        Ancestry *childLoop = autoflow->getSafeChild("Loop");
+        //QString valueLoop = child->getAttribute("value");
+        childLoop->setAttribute("value","false");
+        //if (valueAuto == "true")
+       // {
+         //   child->setAttribute("value","false");
             QString configUser = g_P7SettingsManager.userSettings();
             m_configUser.saveToXML(configUser);
-        }
+        //}
+
     }
 
    // emit acquisitionEnded();

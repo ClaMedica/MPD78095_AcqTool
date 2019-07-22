@@ -463,6 +463,9 @@ void MDataManager::loadFile(QString __fileName)
         Ancestry *autoflow = m_configUser.getSafeChild("AutomaticFlow");
         m_autoFlow = (autoflow->getSafeChild("Auto")->getSafeAttribute(ATT_VALUE) == "true" ? 0 : 2);
 
+        Ancestry *autoloop = m_configUser.getSafeChild("AutomaticFlow");
+        m_autoLoop = (autoloop->getSafeChild("Loop")->getSafeAttribute(ATT_VALUE) == "true" ? true : false);
+
         Ancestry *autoprint = m_configPrinter.getSafeChild("Settings");
         m_autoPrint = (autoprint->getSafeChild("AutoPrint")->getSafeAttribute(ATT_VALUE) == "true" ? true : false);
 
