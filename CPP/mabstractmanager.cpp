@@ -350,14 +350,29 @@ QVariantList MAbstractManager::acqInfo()
 {
     QVariantList list;
 
-    //esci senza salvare
-    list << "$GridElement";
-    list << "descr" << tr("discard");
-    list << "img" << "qrc:/discard";
-    list << "key" << 116;
-    list << "visible" << true;
-    list << "&GridElement";
-
+    Ancestry *autoflow = m_configUser.getSafeChild("AutomaticFlow");
+    Ancestry *childLoop = autoflow->getSafeChild("Loop");
+    QString valueLoop = childLoop->getAttribute("value");
+    if (valueLoop == "true")
+    {
+        //esci senza salvare
+        list << "$GridElement";
+        list << "descr" << tr("exit");
+        list << "img" << "qrc:/salvaChiudi";
+        list << "key" << 117;
+        list << "visible" << true;
+        list << "&GridElement";
+    }
+    else
+    {
+        //esci senza salvare
+        list << "$GridElement";
+        list << "descr" << tr("discard");
+        list << "img" << "qrc:/discard";
+        list << "key" << 116;
+        list << "visible" << true;
+        list << "&GridElement";
+    }
     return list;
 }
 

@@ -145,6 +145,12 @@ MForm{
             onClick:{
                 if (value === "116") {
                     //necessaria richiesta di conferma
+                    dlgDiscard.testo = qsTr("Are you sure to discard the exam?")
+                    dlgDiscard.visible = true
+                }
+                if (value === "117") {
+                    //necessaria richiesta di conferma
+                    dlgDiscard.testo = qsTr("Are you sure to exit from standby?")
                     dlgDiscard.visible = true
                 }
             }
@@ -175,6 +181,7 @@ MForm{
 
     Rectangle {
         id: dlgDiscard
+        property  string testo: ""
         height:screenH*grafic.valueOf("Dialog","height")
         width:screenW*grafic.valueOf("Dialog","width")
         anchors.centerIn: parent
@@ -195,7 +202,7 @@ MForm{
              color: "white"
              horizontalAlignment: Text.AlignHCenter
              verticalAlignment: Text.AlignVCenter
-             text: qsTr("Are you sure to discard the exam?")
+             text: dlgDiscard.testo
              wrapMode: Text.WordWrap
          }
 
