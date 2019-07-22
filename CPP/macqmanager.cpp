@@ -671,6 +671,24 @@ void MAcqManager::handleTCP(SimpleTCPClient *__client, QByteArray __block)
     }
 }
 
+int MAcqManager::manAutoQml()
+{
+    int retv = 0;
+    if(m_acqFileOpened) {
+        if(m_saving)
+            retv = 3;
+        else {
+            if (m_autoStartStop)
+                retv = 2;
+            else
+                retv = 1;
+        }
+    }
+//    qDebug("manauto:%d", retv);
+    return retv;
+}
+
+
 void MAcqManager::initializeServers()
 {
     //creiamo un nuovo canale con la qmlplotter
@@ -1060,11 +1078,11 @@ void MAcqManager::applyOperations()
                             if (m_valPrecVolume < 0) //impostiamo la prima volta il valore precedente
                                 m_valPrecVolume = mediato;
 
-                            if(m_disableWeightFilt == false) {
-                                if (m_valPrecVolume > mediato)
-                                    mediato = m_valPrecVolume;
-                                qDebug()<<"media volume applicata in "<<v<<"ris "<<mediato;
-                            }
+//                            if(m_disableWeightFilt == false) {
+//                                if (m_valPrecVolume > mediato)
+//                                    mediato = m_valPrecVolume;
+//                                qDebug()<<"media volume applicata in "<<v<<"ris "<<mediato;
+//                            }
 
                             m_channelMap[type].at(index)->append(mediato);
                             m_valPrecVolume = mediato;

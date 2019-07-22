@@ -25,7 +25,8 @@ public:
     QVariantList acqMarkers(){return m_acqMarkerList;}
 
     static void dataOnTCP(QObject *__pParent=NULL, SimpleTCPClient *__pTCP=NULL, QByteArray __block=QByteArray());
-    Q_INVOKABLE void send_Command(int __command);
+    Q_INVOKABLE void send_Command(int __command);    
+    Q_INVOKABLE int manAutoQml();
 
 signals:
     void alarmsChanged();
