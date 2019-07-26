@@ -174,7 +174,7 @@ MForm{
                 }
                 if (value === "117") {
                     //necessaria richiesta di conferma
-                    dlgDiscard.testo = qsTr("Are you sure to exit from standby?")
+                    dlgDiscard.testo = qsTr("Are you sure to exit from Stand-By?")
                         dlgDiscard.visible = true
                     }
                 }
