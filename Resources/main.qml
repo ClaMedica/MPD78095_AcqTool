@@ -85,11 +85,11 @@ ApplicationWindow {
             mngAcq.load()
             mngAcq.newAcquisition(dataFile)
             forReal.setMarkersInfo(mngAcq.markersInfo("type", [1, 6]))
+            forReal.setAcqInfo(mngAcq.acqInfo())
             forReal.configurationFile = ""
             forReal.configurationFile = mngAcq.plotConfigFileName()
             forReal.displayMessage(qsTr("Wait for ..."), -1,1)
             forHome.whoIsVisible = forReal.name
-            forReal.setAcqInfo(mngAcq.acqInfo())
         }
         else if(mode === "vis")
         {
