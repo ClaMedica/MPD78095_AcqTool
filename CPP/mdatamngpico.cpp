@@ -37,7 +37,7 @@ void MDataMngPico::sendToPrint()
 {
     qDebug()<<"Check OTHER Load" << "sendToPrint() m_datiCalib:" << m_datiCalib;
 
-    //m_mngPrint->print(m_datiCalib);
+    m_mngPrint->print(m_datiCalib);
     qDebug() << "stampato";
     if (m_autoLoop)
     {
@@ -157,7 +157,7 @@ void MDataMngPico::exitFromReview()
         }
     }
 
-    qDebug()<<"AUTOLOOP"<<m_autoLoop;
+   // qDebug()<<"AUTOLOOP"<<m_autoLoop;
     send_Command(5);   // STARTBT
     if (m_autoLoop)
         g_mainAppBridge->sendLoop();
