@@ -129,13 +129,13 @@ Rectangle {
             {
                 if (PicoFlow)
                     if (layout !== undefined)
-                        rootLabel.font.family = layout.value("FFamily")
+                        mexHelp.font.family = layout.value("FFamily")
                     else
-                        rootLabel.font.family ="Luxi Serif"
+                        mexHelp.font.family ="Luxi Serif"
                 else if (layout !== undefined)
-                    rootLabel.font.family = layout.value("FFamilyW")
+                    mexHelp.font.family = layout.value("FFamilyW")
                 else
-                    rootLabel.font.family = "Calibri"
+                    mexHelp.font.family = "Calibri"
             }
             font.bold: true
             font.pixelSize: 12
