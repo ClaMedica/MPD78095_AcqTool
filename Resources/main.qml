@@ -224,11 +224,11 @@ ApplicationWindow {
             console.log("Go Go Go");
             forReal.displayMessage(qsTr("start"),3000,6)
         }
-//        onAcquisitionEnded:
-//        {
-//            console.log("ENDED")
-//            forReal.endAcq()
-//        }
+        onAcquisitionEnded:
+        {
+            console.log("ENDED")
+            forReal.endAcq()
+        }
         onUdpBtStopped:
         {
             console.log("udp BtStopped")

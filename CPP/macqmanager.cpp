@@ -386,7 +386,7 @@ void MAcqManager::endAcquisition(bool discard)
             m_configUser.saveToXML(configUser);
     }
 
-   // emit acquisitionEnded();
+    emit acquisitionEnded();
 }
 
 void MAcqManager::addMarker(QVariant __key)

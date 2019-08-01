@@ -33,7 +33,7 @@ signals:
     void acqMarkersChanged();
 //    void acquisitionStarted();
     void systemInAcqStatus();
-//    void acquisitionEnded();
+    void acquisitionEnded();
     void udpBtStopped();
     void udpBtRestarted();
     void udpBtUsable(bool);
