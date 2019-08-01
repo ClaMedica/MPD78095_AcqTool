@@ -58,17 +58,6 @@ MForm{
         anchors.right: grid.left
         height: root.height - alarmBox.height
         plotProp:mngCon.plotSetting
-//        Behavior on width {NumberAnimation { duration: 1000 }}
-
-//        //@@@@@@@@@@    Events          @@@@@@@@@@
-//        onPlotPropChanged:
-//        {
-//            if(mngCon.fileName!=="")
-//            {
-//                console.log("start!");
-//                plot.startAll()
-//            }
-//        }
     }
 
     //Managers
