@@ -85,7 +85,7 @@ int main(int argc, char *argv[])
     app.installTranslator(&translatorPlotter);
     app.installTranslator(&translator);
     //versione
-    g_P7SettingsManager.loadVersione();
+    qDebug() << "Vers. " << g_P7SettingsManager.loadVersione();
 
     QStringList arguments;
     //leggiamo gli argomenti
