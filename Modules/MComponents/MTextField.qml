@@ -21,7 +21,7 @@ TextField {
             if (layout !== undefined)
                 rootLabel.font.family = layout.value("FFamily")
             else
-                rootLabel.font.family ="utopia"
+                rootLabel.font.family ="Luxi Serif"
         else if (layout !== undefined)
             rootLabel.font.family = layout.value("FFamilyW")
         else

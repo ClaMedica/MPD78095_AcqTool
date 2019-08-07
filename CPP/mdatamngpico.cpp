@@ -36,8 +36,15 @@ void MDataMngPico::initPrinter()
 void MDataMngPico::sendToPrint()
 {
     qDebug()<<"Check OTHER Load" << "sendToPrint() m_datiCalib:" << m_datiCalib;
+
     m_mngPrint->print(m_datiCalib);
     qDebug() << "stampato";
+    if (m_autoLoop)
+    {
+        //modalita'flusso loop automatico
+        //dopo la stampa deve tornare a medica e far ripartire un'altra flussimetria utomatica
+        exitFromReview();
+    }
 }
 
 void MDataMngPico::getGrabbedImage(QObject *gi, QString __nome)
@@ -119,26 +126,25 @@ void MDataMngPico::udpMdmBtDecode(enum WHO __from, QByteArray __msg)
 
 void MDataMngPico::exitFromReview()
 {
-   qDebug() << "Exit" << getToSave();
+    qDebug() << "Exit" << getToSave();
 
-    //devo resettare il parametro di flusso automatico a false per non far partire sempre l'analisi in automatico all'apertura in review di un file
-    Ancestry *autoflow = m_configUser.getSafeChild("AutomaticFlow");
-    Ancestry *child = autoflow->getSafeChild("Auto");
-    QString valueAuto = child->getAttribute("value");
-    if (valueAuto == "true")
+    if (!m_autoLoop) //se non sono in un loop
     {
-        child->setAttribute("value","false");
-        QString configUser = g_P7SettingsManager.userSettings();
-        m_configUser.saveToXML(configUser);
+        //devo resettare il parametro di flusso automatico a false per non far partire sempre l'analisi in automatico all'apertura in review di un file
+        Ancestry *autoflow = m_configUser.getSafeChild("AutomaticFlow");
+        Ancestry *child = autoflow->getSafeChild("Auto");
+        QString valueAuto = child->getAttribute("value");
+        if (valueAuto == "true")
+        {
+            child->setAttribute("value","false");
+            QString configUser = g_P7SettingsManager.userSettings();
+            m_configUser.saveToXML(configUser);
+        }
     }
 
     if (getToSave() == "ret")  //non ci sono state modifiche
     {
         qDebug()<<"cancellata copia all'exit"<<QFile::remove(m_copyFileName);
-
-        send_Command(5);   // STARTBT
-        g_mainAppBridge->sendExitReview();
-        g_mainAppBridge->sendSwitch();  //send(MEX_SHOW);
     }
     else //devo salvare
     {
@@ -149,10 +155,13 @@ void MDataMngPico::exitFromReview()
             qDebug()<<"cancello vecchio file"<<QFile::remove(m_fileName);
             qDebug()<<"copio le modifiche"<<QFile::rename(m_copyFileName,m_fileName);
         }
-
-        send_Command(5);   // STARTBT
-        g_mainAppBridge->sendExitReview();
-        g_mainAppBridge->sendSwitch(); //poi dovra tornare al modulo database
-
     }
+
+   // qDebug()<<"AUTOLOOP"<<m_autoLoop;
+    send_Command(5);   // STARTBT
+    if (m_autoLoop)
+        g_mainAppBridge->sendLoop();
+    else
+        g_mainAppBridge->sendExitReview();
+    g_mainAppBridge->sendSwitch(); //poi dovra tornare al modulo database
 }

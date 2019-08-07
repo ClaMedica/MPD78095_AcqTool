@@ -51,7 +51,7 @@ Rectangle{
                     if (layout !== undefined)
                         text.font.family = layout.value("FFamily")
                     else
-                        text.font.family ="utopia"
+                        text.font.family ="Luxi Serif"
                 else if (layout !== undefined)
                     text.font.family = layout.value("FFamilyW")
                 else

@@ -379,8 +379,8 @@ void printermanager::print(QString __datiCalib)
     //paziente
     QString dataPaz = m_dfm->GetPatient();
 
-    m_name = dataPaz.section(";", 0, 0);
-    m_surname = dataPaz.section(";", 1, 1);
+    m_surname = dataPaz.section(";", 0, 0);
+    m_name = dataPaz.section(";", 1, 1);
     m_dateofbirth = dataPaz.section(";", 2, 2);
     m_sex = dataPaz.section(";", 12, 12);
     m_ID = dataPaz.section(";", 3, 3);
@@ -398,7 +398,7 @@ void printermanager::print(QString __datiCalib)
     m_durata = m_dfm->GetDuration() / 1000; //in sec
 
      // discrimina se esame veloce oppure completo di dati paziente (servira nel report di stampa)
-    if (m_surname == "Anonymous")
+    if (m_name == "Anonymous")
         m_test_type = true;
 
     if(m_printModeUser)

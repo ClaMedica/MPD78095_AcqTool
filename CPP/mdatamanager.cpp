@@ -167,26 +167,28 @@ void MDataManager::loadFile(QString __fileName)
             m_sexPatient = true;
 
         //dati calibrazione
-        //In questo caso se si decide di cambiare i file di esempio con esami acquisiti
-        //nuovi, non avremmo più necessita del controllo di seguito
-        m_datiCalib = "none";
+        m_datiCalib = "none;";
         QString otherString = m_mng->GetOther();
         QStringList stringSplit = otherString.split(";");
         if (otherString == "")
         {
-            //inserisco dati calibrazione per esami vecchi
-            otherString = "none;";
+            qDebug() << "otherstring vuota" << m_datiCalib;
+            //c'è qualche problema e manca la calibrazione
+            //la inseriamo
+            otherString = m_datiCalib;
             m_mng->SetOther(otherString);
             m_mng->CommitParameters();
+            qDebug() << "otherstring vuota" << m_mng->GetOther();
         }
-        else if (stringSplit.length() >= 2)
+        else if (stringSplit.length() >= 2)//qui è tutto ok
         {
             QString first = stringSplit.at(0);
-            if (first.contains("none") || first.length() >= 5)  // giorgio >=
+            qDebug() << "first:" << first;
+            if (first.contains("none") || first.length() >= 5)
             {
                 m_datiCalib = first;
             }
-            else
+            else //nel caso avessimo valori sul campo other ma non dati sulla calibrazione
             {
                 QString newOther = "none;" + otherString;
                 m_mng->SetOther(newOther);
@@ -463,6 +465,9 @@ void MDataManager::loadFile(QString __fileName)
         //carico le info necessarie dal file di config
         Ancestry *autoflow = m_configUser.getSafeChild("AutomaticFlow");
         m_autoFlow = (autoflow->getSafeChild("Auto")->getSafeAttribute(ATT_VALUE) == "true" ? 0 : 2);
+
+        Ancestry *autoloop = m_configUser.getSafeChild("AutomaticFlow");
+        m_autoLoop = (autoloop->getSafeChild("Loop")->getSafeAttribute(ATT_VALUE) == "true" ? true : false);
 
         Ancestry *autoprint = m_configPrinter.getSafeChild("Settings");
         m_autoPrint = (autoprint->getSafeChild("AutoPrint")->getSafeAttribute(ATT_VALUE) == "true" ? true : false);
@@ -964,8 +969,11 @@ bool MDataManager::checkForVolRes()
 
     //gestione campo Other del file .pic
     QString otherString = m_mng->GetOther();
-    QStringList stringSplit = otherString.split(";");
     qDebug() << "m_mng->GetOther() ==" << otherString;
+    if(otherString == "none")
+        otherString  += ";";
+    QStringList stringSplit = otherString.split(";");
+    qDebug() << "m_mng->GetOther() ==" << otherString << stringSplit;
     if (stringSplit.length() == 2)
     {
         otherString  += "0;" + QString::number(m_autoFlow) + ";";
@@ -1034,7 +1042,7 @@ qDebug() << "INIZIO";
     qDebug() << "File Aperto?" << m_mng->Open();
     qDebug() << "File Caricato?" << m_mng->GetParameters();
 
-    //mi salvo nel campo other il valore del volume residuo nel caso l'utente lo avesse cambiato
+    //mi salvo nel campo other il valore del volume residuo nel caso l'utente lo avesse nonecambiato
     QString other = m_mng->GetOther();
     QStringList otherList = other.split(";");
     m_datiCalib = otherList.at(0);//stringa per dati calibrazione da stampare
@@ -1059,7 +1067,6 @@ qDebug() << "INIZIO";
 
     for (int i = 0; i < m_numAna; i++) {
         int anaType = m_mng->GetAnalysis(i).toInt();
-
         if (anaType == FLW_AVD_STUDY) {
             //verifica se c'e' un definitore per questa analisi.
             VarMap mkOpAnIn;

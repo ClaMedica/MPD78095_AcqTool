@@ -145,6 +145,7 @@ protected:
     QVector<MSignal *> m_signalVector;
 
     int     m_autoFlow;     //Modalita dell'esame 0=auto; 2=manual
+    bool    m_autoLoop;     //se modalita loop
     bool    m_Siroky;       //se stampare Siroky
     bool    m_Liverpool;    //se stampare Liverpool
     bool    m_landscape;    //modalità di stampa: portrait o landascape (ture se landscape)

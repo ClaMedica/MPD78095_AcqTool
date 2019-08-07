@@ -71,7 +71,7 @@ int main(int argc, char *argv[])
 
     qDebug() << "Start. log:" << gPath_log;
     //dirotto il debug log
-    //MyMessageOutput::init(gPath_log);
+    MyMessageOutput::init(gPath_log);
 
     //carico i settaggi
     g_P7SettingsManager.loadSettings();
@@ -85,7 +85,7 @@ int main(int argc, char *argv[])
     app.installTranslator(&translatorPlotter);
     app.installTranslator(&translator);
     //versione
-    g_P7SettingsManager.loadVersione();
+    qDebug() << "Vers. " << g_P7SettingsManager.loadVersione();
 
     QStringList arguments;
     //leggiamo gli argomenti

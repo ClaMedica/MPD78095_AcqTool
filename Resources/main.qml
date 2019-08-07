@@ -89,7 +89,7 @@ ApplicationWindow {
             forReal.configurationFile = mngAcq.plotConfigFileName()
             forReal.displayMessage(qsTr("Wait for ..."), -1,1)
             forHome.whoIsVisible = forReal.name
-            forReal.setAcqInfo(mngData.acqInfo())
+            forReal.setAcqInfo(mngAcq.acqInfo())
         }
         else if(mode === "vis")
         {
@@ -198,6 +198,10 @@ ApplicationWindow {
         {
             console.log("Stampa di prova");
             launch("sta","")
+        }
+        onClosePico:
+        {
+            mngData.exitFromReview()
         }
         onAnaAutomatica:
         {

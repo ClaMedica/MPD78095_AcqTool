@@ -30,7 +30,7 @@ MAcqManager::MAcqManager(QObject *parent)
 
 
     m_startAcqManuale = false; //non ancora premuto tasto start
-    m_calibCella = "";
+    m_calibCella = "none;";
     m_startWithZero = false;
 
 #ifdef PICOFLOW
@@ -241,10 +241,6 @@ bool MAcqManager::newAcquisition(QString __dataFile)
         qDebug() << "Updating datafile...";
         handleDataFile();
 
-        //dati di calibrazione
-        qDebug()<<"calibsave"<<m_calibCella;
-        m_mng->SetOther(m_calibCella);
-
         //ripristino il file in acquisizione
         bool res = m_mng->Continue();
         qDebug() << "Continue ..." << res;
@@ -382,13 +378,12 @@ void MAcqManager::endAcquisition(bool discard)
         //devo resettare il parametro di flusso automatico a false per non far partire sempre l'analisi in automatico all'apertura in review di un file
         Ancestry *autoflow = m_configUser.getSafeChild("AutomaticFlow");
         Ancestry *child = autoflow->getSafeChild("Auto");
-        QString valueAuto = child->getAttribute("value");
-        if (valueAuto == "true")
-        {
-            child->setAttribute("value","false");
-            QString configUser = g_P7SettingsManager.userSettings();
+        child->setAttribute("value","false");
+        //devo resettare il parametro di loop a false per non far partire una nuova acquisiszione alla successiva acquisizione
+        Ancestry *childLoop = autoflow->getSafeChild("Loop");
+        childLoop->setAttribute("value","false");
+        QString configUser = g_P7SettingsManager.userSettings();
             m_configUser.saveToXML(configUser);
-        }
     }
 
     emit acquisitionEnded();
@@ -429,7 +424,7 @@ bool MAcqManager::sendStartAcq()
 {
     qDebug() << "sendStartAcq()";
     m_startWithZero = true;
-    bool ret = sendCommand(ETCP_CMD_START_WITH_ZERO);
+    bool ret = sendCommand(ETCP_CMD_START);
 #ifdef PICOFLOW
  //   system("/root/PicoFlow/beep 15");
     udpConn.sendSup("ButtonStStEnable");
@@ -668,6 +663,24 @@ void MAcqManager::handleTCP(SimpleTCPClient *__client, QByteArray __block)
         }
     }
 }
+
+int MAcqManager::manAutoQml()
+{
+    int retv = 0;
+    if(m_acqFileOpened) {
+        if(m_saving)
+            retv = 3;
+        else {
+            if (m_autoStartStop)
+                retv = 2;
+            else
+                retv = 1;
+        }
+    }
+//    qDebug("manauto:%d", retv);
+    return retv;
+}
+
 
 void MAcqManager::initializeServers()
 {
@@ -1058,11 +1071,11 @@ void MAcqManager::applyOperations()
                             if (m_valPrecVolume < 0) //impostiamo la prima volta il valore precedente
                                 m_valPrecVolume = mediato;
 
-                            if(m_disableWeightFilt == false) {
-                                if (m_valPrecVolume > mediato)
-                                    mediato = m_valPrecVolume;
-                                qDebug()<<"media volume applicata in "<<v<<"ris "<<mediato;
-                            }
+//                            if(m_disableWeightFilt == false) {
+//                                if (m_valPrecVolume > mediato)
+//                                    mediato = m_valPrecVolume;
+//                                qDebug()<<"media volume applicata in "<<v<<"ris "<<mediato;
+//                            }
 
                             m_channelMap[type].at(index)->append(mediato);
                             m_valPrecVolume = mediato;
@@ -1195,14 +1208,15 @@ void MAcqManager::fillBuffers(QByteArray __block)
                         }
 
                         if (tipo == "VV" && m_startWithZero) {
-                            if (!(sample <= -0.1 || sample >= 0.1))
+                            if (!(sample <= -0.1 || sample >= 0.2))
                                 m_startWithZero = false;
                         }
 
+                        qDebug("samples(ch:%d, nd:%d):%f",currChan,numChanData,sample);
                         if (!m_startWithZero)
                         {
                             m_bufferMap[QString::number(currChan)]->append(sample);
-                            qDebug("samples(ch:%d, nd:%d):%f",currChan,numChanData,sample);
+                            qDebug("append sample");
                         }
 
                     }
