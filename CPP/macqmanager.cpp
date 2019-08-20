@@ -54,6 +54,7 @@ MAcqManager::MAcqManager(QObject *parent)
     connect(&m_alarmMng, SIGNAL(alarmsUpdated(QVariantList)), this, SLOT(setAlarms(QVariantList)));
     connect(&udpConn, SIGNAL(receivedUdp(enum WHO, QByteArray)), this, SLOT(udpBtDecode(WHO,QByteArray)));
     udpConn.iAmAcq();
+    udpConn.connessioni();
     udpConn.sendSup("hello from acq");
 #endif
     qDebug() << "fine costruttore ";

@@ -1,10 +1,11 @@
 ﻿<Configuration label="Configuration">
+        <pesoBeaker value="70">
         <AutomaticFlow label="Automatic Flow">
         <Auto
             label="Automatic flow"
             type="CheckBox"
             unit=""
-            value="true"
+            value="false"
             visible="false"
         />
         <AutoStarts label="Auto Starts">>
