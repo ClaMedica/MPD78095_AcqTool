@@ -30,5 +30,14 @@
         <file>danger.png</file>
         <file>danger_click.png</file>
         <file>danger_off.png</file>
+        <file>f1.png</file>
+        <file>f1_click.png</file>
+        <file>f1_off.png</file>
+        <file>f2.png</file>
+        <file>f2_click.png</file>
+        <file>f3.png</file>
+        <file>f3_click.png</file>
+        <file>f3_off.png</file>
+        <file>f2_off.png</file>
     </qresource>
 </RCC>

@@ -87,6 +87,79 @@ void MDataMngDesktop::addOpMarker(QVariant __key,QVariant __posX)
     emit reloadingCompleted();
 }
 
+void MDataMngDesktop::addAnMarker(QVariant __key, QVariant __posX, QVariantList __chName)
+{
+    int posX = __posX.toInt();
+    VarMapVec* elements = m_storage.getAll(CAT_DEFINER);
+    bool defFound = false;
+    VarMap *defMap = NULL;
+    foreach (VarMap *curMap, (*elements)) {
+        int evStart = curMap->value("xMin").toInt();
+        int evEnd = curMap->value("xMax").toInt();
+
+        if (evStart < posX  &&  posX < evEnd) {
+            defFound = true;
+            defMap = curMap;
+            break;
+        }
+    }
+    if (defFound)
+    {
+        //definitore trovato curMap, inserisco il marker analitico
+        //cerco il canale (QUALI CANALI HANNO I MARKER ANALITICI? )
+        foreach(MSignal *sig, m_signalVector) {
+            for (int i=0;i<__chName.length();i++)
+            {
+                if(sig->getName() == __chName[i].toString()) {
+                    QString key = __key.toString();
+
+                    QVariantList valuesY;
+                    for (int i = 0; i < sig->size(); i++)
+                        valuesY.append(sig->at(i));
+
+                    VarMap *mrk = new VarMap;
+                    VarMapVec *mrkAnVec = new VarMapVec;
+
+                    (*mrk)["val"] = __posX;
+                    (*mrk)["type"] = TYPE_ANALYTICAL;
+                    (*mrk)["name"] = "Analitical";
+                    (*mrk)["family"] = "Markers";
+                    (*mrk)["nas"] = sig->getSamplingFrequency();
+                    (*mrk)["valuesY"] = valuesY;
+                    (*mrk)["graph"] = sig->getGraph();
+                    (*mrk)["code"] = key;
+                    (*mrk)["descr"] = defMap->value("descr");
+                    (*mrk)["lock"] = false;
+                    (*mrk)["channel"] = sig->getCh();
+                    (*mrk)["defCode"] = (qulonglong)defMap->value("whoAmI").toULongLong();
+                    (*mrk)["key"] = key.right(1).toInt();
+                    (*mrk)["color"] = COLOR_ANALYTICAL;
+                    (*mrk)["visible"] = true;
+                    (*mrk)["category"] = CAT_MARKER;
+                    mrkAnVec->append(mrk);
+                    //lo associo al suo definitore
+                    QList<QVariant> anM = defMap->value("anMarkers").toList();
+                    anM.append((qulonglong)mrk);
+                    (*defMap)["anMarkers"] = anM;
+
+                    if(!mrkAnVec->isEmpty()) {
+                        QString family = "Markers";
+                        QString name = "Analitical";
+                        saveDataAndUpdate(family, name, mrkAnVec,APPEND);
+                    }
+
+                    updateInfoList();
+                    emit reloadingCompleted();
+                }
+            }
+        }
+    }
+    else
+    {
+        qDebug() << "definitore nono trovato--> warning";
+    }
+}
+
 void MDataMngDesktop::addDefiner(QVariant __key, QVector<double> __pos)
 {
     //prendo il definer corrispondete al __key
@@ -130,7 +203,7 @@ void MDataMngDesktop::addDefiner(QVariant __key, QVector<double> __pos)
 
     VarMapVec *defVec = new VarMapVec;
     defVec->append(def);
-    saveDataAndUpdate(family, name, defVec);
+    saveDataAndUpdate(family, name, defVec,APPEND);
 
     updateInfoList();
     emit reloadingCompleted();

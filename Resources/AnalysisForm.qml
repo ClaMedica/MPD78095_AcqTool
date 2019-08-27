@@ -10,7 +10,7 @@ import MComponents 1.0
 import "qrc:/Components"
 MForm{
     //@@@@@@@@@@    Definitions     @@@@@@@@@@
-    property string displayInformations:""
+    property bool change: false //cambiamenti effettuati nel plot ma che non modificano i suoi limiti (definitori, marker)
     signal back
 
     //@@@@@@@@@@    Properties      @@@@@@@@@@
@@ -25,7 +25,10 @@ MForm{
         plot.tracks=mngData.getData("Track")
         plot.markers=mngData.getData("Marker")
         plot.frames=mngData.getData("Definer")
-        plot.limits=mngData.getPlotLimits();
+          if (!change)
+            plot.limits=mngData.getPlotLimits();
+        else
+            change = false
         lbNamePat.text = mngData.patientInfo
     }
 
@@ -97,10 +100,12 @@ MForm{
 
         property real opMarkerKey: -1
         property real definerKey: -1
+        property string anMarkerKey: ""
         //@@@@@@@@@@    Events          @@@@@@@@@@
 
         onCurObjChanged: {
             if(completed){
+                change = true;
                 if (!PicoFlow && curObj.length === 1) {//sto cancellando un markers
                     dialogDelete.obj = curObj
                     dialogDelete.owner=this
@@ -111,11 +116,18 @@ MForm{
         }
 
         onOpMarkerPosChanged:{
+            change = true; //cambiamenti nel plot
             mngData.addOpMarker(opMarkerKey,opMarkerPos)
         }
 
         onDefinerPosChanged:{
+            change = true; //cambiamenti nel plot
             mngData.addDefiner(definerKey,definerPos)
+        }
+
+        onAnMarkerPosChanged: {
+            change = true; //cambiamenti nel plot
+            mngData.addAnMarker(anMarkerKey,anMarkerPos,anMarkChNames)
         }
 
     }
@@ -226,7 +238,13 @@ MForm{
         itemsInRow:1
         delegate: MMarkerButton {
             onClick: {
-                mngData.deleteAnMArkers()
+                if (value === "116")
+                    mngData.deleteAnMArkers()
+                if (value === "f1" || value === "f2" || value === "f3")
+                {
+                    plot.anMarkerKey = value
+                    plot.newAnMarker = true
+                }
             }
             onTooltipActive: {
                 if (testo === "")

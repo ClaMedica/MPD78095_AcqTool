@@ -251,14 +251,34 @@ QVariantList MAbstractManager::actionsInfo()
     //leggiamo il file di configurazione e riempiamo le info
     QVariantList list;
 
-//    //aggiungo pulsante cancella markers analitici
+//    //aggiungo pulsanti markers analitici (f1 f2 f3)
+    list << "$GridElement";
+    list << "descr" << tr("insert f1 marker");
+    list << "img" << "qrc:/f1";
+    list << "key" << "f1";
+    list << "visible" << true;
+    list << "&GridElement";
 
-   list << "$GridElement";
-   list << "descr" << tr("delete analytical markers");
-   list << "img" << "qrc:/danger";
-   list << "key" << 116;
-   list << "visible" << true;
-   list << "&GridElement";
+    list << "$GridElement";
+    list << "descr" << tr("insert f2 marker");
+    list << "img" << "qrc:/f2";
+    list << "key" << "f2";
+    list << "visible" << true;
+    list << "&GridElement";
+
+    list << "$GridElement";
+    list << "descr" << tr("insert f3 marker");
+    list << "img" << "qrc:/f3";
+    list << "key" << "f3";
+    list << "visible" << true;
+    list << "&GridElement";
+
+    list << "$GridElement";
+    list << "descr" << tr("delete analytical markers");
+    list << "img" << "qrc:/danger";
+    list << "key" << 116;
+    list << "visible" << true;
+    list << "&GridElement";
 
     return list;
 }

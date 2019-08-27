@@ -253,8 +253,9 @@ void MDataManager::loadFile(QString __fileName)
             for(int i = 0; i < m_mng->GetSamplesNumber(h); i++)
                 sig->replace(i, m_mng->GetValue(h, i));
 
-            qDebug() << "sig:" << sig;
             sig->setName(m_mng->GetChanName(h));
+            sig->setGraph(m_mng->GetGraph(h)-1);
+            sig->setCh(h);
             sig->setSamplingFrequency(m_mng->GetNAS(h));
             sig->setSupLim(m_mng->GetSupLim(h));
 
@@ -465,9 +466,6 @@ void MDataManager::loadFile(QString __fileName)
         //carico le info necessarie dal file di config
         Ancestry *autoflow = m_configUser.getSafeChild("AutomaticFlow");
         m_autoFlow = (autoflow->getSafeChild("Auto")->getSafeAttribute(ATT_VALUE) == "true" ? 0 : 2);
-
-        Ancestry *autoloop = m_configUser.getSafeChild("AutomaticFlow");
-        m_autoLoop = (autoloop->getSafeChild("Loop")->getSafeAttribute(ATT_VALUE) == "true" ? true : false);
 
         Ancestry *autoprint = m_configPrinter.getSafeChild("Settings");
         m_autoPrint = (autoprint->getSafeChild("AutoPrint")->getSafeAttribute(ATT_VALUE) == "true" ? true : false);

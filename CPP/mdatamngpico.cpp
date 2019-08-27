@@ -21,6 +21,8 @@ MDataMngPico::~MDataMngPico()
 void MDataMngPico::loadFile(QString __fileName)
 {
     MDataManager::loadFile(__fileName);
+    Ancestry *autoloop = m_configUser.getSafeChild("AutomaticFlow");
+    m_autoLoop = (autoloop->getSafeChild("Loop")->getSafeAttribute(ATT_VALUE) == "true" ? true : false);
     initPrinter();
 }
 
