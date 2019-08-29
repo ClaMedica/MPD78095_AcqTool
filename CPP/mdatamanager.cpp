@@ -384,6 +384,8 @@ void MDataManager::loadFile(QString __fileName)
                 (*mrk)["color"] = COLOR_ANALYTICAL;
                 (*mrk)["visible"] = true;
                 (*mrk)["category"] = CAT_MARKER;
+                (*mrk)["limDefMax"] = defVec->value(numDef)->value("xMax").toDouble();
+                (*mrk)["limDefMin"] = defVec->value(numDef)->value("xMin").toDouble();
                 mrkAnVec->append(mrk);
                 //lo associo al suo definitore
                 QList<QVariant> anM  =  defVec->value(numDef)->value("anMarkers").toList();
@@ -1377,6 +1379,8 @@ void MDataManager::InitPageGraphs(int __anaType)
                 (*mrk)["color"] = COLOR_ANALYTICAL;
                 (*mrk)["visible"] = true;
                 (*mrk)["category"] = CAT_MARKER;
+                (*mrk)["limDefMax"] = evMarkOpIn->value("xMax").toDouble();
+                (*mrk)["limDefMin"] = evMarkOpIn->value("xMin").toDouble();
                 mrkAnVec->append(mrk);
                 //lo associo al suo definitore
                 QList<QVariant> anM = evMarkOpIn->value("anMarkers").toList();

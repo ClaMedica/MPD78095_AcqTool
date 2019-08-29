@@ -89,74 +89,97 @@ void MDataMngDesktop::addOpMarker(QVariant __key,QVariant __posX)
 
 void MDataMngDesktop::addAnMarker(QVariant __key, QVariant __posX, QVariantList __chName)
 {
-    int posX = __posX.toInt();
-    VarMapVec* elements = m_storage.getAll(CAT_DEFINER);
-    bool defFound = false;
-    VarMap *defMap = NULL;
-    foreach (VarMap *curMap, (*elements)) {
-        int evStart = curMap->value("xMin").toInt();
-        int evEnd = curMap->value("xMax").toInt();
-
-        if (evStart < posX  &&  posX < evEnd) {
-            defFound = true;
-            defMap = curMap;
-            break;
-        }
+    QString warning = "";
+    QString chName = "";
+    for (int i=0;i<__chName.length();i++) {
+        QString chTemp = __chName.at(i).toString();
+        if (chTemp.startsWith("Q"))
+            chName = __chName.at(i).toString();
     }
-    if (defFound)
-    {
-        //definitore trovato curMap, inserisco il marker analitico
-        //cerco il canale (QUALI CANALI HANNO I MARKER ANALITICI? )
-        foreach(MSignal *sig, m_signalVector) {
-            for (int i=0;i<__chName.length();i++)
-            {
-                if(sig->getName() == __chName[i].toString()) {
-                    QString key = __key.toString();
 
-                    QVariantList valuesY;
-                    for (int i = 0; i < sig->size(); i++)
-                        valuesY.append(sig->at(i));
+    if (chName != ""){
+        int posX = __posX.toInt();
+        VarMapVec* elements = m_storage.getAll(CAT_DEFINER);
+        bool defFound = false;
+        VarMap *defMap = NULL;
+        foreach (VarMap *curMap, (*elements)) {
+            int evStart = curMap->value("xMin").toInt();
+            int evEnd = curMap->value("xMax").toInt();
 
-                    VarMap *mrk = new VarMap;
-                    VarMapVec *mrkAnVec = new VarMapVec;
+            if (evStart < posX  &&  posX < evEnd) {
+                defFound = true;
+                defMap = curMap;
+                break;
+            }
+        }
+        if (defFound)
+        {
+            //definitore trovato curMap, inserisco il marker analitico
+            //cerco il canale (QUALI CANALI HANNO I MARKER ANALITICI? Q1)
+            foreach(MSignal *sig, m_signalVector) {
+                for (int i=0;i<__chName.length();i++)
+                {
+                    QString chName =  __chName[i].toString();
+                    if (chName.startsWith("Q") && (sig->getName() == chName))
+                    {
+                        QString key = __key.toString();
 
-                    (*mrk)["val"] = __posX;
-                    (*mrk)["type"] = TYPE_ANALYTICAL;
-                    (*mrk)["name"] = "Analitical";
-                    (*mrk)["family"] = "Markers";
-                    (*mrk)["nas"] = sig->getSamplingFrequency();
-                    (*mrk)["valuesY"] = valuesY;
-                    (*mrk)["graph"] = sig->getGraph();
-                    (*mrk)["code"] = key;
-                    (*mrk)["descr"] = defMap->value("descr");
-                    (*mrk)["lock"] = false;
-                    (*mrk)["channel"] = sig->getCh();
-                    (*mrk)["defCode"] = (qulonglong)defMap->value("whoAmI").toULongLong();
-                    (*mrk)["key"] = key.right(1).toInt();
-                    (*mrk)["color"] = COLOR_ANALYTICAL;
-                    (*mrk)["visible"] = true;
-                    (*mrk)["category"] = CAT_MARKER;
-                    mrkAnVec->append(mrk);
-                    //lo associo al suo definitore
-                    QList<QVariant> anM = defMap->value("anMarkers").toList();
-                    anM.append((qulonglong)mrk);
-                    (*defMap)["anMarkers"] = anM;
+                        QVariantList valuesY;
+                        for (int i = 0; i < sig->size(); i++)
+                            valuesY.append(sig->at(i));
 
-                    if(!mrkAnVec->isEmpty()) {
-                        QString family = "Markers";
-                        QString name = "Analitical";
-                        saveDataAndUpdate(family, name, mrkAnVec,APPEND);
+                        VarMap *mrk = new VarMap;
+                        VarMapVec *mrkAnVec = new VarMapVec;
+
+                        (*mrk)["val"] = __posX;
+                        (*mrk)["type"] = TYPE_ANALYTICAL;
+                        (*mrk)["name"] = "Analitical";
+                        (*mrk)["family"] = "Markers";
+                        (*mrk)["nas"] = sig->getSamplingFrequency();
+                        (*mrk)["valuesY"] = valuesY;
+                        (*mrk)["graph"] = sig->getGraph();
+                        (*mrk)["code"] = key;
+                        (*mrk)["descr"] = defMap->value("descr");
+                        (*mrk)["lock"] = false;
+                        (*mrk)["channel"] = sig->getCh();
+                        (*mrk)["defCode"] = (qulonglong)defMap->value("whoAmI").toULongLong();
+                        (*mrk)["key"] = key.right(1).toInt();
+                        (*mrk)["color"] = COLOR_ANALYTICAL;
+                        (*mrk)["visible"] = true;
+                        (*mrk)["category"] = CAT_MARKER;
+                        (*mrk)["limDefMax"] = defMap->value("xMax").toDouble();
+                        (*mrk)["limDefMin"] = defMap->value("xMin").toDouble();
+                        mrkAnVec->append(mrk);
+                        //lo associo al suo definitore
+                        QList<QVariant> anM = defMap->value("anMarkers").toList();
+                        anM.append((qulonglong)mrk);
+                        (*defMap)["anMarkers"] = anM;
+
+                        if(!mrkAnVec->isEmpty()) {
+                            QString family = "Markers";
+                            QString name = "Analitical";
+                            saveDataAndUpdate(family, name, mrkAnVec,APPEND);
+                        }
+
+                        updateInfoList();
+                        emit reloadingCompleted();
                     }
-
-                    updateInfoList();
-                    emit reloadingCompleted();
                 }
             }
+        }
+        else
+        {
+            warning = "definitore non trovato--> warning";
         }
     }
     else
     {
-        qDebug() << "definitore nono trovato--> warning";
+        warning = "warning ---- su questo canale non possono inserirsi anmarker";
+    }
+
+    if (warning != "")
+    {
+        qDebug()<<warning;
     }
 }
 

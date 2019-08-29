@@ -10,7 +10,10 @@ import MComponents 1.0
 import "qrc:/Components"
 MForm{
     //@@@@@@@@@@    Definitions     @@@@@@@@@@
-    property bool change: false //cambiamenti effettuati nel plot ma che non modificano i suoi limiti (definitori, marker)
+    //cambiamenti effettuati nel plot ma che non modificano i suoi limiti (definitori, marker)
+    //in caso di plot zoomato il cambiamento deilimiti genera un reset dello zoom
+    property bool change: false
+
     signal back
 
     //@@@@@@@@@@    Properties      @@@@@@@@@@
@@ -25,7 +28,7 @@ MForm{
         plot.tracks=mngData.getData("Track")
         plot.markers=mngData.getData("Marker")
         plot.frames=mngData.getData("Definer")
-          if (!change)
+        if (!change)
             plot.limits=mngData.getPlotLimits();
         else
             change = false
