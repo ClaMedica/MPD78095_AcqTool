@@ -103,7 +103,7 @@ void MAcqManager::udpBtDecode(enum WHO __from, QByteArray __msg)
                 if((__msg.at(0) == 'N') && (__msg == "NoBt"))      emit udpBtUsable(false);
                 if((__msg.at(0) == 'C') && (__msg.startsWith("CALIB:"))) {
                     m_calibCella = __msg.mid(6) + ";";
-                    qDebug() << "calibration data:" << m_calibCella;
+                    //qDebug() << "calibration data:" << m_calibCella;
                 }
                 break;
     case E_PRN:
@@ -637,7 +637,7 @@ void MAcqManager::handleTCP(SimpleTCPClient *__client, QByteArray __block)
                     //azzero
                     qDebug() << "CMD __block[4] == '5': Start acquiring sendStartAcq()";
                     acqStarted = true;
-                    sendStartAcq();
+
                     m_startAcqManuale = true;
                     int secToSave = 0.0;
                     //in caso di flussimetria manuale non devo tenermi buffer di dati:
@@ -651,6 +651,8 @@ void MAcqManager::handleTCP(SimpleTCPClient *__client, QByteArray __block)
                     m_saving = true;    //posso iniziare a salvare i dati
                   //  emit systemInAcqStatus();
                     m_acqFinished = false;
+
+                    sendStartAcq();
                 }
                 else {
                     //ferma immediatamente l'acquisizione
@@ -849,6 +851,7 @@ void MAcqManager::checkAutomaticStartStop(QString __which)
                     m_saving = true;    //posso iniziare a salvare i dati
                    // emit systemInAcqStatus();
                     qDebug() << "Start acquiring";
+                    m_stopBuffer.clear();
                     m_acqFinished = false;
                     return;
                 }
@@ -863,7 +866,7 @@ void MAcqManager::checkAutomaticStartStop(QString __which)
             Ancestry *childDur = condition->getSafeChild(XML_DURATION);
             Ancestry *childVal = condition->getSafeChild(XML_VALUE);
 
-            //per prima cosa controlliamo quanti campioni ha
+            //per prima cosa controlliamo la durata minima
             int min = childDur->getSafeChild(ATT_MIN)->getSafeAttribute(ATT_VALUE).toUInt();
 
             qreal valMin = childVal->getSafeChild(ATT_MIN)->getSafeAttribute(ATT_VALUE).toDouble();
@@ -872,11 +875,11 @@ void MAcqManager::checkAutomaticStartStop(QString __which)
 
             m_stopBuffer.setSamplingPeriod(m_channelMap[chanType].at(num)->getSamplingPeriod());
             m_stopBuffer << *(m_channelMap[chanType].at(num));
-            //qDebug()<<"StopBuffer Len"<<m_stopBuffer.getDuration()<<m_stopBuffer.size();
+            //qDebug()<<"StopBuffer Len"<<m_stopBuffer.getDuration()<<m_stopBuffer.size()<<"min"<<min;
             m_stopBuffer.saveLastSec(min);
 
             if (!(m_stopBuffer.getDuration() < min))
-            {//   continue;
+            {
                 //ora quindi sono sicuro che arrivo qui solo quando ho abbastanza campioni
 
                 //controllo gli ultimi min campioni
@@ -1188,7 +1191,7 @@ void MAcqManager::fillBuffers(QByteArray __block)
         for(int k = 0; k < numChan; k++) {
             in >> currChan;
             in >> numChanData;
-            qDebug() << "currChan:" << currChan;
+            //qDebug() << "currChan:" << currChan;
 
             if((currChan < maxNumChan) && (currChan >= 0)) {    //se e' un canale con del senso
                 if(m_bufferMap.keys().contains(QString::number(currChan))) {
