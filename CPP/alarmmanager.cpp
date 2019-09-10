@@ -35,7 +35,7 @@ bool AlarmManager::load(QString __fileName)
 {
     m_confAla = new Ancestry;
     if(!m_confAla->loadFromXML(__fileName)) {
-        qCritical() << "File corrupted";
+        qWarning() << "File corrupted";
         delete m_confAla;
         m_confAla = NULL;
         return false;
@@ -96,7 +96,7 @@ void AlarmManager::addAlarm(int __code)
     {
         indexAllarmText = 2;
         indexAllarmHelp = 3;
-    } else if (__code == 200 ) //acquisizione interrotta
+    } else if (__code == 201 ) //acquisizione interrotta
     {
         indexAllarmText = 4;
         indexAllarmHelp = 3;
@@ -152,7 +152,7 @@ bool AlarmManager::manageAlarm(int __code, bool __enable)
         return true;
     }
     else {
-        qDebug() /*qCritical()*/ << "Code " + QString::number(__code) + " not found";
+        qDebug() << "Code " + QString::number(__code) + " not found";
         return false;
     }
 }
