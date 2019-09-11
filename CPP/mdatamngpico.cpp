@@ -139,6 +139,9 @@ void MDataMngPico::exitFromReview()
             child->setAttribute("value","false");
             QString configUser = g_P7SettingsManager.userSettings();
             m_configUser.saveToXML(configUser);
+#ifdef PICOFLOW
+            system("sync");
+#endif
         }
     }
 

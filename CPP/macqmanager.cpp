@@ -386,6 +386,9 @@ void MAcqManager::endAcquisition(bool discard)
         childLoop->setAttribute("value","false");
         QString configUser = g_P7SettingsManager.userSettings();
             m_configUser.saveToXML(configUser);
+#ifdef PICOFLOW
+        system("sync");
+#endif
     }
 
     emit acquisitionEnded();
@@ -737,59 +740,61 @@ void MAcqManager::analyzeStatus(uint8_t __currState, bool __isBT)
     static const char * names[] = { "st_IDLE_NOT_CONNECTED", "st_IDLE_CONNECTED", "st_ACQUIRING" };
     qDebug("new:%s olstate:%s %s", names[__currState], names[m_oldState], __isBT ? "BT" : "Cavo");
 
-    static bool interruption = false;
-    switch(__currState)
+    if (__isBT)
     {
-    case ESTATE_IDLE_NOT_CONNECTED:
-        //se ero connesso e poi non lo sono più, parte un timer di attesa per allarme "non connesso"
-        if(m_oldState == ESTATE_IDLE_CONNECTED)
-            m_alarmMng.startTimeoutAlarm(ALA_NOT_CONNECTED, 1000);
+        static bool interruption = false;
+        switch(__currState)
+        {
+        case ESTATE_IDLE_NOT_CONNECTED:
+            //se ero connesso e poi non lo sono più, parte un timer di attesa per allarme "non connesso"
+            if(m_oldState == ESTATE_IDLE_CONNECTED)
+                m_alarmMng.startTimeoutAlarm(ALA_NOT_CONNECTED, 1000);
 
-        //quando durante un'acquisizione si spegne la cella
-        if(m_oldState == ESTATE_ACQUIRING) {
-            m_alarmMng.addAlarm(ALA_NOT_CONNECTED);
-            interruption = true;
-        }
-        break;
-
-    case ESTATE_IDLE_CONNECTED:
-        //se torna la connessione stoppo il timer di attesa allarme "non connesso"
-        if(m_oldState == ESTATE_IDLE_NOT_CONNECTED)
-            m_alarmMng.stopTimeoutAlarm(ALA_NOT_CONNECTED);
-
-        //se improvvisamente non acquisisco più
-        if(m_oldState == ESTATE_ACQUIRING){
-            m_alarmMng.addAlarm(ALA_NOT_ACQUIRING);
-            interruption = true;
-        }
-
-        break;
-
-    case ESTATE_ACQUIRING:
-        //inizio acquisizione attivo allarme "non sto acquisendo"
-        if(m_oldState == ESTATE_IDLE_CONNECTED || m_oldState == ESTATE_IDLE_NOT_CONNECTED) {
-            //se c'è stata un'interruzione di connessione (vera o dovuta a apri/chiudi review)
-            if (interruption){
-                interruption = false;
-                //e un 'esame aperto (interruzione vera)
-                if (m_acqFileOpened){
-                    //devo inserire il marker di sistema per acquisizione interrotta
-                    qDebug()<<"inserisco marker per interruzione";
-                    addMarker(MRK_E3);
-                }
+            //quando durante un'acquisizione si spegne la cella
+            if(m_oldState == ESTATE_ACQUIRING) {
+                m_alarmMng.addAlarm(ALA_NOT_CONNECTED);
+                interruption = true;
             }
-            //avviso l'utente che l'acquisizione è ripartita
-            resetAlarms();
-            emit systemInAcqStatus();
-            //attivo allarme di possibile perdita acquisizione
-            m_alarmMng.manageAlarm(ALA_NOT_ACQUIRING, ENABLE);
+            break;
+
+        case ESTATE_IDLE_CONNECTED:
+            //se torna la connessione stoppo il timer di attesa allarme "non connesso"
+            if(m_oldState == ESTATE_IDLE_NOT_CONNECTED)
+                m_alarmMng.stopTimeoutAlarm(ALA_NOT_CONNECTED);
+
+            //se improvvisamente non acquisisco più
+            if(m_oldState == ESTATE_ACQUIRING){
+                m_alarmMng.addAlarm(ALA_NOT_ACQUIRING);
+                interruption = true;
+            }
+
+            break;
+
+        case ESTATE_ACQUIRING:
+            //inizio acquisizione attivo allarme "non sto acquisendo"
+            if(m_oldState == ESTATE_IDLE_CONNECTED || m_oldState == ESTATE_IDLE_NOT_CONNECTED) {
+                //se c'è stata un'interruzione di connessione (vera o dovuta a apri/chiudi review)
+                if (interruption){
+                    interruption = false;
+                    //e un 'esame aperto (interruzione vera)
+                    if (m_acqFileOpened){
+                        //devo inserire il marker di sistema per acquisizione interrotta
+                        qDebug()<<"inserisco marker per interruzione";
+                        addMarker(MRK_E3);
+                    }
+                }
+                //avviso l'utente che l'acquisizione è ripartita
+                resetAlarms();
+                emit systemInAcqStatus();
+                //attivo allarme di possibile perdita acquisizione
+                m_alarmMng.manageAlarm(ALA_NOT_ACQUIRING, ENABLE);
+            }
+
+            break;
+
+        default:break;
         }
-
-        break;
-
-    default:break;
     }
-
 
     m_oldState = __currState;
 }
