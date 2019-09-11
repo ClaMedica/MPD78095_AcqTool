@@ -1,8 +1,8 @@
-﻿<Layout>
+﻿<Layout label="Layout">
         <Windows label="Windows Layout">
             <BackgroundColor
             label="Background Color"
-            type="MColorBox"
+            type="ColorBox"
             dt="string"
             unit=""
             value="#355667"
@@ -12,14 +12,14 @@
             type="ComboBox"
             dt="int"
             unit=""
-            model="5#6#7#8#9#10"
+            model="2#3#4#5#6#7#8#9#10"
             value="2"
             />
         </Windows>
         <Fonts label="Fonts">
             <FFamily
             label="Font Family"
-            type="ComboBox"
+            type="ComboFont"
             dt="string"
             unit=""
             model=""
@@ -31,44 +31,52 @@
             dt="string"
             unit=""
             model=""
-            value="MS Sans Serif"
+            value="Calibri"
+            />
+            <F3
+            label="Font"
+            type="SpinBox"
+            dt="real"
+            unit="%"
+            model="30#1#0.1#1#"
+            value="4"
             />
             <F4
             label="Font"
-            type="ComboBox"
-            dt="height"
-            unit="pt"
-            model="1#2#3#4#5#6#7#8#9#10"
+            type="SpinBox"
+            dt="real"
+            unit="%"
+            model="30#1#0.1#1#"
             value="4"
             />
             </Fonts>
         <Tables label="Tables Layout">
             <THF
             label="Table Header Dim."
-            type="ComboBox"
+            type="SpinBox"
             dt="height"
-            unit="pt"
-            model="1#2#3#4#5#6#7#8#9#10"
-            value="6"
+            unit="%"
+            model="30#1#0.1#1#"
+            value="10"
             />
             <TIF
             label="Table Element Dim."
-            type="ComboBox"
+            type="SpinBox"
             dt="height"
-            unit="pt"
-            model="1#2#3#4#5#6#7#8#9#10"
-            value="4"
+            unit="%"
+            model="30#1#0.1#1#"
+            value="10"
             />
             <THC1
             label="Table Header Col. 1"
-            type="MColorBox"
+            type="ColorBox"
             dt="string"
             unit=""
             value="#6666FF"
             />
             <THC2
             label="Table Header Col. 2"
-            type="MColorBox"
+            type="ColorBox"
             dt="string"
             unit=""
             value="#3333FF"
