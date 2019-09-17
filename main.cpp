@@ -74,7 +74,7 @@ int main(int argc, char *argv[])
     MyMessageOutput::init(gPath_log);
 
     //carico i settaggi
-    g_P7SettingsManager.loadSettings();
+    g_P7SettingsManager.loadSettings(true);
     //localizzazione
     QString local = g_P7SettingsManager.localization();
     qDebug()<<"Language to load: "<<g_P7SettingsManager.appPath() + "/acqtool_" + local;
