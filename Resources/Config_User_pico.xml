@@ -28,7 +28,7 @@
                         label="Maximum"
                         type="TextField"
                         unit="ml/sec"
-                        value="50"
+                        value="150"
                         alfanum="false"
                      />
                 </Amplitude>

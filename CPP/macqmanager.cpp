@@ -846,19 +846,15 @@ void MAcqManager::checkAutomaticStartStop(QString __which)
 
                 qreal startVal = m_channelMap[chanType].at(num)->first();
 
-//CONTROLLO GRADINO TOLTO 10/09/2019
                 //controllo se c'e' un gradino
-//                int count = 0;
-//                foreach(qreal sample, (*m_channelMap[chanType].at(num))) {
-//                    if((sample-startVal > ampMin) && (sample-startVal < ampMax))
-//                        count++;
-//                    else
-//                        count = 0;
-//                }
-//                if(count >= min) //trigger inizio acq
-
-                qreal sample = m_channelMap[chanType].at(num)->last();
-                if((sample-startVal > ampMin) && (sample-startVal < ampMax))
+                int count = 0;
+                foreach(qreal sample, (*m_channelMap[chanType].at(num))) {
+                    if((sample-startVal > ampMin) && (sample-startVal < ampMax))
+                        count++;
+                    else
+                        count = 0;
+                }
+                if(count >= min) //trigger inizio acq
                 {
                     //effetto buffer tengo solo gli ultimi 5 secondi
                     foreach(QString type, m_channelMap.keys())
