@@ -115,7 +115,6 @@ void MDataMngDesktop::addAnMarker(QVariant __key, QVariant __posX, QVariantList 
         if (defFound)
         {
             //definitore trovato curMap, inserisco il marker analitico
-            //cerco il canale (QUALI CANALI HANNO I MARKER ANALITICI? Q1)
             foreach(MSignal *sig, m_signalVector) {
                 for (int i=0;i<__chName.length();i++)
                 {
