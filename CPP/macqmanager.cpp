@@ -657,6 +657,9 @@ void MAcqManager::handleTCP(SimpleTCPClient *__client, QByteArray __block)
                         foreach(MSignal *sig, m_channelMap[type])
                             sig->saveLastSec(secToSave);
 
+                    //messaggio udp per il supe che deve spegnere i filtri
+                    udpConn.sendSup("WDebounceStop");
+
                     m_saving = true;    //posso iniziare a salvare i dati
                   //  emit systemInAcqStatus();
                     m_acqFinished = false;
@@ -866,6 +869,10 @@ void MAcqManager::checkAutomaticStartStop(QString __which)
                     //devo resettare il buffer del controllo dei min secondi per lo stop automatico
                     m_stopBuffer.clear();
                     m_acqFinished = false;
+
+                    //messaggio udp per il supe che deve spegnere i filtri
+                    udpConn.sendSup("WDebounceStop");
+
                     //il seguente assegnamento deve essere fatto qui prima del return
                     //per evitare che si eseguano altri controlli prima di finire le operazioni precedenti
                     m_saving = true;    //posso iniziare a salvare i dati
@@ -905,6 +912,7 @@ void MAcqManager::checkAutomaticStartStop(QString __which)
                 if((smin > valMin) && (smax < valMax)) {
                     qDebug() << "Stop acquiring";
                     endAcquisitionSave();
+
                     m_acqFinished = true;
                     return;
                 }
@@ -1041,6 +1049,7 @@ bool MAcqManager::handleDataFile()
         }
 #if defined(PICOFLOW) || defined(LINUXDESKTOP)
         m_autoStartStop = checkAutomaticFlow();
+        if (m_autoStartStop) udpConn.sendSup("WDebounceStart");
 #else
         //controllo se questo canale ha i requisiti per fare l'acq automatica
         //mi fido del software archivio pazienti
