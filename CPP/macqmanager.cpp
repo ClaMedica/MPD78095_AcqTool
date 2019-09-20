@@ -658,13 +658,13 @@ void MAcqManager::handleTCP(SimpleTCPClient *__client, QByteArray __block)
                             sig->saveLastSec(secToSave);
 
                     //messaggio udp per il supe che deve spegnere i filtri
-                    QFile tempVerifica;
-                    tempVerifica.setFileName(m_fileVerifica);
-                    tempVerifica.open(QIODevice::WriteOnly);
-                    QTextStream stream(&tempVerifica);
-                    stream << "ok "<< endl;
-                    tempVerifica.close();
-                    //udpConn.sendSup("WDebounceStop");
+//                    QFile tempVerifica;
+//                    tempVerifica.setFileName(m_fileVerifica);
+//                    tempVerifica.open(QIODevice::WriteOnly);
+//                    QTextStream stream(&tempVerifica);
+//                    stream << "ok "<< endl;
+//                    tempVerifica.close();
+                    udpConn.sendSup("WDebounceStop");
 
                     m_saving = true;    //posso iniziare a salvare i dati
                   //  emit systemInAcqStatus();
@@ -877,13 +877,13 @@ void MAcqManager::checkAutomaticStartStop(QString __which)
                     m_acqFinished = false;
 
                     //messaggio udp per il supe che deve spegnere i filtri
-                    QFile tempVerifica;
-                    tempVerifica.setFileName(m_fileVerifica);
-                    tempVerifica.open(QIODevice::WriteOnly);
-                    QTextStream stream(&tempVerifica);
-                    stream << "ok "<< endl;
-                    tempVerifica.close();
-                    //udpConn.sendSup("WDebounceStop");
+//                    QFile tempVerifica;
+//                    tempVerifica.setFileName(m_fileVerifica);
+//                    tempVerifica.open(QIODevice::WriteOnly);
+//                    QTextStream stream(&tempVerifica);
+//                    stream << "ok "<< endl;
+//                    tempVerifica.close();
+                    udpConn.sendSup("WDebounceStop");
 
                     //il seguente assegnamento deve essere fatto qui prima del return
                     //per evitare che si eseguano altri controlli prima di finire le operazioni precedenti
@@ -1062,11 +1062,11 @@ bool MAcqManager::handleDataFile()
 #if defined(PICOFLOW) || defined(LINUXDESKTOP)
         m_autoStartStop = checkAutomaticFlow();
         if (m_autoStartStop) {
-            QFile tempVerifica;
-            tempVerifica.setFileName(m_fileVerifica);
-            if (tempVerifica.exists())
-                tempVerifica.remove();
-            //udpConn.sendSup("WDebounceStart");
+//            QFile tempVerifica;
+//            tempVerifica.setFileName(m_fileVerifica);
+//            if (tempVerifica.exists())
+//                tempVerifica.remove();
+            udpConn.sendSup("WDebounceStart");
         }
 #else
         //controllo se questo canale ha i requisiti per fare l'acq automatica
