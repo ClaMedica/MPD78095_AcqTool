@@ -1,12 +1,11 @@
 ﻿<Configuration>
         <DataFolders>
             <imx6-qsdl      value="/root/PicoFlow/urodata"/>
-            <debug          value="E:\Piattaforma70\Build\AcqTool\debug"/>
         </DataFolders>
         <ProgFolders>
             <imx6-qsdl      value="/root/PicoFlow"/>
         </ProgFolders>
         <AndroidFolders>
             <imx6-qsdl      value=""/>
-        </AndroidFolders>"
+        </AndroidFolders>
 </Configuration>

@@ -104,7 +104,7 @@ void MAcqManager::udpBtDecode(enum WHO __from, QByteArray __msg)
                 if((__msg.at(0) == 'N') && (__msg == "NoBt"))      emit udpBtUsable(false);
                 if((__msg.at(0) == 'C') && (__msg.startsWith("CALIB:"))) {
                     m_calibCella = __msg.mid(6) + ";";
-                    qDebug() << "calibration data:" << m_calibCella;
+                    //qDebug() << "calibration data:" << m_calibCella;
                 }
                 break;
     case E_PRN:
@@ -134,21 +134,21 @@ void MAcqManager::dataOnTCP(QObject *__pParent, SimpleTCPClient *__pTCP, QByteAr
 bool MAcqManager::newAcquisition(QString __dataFile)
 {
     if(m_acqFileOpened) {
-        qCritical() << "acquisizione in corso";   //sono gia' in acquisizione e voglio farne partire un altra
+        qDebug() << "acquisizione in corso";   //sono gia' in acquisizione e voglio farne partire un altra
     }
     else
     {
         qDebug() << "carico la configurazione per l'acquisizione";
         qDebug() << g_P7SettingsManager.progPath();
         if(!m_configAcq.loadFromXML(g_P7SettingsManager.progPath() + "/Config_Acq.xml"))
-            qCritical() << "Error on acq configuration file";
+            qDebug() << "Error on acq configuration file";
 
         //e infine carico il file degli allarmi
         QString configAlarms = m_applicationPath + "/Config_Alarms.xml";
         if(!QFile::exists(configAlarms))
             configAlarms = ":/Config/Config_Alarms.xml";
         if(!m_alarmMng.load(configAlarms))
-            qCritical() << "Error on alarm configuration file";
+            qDebug() << "Error on alarm configuration file";
 
         //carico info di connettivitA
         loadConnectivityInfo(m_configAcq.getSafeChild(XML_CONNECTIONS));
@@ -187,8 +187,10 @@ bool MAcqManager::newAcquisition(QString __dataFile)
 
         //controllo l'esistenza dei file
 
-        if(!QFile::exists(__dataFile))
-            qCritical() << "File does not exists";
+        if(!QFile::exists(__dataFile)){
+            qDebug() << "File does not exists";
+            return false;
+        }
 
         //gestione esami interrotti
         //creo il file out_file nel quale va scritto l'ok se tutto va a buon fine
@@ -201,9 +203,9 @@ bool MAcqManager::newAcquisition(QString __dataFile)
             QDir(g_P7SettingsManager.progPath()).remove(outF);
 
         OutFile->open(QIODevice::WriteOnly | QIODevice::Text);
-        QTextStream* out = new QTextStream(OutFile);
-        *out << __dataFile;
+        OutFile->write(__dataFile.toLocal8Bit());
         OutFile->close();
+
 #ifdef PICOFLOW
         system("sync");
 #endif
@@ -230,15 +232,15 @@ bool MAcqManager::newAcquisition(QString __dataFile)
         qDebug() << "Canali presenti nell'esame" << m_channelNames;
         qDebug() << "Reading configuration file";
         if(!readConfigurationFile())
-            qCritical() << "Error during reading of configuration file";
+            qDebug() << "Error during reading of configuration file";
 
         //bene nel file di configurazione c'e scritto tutto il massimo potenziale della scheda
         //tuttavia non e detto che ci serva tutto per cui
         qDebug() << "Building configuration file for plots";
         if(!buildConfigurationFile())
-            qCritical() << "Error during building of configuration file";
+            qDebug() << "Error during building of configuration file";
 
-        //aggiorno il datafile con i dati relativi alla mia configurazione #BUG da togliere non appena il file verrA  scritto correttamente
+        //aggiorno il datafile con i dati relativi alla mia configurazione
         qDebug() << "Updating datafile...";
         handleDataFile();
 
@@ -385,6 +387,9 @@ void MAcqManager::endAcquisition(bool discard)
         childLoop->setAttribute("value","false");
         QString configUser = g_P7SettingsManager.userSettings();
             m_configUser.saveToXML(configUser);
+#ifdef PICOFLOW
+        system("sync");
+#endif
     }
 
     emit acquisitionEnded();
@@ -638,20 +643,35 @@ void MAcqManager::handleTCP(SimpleTCPClient *__client, QByteArray __block)
                     //azzero
                     qDebug() << "CMD __block[4] == '5': Start acquiring sendStartAcq()";
                     acqStarted = true;
-                    sendStartAcq();
+
                     m_startAcqManuale = true;
                     int secToSave = 0.0;
                     //in caso di flussimetria manuale non devo tenermi buffer di dati:
                     //i dati salvati partono dal momento dello start acquisizione da parte dell'utente
-                    if (m_autoStartStop)  //effetto buffer tengo solo gli ultimi 5 secondi
+                    if (m_autoStartStop)  { //in caso di flussimetria automatica
+                        //effetto buffer tengo solo gli ultimi 5 secondi
                         secToSave = 5.0;
+                        //devo resettare il buffer del controllo dei min secondi per lo stop automatico
+                        m_stopBuffer.clear();
+                    }
                     foreach(QString type, m_channelMap.keys())
                         foreach(MSignal *sig, m_channelMap[type])
                             sig->saveLastSec(secToSave);
 
+                    //messaggio udp per il supe che deve spegnere i filtri
+//                    QFile tempVerifica;
+//                    tempVerifica.setFileName(m_fileVerifica);
+//                    tempVerifica.open(QIODevice::WriteOnly);
+//                    QTextStream stream(&tempVerifica);
+//                    stream << "ok "<< endl;
+//                    tempVerifica.close();
+                    udpConn.sendSup("WDebounceStop");
+
                     m_saving = true;    //posso iniziare a salvare i dati
                   //  emit systemInAcqStatus();
                     m_acqFinished = false;
+
+                    sendStartAcq();
                 }
                 else {
                     //ferma immediatamente l'acquisizione
@@ -726,61 +746,64 @@ bool MAcqManager::loadConnectivityInfo(Ancestry *__info)
 
 void MAcqManager::analyzeStatus(uint8_t __currState, bool __isBT)
 {
+
     static const char * names[] = { "st_IDLE_NOT_CONNECTED", "st_IDLE_CONNECTED", "st_ACQUIRING" };
     qDebug("new:%s olstate:%s %s", names[__currState], names[m_oldState], __isBT ? "BT" : "Cavo");
 
-    static bool interruption = false;
-
-    switch(__currState)
+    if (__isBT)
     {
-    case ESTATE_IDLE_NOT_CONNECTED:
-        //se ero connesso e poi non lo sono più, parte un timer di attesa per allarme "non connesso"
-        if(m_oldState == ESTATE_IDLE_CONNECTED)
-            m_alarmMng.startTimeoutAlarm(ALA_NOT_CONNECTED, 1000);
+        static bool interruption = false;
+        switch(__currState)
+        {
+        case ESTATE_IDLE_NOT_CONNECTED:
+            //se ero connesso e poi non lo sono più, parte un timer di attesa per allarme "non connesso"
+            if(m_oldState == ESTATE_IDLE_CONNECTED)
+                m_alarmMng.startTimeoutAlarm(ALA_NOT_CONNECTED, 1000);
 
-        //quando durante un'acquisizione si spegne la cella
-        if(m_oldState == ESTATE_ACQUIRING) {
-            m_alarmMng.addAlarm(ALA_NOT_CONNECTED);
-            interruption = true;
-        }
-        break;
-
-    case ESTATE_IDLE_CONNECTED:
-        //se torna la connessione stoppo il timer di attesa allarme "non connesso"
-        if(m_oldState == ESTATE_IDLE_NOT_CONNECTED)
-            m_alarmMng.stopTimeoutAlarm(ALA_NOT_CONNECTED);
-
-        //se improvvisamente non acquisisco più
-        if(m_oldState == ESTATE_ACQUIRING){
-            m_alarmMng.addAlarm(ALA_NOT_ACQUIRING);
-            interruption = true;
-        }
-
-        break;
-
-    case ESTATE_ACQUIRING:
-        //inizio acquisizione attivo allarme "non sto acquisendo"
-        if(m_oldState == ESTATE_IDLE_CONNECTED || m_oldState == ESTATE_IDLE_NOT_CONNECTED) {
-            //se c'è stata un'interruzione di connessione (vera o dovuta a apri/chiudi review)
-            if (interruption){
-                interruption = false;
-                //e un 'esame aperto (interruzione vera)
-                if (m_acqFileOpened){
-                    //devo inserire il marker di sistema per acquisizione interrotta
-                    qDebug()<<"inserisco marker per interruzione";
-                    addMarker(MRK_E3);
-                }
+            //quando durante un'acquisizione si spegne la cella
+            if(m_oldState == ESTATE_ACQUIRING) {
+                m_alarmMng.addAlarm(ALA_NOT_CONNECTED);
+                interruption = true;
             }
-            //avviso l'utente che l'acquisizione è ripartita
-            resetAlarms();
-            emit systemInAcqStatus();
-            //attivo allarme di possibile perdita acquisizione
-            m_alarmMng.manageAlarm(ALA_NOT_ACQUIRING, ENABLE);
+            break;
+
+        case ESTATE_IDLE_CONNECTED:
+            //se torna la connessione stoppo il timer di attesa allarme "non connesso"
+            if(m_oldState == ESTATE_IDLE_NOT_CONNECTED)
+                m_alarmMng.stopTimeoutAlarm(ALA_NOT_CONNECTED);
+
+            //se improvvisamente non acquisisco più
+            if(m_oldState == ESTATE_ACQUIRING){
+                m_alarmMng.addAlarm(ALA_NOT_ACQUIRING);
+                interruption = true;
+            }
+
+            break;
+
+        case ESTATE_ACQUIRING:
+            //inizio acquisizione attivo allarme "non sto acquisendo"
+            if(m_oldState == ESTATE_IDLE_CONNECTED || m_oldState == ESTATE_IDLE_NOT_CONNECTED) {
+                //se c'è stata un'interruzione di connessione (vera o dovuta a apri/chiudi review)
+                if (interruption){
+                    interruption = false;
+                    //e un 'esame aperto (interruzione vera)
+                    if (m_acqFileOpened){
+                        //devo inserire il marker di sistema per acquisizione interrotta
+                        qDebug()<<"inserisco marker per interruzione";
+                        addMarker(MRK_E3);
+                    }
+                }
+                //avviso l'utente che l'acquisizione è ripartita
+                resetAlarms();
+                emit systemInAcqStatus();
+                //attivo allarme di possibile perdita acquisizione
+                m_alarmMng.manageAlarm(ALA_NOT_ACQUIRING, ENABLE);
+            }
+
+            break;
+
+        default:break;
         }
-
-        break;
-
-    default:break;
     }
 
     m_oldState = __currState;
@@ -831,8 +854,9 @@ void MAcqManager::checkAutomaticStartStop(QString __which)
             {
                 //ora quindi sono sicuro che arrivo qui solo quando ho abbastanza campioni
 
-                //controllo se c'e' un gradino
                 qreal startVal = m_channelMap[chanType].at(num)->first();
+
+                //controllo se c'e' un gradino
                 int count = 0;
                 foreach(qreal sample, (*m_channelMap[chanType].at(num))) {
                     if((sample-startVal > ampMin) && (sample-startVal < ampMax))
@@ -840,17 +864,31 @@ void MAcqManager::checkAutomaticStartStop(QString __which)
                     else
                         count = 0;
                 }
-
-                if(count >= min) {//trigger inizio acq
+                if(count >= min) //trigger inizio acq
+                {
                     //effetto buffer tengo solo gli ultimi 5 secondi
                     foreach(QString type, m_channelMap.keys())
                         foreach(MSignal *sig, m_channelMap[type])
                             sig->saveLastSec(5.0);
 
-                    m_saving = true;    //posso iniziare a salvare i dati
                    // emit systemInAcqStatus();
                     qDebug() << "Start acquiring";
+                    //devo resettare il buffer del controllo dei min secondi per lo stop automatico
+                    m_stopBuffer.clear();
                     m_acqFinished = false;
+
+                    //messaggio udp per il supe che deve spegnere i filtri
+//                    QFile tempVerifica;
+//                    tempVerifica.setFileName(m_fileVerifica);
+//                    tempVerifica.open(QIODevice::WriteOnly);
+//                    QTextStream stream(&tempVerifica);
+//                    stream << "ok "<< endl;
+//                    tempVerifica.close();
+                    udpConn.sendSup("WDebounceStop");
+
+                    //il seguente assegnamento deve essere fatto qui prima del return
+                    //per evitare che si eseguano altri controlli prima di finire le operazioni precedenti
+                    m_saving = true;    //posso iniziare a salvare i dati
                     return;
                 }
                 else {
@@ -864,7 +902,7 @@ void MAcqManager::checkAutomaticStartStop(QString __which)
             Ancestry *childDur = condition->getSafeChild(XML_DURATION);
             Ancestry *childVal = condition->getSafeChild(XML_VALUE);
 
-            //per prima cosa controlliamo quanti campioni ha
+            //per prima cosa controlliamo la durata minima
             int min = childDur->getSafeChild(ATT_MIN)->getSafeAttribute(ATT_VALUE).toUInt();
 
             qreal valMin = childVal->getSafeChild(ATT_MIN)->getSafeAttribute(ATT_VALUE).toDouble();
@@ -873,20 +911,21 @@ void MAcqManager::checkAutomaticStartStop(QString __which)
 
             m_stopBuffer.setSamplingPeriod(m_channelMap[chanType].at(num)->getSamplingPeriod());
             m_stopBuffer << *(m_channelMap[chanType].at(num));
-            //qDebug()<<"StopBuffer Len"<<m_stopBuffer.getDuration()<<m_stopBuffer.size();
+            qDebug()<<"StopBuffer Len"<<m_stopBuffer.getDuration()<<m_stopBuffer.size()<<"min"<<min;
             m_stopBuffer.saveLastSec(min);
 
             if (!(m_stopBuffer.getDuration() < min))
-            {//   continue;
+            {
                 //ora quindi sono sicuro che arrivo qui solo quando ho abbastanza campioni
 
                 //controllo gli ultimi min campioni
                 qreal smin = m_stopBuffer.minimum();
                 qreal smax = m_stopBuffer.maximum();
-                //qDebug()<<"STOP flowauto"<<smin<<valMin<<smax<<valMax;
+                qDebug()<<"STOP flowauto"<<smin<<valMin<<smax<<valMax;
                 if((smin > valMin) && (smax < valMax)) {
                     qDebug() << "Stop acquiring";
                     endAcquisitionSave();
+
                     m_acqFinished = true;
                     return;
                 }
@@ -1005,7 +1044,7 @@ bool MAcqManager::handleDataFile()
 {   // viene chiamata per aggiornare il datafile a seconda del file di configurazione del relativo esame
     Ancestry *channels = m_configAcq.getChild(XML_CHANNELS);
     if(channels == NULL)
-        qCritical("Child not alive");
+        qDebug("Child not alive");
 
     // ciclo per ogni canale del datafile alla ricerca di proprietA  da completare
     int maxChan = m_mng->GetChanNum();
@@ -1023,13 +1062,20 @@ bool MAcqManager::handleDataFile()
         }
 #if defined(PICOFLOW) || defined(LINUXDESKTOP)
         m_autoStartStop = checkAutomaticFlow();
+        if (m_autoStartStop) {
+//            QFile tempVerifica;
+//            tempVerifica.setFileName(m_fileVerifica);
+//            if (tempVerifica.exists())
+//                tempVerifica.remove();
+            udpConn.sendSup("WDebounceStart");
+        }
 #else
         //controllo se questo canale ha i requisiti per fare l'acq automatica
         //mi fido del software archivio pazienti
         if(m_mng->GetLoc(i) == "a")
             m_autoStartStop = true;
 #endif
-        qDebug() << "handleDataFile(): GetGain,GetOffset:" << m_mng->GetGain(i) << m_mng->GetOffset(i);
+        //qDebug() << "handleDataFile(): GetGain,GetOffset:" << m_mng->GetGain(i) << m_mng->GetOffset(i);
     }
 
     //    //qDebug()<<"stato"<<m_mng->GetState();
@@ -1173,7 +1219,7 @@ void MAcqManager::fillBuffers(QByteArray __block)
         QDataStream in(&staticblock, QIODevice::ReadOnly);
 
         in >> numBytes;
-        qDebug()<<"NA? bytes: "<<numBytes;
+        //qDebug()<<"NA? bytes: "<<numBytes;
         if(staticblock.size() < numBytes)
             break;
 
@@ -1189,7 +1235,7 @@ void MAcqManager::fillBuffers(QByteArray __block)
         for(int k = 0; k < numChan; k++) {
             in >> currChan;
             in >> numChanData;
-            qDebug() << "currChan:" << currChan;
+            //qDebug() << "currChan:" << currChan;
 
             if((currChan < maxNumChan) && (currChan >= 0)) {    //se e' un canale con del senso
                 if(m_bufferMap.keys().contains(QString::number(currChan))) {

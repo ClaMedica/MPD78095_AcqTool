@@ -60,21 +60,31 @@ int main(int argc, char *argv[])
 #ifdef ANDROID
     gPath_log = "/mnt/sdcard/" + logFile;
 #endif
+
 #ifdef PICOFLOW
+#ifdef MESSAGE2SYSLOG
+    MyMessageOutput::init();
+#else
     QString logFile = "acqTool_log_" + QDateTime::currentDateTime().toString("yyyyMMdd_hhmmss")+".htm";
     gPath_log = "/tmp/" + logFile;
+    qDebug() << "Start. log:" << gPath_log;
+    //dirotto il debug log
+    MyMessageOutput::init(gPath_log);
 #endif
+#endif
+
 #ifdef WIN32
      QString logFile = "acqTool_log_" + QDateTime::currentDateTime().toString("yyyyMMdd_hhmmss")+".htm";
      gPath_log = QApplication::applicationDirPath() + "/"+ logFile;
+     qDebug() << "Start. log:" << gPath_log;
+     //dirotto il debug log
+     MyMessageOutput::init(gPath_log);
 #endif
 
-    qDebug() << "Start. log:" << gPath_log;
-    //dirotto il debug log
-    //MyMessageOutput::init(gPath_log);
+
 
     //carico i settaggi
-    g_P7SettingsManager.loadSettings();
+    g_P7SettingsManager.loadSettings(true);
     //localizzazione
     QString local = g_P7SettingsManager.localization();
     qDebug()<<"Language to load: "<<g_P7SettingsManager.appPath() + "/acqtool_" + local;

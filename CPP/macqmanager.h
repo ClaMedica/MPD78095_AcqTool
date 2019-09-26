@@ -71,7 +71,7 @@ private:
     m_sendingToPlot,
     m_saving,
     m_acqFinished,  //mi dice se ho finito di acquisire
-    m_autoStartStop;//mi dice se il controllo A? abilitato o meno
+    m_autoStartStop;//mi dice se il controllo e' abilitato o meno
     bool m_startAcqManuale; //tasto start
 
     QByteArray m_sendingPack;
