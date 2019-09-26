@@ -127,6 +127,7 @@ win32 {
     HEADERS += CPP/mdatamngdesktop.h
 
     INCLUDEPATH +=  ../MedicalReport
+    INCLUDEPATH +=  ../MGlobal
 
     rootPath = E:\Piattaforma70
     #creo la cartella da copiare in giro
@@ -143,11 +144,11 @@ win32 {
 
 
     # Additional import path used to resolve QML modules in Qt Creator's code model
-    QML_IMPORT_PATH = ../MGlobal \
-                      Modules
+#    QML_IMPORT_PATH = ../MGlobal \
+#                      Modules
 
-    DISTFILES += ../MGlobal/MComponents/* \
-                 ../MGlobal/MComponents/Images/*
+#    DISTFILES += ../MGlobal/MComponents/* \
+#                 ../MGlobal/MComponents/Images/*
 
     QT += printsupport
 }

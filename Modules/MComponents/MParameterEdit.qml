@@ -1,4 +1,4 @@
-import QtQuick 2.5
+﻿import QtQuick 2.5
 import QtQuick.Controls 1.4
 import QtQuick.Window 2.2
 import QtQuick.Layouts 1.1
@@ -67,31 +67,41 @@ Rectangle {
 
         onFocusChanged:
         {
-            if(target.focus && isTouch)
+            if(target.focus)
             {
-                mngSys.startSound()
-                var c
-                if (keyboardAlfaNum)
-                    c = keyboard
-                else
-                    c = keyboardNum
-
-                if (c !== undefined)
+                if (isTouch)
                 {
-                    c.target = connection.target
-                    c.labelTarget = label.text
-                    DataEngine.putItemOnTop(c)
-                    if (rootParEdit.type === typTextField)
-                        c.testo = connection.target.text
-                    c.show()
-                    rootParEdit.virtualKeyOpen = true;
+                    mngSys.startSound()
+                    var c
+                    if (keyboardAlfaNum)
+                        c = keyboard
+                    else
+                        c = keyboardNum
+
+                    if (c !== undefined)
+                    {
+                        c.target = connection.target
+                        c.labelTarget = label.text
+                        DataEngine.putItemOnTop(c)
+                        if (rootParEdit.type === typTextField)
+                            c.testo = connection.target.text
+                        c.show()
+                        rootParEdit.virtualKeyOpen = true;
+                    }
+                    rootParEdit.clicked()
+                    if (rootParEdit.virtualKeyOpen)
+                    {
+                        rootParEdit.virtualKeyOpen = false
+                        rootParEdit.virtualKeyClosed()
+                    }
                 }
-                rootParEdit.clicked()
-            }
-            else if (rootParEdit.virtualKeyOpen && isTouch)
-            {
-                rootParEdit.virtualKeyOpen = false
-                rootParEdit.virtualKeyClosed()
+                else
+                {
+                    if (keyboardAlfaNum)
+                        component.onlyNumber = false
+                    else
+                        component.onlyNumber = true
+                }
             }
         }
     }
@@ -254,7 +264,7 @@ Rectangle {
 
             c.anchors.margins = 2
 
-            if(type!==typComboBox && type!==typComboFont)
+            if(rootParEdit.type!==typComboBox && rootParEdit.type!==typComboFont)
                 c.anchors.fill=container
             else
             {

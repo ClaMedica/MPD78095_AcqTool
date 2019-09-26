@@ -8,6 +8,18 @@ TextField {
     id: rootLabel
     property real labelSize: 8
     property string safeText: ""
+    property bool onlyNumber: false
+
+    IntValidator { id: intval  }
+    RegExpValidator { id: regexp; regExp: /""/ }
+    onOnlyNumberChanged:
+    {
+        if (onlyNumber)
+            rootLabel.validator= intval
+        else
+            rootLabel.validator = regexp
+    }
+
     onTextChanged: {
         if(acceptableInput)
             safeText = text

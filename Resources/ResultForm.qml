@@ -44,10 +44,12 @@ MForm {
         if (__disable){
             btnReport.enabled = false
             btnBack.enabled = false
+            btnExit.enabled = false
         }
         else {
             btnReport.enabled = true
             btnBack.enabled = true
+            btnExit.enabled = true
         }
     }
 
