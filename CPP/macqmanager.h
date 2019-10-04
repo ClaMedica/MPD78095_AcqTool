@@ -34,6 +34,8 @@ signals:
 //    void acquisitionStarted();
     void systemInAcqStatus();
     void acquisitionEnded();
+    void noBeaker();
+
     void udpBtStopped();
     void udpBtRestarted();
     void udpBtUsable(bool);
@@ -53,6 +55,7 @@ public slots:
     void resetAlarms();
     void setAlarms(QVariantList __list);
     void udpBtDecode(enum WHO __from, QByteArray __msg);
+    void okNoBeaker();
 
 
 //private slots:
