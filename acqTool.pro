@@ -42,6 +42,7 @@ SOURCES += \
     ../AnaUro/analysis.cpp \
     ../AnaUro/anautils.cpp \
     ../MGlobal/fileio.cpp \
+    ../MGlobal/udpmsgs.cpp \
     CPP/graficmanager.cpp
 
 HEADERS += \
@@ -76,6 +77,7 @@ HEADERS += \
     ../MGlobal/p7settingsmanager.h \
     ../MGlobal/systemmanager.h \
     ../MGlobal/UdmImpl.h \
+    ../MGlobal/udpmsgs.h \
     ../MGlobal/fileio.h
 
 
@@ -196,11 +198,9 @@ CLAUDIA {
     TARGET = PicoAcq
 
     SOURCES += \
-        ../MGlobal/udpmsgs.cpp \
         CPP/mdatamngpico.cpp
 
     HEADERS += \
-        ../MGlobal/udpmsgs.h \
         CPP/mdatamngpico.h
 
     RESOURCES += modules_picoflow.qrc

@@ -1,5 +1,5 @@
 ﻿<Configuration label="Configuration">
-        <pesoBeaker value="70">
+        <pesoBeaker value="70"/>
         <AutomaticFlow label="Automatic Flow">
         <Auto
             label="Automatic flow"

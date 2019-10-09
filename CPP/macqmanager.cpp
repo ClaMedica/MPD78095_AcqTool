@@ -49,14 +49,15 @@ MAcqManager::MAcqManager(QObject *parent)
     loadConnectivityInfo(m_configAcq.getSafeChild(XML_CONNECTIONS));
 
     QTimer::singleShot(1000, this, SLOT(connectToServers()));
-
     //connetto il gestore degli allarmi alla proprietA  alarms
     connect(&m_alarmMng, SIGNAL(alarmsUpdated(QVariantList)), this, SLOT(setAlarms(QVariantList)));
+#endif
+
     connect(&udpConn, SIGNAL(receivedUdp(enum WHO, QByteArray)), this, SLOT(udpBtDecode(WHO,QByteArray)));
     udpConn.iAmAcq();
     udpConn.connessioni();
     udpConn.sendSup("hello from acq");
-#endif
+
     qDebug() << "fine costruttore ";
     qDebug() << "m_acqFileOpened:" << m_acqFileOpened;
 }
