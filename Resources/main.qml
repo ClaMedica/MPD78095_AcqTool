@@ -239,6 +239,10 @@ ApplicationWindow {
             console.log("udp BtRestarted")
 //            btStatusUdp = 4
         }
+        onNoBeaker:
+        {
+            forReal.noBeaker()
+        }
 
 
     }

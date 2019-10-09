@@ -107,6 +107,10 @@ void MAcqManager::udpBtDecode(enum WHO __from, QByteArray __msg)
                     m_calibCella = __msg.mid(6) + ";";
                     //qDebug() << "calibration data:" << m_calibCella;
                 }
+                if((__msg == "NoBeaker")) {
+                    //devo mandare un messaggio ad acqtool
+                    emit noBeaker();
+                }
                 break;
     case E_PRN:
                 if((__msg.at(0) == 'R') && (__msg == "Ready"))     emit udpPrnStatus(__msg.at(0));
@@ -312,6 +316,10 @@ void MAcqManager::endAcquisitionSave()
     g_mainAppBridge->sendOpen();
 #endif
 
+}
+void MAcqManager::okNoBeaker()
+{
+    udpConn.sendSup("BeakerOk");
 }
 
 void MAcqManager::endAcquisitionDiscard()

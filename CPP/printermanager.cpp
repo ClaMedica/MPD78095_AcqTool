@@ -698,8 +698,8 @@ void printermanager::Report_data()
     Report_row(tr("Name ...........: "), m_test_type ? puntini : m_name);
     Report_row(tr("Birth Date .....: "), m_test_type ? puntini : m_dateofbirth);
     Report_row(tr("Gender .........: "), m_test_type ? puntini : m_sex);
-    Report_row(tr("Investigator ...: "), puntini);
-    Report_row(tr("Comments .......: "), puntini);
+//    Report_row(tr("Investigator ...: "), puntini);
+//    Report_row(tr("Comments .......: "), puntini);
 
     int deltaY = tf_infoLabel.charH;
     int deltaX = tf_infoLabel.charW * tr("Comments .......: ").size();
