@@ -222,11 +222,11 @@ PICOFLOW {
     TARGET = PicoAcq
 
     SOURCES += \
-        ../MGlobal/udpmsgs.cpp \
+#        ../MGlobal/udpmsgs.cpp \
         CPP/mdatamngpico.cpp
 
     HEADERS += \
-        ../MGlobal/udpmsgs.h \
+#        ../MGlobal/udpmsgs.h \
         CPP/mdatamngpico.h
 
     RESOURCES += modules_picoflow.qrc
