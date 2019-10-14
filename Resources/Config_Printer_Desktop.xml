@@ -1,0 +1,24 @@
+﻿<Configuration label="Configuration">
+<Settings label="Settings">
+    <AutoPrint
+        label="Automatic Print"
+        type="CheckBox"
+        unit=""
+        value="false"
+    />
+</Settings>
+<Headers label="Headers">
+    <First
+       label="Insert first header"
+       type="TextField"
+       unit=""
+       value="Medica s.p.a"
+    />
+    <Second
+       label="Insert second header"
+       type="TextField"
+       unit=""
+       value="Pico Flow 2"
+    />
+</Headers>
+</Configuration>
