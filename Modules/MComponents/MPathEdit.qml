@@ -1,4 +1,4 @@
-import QtQuick 2.4
+﻿import QtQuick 2.4
 import QtQuick.Controls 1.4
 import QtQuick.Dialogs 1.2
 
@@ -9,12 +9,13 @@ Rectangle {
     property alias fileURL:path.text
     id:rootPathEdit
     color:"transparent"
-    TextField{
+    MTextField{
         id:path
         anchors.top:parent.top
         anchors.left:parent.left
         anchors.right:btnDialog.left
         anchors.bottom:parent.bottom
+        labelSize: layout.value("F4")
         enabled: false
         text:""
     }
