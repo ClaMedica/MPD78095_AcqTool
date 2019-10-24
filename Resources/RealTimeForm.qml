@@ -49,11 +49,6 @@ MForm{
         plot.stopAll()
     }
 
-    function noBeaker()
-    {
-        dlgNoBeaker.visible = true
-    }
-
     MPlot2DRealStack {
         //@@@@@@@@@@    Properties      @@@@@@@@@@
         id: plot
@@ -267,49 +262,6 @@ MForm{
             labelSize: layout.value("F4")
             text: qsTr("No")
             onClicked: dlgDiscard.visible = false
-        }
-    }
-
-    Rectangle {
-        id: dlgNoBeaker
-        property  string testo: ""
-        height:screenH*grafic.valueOf("Dialog","height")
-        width:screenW*grafic.valueOf("Dialog","width")
-        anchors.centerIn: parent
-        visible: false
-        color : layout.value("BackgroundColor")
-
-        Keys.onReturnPressed: {
-            dlgNoBeaker.visible = false
-        }
-
-        MLabel
-         {
-             anchors.top:parent.top
-             anchors.left: parent.left
-             anchors.right:parent.right
-             height:parent.height*0.8
-             labelSize: layout.value("F4")
-             color: "white"
-             horizontalAlignment: Text.AlignHCenter
-             verticalAlignment: Text.AlignVCenter
-             text: qsTr("<p>Beaker removed</p><p>Acquisition blocked</p><p>Replace the Beaker</p><p>Press OK to resume</p>")
-             wrapMode: Text.WordWrap
-         }
-
-        MButton {
-            id: btnOkB
-            anchors.bottom: parent.bottom
-            anchors.horizontalCenter: parent.horizontalCenter
-            height: parent.height/5
-            width: parent.width/3
-            anchors.margins: 10
-            labelSize: layout.value("F4")
-            text: qsTr("OK")
-            onClicked: {
-                dlgNoBeaker.visible = false
-                mngAcq.okNoBeaker()
-            }
         }
     }
 }

@@ -32,6 +32,7 @@ MAcqManager::MAcqManager(QObject *parent)
     m_startAcqManuale = false; //non ancora premuto tasto start
     m_calibCella = "none;";
     m_startWithZero = false;
+    m_noBeaker = false;
 
 #ifdef PICOFLOW
     m_fileVerifica = "/tmp/disableDebounce";
@@ -107,9 +108,45 @@ void MAcqManager::udpBtDecode(enum WHO __from, QByteArray __msg)
                     m_calibCella = __msg.mid(6) + ";";
                     //qDebug() << "calibration data:" << m_calibCella;
                 }
-                if((__msg == "NoBeaker")) {
-                    //devo mandare un messaggio ad acqtool
-                    emit noBeaker();
+                if (__msg.at(0) == 'W') {
+                    float lordo = 0;
+                    char* s = __msg.mid(6).data();
+                    char* l = (char*)&lordo;
+                    for (int i=0; i<4;i++)
+                        *l++ = *s++;
+
+                    qDebug("DA SUP lordo ACQ%.1f", lordo );
+                    int pesoBeaker = g_P7SettingsManager.getPesoBeaker();
+                    if (lordo < pesoBeaker){
+                        m_noBeaker = true;
+                        m_alarmMng.addAlarm(ALA_NO_BEAKER);
+                    }
+                    else if (m_noBeaker) {
+                        udpConn.sendSup("BeakerOk");
+                        //resetto i buffer
+                        foreach(QString type, m_channelMap.keys())
+                            foreach(MSignal *sig, m_channelMap[type])
+                                sig->clear();
+                        foreach(QString c, m_totalHWChan)
+                            m_bufferMap[c]->clear();
+                        //inizializzazione media mobile e filtro digitale per flusso
+                        m_valPrecVolume = 0;
+                        m_sommaMMobileF = 0;
+                        m_sommaMMobileV = 0;
+                        m_buffer_MMobileV.clear();
+                        m_buffer_MMobileF.clear();
+                        for (int i=0; i<m_lenMMobile;i++){
+                            m_buffer_MMobileV.append(0);
+                            m_buffer_MMobileF.append(0);
+                        }
+                        m_buffer_DigFilter.clear();
+                        for (int i=0; i<m_lenDifFilter;i++)
+                            m_buffer_DigFilter.append(0);
+
+                        m_noBeaker = false;
+                        resetAlarms();
+                    }
+
                 }
                 break;
     case E_PRN:
@@ -316,10 +353,6 @@ void MAcqManager::endAcquisitionSave()
     g_mainAppBridge->sendOpen();
 #endif
 
-}
-void MAcqManager::okNoBeaker()
-{
-    udpConn.sendSup("BeakerOk");
 }
 
 void MAcqManager::endAcquisitionDiscard()
@@ -534,7 +567,7 @@ void MAcqManager::handleTCP(SimpleTCPClient *__client, QByteArray __block)
     alarms_t alarms;
     if(m_tcpClients.values().contains(__client)) {
         QString who = m_tcpClients.key(__client);
-        //qDebug() << who ;//<< __block;
+       // qDebug() <<"handleTCP"<< who << __block;
 
         if(who == "STA") {      //allora e' uno stato
             static QByteArray staticblock;
@@ -611,7 +644,7 @@ void MAcqManager::handleTCP(SimpleTCPClient *__client, QByteArray __block)
             }
         }
         else if(who == "VAL") {
-            if (m_autoStartStop || m_startAcqManuale) {
+            if ((m_autoStartStop || m_startAcqManuale) && !m_noBeaker) {
                 // riempo i buffer
                 fillBuffers(__block);
 
@@ -854,9 +887,12 @@ void MAcqManager::checkAutomaticStartStop(QString __which)
 
             //per prima cosa controlliamo quanti campioni
             int      minSec = childDur->getSafeChild(ATT_MIN)->getSafeAttribute(ATT_VALUE).toUInt();
+            //le ampiezze sono ml/s
             qreal ampMin = childAmp->getSafeChild(ATT_MIN)->getSafeAttribute(ATT_VALUE).toInt();
             qreal ampMax = childAmp->getSafeChild(ATT_MAX)->getSafeAttribute(ATT_VALUE).toInt();
+            ampMax = ampMax*minSec;
 
+            //campioni
             int min = minSec*m_channelMap[chanType].at(num)->getSamplingFrequency();
             //se non ho ancora abbastanza campioni per decidere non vado avanti
             if (!(m_channelMap[chanType].at(num)->size() < min))
@@ -920,7 +956,7 @@ void MAcqManager::checkAutomaticStartStop(QString __which)
 
             m_stopBuffer.setSamplingPeriod(m_channelMap[chanType].at(num)->getSamplingPeriod());
             m_stopBuffer << *(m_channelMap[chanType].at(num));
-            qDebug()<<"StopBuffer Len"<<m_stopBuffer.getDuration()<<m_stopBuffer.size()<<"min"<<min;
+            //qDebug()<<"StopBuffer Len"<<m_stopBuffer.getDuration()<<m_stopBuffer.size()<<"min"<<min;
             m_stopBuffer.saveLastSec(min);
 
             if (!(m_stopBuffer.getDuration() < min))
@@ -930,7 +966,7 @@ void MAcqManager::checkAutomaticStartStop(QString __which)
                 //controllo gli ultimi min campioni
                 qreal smin = m_stopBuffer.minimum();
                 qreal smax = m_stopBuffer.maximum();
-                qDebug()<<"STOP flowauto"<<smin<<valMin<<smax<<valMax;
+                //qDebug()<<"STOP flowauto"<<smin<<valMin<<smax<<valMax;
                 if((smin > valMin) && (smax < valMax)) {
                     qDebug() << "Stop acquiring";
                     endAcquisitionSave();
@@ -992,7 +1028,7 @@ void MAcqManager::sendBuffersToPlot()
     //m_namesToDataChanNum mi dice in base al canale
 
     foreach(QString plotName, m_chanInPlots.keys()) {
-        qDebug() << "Gestisco plot" << plotName;
+        //qDebug() << "Gestisco plot" << plotName;
         QByteArray block;
         QDataStream out(&block, QIODevice::WriteOnly);
 
@@ -1046,7 +1082,8 @@ void MAcqManager::sendBuffersToPlot()
 void MAcqManager::removeLastFrame()
 {           //rimuovo un frame temporale
     foreach(QString hwc, m_totalHWChan)
-        m_bufferMap[hwc]->remove(0, m_frameMap[hwc]);
+        if (m_bufferMap[hwc]->length() > m_frameMap[hwc])
+            m_bufferMap[hwc]->remove(0, m_frameMap[hwc]);
 }
 
 bool MAcqManager::handleDataFile()
@@ -1139,7 +1176,7 @@ void MAcqManager::applyOperations()
                         else
                             m_channelMap[type].at(index)->append(v);
                     }
-                    qDebug() << "Canale" << type << "Copiato" << m_frameMap[hwc] << "campioni su" << index;
+                    //qDebug() << "Canale" << type << "Copiato" << m_frameMap[hwc] << "campioni su" << index;
                 }
             }
 
@@ -1169,6 +1206,8 @@ void MAcqManager::applyOperations()
                         if (flusso > 100)
                             flusso = 100;
                         m_channelMap[type].at(index)->append(flusso);
+                        qDebug()<<"FLUSSO"<<flusso;
+                        //qDebug() << "Canale" << type << "Copiato" << m_frameMap[hwc] << "campioni su" << index;
 
                     }
                 }
@@ -1234,7 +1273,7 @@ void MAcqManager::fillBuffers(QByteArray __block)
 
         //Chan number
         in >> numChan;
-        qDebug()<<"NA? chan: "<<numChan;
+        //qDebug()<<"NA? chan: "<<numChan;
 
         if(numChan > maxNumChan) {
             qCritical( "ERROR, numChan(%d) > maxNumChan(%d)", numChan,maxNumChan);
@@ -1272,7 +1311,7 @@ void MAcqManager::fillBuffers(QByteArray __block)
                         if (!m_startWithZero)
                         {
                             m_bufferMap[QString::number(currChan)]->append(sample);
-                            qDebug("append sample");
+                            qDebug()<<"append sample"<<sample;
                         }
 
                     }

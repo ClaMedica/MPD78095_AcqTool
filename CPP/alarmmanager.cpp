@@ -73,7 +73,7 @@ void AlarmManager::addAlarm(int __code)
     ala["code"] = __code;
     Ancestry *child = m_confAla->getChild(m_vecMap[__code]);
     if(child == NULL) {
-        qCritical() << m_vecMap[__code] << MEX_CHILD_NOT_ALIVE;
+        qWarning() << m_vecMap[__code] << MEX_CHILD_NOT_ALIVE;
         return;
     }
 
@@ -84,6 +84,8 @@ void AlarmManager::addAlarm(int __code)
         QT_TR_NOOP("Cell not connected"),               // code 200 Text
         QT_TR_NOOP("Turn the cell off and on again"),   //code 200/201 Help
         QT_TR_NOOP("Interrupted acquisition"),          //code 201 Text
+        QT_TR_NOOP("Beaker removed"),                   //code 202 Text
+        QT_TR_NOOP("Replace the Beaker"),               //code 202 Help
         QT_TR_NOOP("Allarm not present")                //code non previsto
     };
 
@@ -100,10 +102,14 @@ void AlarmManager::addAlarm(int __code)
     {
         indexAllarmText = 4;
         indexAllarmHelp = 3;
-    } else
+    } else if (__code == 202)
     {
         indexAllarmText = 5;
-        indexAllarmHelp = 5;
+        indexAllarmHelp = 6;
+    } else
+    {
+        indexAllarmText = 7;
+        indexAllarmHelp = 7;
     }
 
     ala["message"] = tr(stringTraslated[indexAllarmText]);

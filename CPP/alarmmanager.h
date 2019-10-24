@@ -10,6 +10,7 @@ enum AlarmRecord
 {
     ALA_NOT_CONNECTED=200,
     ALA_NOT_ACQUIRING,
+    ALA_NO_BEAKER,
     ALA_TIMEOUT_STATUS=300,
     ALA_NUM
 };

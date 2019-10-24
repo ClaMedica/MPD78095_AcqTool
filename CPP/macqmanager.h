@@ -34,7 +34,6 @@ signals:
 //    void acquisitionStarted();
     void systemInAcqStatus();
     void acquisitionEnded();
-    void noBeaker();
 
     void udpBtStopped();
     void udpBtRestarted();
@@ -55,8 +54,6 @@ public slots:
     void resetAlarms();
     void setAlarms(QVariantList __list);
     void udpBtDecode(enum WHO __from, QByteArray __msg);
-    void okNoBeaker();
-
 
 //private slots:
     bool sendCommand(tcp_flow_bt_cmd_t __command);
@@ -143,6 +140,8 @@ private:
     bool m_startWithZero;
     QString m_fileVerifica;
     bool m_disableWeightFilt;
+
+    bool m_noBeaker;
 
 };
 

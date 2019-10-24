@@ -81,6 +81,7 @@ ApplicationWindow {
         console.log("launch(mode,dataFile)", mode, dataFile)
         if(mode === "acq")
         {
+
             console.log("Start new acq", codSoft)
             mngAcq.load()
             mngAcq.newAcquisition(dataFile)
@@ -239,12 +240,6 @@ ApplicationWindow {
             console.log("udp BtRestarted")
 //            btStatusUdp = 4
         }
-        onNoBeaker:
-        {
-            forReal.noBeaker()
-        }
-
-
     }
 
     MDataManager{
