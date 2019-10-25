@@ -122,7 +122,6 @@ void MAcqManager::udpBtDecode(enum WHO __from, QByteArray __msg)
                         m_alarmMng.addAlarm(ALA_NO_BEAKER);
                     }
                     else if (m_noBeaker) {
-                        udpConn.sendSup("BeakerOk");
                         //resetto i buffer
                         foreach(QString type, m_channelMap.keys())
                             foreach(MSignal *sig, m_channelMap[type])
@@ -144,6 +143,7 @@ void MAcqManager::udpBtDecode(enum WHO __from, QByteArray __msg)
                             m_buffer_DigFilter.append(0);
 
                         m_noBeaker = false;
+                        udpConn.sendSup("BeakerOk");
                         resetAlarms();
                     }
 
