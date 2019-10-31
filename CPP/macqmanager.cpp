@@ -115,47 +115,46 @@ void MAcqManager::udpBtDecode(enum WHO __from, QByteArray __msg)
                     for (int i=0; i<4;i++)
                         *l++ = *s++;
 
-                    qDebug("DA SUP lordo ACQ%.1f", lordo );
                     int pesoBeaker = g_P7SettingsManager.getPesoBeaker();
 
                     if (lordo < pesoBeaker){
                         if (!m_noBeaker) //per non dare allarme più volte
                         {
-                            //qDebug()<<"DARE ALLARME";
+                            qDebug("DA SUP lordo ACQ%.1f No beaker", lordo );
                             m_alarmMng.addAlarm(ALA_NO_BEAKER);
                         }
                         m_noBeaker = true;
                     }
                     else if (m_noBeaker) {
-                        //resetto i buffer
-                        foreach(QString type, m_channelMap.keys())
-                            foreach(MSignal *sig, m_channelMap[type])
-                                sig->clear();
-                        foreach(QString c, m_totalHWChan)
-                            m_bufferMap[c]->clear();
-                        //inizializzazione media mobile e filtro digitale per flusso
-                        m_valPrecVolume = 0;
-                        m_sommaMMobileF = 0;
-                        m_sommaMMobileV = 0;
-                        m_buffer_MMobileV.clear();
-                        m_buffer_MMobileF.clear();
-                        for (int i=0; i<m_lenMMobile;i++){
-                            m_buffer_MMobileV.append(0);
-                            m_buffer_MMobileF.append(0);
-                        }
-                        m_buffer_DigFilter.clear();
-                        for (int i=0; i<m_lenDifFilter;i++)
-                            m_buffer_DigFilter.append(0);
-
-
-                        //qDebug()<<"TOGLIERE ALLARME";
+                        qDebug("DA SUP lordo ACQ%.1f Si Beaker", lordo );
+                        //avviso il supe
                         udpConn.sendSup("BeakerOk");
-                        m_noBeaker = false;
-                        m_alarmMng.resetAlarm(ALA_NO_BEAKER);
-                        //resetAlarms();
                     }
 
+                }
+                if (__msg.at(0) == 'R') {
+                    //qDebug()<<"RESETTO BUFFER";
+                    foreach(QString type, m_channelMap.keys())
+                        foreach(MSignal *sig, m_channelMap[type])
+                            sig->clear();
+                    foreach(QString c, m_totalHWChan)
+                        m_bufferMap[c]->clear();
+                    //inizializzazione media mobile e filtro digitale per flusso
+                    m_valPrecVolume = 0;
+                    m_sommaMMobileF = 0;
+                    m_sommaMMobileV = 0;
+                    m_buffer_MMobileV.clear();
+                    m_buffer_MMobileF.clear();
+                    for (int i=0; i<m_lenMMobile;i++){
+                        m_buffer_MMobileV.append(0);
+                        m_buffer_MMobileF.append(0);
+                    }
+                    m_buffer_DigFilter.clear();
+                    for (int i=0; i<m_lenDifFilter;i++)
+                        m_buffer_DigFilter.append(0);
 
+                    m_noBeaker = false;
+                    m_alarmMng.resetAlarm(ALA_NO_BEAKER);
                 }
                 break;
     case E_PRN:
