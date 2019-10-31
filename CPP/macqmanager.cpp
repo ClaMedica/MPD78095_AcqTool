@@ -117,9 +117,14 @@ void MAcqManager::udpBtDecode(enum WHO __from, QByteArray __msg)
 
                     qDebug("DA SUP lordo ACQ%.1f", lordo );
                     int pesoBeaker = g_P7SettingsManager.getPesoBeaker();
+
                     if (lordo < pesoBeaker){
+                        if (!m_noBeaker) //per non dare allarme più volte
+                        {
+                            //qDebug()<<"DARE ALLARME";
+                            m_alarmMng.addAlarm(ALA_NO_BEAKER);
+                        }
                         m_noBeaker = true;
-                        m_alarmMng.addAlarm(ALA_NO_BEAKER);
                     }
                     else if (m_noBeaker) {
                         //resetto i buffer
@@ -142,10 +147,14 @@ void MAcqManager::udpBtDecode(enum WHO __from, QByteArray __msg)
                         for (int i=0; i<m_lenDifFilter;i++)
                             m_buffer_DigFilter.append(0);
 
-                        m_noBeaker = false;
+
+                        //qDebug()<<"TOGLIERE ALLARME";
                         udpConn.sendSup("BeakerOk");
-                        resetAlarms();
+                        m_noBeaker = false;
+                        m_alarmMng.resetAlarm(ALA_NO_BEAKER);
+                        //resetAlarms();
                     }
+
 
                 }
                 break;
@@ -836,7 +845,9 @@ void MAcqManager::analyzeStatus(uint8_t __currState, bool __isBT)
                     }
                 }
                 //avviso l'utente che l'acquisizione è ripartita
-                resetAlarms();
+                m_alarmMng.resetAlarm(ALA_NOT_ACQUIRING);
+                m_alarmMng.resetAlarm(ALA_NOT_CONNECTED);
+
                 emit systemInAcqStatus();
                 //attivo allarme di possibile perdita acquisizione
                 m_alarmMng.manageAlarm(ALA_NOT_ACQUIRING, ENABLE);
@@ -1206,7 +1217,7 @@ void MAcqManager::applyOperations()
                         if (flusso > 100)
                             flusso = 100;
                         m_channelMap[type].at(index)->append(flusso);
-                        qDebug()<<"FLUSSO"<<flusso;
+                        //qDebug()<<"FLUSSO"<<flusso;
                         //qDebug() << "Canale" << type << "Copiato" << m_frameMap[hwc] << "campioni su" << index;
 
                     }
@@ -1310,6 +1321,7 @@ void MAcqManager::fillBuffers(QByteArray __block)
                         qDebug("samples(ch:%d, nd:%d):%f",currChan,numChanData,sample);
                         if (!m_startWithZero)
                         {
+                            if (sample < 0) sample = 0;
                             m_bufferMap[QString::number(currChan)]->append(sample);
                             qDebug()<<"append sample"<<sample;
                         }

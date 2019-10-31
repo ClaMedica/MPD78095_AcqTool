@@ -44,6 +44,7 @@ public:
     bool load(QString __fileName);
     QVector<VarMap> * alarmVector(){return &m_alarms;}
     void resetAlarms();
+    void resetAlarm(int __code);
     void startTimeoutAlarm(int __code, int __time=TIMEOUT_TIME, bool __repeat=false);
     void stopTimeoutAlarm(int __code);
     bool manageAlarm(int __code,bool __enable);

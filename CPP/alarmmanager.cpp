@@ -133,6 +133,23 @@ void AlarmManager::resetAlarms()
     updateAlarms();
 }
 
+void AlarmManager::resetAlarm(int __code)
+{
+    if(m_repeatAlarms.contains(__code))
+        m_ATMap[__code]->reset();
+
+    foreach (VarMap raisedAlarms, m_alarms) {
+        if(raisedAlarms["code"] == __code) {
+            int index = m_alarms.indexOf(raisedAlarms);
+            m_alarms.remove(index);
+            break;
+        }
+    }
+
+    updateAlarms();
+}
+
+
 void AlarmManager::startTimeoutAlarm(int __code, int __time,bool __repeat)
 {
     //qDebug()<<"Alarm"<<__code<<"will come in"<<__time<<"seconds";
