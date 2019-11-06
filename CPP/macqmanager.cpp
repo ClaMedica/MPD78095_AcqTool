@@ -294,7 +294,10 @@ bool MAcqManager::newAcquisition(QString __dataFile)
 
         m_acqFinished = false;
 
+        //necessari assegnamenti per risentire gli allarmi su gestione beaker
+        //ad ogni nuova acquisizione
         m_fullBeaker = false;
+        m_noBeaker = false;
 
         //popoliamo la lista dei canali prenotati
 

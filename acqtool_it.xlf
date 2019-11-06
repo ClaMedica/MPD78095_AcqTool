@@ -661,7 +661,7 @@
       <trans-unit id="_msg131" approved="yes">
         <source xml:space="preserve">Are you sure to discard the exam?</source>
         <target xml:space="preserve">Sei sicuro di scartare l&apos;esame?</target>
-        <context-group purpose="location"><context context-type="linenumber">166</context></context-group>
+        <context-group purpose="location"><context context-type="linenumber">161</context></context-group>
       </trans-unit>
       <trans-unit id="_msg132" approved="yes">
         <source xml:space="preserve">Are you sure to exit from Stand-By?</source>
@@ -669,17 +669,17 @@
           <source xml:space="preserve">Are you sure to exit from standby?</source>
           <target xml:space="preserve">Sei sicuro di voler uscire da Stand-By?</target>
         </alt-trans>
-        <context-group purpose="location"><context context-type="linenumber">171</context></context-group>
+        <context-group purpose="location"><context context-type="linenumber">166</context></context-group>
       </trans-unit>
       <trans-unit id="_msg133" approved="yes">
         <source xml:space="preserve">Yes</source>
         <target xml:space="preserve">Sì</target>
-        <context-group purpose="location"><context context-type="linenumber">252</context></context-group>
+        <context-group purpose="location"><context context-type="linenumber">247</context></context-group>
       </trans-unit>
       <trans-unit id="_msg134" approved="yes">
         <source xml:space="preserve">No</source>
         <target xml:space="preserve">No</target>
-        <context-group purpose="location"><context context-type="linenumber">268</context></context-group>
+        <context-group purpose="location"><context context-type="linenumber">263</context></context-group>
       </trans-unit>
     </group>
   </body></file>
@@ -945,15 +945,25 @@
         <context-group purpose="location"><context context-type="linenumber">88</context></context-group>
       </trans-unit>
       <trans-unit id="_msg177" approved="yes">
+        <source xml:space="preserve">The Beaker is full</source>
+        <target xml:space="preserve">Il Beaker è pieno</target>
+        <context-group purpose="location"><context context-type="linenumber">89</context></context-group>
+      </trans-unit>
+      <trans-unit id="_msg178" approved="yes">
+        <source xml:space="preserve">Empty the Beaker</source>
+        <target xml:space="preserve">Svuotare il Beaker</target>
+        <context-group purpose="location"><context context-type="linenumber">90</context></context-group>
+      </trans-unit>
+      <trans-unit id="_msg179" approved="yes">
         <source xml:space="preserve">Allarm not present</source>
         <target xml:space="preserve">Allarme non presente</target>
-        <context-group purpose="location"><context context-type="linenumber">89</context></context-group>
+        <context-group purpose="location"><context context-type="linenumber">91</context></context-group>
       </trans-unit>
     </group>
   </body></file>
   <file original="/mnt/hgfs/SharedVM/Piattaforma70/MGlobal/layoutmanager.cpp" datatype="cpp" source-language="en-US" target-language="it-IT"><body>
     <group restype="x-trolltech-linguist-context" resname="LayoutManager">
-      <trans-unit id="_msg178" approved="yes">
+      <trans-unit id="_msg180" approved="yes">
         <source xml:space="preserve">Richiesta sbagliata</source>
         <target xml:space="preserve">Richiesta sbagliata</target>
         <context-group purpose="location"><context context-type="linenumber">65</context></context-group>
@@ -962,7 +972,7 @@
   </body></file>
   <file original="/mnt/hgfs/SharedVM/Piattaforma70/AcqTool/CPP/mdatamngdesktop.cpp" datatype="cpp" source-language="en-US" target-language="it-IT"><body>
     <group restype="x-trolltech-linguist-context" resname="MDataMngDesktop">
-      <trans-unit id="_msg179" approved="yes">
+      <trans-unit id="_msg181" approved="yes">
         <source xml:space="preserve">problems in the report writing</source>
         <target xml:space="preserve">problemi nella scrittura del referto</target>
         <context-group purpose="location"><context context-type="linenumber">267</context></context-group>
@@ -971,7 +981,7 @@
   </body></file>
   <file original="/mnt/hgfs/SharedVM/Piattaforma70/AcqTool/Resources/AnalysisForm.qml" datatype="plaintext" source-language="en-US" target-language="it-IT"><body>
     <group restype="x-trolltech-linguist-context" resname="AnalysisForm">
-      <trans-unit id="_msg180" approved="yes">
+      <trans-unit id="_msg182" approved="yes">
         <source xml:space="preserve">Do you really want to delete the </source>
         <target xml:space="preserve">Si vuole cancellare veramente il </target>
         <context-group purpose="location"><context context-type="linenumber">419</context></context-group>
