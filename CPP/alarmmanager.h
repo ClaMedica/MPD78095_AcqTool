@@ -11,6 +11,7 @@ enum AlarmRecord
     ALA_NOT_CONNECTED=200,
     ALA_NOT_ACQUIRING,
     ALA_NO_BEAKER,
+    ALA_FULL_BEAKER,
     ALA_TIMEOUT_STATUS=300,
     ALA_NUM
 };
@@ -54,7 +55,7 @@ signals:
     void alarmsUpdated(QVariantList);
 
 public slots:
-    void addAlarm(int __code);
+    bool addAlarm(int __code);
 private:
 
     QMap<int,AlarmTimer *> m_ATMap;

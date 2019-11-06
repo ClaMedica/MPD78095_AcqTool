@@ -16,4 +16,8 @@
                 <Text>Beaker removed</Text>
                 <Help>Replace the Beaker</Help>
         </S_ALA_NO_BEAKER >
+        <S_ALA_NO_BEAKER code="203">
+                <Text>The Beaker is full</Text>
+                <Help>Empty the Beaker</Help>
+        </S_ALA_NO_BEAKER >
 </Root>

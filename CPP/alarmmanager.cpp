@@ -50,31 +50,31 @@ bool AlarmManager::load(QString __fileName)
     return true;
 }
 
-void AlarmManager::addAlarm(int __code)
+bool AlarmManager::addAlarm(int __code)
 {
 
     if(m_confAla == NULL) {
         qDebug() /*qCritical()*/ << "No alarm configuration file loaded";
-        return;
+        return false;
     }
 
     if(m_enabledAlarms.contains(__code))
         if(!m_enabledAlarms[__code]) {
-            return;
+            return false;
         }               //allarme disabilitato
 
     VarMap ala;
 
     foreach (VarMap raisedAlarms, m_alarms) {
         if(raisedAlarms["code"] == __code)
-            return;
+            return false;
     }
 
     ala["code"] = __code;
     Ancestry *child = m_confAla->getChild(m_vecMap[__code]);
     if(child == NULL) {
         qWarning() << m_vecMap[__code] << MEX_CHILD_NOT_ALIVE;
-        return;
+        return false;
     }
 
     //Config_Alarms TESTO DA TRADURRE
@@ -86,6 +86,8 @@ void AlarmManager::addAlarm(int __code)
         QT_TR_NOOP("Interrupted acquisition"),          //code 201 Text
         QT_TR_NOOP("Beaker removed"),                   //code 202 Text
         QT_TR_NOOP("Replace the Beaker"),               //code 202 Help
+        QT_TR_NOOP("The Beaker is full"),               //code 203 Text
+        QT_TR_NOOP("Empty the Beaker"),                 //code 203 Help
         QT_TR_NOOP("Allarm not present")                //code non previsto
     };
 
@@ -106,10 +108,14 @@ void AlarmManager::addAlarm(int __code)
     {
         indexAllarmText = 5;
         indexAllarmHelp = 6;
-    } else
+    } else if (__code == 203)
     {
         indexAllarmText = 7;
-        indexAllarmHelp = 7;
+        indexAllarmHelp = 8;
+    } else
+    {
+        indexAllarmText = 9;
+        indexAllarmHelp = 9;
     }
 
     ala["message"] = tr(stringTraslated[indexAllarmText]);
@@ -120,6 +126,7 @@ void AlarmManager::addAlarm(int __code)
     m_alarms.append(ala);
     updateAlarms();
     qDebug() << "Alarm! " << __code;
+    return true;
 }
 
 void AlarmManager::resetAlarms()

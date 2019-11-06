@@ -103,7 +103,7 @@ private:
 
     Ancestry m_configAcq;                //contiene le info per l'acquisizione
 
-   AlarmManager    m_alarmMng;         //gestore allarmi
+    AlarmManager    m_alarmMng;         //gestore allarmi
 
     uint8_t m_oldState;
     QQueue<int>     m_newStateQ;
@@ -142,6 +142,7 @@ private:
     bool m_disableWeightFilt;
 
     bool m_noBeaker;
+    bool m_fullBeaker;
 
 };
 

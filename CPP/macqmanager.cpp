@@ -33,6 +33,7 @@ MAcqManager::MAcqManager(QObject *parent)
     m_calibCella = "none;";
     m_startWithZero = false;
     m_noBeaker = false;
+    m_fullBeaker = false;
 
 #ifdef PICOFLOW
     m_fileVerifica = "/tmp/disableDebounce";
@@ -109,6 +110,10 @@ void MAcqManager::udpBtDecode(enum WHO __from, QByteArray __msg)
                     //qDebug() << "calibration data:" << m_calibCella;
                 }
                 if (__msg.at(0) == 'W') {
+
+                    if (QFile::exists(m_fileVerifica))
+                        break;
+
                     float lordo = 0;
                     char* s = __msg.mid(6).data();
                     char* l = (char*)&lordo;
@@ -117,19 +122,36 @@ void MAcqManager::udpBtDecode(enum WHO __from, QByteArray __msg)
 
                     int pesoBeaker = g_P7SettingsManager.getPesoBeaker();
 
-                    if (lordo < pesoBeaker){
+                    if (lordo > 1600) //1600 = massimo peso per beaker+volume vuotato
+                    {
+                        if (!m_fullBeaker) //per non dare allarme più volte
+                        {
+                            bool val = m_alarmMng.addAlarm(ALA_FULL_BEAKER);
+                            if (val)
+                                m_fullBeaker = true;
+                        }
+                    }
+
+                    if (lordo < pesoBeaker)
+                    {
                         if (!m_noBeaker) //per non dare allarme più volte
                         {
                             qDebug("DA SUP lordo ACQ%.1f No beaker", lordo );
-                            m_alarmMng.addAlarm(ALA_NO_BEAKER);
+                            m_alarmMng.resetAlarm(ALA_FULL_BEAKER);
+                            m_fullBeaker = false;
+                            bool val = m_alarmMng.addAlarm(ALA_NO_BEAKER);
+                            if (val)
+                                m_noBeaker = true;
                         }
-                        m_noBeaker = true;
+
                     }
                     else if (m_noBeaker) {
-                        qDebug("DA SUP lordo ACQ%.1f Si Beaker", lordo );
+                        //qDebug("DA SUP lordo ACQ%.1f Si Beaker", lordo );
                         //avviso il supe
                         udpConn.sendSup("BeakerOk");
                     }
+
+
 
                 }
                 if (__msg.at(0) == 'R') {
@@ -272,6 +294,8 @@ bool MAcqManager::newAcquisition(QString __dataFile)
 
         m_acqFinished = false;
 
+        m_fullBeaker = false;
+
         //popoliamo la lista dei canali prenotati
 
         m_channelNames.clear();
@@ -348,9 +372,7 @@ void MAcqManager::endAcquisitionSave()
 {
     qDebug() << "endAcquisitionSave()";
 #ifdef PICOFLOW
-    QFile tempVerifica;
-    tempVerifica.setFileName(m_fileVerifica);
-    if (tempVerifica.exists())
+    if (QFile::exists(m_fileVerifica))
         endAcquisitionDiscard();
     else {
         endAcquisition();
@@ -708,13 +730,7 @@ void MAcqManager::handleTCP(SimpleTCPClient *__client, QByteArray __block)
                         foreach(MSignal *sig, m_channelMap[type])
                             sig->saveLastSec(secToSave);
 
-                    //messaggio udp per il supe che deve spegnere i filtri
-//                    QFile tempVerifica;
-//                    tempVerifica.setFileName(m_fileVerifica);
-//                    tempVerifica.open(QIODevice::WriteOnly);
-//                    QTextStream stream(&tempVerifica);
-//                    stream << "ok "<< endl;
-//                    tempVerifica.close();
+
                     udpConn.sendSup("WDebounceStop");
 
                     m_saving = true;    //posso iniziare a salvare i dati
