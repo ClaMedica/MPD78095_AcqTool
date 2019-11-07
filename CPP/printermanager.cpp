@@ -378,15 +378,14 @@ void printermanager::print(QString __datiCalib)
     m_dfm->GetParameters();
     //paziente
     QString dataPaz = m_dfm->GetPatient();
-
+   // qDebug()<<"DATI PAZIENTE"<<dataPaz;
     m_surname = dataPaz.section(";", 0, 0);
     m_name = dataPaz.section(";", 1, 1);
     m_dateofbirth = dataPaz.section(";", 2, 2);
     m_sex = dataPaz.section(";", 12, 12);
     m_ID = dataPaz.section(";", 3, 3);
-    m_operatore = dataPaz.section(";",6,6);
-    //"7;v;07/11/2010;40489;;;;piuyt;;;;;;M"
-    qDebug()<<"DATI PAZIENTE"<<dataPaz<<m_sex;
+    m_operatore = dataPaz.section(";",7,7);
+    m_commenti = dataPaz.section(";",11,11);
     //esame
     m_numchan = m_dfm->GetChanNum();
     m_numTest = m_dfm->GetTestNum();
@@ -701,7 +700,7 @@ void printermanager::Report_data()
     Report_row(tr("Birth Date .....: "), m_test_type ? puntini : m_dateofbirth);
     Report_row(tr("Gender .........: "), m_test_type ? puntini : m_sex);
     Report_row(tr("Operator .......: "), m_test_type ? puntini : m_operatore);
-//    Report_row(tr("Comments .......: "), puntini);
+    Report_row(tr("Comments .......: "), m_test_type ? puntini : m_commenti);
 
     int deltaY = tf_infoLabel.charH;
     int deltaX = tf_infoLabel.charW * tr("Comments .......: ").size();
