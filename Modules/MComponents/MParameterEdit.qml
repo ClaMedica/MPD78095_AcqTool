@@ -17,7 +17,7 @@ Rectangle {
     property string unit:""
     property bool created:false
     property bool editable:true
-    property color labelColor:"black"//colore della role
+    property color labelColor:"white"//colore della role
     property var beginInfo:undefined//è il valore che ha la info la prima volta
     property bool keyboardAlfaNum: true
     property int comboNumMaxEle:5
@@ -44,7 +44,7 @@ Rectangle {
     // has clicked. The id must be unique
     property int parameterId: 0
     signal clicked()
-    signal virtualKeyClosed()
+
     onComponentChanged: if(component !== undefined) connection.target = component
 
     function reload()
@@ -90,10 +90,7 @@ Rectangle {
                     }
                     rootParEdit.clicked()
                     if (rootParEdit.virtualKeyOpen)
-                    {
                         rootParEdit.virtualKeyOpen = false
-                        rootParEdit.virtualKeyClosed()
-                    }
                 }
                 else
                 {
@@ -113,7 +110,7 @@ Rectangle {
         if(__info !== undefined)
         {
             if(created) {
-                //console.log("NUOVE INFO",__info)
+                info = __info
                 switch(type) {
                 case typTextField:component.text        =__info.toString();break;
                 case typComboBox :component.currentIndex=component.find(__info.toString());break;

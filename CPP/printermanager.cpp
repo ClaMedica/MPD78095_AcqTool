@@ -384,6 +384,8 @@ void printermanager::print(QString __datiCalib)
     m_dateofbirth = dataPaz.section(";", 2, 2);
     m_sex = dataPaz.section(";", 12, 12);
     m_ID = dataPaz.section(";", 3, 3);
+    m_operatore = dataPaz.section(";",6,6);
+    //"7;v;07/11/2010;40489;;;;piuyt;;;;;;M"
     qDebug()<<"DATI PAZIENTE"<<dataPaz<<m_sex;
     //esame
     m_numchan = m_dfm->GetChanNum();
@@ -698,7 +700,7 @@ void printermanager::Report_data()
     Report_row(tr("Name ...........: "), m_test_type ? puntini : m_name);
     Report_row(tr("Birth Date .....: "), m_test_type ? puntini : m_dateofbirth);
     Report_row(tr("Gender .........: "), m_test_type ? puntini : m_sex);
-//    Report_row(tr("Investigator ...: "), puntini);
+    Report_row(tr("Operator .......: "), m_test_type ? puntini : m_operatore);
 //    Report_row(tr("Comments .......: "), puntini);
 
     int deltaY = tf_infoLabel.charH;

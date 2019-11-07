@@ -468,7 +468,7 @@ void MDataManager::loadFile(QString __fileName)
         //carico le info necessarie dal file di config
         Ancestry *autoflow = m_configUser.getSafeChild("AutomaticFlow");
         m_autoFlow = (autoflow->getSafeChild("Auto")->getSafeAttribute(ATT_VALUE) == "true" ? 0 : 2);
-
+#ifdef PICOFLOW
         Ancestry *autoprint = m_configPrinter.getSafeChild("Settings");
         m_autoPrint = (autoprint->getSafeChild("AutoPrint")->getSafeAttribute(ATT_VALUE) == "true" ? true : false);
 
@@ -480,6 +480,7 @@ void MDataManager::loadFile(QString __fileName)
 
         Ancestry *printmode = m_configPrinter.getSafeChild("Settings");
         m_landscape = (printmode->getSafeChild("PrinterMode")->getSafeAttribute(ATT_VALUE) == "true" ? true : false);
+#endif
 
         Ancestry *head1 = m_configPrinter.getSafeChild("Headers");
         m_firstHead = head1->getSafeChild("First")->getSafeAttribute(ATT_VALUE);
