@@ -1,6 +1,7 @@
 ﻿import QtQuick 2.4
 import Managers 1.0
 import MPlotModule 1.0
+import MComponents 1.0
 
 
 Rectangle {
@@ -34,6 +35,7 @@ Rectangle {
 
     property int labelSize: layout.value("F4")-1//grafic.valueOf("Nomogrammi","labelSize")
     property int dimPoint: grafic.valueOf("Nomogrammi","dimPoint")
+    property bool isVis: true
     border.width: 1
 
     color: "lightgrey"
@@ -412,35 +414,52 @@ Rectangle {
             yAbsoluteMin: rootPlot.yMin
         }
 
-        Rectangle{
-            id: point
-            color: "blue"
-            border.color: "darkblue"
-            height: dimPoint*10
-            width: dimPoint*10
+        Item {
+            visible: isVis
+
+                Rectangle{
+                id: point
+                color: "blue"
+                border.color: "darkblue"
+                height: dimPoint*10
+                width: dimPoint*10
+            }
+
+
+            Rectangle{
+                id:lineaO
+                height:1
+                width:rCenter.width
+                anchors.left:rCenter.left
+                y: point.y + point.height/2
+                x: 0
+                color: "slateblue"
+                opacity: 1
+            }
+
+            Rectangle{
+                id:lineaV
+                height: rCenter.height
+                width: 1
+                anchors.bottom: rCenter.bottom
+                y: 0
+                x: point.x + point.width/2
+                color: "slateblue"
+                opacity: 1
+            }
         }
 
-
-        Rectangle{
-            id:lineaO
-            height:1
-            width:rCenter.width
-            anchors.left:rCenter.left
-            y: point.y + point.height/2
-            x: 0
-            color: "slateblue"
-            opacity: 1
-        }
-
-        Rectangle{
-            id:lineaV
-            height: rCenter.height
-            width: 1
-            anchors.bottom: rCenter.bottom
-            y: 0
-            x: point.x + point.width/2
-            color: "slateblue"
-            opacity: 1
+        Item {
+            visible: !isVis
+            anchors.centerIn: parent
+            MLabel {
+                id: lblOutOfRange
+                anchors.centerIn: parent
+                fontSizeMode: Text.FixedSize
+                labelSize: layout.value("F4")
+                color: "black"
+                text: qsTr("OUT OF RANGE")
+            }
         }
     }
 
