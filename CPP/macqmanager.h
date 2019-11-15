@@ -144,6 +144,8 @@ private:
     bool m_noBeaker;
     bool m_fullBeaker;
 
+    int m_wrongSamples;
+
 };
 
 

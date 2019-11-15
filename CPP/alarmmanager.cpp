@@ -79,16 +79,16 @@ bool AlarmManager::addAlarm(int __code)
 
     //Config_Alarms TESTO DA TRADURRE
     static const char* stringTraslated[] = {
-        QT_TR_NOOP("Fatal Error"),                      //code 0 Text
-        QT_TR_NOOP("Call the technical service"),       //code 0 Help
-        QT_TR_NOOP("Cell not connected"),               // code 200 Text
-        QT_TR_NOOP("Turn the cell off and on again"),   //code 200/201 Help
-        QT_TR_NOOP("Interrupted acquisition"),          //code 201 Text
-        QT_TR_NOOP("Beaker removed"),                   //code 202 Text
-        QT_TR_NOOP("Replace the Beaker"),               //code 202 Help
-        QT_TR_NOOP("The Beaker is full"),               //code 203 Text
-        QT_TR_NOOP("Empty the Beaker"),                 //code 203 Help
-        QT_TR_NOOP("Allarm not present")                //code non previsto
+        QT_TR_NOOP("Fatal Error"),                      //0 code 0 Text ALA_NOT_CONNECTED
+        QT_TR_NOOP("Call the technical service"),       //1 code 0 Help
+        QT_TR_NOOP("Cell not connected"),               //2 code 200 Text ALA_NOT_CONNECTED
+        QT_TR_NOOP("Turn the cell off and on again"),   //3 code 200/201 Help ALA_NOT_CONNECTED/ALA_NOT_ACQUIRING
+        QT_TR_NOOP("Interrupted acquisition"),          //4 code 201 Text ALA_NOT_ACQUIRING
+        QT_TR_NOOP("Beaker removed"),                   //5 code 202 Text ALA_NO_BEAKER
+        QT_TR_NOOP("Replace the Beaker"),               //6 code 202 Help ALA_NO_BEAKER
+        QT_TR_NOOP("The Beaker is full"),               //7 code 203 Text ALA_FULL_BEAKER
+        QT_TR_NOOP("Empty the Beaker"),                 //8 code 203 Help ALA_FULL_BEAKER
+        QT_TR_NOOP("Allarm not present")                //9 code non previsto
     };
 
     int indexAllarmText = -1, indexAllarmHelp = -1;
@@ -96,19 +96,19 @@ bool AlarmManager::addAlarm(int __code)
     {
         indexAllarmText = 0;
         indexAllarmHelp = 1;
-    } else if (__code == 200 ) //cella non connessa
+    } else if (__code == ALA_NOT_CONNECTED ) //cella non connessa
     {
         indexAllarmText = 2;
         indexAllarmHelp = 3;
-    } else if (__code == 201 ) //acquisizione interrotta
+    } else if (__code == ALA_NOT_ACQUIRING ) //acquisizione interrotta
     {
         indexAllarmText = 4;
         indexAllarmHelp = 3;
-    } else if (__code == 202)
+    } else if (__code == ALA_NO_BEAKER)
     {
         indexAllarmText = 5;
         indexAllarmHelp = 6;
-    } else if (__code == 203)
+    } else if (__code == ALA_FULL_BEAKER)
     {
         indexAllarmText = 7;
         indexAllarmHelp = 8;

@@ -34,6 +34,7 @@ MAcqManager::MAcqManager(QObject *parent)
     m_startWithZero = false;
     m_noBeaker = false;
     m_fullBeaker = false;
+    m_wrongSamples = 0;
 
 #ifdef PICOFLOW
     m_fileVerifica = "/tmp/disableDebounce";
@@ -126,6 +127,7 @@ void MAcqManager::udpBtDecode(enum WHO __from, QByteArray __msg)
                     {
                         if (!m_fullBeaker) //per non dare allarme più volte
                         {
+                            qDebug("DA SUP lordo ACQ%.1f beaker", lordo );
                             bool val = m_alarmMng.addAlarm(ALA_FULL_BEAKER);
                             if (val)
                                 m_fullBeaker = true;
@@ -333,9 +335,10 @@ bool MAcqManager::newAcquisition(QString __dataFile)
         //inizializzo i server di comunicazione con i plotter
         initializeServers();
 
-        //disabilito alcuni allarmi
+        //disabilito/reset alcuni allarmi
         m_alarmMng.manageAlarm(ALA_NOT_ACQUIRING, DISABLE);
-
+        m_alarmMng.resetAlarm(ALA_NO_BEAKER);
+        m_alarmMng.resetAlarm(ALA_FULL_BEAKER);
 
         //connessioni
         connectToServers();
@@ -1339,6 +1342,26 @@ void MAcqManager::fillBuffers(QByteArray __block)
                         qDebug("samples(ch:%d, nd:%d):%f",currChan,numChanData,sample);
                         if (!m_startWithZero)
                         {
+                            if (sample < -10)
+                                m_wrongSamples++;
+                            if (m_wrongSamples > 20)
+                            {
+                                static bool needStopStart = true;
+
+                                if (needStopStart)
+                                {
+                                    needStopStart = false;
+                                    //qDebug()<<"Alarm WRONG"<<m_wrongSamples;
+                                    udpConn.sendSup("BeakerOk");
+                                }
+                                if (sample >= 0)
+                                {
+                                    m_wrongSamples = 0;
+                                    qDebug()<<"Alarm WRONG RESET";
+                                    needStopStart = true;
+                                    m_alarmMng.resetAlarm(ALA_FULL_BEAKER);
+                                }
+                            }
                             if (sample < 0) sample = 0;
                             m_bufferMap[QString::number(currChan)]->append(sample);
                             qDebug()<<"append sample"<<sample;
