@@ -50,41 +50,45 @@ bool AlarmManager::load(QString __fileName)
     return true;
 }
 
-void AlarmManager::addAlarm(int __code)
+bool AlarmManager::addAlarm(int __code)
 {
 
     if(m_confAla == NULL) {
         qDebug() /*qCritical()*/ << "No alarm configuration file loaded";
-        return;
+        return false;
     }
 
     if(m_enabledAlarms.contains(__code))
         if(!m_enabledAlarms[__code]) {
-            return;
+            return false;
         }               //allarme disabilitato
 
     VarMap ala;
 
     foreach (VarMap raisedAlarms, m_alarms) {
         if(raisedAlarms["code"] == __code)
-            return;
+            return false;
     }
 
     ala["code"] = __code;
     Ancestry *child = m_confAla->getChild(m_vecMap[__code]);
     if(child == NULL) {
-        qCritical() << m_vecMap[__code] << MEX_CHILD_NOT_ALIVE;
-        return;
+        qWarning() << m_vecMap[__code] << MEX_CHILD_NOT_ALIVE;
+        return false;
     }
 
     //Config_Alarms TESTO DA TRADURRE
     static const char* stringTraslated[] = {
-        QT_TR_NOOP("Fatal Error"),                      //code 0 Text
-        QT_TR_NOOP("Call the technical service"),       //code 0 Help
-        QT_TR_NOOP("Cell not connected"),               // code 200 Text
-        QT_TR_NOOP("Turn the cell off and on again"),   //code 200/201 Help
-        QT_TR_NOOP("Interrupted acquisition"),          //code 201 Text
-        QT_TR_NOOP("Allarm not present")                //code non previsto
+        QT_TR_NOOP("Fatal Error"),                      //0 code 0 Text ALA_NOT_CONNECTED
+        QT_TR_NOOP("Call the technical service"),       //1 code 0 Help
+        QT_TR_NOOP("Cell not connected"),               //2 code 200 Text ALA_NOT_CONNECTED
+        QT_TR_NOOP("Turn the cell off and on again"),   //3 code 200/201 Help ALA_NOT_CONNECTED/ALA_NOT_ACQUIRING
+        QT_TR_NOOP("Interrupted acquisition"),          //4 code 201 Text ALA_NOT_ACQUIRING
+        QT_TR_NOOP("Beaker removed"),                   //5 code 202 Text ALA_NO_BEAKER
+        QT_TR_NOOP("Replace the Beaker"),               //6 code 202 Help ALA_NO_BEAKER
+        QT_TR_NOOP("The Beaker is full"),               //7 code 203 Text ALA_FULL_BEAKER
+        QT_TR_NOOP("Empty the Beaker"),                 //8 code 203 Help ALA_FULL_BEAKER
+        QT_TR_NOOP("Allarm not present")                //9 code non previsto
     };
 
     int indexAllarmText = -1, indexAllarmHelp = -1;
@@ -92,18 +96,26 @@ void AlarmManager::addAlarm(int __code)
     {
         indexAllarmText = 0;
         indexAllarmHelp = 1;
-    } else if (__code == 200 ) //cella non connessa
+    } else if (__code == ALA_NOT_CONNECTED ) //cella non connessa
     {
         indexAllarmText = 2;
         indexAllarmHelp = 3;
-    } else if (__code == 201 ) //acquisizione interrotta
+    } else if (__code == ALA_NOT_ACQUIRING ) //acquisizione interrotta
     {
         indexAllarmText = 4;
         indexAllarmHelp = 3;
-    } else
+    } else if (__code == ALA_NO_BEAKER)
     {
         indexAllarmText = 5;
-        indexAllarmHelp = 5;
+        indexAllarmHelp = 6;
+    } else if (__code == ALA_FULL_BEAKER)
+    {
+        indexAllarmText = 7;
+        indexAllarmHelp = 8;
+    } else
+    {
+        indexAllarmText = 9;
+        indexAllarmHelp = 9;
     }
 
     ala["message"] = tr(stringTraslated[indexAllarmText]);
@@ -114,6 +126,7 @@ void AlarmManager::addAlarm(int __code)
     m_alarms.append(ala);
     updateAlarms();
     qDebug() << "Alarm! " << __code;
+    return true;
 }
 
 void AlarmManager::resetAlarms()
@@ -126,6 +139,23 @@ void AlarmManager::resetAlarms()
 
     updateAlarms();
 }
+
+void AlarmManager::resetAlarm(int __code)
+{
+    if(m_repeatAlarms.contains(__code))
+        m_ATMap[__code]->reset();
+
+    foreach (VarMap raisedAlarms, m_alarms) {
+        if(raisedAlarms["code"] == __code) {
+            int index = m_alarms.indexOf(raisedAlarms);
+            m_alarms.remove(index);
+            break;
+        }
+    }
+
+    updateAlarms();
+}
+
 
 void AlarmManager::startTimeoutAlarm(int __code, int __time,bool __repeat)
 {

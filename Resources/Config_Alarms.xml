@@ -12,4 +12,12 @@
                 <Text>Interrupted acquisition</Text>
                 <Help>Turn the cell off and on again</Help>
 	</S_ALA_NOT_ACQUIRING>
+        <S_ALA_NO_BEAKER code="202">
+                <Text>Beaker removed</Text>
+                <Help>Replace the Beaker</Help>
+        </S_ALA_NO_BEAKER >
+        <S_ALA_NO_BEAKER code="203">
+                <Text>The Beaker is full</Text>
+                <Help>Empty the Beaker</Help>
+        </S_ALA_NO_BEAKER >
 </Root>

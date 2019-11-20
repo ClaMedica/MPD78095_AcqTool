@@ -10,6 +10,8 @@ enum AlarmRecord
 {
     ALA_NOT_CONNECTED=200,
     ALA_NOT_ACQUIRING,
+    ALA_NO_BEAKER,
+    ALA_FULL_BEAKER,
     ALA_TIMEOUT_STATUS=300,
     ALA_NUM
 };
@@ -43,6 +45,7 @@ public:
     bool load(QString __fileName);
     QVector<VarMap> * alarmVector(){return &m_alarms;}
     void resetAlarms();
+    void resetAlarm(int __code);
     void startTimeoutAlarm(int __code, int __time=TIMEOUT_TIME, bool __repeat=false);
     void stopTimeoutAlarm(int __code);
     bool manageAlarm(int __code,bool __enable);
@@ -52,7 +55,7 @@ signals:
     void alarmsUpdated(QVariantList);
 
 public slots:
-    void addAlarm(int __code);
+    bool addAlarm(int __code);
 private:
 
     QMap<int,AlarmTimer *> m_ATMap;

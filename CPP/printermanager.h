@@ -120,6 +120,8 @@ private:
     QString m_dateofbirth;
     QString m_sex;				// M o F
     QString m_ID;
+    QString m_operatore;
+    QString m_commenti;
 
     //dati esame
     int     m_numchan;  			// 1(volume/flusso) 2(volume/flusso + EMG)(+ eventualmente finestringa)
