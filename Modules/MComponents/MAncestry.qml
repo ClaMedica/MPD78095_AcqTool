@@ -3,6 +3,7 @@ import QtQuick.Controls 1.2
 import QtQuick.Dialogs 1.2
 import MComponents 1.0
 import Settings 1.0
+import AcqModuleManager 1.0
 
 Column {
     id:rootAncestry
@@ -158,6 +159,9 @@ Column {
 
                 var labelAttr = pchild.getAttribute("label")
                 if (labelAttr === "width track" || labelAttr === "Margin" || labelAttr === "Fonts")
+                    continue
+
+                if (CODSOFT === AcqModuleManager.FLOWSOFT && (labelAttr === "Range" || labelAttr === "Auto Range"))
                     continue
 
                 if(pchild.isYoungest()) {//creo un parametro modificabile
