@@ -21,6 +21,10 @@ Rectangle {
     signal pressAndHold(var id)
 
 
+    function setChecked(check)
+    {
+        control.checked = check
+    }
 
     onImageChanged:img.source=image
 

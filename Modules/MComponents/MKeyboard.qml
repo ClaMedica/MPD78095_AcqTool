@@ -20,6 +20,9 @@ Rectangle {
     property string oldTesto: ""
     property string labelTarget: ""
 
+    property var butShift:undefined
+    property var butSpecial:undefined
+
     anchors.fill: parent
 
     onShiftChanged:
@@ -58,7 +61,6 @@ Rectangle {
 
         MLabel{
             id:txtTarget
-          //  anchors.fill: parent
             anchors.left: parent.left
             anchors.verticalCenter: parent.verticalCenter
             labelSize: rootKeyboard.labelSize
@@ -66,7 +68,6 @@ Rectangle {
         }
         MTextField{
             id:txtField
-//            selectByMouse:false
             anchors.left: txtTarget.right
             anchors.right:parent.right
             labelSize: rootKeyboard.labelSize
@@ -82,6 +83,7 @@ Rectangle {
         anchors.left: parent.left
         anchors.right:parent.right
         anchors.bottom: parent.bottom
+
         Repeater{
             id:repRow
             model: [
@@ -94,7 +96,7 @@ Rectangle {
                 [100,[["",15,"shift.png"],"z","x","c","v","b","n","m",["",15,"backspace.png"]],
                  [["",15,"shift.png"],"|","à","è","é","ì","ò","ù",["",15,"backspace.png"]]],
 
-                [100,[["1@#",15],[" ",55,"space.png"],["OK",15],["BACK",15]],[["1@#",15],[" ",55,"space.png"],["OK",15],["CANC",15]]]
+                [100,[["1@#",15],[" ",55,"space.png"],["OK",15],["BACK",15]],[["1@#",15],[" ",55,"space.png"],["OK",15],["BACK",15]]]
             ]
             delegate:
                 Row{
@@ -115,21 +117,19 @@ Rectangle {
                                    modelData[1]*row.width/100:btnW
 
                         image: modelData[2]!==undefined?modelData[2]:""
-                        Component.onCompleted: btnLetters.push(this)
+                        Component.onCompleted: {
+                            btnLetters.push(this)
+                            shift = false
+                        }
                         switchEnabled: image==="shift.png"|text==="1@#"
-//                        onPressAndHold:
-//                        {
-//                            if(image=="shift.png"){
-//                                shift=true
-//                                caps=!caps
-//                            }
-//                        }
+
                         onClicked:{
                             //console.log(text)
                             switch(text)
                             {
                             case "":
                                 if(image=="shift.png"){
+                                    butShift = this
                                     shift=!shift
                                 }
                                 if(image=="backspace.png"){
@@ -139,17 +139,26 @@ Rectangle {
                                 break;
                             case "1@#":
                                 btnLetters = []
+                                butSpecial = this
                                 special=!special
-                                if (shift) shift = false
                                 break;
                             case "OK":
                                 if(destroyWhenOK)
                                     rootKeyboard.destroy()
                                 else
                                 {
-                                    shift=false
-                                    special=false
-                                    //caps=false
+                                    if (shift)
+                                    {
+                                        shift=false
+                                        butShift.setChecked(shift)
+                                    }
+                                    if (special)
+                                    {
+                                        btnLetters = []
+                                        special=false
+                                        butSpecial.setChecked(false)
+                                    }
+
                                     rootKeyboard.visible=false
                                     target.focus=false
                                 }
@@ -160,18 +169,24 @@ Rectangle {
                                     rootKeyboard.destroy()
                                 else
                                 {
-                                    shift=false
-                                    special=false
-                                    //caps=false
+                                    if (shift)
+                                    {
+                                        shift=false
+                                        butShift.setChecked(shift)
+                                    }
+                                    if (special)
+                                    {
+                                        btnLetters = []
+                                        special=false
+                                        butSpecial.setChecked(special)
+                                    }
+
                                     rootKeyboard.visible=false
                                     target.focus=false
                                 }
                                 break;
                             default:
                                 txtField.insert(txtField.cursorPosition,text)
-                             //   special=false
-                            //    if(!caps)
-                            //        shift=false
                                 break;
 
                             }
