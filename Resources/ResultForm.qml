@@ -161,7 +161,6 @@ MForm {
                     LQM.isVis = true
                 else
                     LQM.isVis = false
-                console.log("LQM",LQM.xPoint,LQM.yPoint,LQM.isVis)
 
                 LQM.udmX =  mngData.getFlowDatas(i).getLiverpoolMax().getUnitx()
                 LQM.udmY =  mngData.getFlowDatas(i).getLiverpoolMax().getUnity()
@@ -205,13 +204,10 @@ MForm {
                 LQA.xPoint = mngData.getFlowDatas(i).getLiverpoolAve().getDatoX()
                 LQA.yPoint = mngData.getFlowDatas(i).getLiverpoolAve().getDatoY()
 
-                console.log("LQA",LQA.xPoint,LQA.yPoint)
                 if (LQA.xPoint > LQA.xMin && LQA.xPoint < LQA.xMax && LQA.yPoint > LQA.yMin && LQA.yPoint < LQA.yMax)
                     LQA.isVis = true
                 else
                     LQA.isVis = false
-                console.log("LQA",LQA.xPoint,LQA.yPoint,LQA.isVis)
-
                 LQA.udmX =  mngData.getFlowDatas(i).getLiverpoolAve().getUnitx()
                 LQA.udmY =  mngData.getFlowDatas(i).getLiverpoolAve().getUnity()
                 LQA.tracksWidth = [2,2,1,1,1,1,2]
@@ -260,7 +256,6 @@ MForm {
                         SQM.isVis = true
                     else
                         SQM.isVis = false
-                    console.log("SQM",SQM.xPoint,SQM.yPoint,SQM.isVis)
 
                     SQM.udmX =  mngData.getFlowDatas(i).getSirokyMax().getUnitx()
                     SQM.udmY =  mngData.getFlowDatas(i).getSirokyMax().getUnity()
@@ -314,7 +309,6 @@ MForm {
                         SQA.isVis = true
                     else
                         SQA.isVis = false
-                    console.log("SQA",SQA.xPoint,SQA.yPoint,SQA.isVis,"x",SQA.xMin,SQA.xMax,"y",SQA.yMin,SQA.yMax)
 
                     SQA.udmX =  mngData.getFlowDatas(i).getSirokyAve().getUnitx()
                     SQA.udmY =  mngData.getFlowDatas(i).getSirokyAve().getUnity()
