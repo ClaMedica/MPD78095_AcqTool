@@ -1342,27 +1342,31 @@ void MAcqManager::fillBuffers(QByteArray __block)
                         qDebug("samples(ch:%d, nd:%d):%f",currChan,numChanData,sample);
                         if (!m_startWithZero)
                         {
-                            if (sample < -10)
-                                m_wrongSamples++;
-                            if (m_wrongSamples > 20)
+                            if (tipo == "VV")
                             {
-                                static bool needStopStart = true;
+                                if (sample < -10)
+                                    m_wrongSamples++;
+                                if (m_wrongSamples > 20)
+                                {
+                                    static bool needStopStart = true;
 
-                                if (needStopStart)
-                                {
-                                    needStopStart = false;
-                                    //qDebug()<<"Alarm WRONG"<<m_wrongSamples;
-                                    udpConn.sendSup("BeakerOk");
+                                    if (needStopStart)
+                                    {
+                                        needStopStart = false;
+                                        //qDebug()<<"Alarm WRONG"<<m_wrongSamples;
+                                        udpConn.sendSup("BeakerOk");
+                                    }
+                                    if (sample >= 0)
+                                    {
+                                        m_wrongSamples = 0;
+                                        qDebug()<<"Alarm WRONG RESET";
+                                        needStopStart = true;
+                                        m_alarmMng.resetAlarm(ALA_FULL_BEAKER);
+                                    }
                                 }
-                                if (sample >= 0)
-                                {
-                                    m_wrongSamples = 0;
-                                    qDebug()<<"Alarm WRONG RESET";
-                                    needStopStart = true;
-                                    m_alarmMng.resetAlarm(ALA_FULL_BEAKER);
-                                }
+                                if (sample < 0) sample = 0;
                             }
-                            if (sample < 0) sample = 0;
+
                             m_bufferMap[QString::number(currChan)]->append(sample);
                             qDebug()<<"append sample"<<sample;
                         }
