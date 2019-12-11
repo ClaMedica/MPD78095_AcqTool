@@ -34,6 +34,7 @@ MAcqManager::MAcqManager(QObject *parent)
     m_startWithZero = false;
     m_noBeaker = false;
     m_fullBeaker = false;
+    m_startReset = true;
     m_wrongSamples = 0;
 
 #ifdef PICOFLOW
@@ -96,6 +97,13 @@ MAcqManager::~MAcqManager()
     //            delete m_signalVector[i];
 }
 
+void MAcqManager::sendBeakerOkToSupe()
+{
+    //avviso il supe
+    //qDebug()<<"SEND BEAKER OK";
+    udpConn.sendSup("BeakerOk");
+}
+
 void MAcqManager::udpBtDecode(enum WHO __from, QByteArray __msg)
 {
 //    qDebug() << __from << __msg;
@@ -147,13 +155,11 @@ void MAcqManager::udpBtDecode(enum WHO __from, QByteArray __msg)
                         }
 
                     }
-                    else if (m_noBeaker) {
+                    else if (m_noBeaker && m_startReset) {
                         //qDebug("DA SUP lordo ACQ%.1f Si Beaker", lordo );
-                        //avviso il supe
-                        udpConn.sendSup("BeakerOk");
+                        QTimer::singleShot(3000,this,SLOT(sendBeakerOkToSupe()));
+                        m_startReset = false;
                     }
-
-
 
                 }
                 if (__msg.at(0) == 'R') {
@@ -178,6 +184,7 @@ void MAcqManager::udpBtDecode(enum WHO __from, QByteArray __msg)
                         m_buffer_DigFilter.append(0);
 
                     m_noBeaker = false;
+                    m_startReset = true;
                     m_alarmMng.resetAlarm(ALA_NO_BEAKER);
                 }
                 break;

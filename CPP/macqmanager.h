@@ -54,6 +54,7 @@ public slots:
     void resetAlarms();
     void setAlarms(QVariantList __list);
     void udpBtDecode(enum WHO __from, QByteArray __msg);
+    void sendBeakerOkToSupe();
 
 //private slots:
     bool sendCommand(tcp_flow_bt_cmd_t __command);
@@ -143,7 +144,7 @@ private:
 
     bool m_noBeaker;
     bool m_fullBeaker;
-
+    bool m_startReset;
     int m_wrongSamples;
 
 };
