@@ -35,6 +35,7 @@ MAcqManager::MAcqManager(QObject *parent)
     m_noBeaker = false;
     m_fullBeaker = false;
     m_startReset = true;
+    m_timeGo = 0;
     m_wrongSamples = 0;
 
 #ifdef PICOFLOW
@@ -99,9 +100,16 @@ MAcqManager::~MAcqManager()
 
 void MAcqManager::sendBeakerOkToSupe()
 {
-    //avviso il supe
-    //qDebug()<<"SEND BEAKER OK";
-    udpConn.sendSup("BeakerOk");
+    //avviso il supe solo dopo lo scadere dell'ultimo timer partito per riposizionamento beaker
+    //possono essere più di uno se l'utente decide di togliere/mettere il beaker più volte,
+    //in questo caso è necessario gestire solo l'ultimo
+    if (m_timeGo == 1)
+    {
+        m_alarmMng.resetAlarm(ALA_STABILIZE);
+        m_alarmMng.resetAlarm(ALA_NO_BEAKER);
+        udpConn.sendSup("BeakerOk");
+    }
+    m_timeGo--;
 }
 
 void MAcqManager::udpBtDecode(enum WHO __from, QByteArray __msg)
@@ -144,23 +152,33 @@ void MAcqManager::udpBtDecode(enum WHO __from, QByteArray __msg)
 
                     if (lordo < pesoBeaker)
                     {
-                        if (!m_noBeaker) //per non dare allarme più volte
+                        if (!m_noBeaker || !m_startReset)
                         {
                             qDebug("DA SUP lordo ACQ%.1f No beaker", lordo );
                             m_alarmMng.resetAlarm(ALA_FULL_BEAKER);
+                            m_alarmMng.resetAlarm(ALA_STABILIZE);
                             m_fullBeaker = false;
                             bool val = m_alarmMng.addAlarm(ALA_NO_BEAKER);
                             if (val)
+                            {
                                 m_noBeaker = true;
+                                m_saving = false;   //nel caso il togliere il beaker avesse fatto partire un'acquisizione
+                                m_startReset = true;
+                            }
                         }
-
                     }
-                    else if (m_noBeaker && m_startReset) {
-                        //qDebug("DA SUP lordo ACQ%.1f Si Beaker", lordo );
-                        QTimer::singleShot(3000,this,SLOT(sendBeakerOkToSupe()));
-                        m_startReset = false;
+                    else if (m_noBeaker && m_startReset)
+                    {
+                        //qDebug()<<"DA SUP lordo ACQ%.1f Si Beaker"<<m_timeGo;
+                        m_alarmMng.resetAlarm(ALA_NO_BEAKER);
+                        bool val = m_alarmMng.addAlarm(ALA_STABILIZE);
+                        if (val)
+                        {
+                            QTimer::singleShot(10000,this,SLOT(sendBeakerOkToSupe()));
+                            m_startReset = false;
+                            m_timeGo++;
+                        }
                     }
-
                 }
                 if (__msg.at(0) == 'R') {
                     //qDebug()<<"RESETTO BUFFER";
@@ -184,7 +202,6 @@ void MAcqManager::udpBtDecode(enum WHO __from, QByteArray __msg)
                         m_buffer_DigFilter.append(0);
 
                     m_noBeaker = false;
-                    m_startReset = true;
                     m_alarmMng.resetAlarm(ALA_NO_BEAKER);
                 }
                 break;

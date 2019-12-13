@@ -20,4 +20,8 @@
                 <Text>The Beaker is full</Text>
                 <Help>Empty the Beaker</Help>
         </S_ALA_NO_BEAKER >
+        <S_ALA_STABILIZE code="204">
+                <Text>Wait for stabilization</Text>
+                <Help>Wait some seconds</Help>
+        </S_ALA_STABILIZE >
 </Root>

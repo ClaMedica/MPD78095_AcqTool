@@ -79,16 +79,18 @@ bool AlarmManager::addAlarm(int __code)
 
     //Config_Alarms TESTO DA TRADURRE
     static const char* stringTraslated[] = {
-        QT_TR_NOOP("Fatal Error"),                      //0 code 0 Text ALA_NOT_CONNECTED
-        QT_TR_NOOP("Call the technical service"),       //1 code 0 Help
-        QT_TR_NOOP("Cell not connected"),               //2 code 200 Text ALA_NOT_CONNECTED
-        QT_TR_NOOP("Turn the cell off and on again"),   //3 code 200/201 Help ALA_NOT_CONNECTED/ALA_NOT_ACQUIRING
-        QT_TR_NOOP("Interrupted acquisition"),          //4 code 201 Text ALA_NOT_ACQUIRING
-        QT_TR_NOOP("Beaker removed"),                   //5 code 202 Text ALA_NO_BEAKER
-        QT_TR_NOOP("Replace the Beaker"),               //6 code 202 Help ALA_NO_BEAKER
-        QT_TR_NOOP("The Beaker is full"),               //7 code 203 Text ALA_FULL_BEAKER
-        QT_TR_NOOP("Empty the Beaker"),                 //8 code 203 Help ALA_FULL_BEAKER
-        QT_TR_NOOP("Allarm not present")                //9 code non previsto
+        QT_TR_NOOP("Fatal Error"),                      // 0 code 0 Text ALA_NOT_CONNECTED
+        QT_TR_NOOP("Call the technical service"),       // 1 code 0 Help
+        QT_TR_NOOP("Cell not connected"),               // 2 code 200 Text ALA_NOT_CONNECTED
+        QT_TR_NOOP("Turn the cell off and on again"),   // 3 code 200/201 Help ALA_NOT_CONNECTED/ALA_NOT_ACQUIRING
+        QT_TR_NOOP("Interrupted acquisition"),          // 4 code 201 Text ALA_NOT_ACQUIRING
+        QT_TR_NOOP("Beaker removed"),                   // 5 code 202 Text ALA_NO_BEAKER
+        QT_TR_NOOP("Replace the Beaker"),               // 6 code 202 Help ALA_NO_BEAKER
+        QT_TR_NOOP("The Beaker is full"),               // 7 code 203 Text ALA_FULL_BEAKER
+        QT_TR_NOOP("Empty the Beaker"),                 // 8 code 203 Help ALA_FULL_BEAKER
+        QT_TR_NOOP("Wait for stabilization"),            // 9 code 204 Text ALA_STABILIZE
+        QT_TR_NOOP("Wait some seconds"),                //10 code 204 Help ALA_STABILIZE
+        QT_TR_NOOP("Allarm not present")                //11 code non previsto
     };
 
     int indexAllarmText = -1, indexAllarmHelp = -1;
@@ -112,10 +114,14 @@ bool AlarmManager::addAlarm(int __code)
     {
         indexAllarmText = 7;
         indexAllarmHelp = 8;
-    } else
+    } else if (__code == ALA_STABILIZE)
     {
         indexAllarmText = 9;
-        indexAllarmHelp = 9;
+        indexAllarmHelp = 10;
+    } else
+    {
+        indexAllarmText = 11;
+        indexAllarmHelp = 11;
     }
 
     ala["message"] = tr(stringTraslated[indexAllarmText]);

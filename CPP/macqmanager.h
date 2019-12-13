@@ -142,9 +142,10 @@ private:
     QString m_fileVerifica;
     bool m_disableWeightFilt;
 
-    bool m_noBeaker;
-    bool m_fullBeaker;
-    bool m_startReset;
+    bool m_noBeaker;            //presenza beaker sulla cella
+    bool m_fullBeaker;          //beaker pieno
+    bool m_startReset;          //necessario start/stop acquisizione per reset dopo rinserimento beaker sulla cella
+    int m_timeGo;               //gestiste il reset in caso di togli/metti beaker
     int m_wrongSamples;
 
 };
