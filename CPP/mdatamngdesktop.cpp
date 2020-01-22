@@ -255,7 +255,7 @@ void MDataMngDesktop::openReport()
     {
         bool refDone = false;
 
-        Init(g_P7SettingsManager.dataPath().toLatin1(),g_P7SettingsManager.appPath().toLatin1(),m_copyFileName.toLatin1(), 4,"Standard.rtf");
+        Init(g_P7SettingsManager.dataPath().toLatin1(),g_P7SettingsManager.appPath().toLatin1(),m_copyFileName.toLatin1(), 4,"Standard.rtf",g_P7SettingsManager.localization());
         if (fillRef1())
             if (fillRef2())
                 if (fillRef3())

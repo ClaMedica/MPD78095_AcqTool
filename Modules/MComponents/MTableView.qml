@@ -1,4 +1,4 @@
-//qt imports
+﻿//qt imports
 import QtQuick 2.4
 import QtQuick.Controls 1.2
 import QtQuick.Window 2.1
@@ -26,6 +26,33 @@ BuzzTableView{
     onSortIndicatorOrderChanged:  order(sortIndicatorColumn, sortIndicatorOrder,true)
 
     signal selected()
+
+    property int rowSel: -1
+
+    function selectRowFromPKS(pks)
+    {
+        if (pks.length > 0)
+        {
+            for (var i=0; i<pks.length; i++)
+            {
+                var rowi = model.indexOfPK(pks[i])
+                rootTable.selection.select(rowi)
+            }
+            var row = model.indexOfPK(pks[0])
+            rootTable.currentRow = row
+            rowSel = row
+            posItemTimer.start()
+        }
+        rootTable.selected()
+    }
+    //necessario timer, come previsto da documentazione, affinche' la funzione rootTable.positionViewAtRow(row,ListView.End) abbia effetto
+    Timer {
+        id: posItemTimer
+        interval: 50
+        running: false
+        repeat: false
+        onTriggered: rootTable.positionViewAtRow(rowSel,ListView.Contain)
+    }
 
     function selectRowFromPK(pk)
     {
