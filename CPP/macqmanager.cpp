@@ -242,11 +242,7 @@ bool MAcqManager::newAcquisition(QString __dataFile)
             qDebug() << "Error on acq configuration file";
 
         //e infine carico il file degli allarmi
-        QString configAlarms = m_applicationPath + "/Config_Alarms.xml";
-        if(!QFile::exists(configAlarms))
-            configAlarms = ":/Config/Config_Alarms.xml";
-        if(!m_alarmMng.load(configAlarms))
-            qDebug() << "Error on alarm configuration file";
+        m_alarmMng.loadAllarm(m_messaggiUtente);
 
         //carico info di connettivitA
         loadConnectivityInfo(m_configAcq.getSafeChild(XML_CONNECTIONS));

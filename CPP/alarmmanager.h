@@ -1,4 +1,4 @@
-#ifndef ALARMMANAGER_H
+﻿#ifndef ALARMMANAGER_H
 #define ALARMMANAGER_H
 
 #include <QObject>
@@ -43,7 +43,7 @@ public:
     explicit AlarmManager(QObject *parent = 0);
     ~AlarmManager();
 
-    bool load(QString __fileName);
+    bool loadAllarm(QMap<int, QStringList> __msg);
     QVector<VarMap> * alarmVector(){return &m_alarms;}
     void resetAlarms();
     void resetAlarm(int __code);
@@ -63,7 +63,7 @@ private:
     Ancestry *m_confAla;
     QVector<VarMap> m_alarms;
     QVariantList m_alarmList;
-    QMap<int,QString> m_vecMap;
+    QMap<int,QStringList> m_vecMap;
     QMap<int,bool> m_enabledAlarms;
     QList<int> m_repeatAlarms;
     void updateAlarms();

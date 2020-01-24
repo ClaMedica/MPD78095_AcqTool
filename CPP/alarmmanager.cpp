@@ -1,4 +1,4 @@
-#include "alarmmanager.h"
+﻿#include "alarmmanager.h"
 
 AlarmTimer::AlarmTimer(AlarmRecord __code) {
     m_code = (int) __code;
@@ -31,21 +31,14 @@ AlarmManager::~AlarmManager()
         delete a;
 }
 
-bool AlarmManager::load(QString __fileName)
+bool AlarmManager::loadAllarm(QMap<int,QStringList> __msg)
 {
-    m_confAla = new Ancestry;
-    if(!m_confAla->loadFromXML(__fileName)) {
-        qWarning() << "File corrupted";
-        delete m_confAla;
-        m_confAla = NULL;
-        return false;
+    QMap<int,QStringList>::iterator map;
+    for (map = __msg.begin(); map != __msg.end(); ++map)
+    {
+        m_enabledAlarms[map.key()] = true;
+        m_vecMap[map.key()] = map.value();
     }
-    foreach (Ancestry *alarm, m_confAla->getChildren()) {
-        m_vecMap[alarm->getAttribute("code").toInt()] = alarm->name();
-        m_enabledAlarms[alarm->getAttribute("code").toInt()] = true;
-    }
-
-    qDebug() << "Alarms loaded:" << m_confAla->childrenNames();
 
     return true;
 }
@@ -71,61 +64,61 @@ bool AlarmManager::addAlarm(int __code)
     }
 
     ala["code"] = __code;
-    Ancestry *child = m_confAla->getChild(m_vecMap[__code]);
-    if(child == NULL) {
-        qWarning() << m_vecMap[__code] << MEX_CHILD_NOT_ALIVE;
+    QStringList listMessage = m_vecMap[__code];
+    if(listMessage.length() == 0) {
+        qWarning() << m_vecMap[__code] << "Alarm not found";
         return false;
     }
 
-    //Config_Alarms TESTO DA TRADURRE
-    static const char* stringTraslated[] = {
-        QT_TR_NOOP("Fatal Error"),                      // 0 code 0 Text ALA_NOT_CONNECTED
-        QT_TR_NOOP("Call the technical service"),       // 1 code 0 Help
-        QT_TR_NOOP("Cell not connected"),               // 2 code 200 Text ALA_NOT_CONNECTED
-        QT_TR_NOOP("Turn the cell off and on again"),   // 3 code 200/201 Help ALA_NOT_CONNECTED/ALA_NOT_ACQUIRING
-        QT_TR_NOOP("Interrupted acquisition"),          // 4 code 201 Text ALA_NOT_ACQUIRING
-        QT_TR_NOOP("Beaker removed"),                   // 5 code 202 Text ALA_NO_BEAKER
-        QT_TR_NOOP("Replace the Beaker"),               // 6 code 202 Help ALA_NO_BEAKER
-        QT_TR_NOOP("The Beaker is full"),               // 7 code 203 Text ALA_FULL_BEAKER
-        QT_TR_NOOP("Empty the Beaker"),                 // 8 code 203 Help ALA_FULL_BEAKER
-        QT_TR_NOOP("Wait for stabilization"),            // 9 code 204 Text ALA_STABILIZE
-        QT_TR_NOOP("Wait some seconds"),                //10 code 204 Help ALA_STABILIZE
-        QT_TR_NOOP("Allarm not present")                //11 code non previsto
-    };
+//    //Config_Alarms TESTO DA TRADURRE
+//    static const char* stringTraslated[] = {
+//        QT_TR_NOOP("Fatal Error"),                      // 0 code 0 Text ALA_NOT_CONNECTED
+//        QT_TR_NOOP("Call the technical service"),       // 1 code 0 Help
+//        QT_TR_NOOP("Cell not connected"),               // 2 code 200 Text ALA_NOT_CONNECTED
+//        QT_TR_NOOP("Turn the cell off and on again"),   // 3 code 200/201 Help ALA_NOT_CONNECTED/ALA_NOT_ACQUIRING
+//        QT_TR_NOOP("Interrupted acquisition"),          // 4 code 201 Text ALA_NOT_ACQUIRING
+//        QT_TR_NOOP("Beaker removed"),                   // 5 code 202 Text ALA_NO_BEAKER
+//        QT_TR_NOOP("Replace the Beaker"),               // 6 code 202 Help ALA_NO_BEAKER
+//        QT_TR_NOOP("The Beaker is full"),               // 7 code 203 Text ALA_FULL_BEAKER
+//        QT_TR_NOOP("Empty the Beaker"),                 // 8 code 203 Help ALA_FULL_BEAKER
+//        QT_TR_NOOP("Wait for stabilization"),            // 9 code 204 Text ALA_STABILIZE
+//        QT_TR_NOOP("Wait some seconds"),                //10 code 204 Help ALA_STABILIZE
+//        QT_TR_NOOP("Allarm not present")                //11 code non previsto
+//    };
 
-    int indexAllarmText = -1, indexAllarmHelp = -1;
-    if (__code == 0 ) //fatal error
-    {
-        indexAllarmText = 0;
-        indexAllarmHelp = 1;
-    } else if (__code == ALA_NOT_CONNECTED ) //cella non connessa
-    {
-        indexAllarmText = 2;
-        indexAllarmHelp = 3;
-    } else if (__code == ALA_NOT_ACQUIRING ) //acquisizione interrotta
-    {
-        indexAllarmText = 4;
-        indexAllarmHelp = 3;
-    } else if (__code == ALA_NO_BEAKER)
-    {
-        indexAllarmText = 5;
-        indexAllarmHelp = 6;
-    } else if (__code == ALA_FULL_BEAKER)
-    {
-        indexAllarmText = 7;
-        indexAllarmHelp = 8;
-    } else if (__code == ALA_STABILIZE)
-    {
-        indexAllarmText = 9;
-        indexAllarmHelp = 10;
-    } else
-    {
-        indexAllarmText = 11;
-        indexAllarmHelp = 11;
-    }
+//    int indexAllarmText = -1, indexAllarmHelp = -1;
+//    if (__code == 0 ) //fatal error
+//    {
+//        indexAllarmText = 0;
+//        indexAllarmHelp = 1;
+//    } else if (__code == ALA_NOT_CONNECTED ) //cella non connessa
+//    {
+//        indexAllarmText = 2;
+//        indexAllarmHelp = 3;
+//    } else if (__code == ALA_NOT_ACQUIRING ) //acquisizione interrotta
+//    {
+//        indexAllarmText = 4;
+//        indexAllarmHelp = 3;
+//    } else if (__code == ALA_NO_BEAKER)
+//    {
+//        indexAllarmText = 5;
+//        indexAllarmHelp = 6;
+//    } else if (__code == ALA_FULL_BEAKER)
+//    {
+//        indexAllarmText = 7;
+//        indexAllarmHelp = 8;
+//    } else if (__code == ALA_STABILIZE)
+//    {
+//        indexAllarmText = 9;
+//        indexAllarmHelp = 10;
+//    } else
+//    {
+//        indexAllarmText = 11;
+//        indexAllarmHelp = 11;
+//    }
 
-    ala["message"] = tr(stringTraslated[indexAllarmText]);
-    ala["help"]    = tr(stringTraslated[indexAllarmHelp]);
+    ala["message"] = m_vecMap[__code].value(0);
+    ala["help"]    = m_vecMap[__code].value(1);
     ala["color"]   = "red";
     ala["sound"]   = "file:///" + g_P7SettingsManager.appPath() + "/Alarm.wav";
 

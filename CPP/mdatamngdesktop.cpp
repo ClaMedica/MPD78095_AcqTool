@@ -97,7 +97,8 @@ void MDataMngDesktop::addAnMarker(QVariant __key, QVariant __posX, QVariantList 
             chName = __chName.at(i).toString();
     }
 
-    if (chName != ""){
+    if (chName != "")
+    {
         int posX = __posX.toInt();
         VarMapVec* elements = m_storage.getAll(CAT_DEFINER);
         bool defFound = false;
@@ -168,17 +169,12 @@ void MDataMngDesktop::addAnMarker(QVariant __key, QVariant __posX, QVariantList 
         }
         else
         {
-            warning = "definitore non trovato--> warning";
+           emit sg_warning(m_messaggiUtente[AVV_ANMNOINSERT].at(0));//anmarker fuori da un definitore
         }
     }
     else
     {
-        warning = "warning ---- su questo canale non possono inserirsi anmarker";
-    }
-
-    if (warning != "")
-    {
-        qDebug()<<warning;
+        emit sg_warning(m_messaggiUtente[AVV_ANMOUTCH].at(0)); //anmarker in un un canale errato
     }
 }
 
@@ -255,7 +251,7 @@ void MDataMngDesktop::openReport()
     {
         bool refDone = false;
 
-        Init(g_P7SettingsManager.dataPath().toLatin1(),g_P7SettingsManager.appPath().toLatin1(),m_copyFileName.toLatin1(), 4,"Standard.rtf");
+        Init(g_P7SettingsManager.dataPath().toLatin1(),g_P7SettingsManager.appPath().toLatin1(),m_copyFileName.toLatin1(), 4,"Standard.rtf",g_P7SettingsManager.localization());
         if (fillRef1())
             if (fillRef2())
                 if (fillRef3())

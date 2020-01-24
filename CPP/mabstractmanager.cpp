@@ -446,6 +446,26 @@ bool MAbstractManager::load()
     if(!m_configLang.loadFromXML(configLanguage))
         qCritical() << "Error on user configuration file";
 
+    //carico in una mappa la lista degli avvisi e allarmi che mi sono utili
+    QFile fileMess(g_P7SettingsManager.messaggiUtenti());
+    if (!fileMess.open(QIODevice::ReadOnly)) {
+        qDebug() << "errore lettura file messaggi utenti";
+        return 1;
+    }
+
+    bool firstLine = true;
+    while (!fileMess.atEnd()) {
+        QByteArray line = fileMess.readLine();
+        if (firstLine) {
+            firstLine = false;
+            continue;
+        }
+        QList<QByteArray> row = line.split(',');
+        QString code = row.at(0);
+        QStringList testi;
+        testi << row.at(3) << row.at(4);
+        m_messaggiUtente[code.toInt()] = testi;
+    }
 
     bool res = buildMarkerInfoMap();
     return res;

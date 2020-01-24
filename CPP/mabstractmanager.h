@@ -21,6 +21,11 @@
 
 extern AcqBridge *g_mainAppBridge;
 
+enum AvvisiUtente {
+    AVV_ANMNOINSERT = 0,
+    AVV_ANMOUTCH
+};
+
 class MAbstractManager : public QObject
 {
     Q_OBJECT
@@ -74,6 +79,8 @@ protected:
     m_configUserProp,               //contiene le info modificate dall'utente per grafica canali
     m_configPrinter,            //contiene le info relative alla stampa
     m_configLang;            //contiene le info relative alla lingua
+
+    QMap<int,QStringList> m_messaggiUtente;
 
     /// lista delle info di entrata:
     /// [[plotName1,[traccia1,markers,ecc]][plotName2,[traccia2,markers,ecc]]]

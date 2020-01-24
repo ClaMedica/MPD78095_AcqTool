@@ -78,7 +78,7 @@ int main(int argc, char *argv[])
      gPath_log = QApplication::applicationDirPath() + "/"+ logFile;
      qDebug() << "Start. log:" << gPath_log;
      //dirotto il debug log
-     MyMessageOutput::init(gPath_log);
+     //MyMessageOutput::init(gPath_log);
 #endif
 
 
