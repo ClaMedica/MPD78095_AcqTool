@@ -97,7 +97,8 @@ void MDataMngDesktop::addAnMarker(QVariant __key, QVariant __posX, QVariantList 
             chName = __chName.at(i).toString();
     }
 
-    if (chName != ""){
+    if (chName != "")
+    {
         int posX = __posX.toInt();
         VarMapVec* elements = m_storage.getAll(CAT_DEFINER);
         bool defFound = false;
@@ -168,17 +169,12 @@ void MDataMngDesktop::addAnMarker(QVariant __key, QVariant __posX, QVariantList 
         }
         else
         {
-            warning = "definitore non trovato--> warning";
+           emit sg_warning(m_messaggiUtente[AVV_ANMNOINSERT].at(0));//anmarker fuori da un definitore
         }
     }
     else
     {
-        warning = "warning ---- su questo canale non possono inserirsi anmarker";
-    }
-
-    if (warning != "")
-    {
-        qDebug()<<warning;
+        emit sg_warning(m_messaggiUtente[AVV_ANMOUTCH].at(0)); //anmarker in un un canale errato
     }
 }
 

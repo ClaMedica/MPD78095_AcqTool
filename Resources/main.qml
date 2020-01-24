@@ -135,50 +135,6 @@ ApplicationWindow {
 //            timStopBT.start()
     }
 
-//    function restartBt()
-//    {
-////        console.log("================ btStatusUdp:",btStatusUdp,"btOkPrint",btOkPrint)
-//        mngAcq.send_Command(5)   // STARTBT
-////        if(btStatusUdp == 2)
-////            timStopBT.start()
-//    }
-
-//    Timer{
-//        id: timStopBT
-//        interval: 500
-//        repeat: true
-//        onTriggered: {
-//            console.log("================ btStatusUdp:",btStatusUdp,"btOkPrint",btOkPrint)
-//            switch(btStatusUdp) {  // 0:don't care 1:stopping 2:stopped 3:restarting 4:restarted
-//            case 0:
-//                mngAcq.send_Command(4)   // STOPBT
-//                btStatusUdp = 1
-//                break
-//            case 1: // da 1 a 2 alla ricezione di udpBtStopped
-//                break
-//            case 2:
-//                if(!btOkPrint) {
-//                    btOkPrint = true    //  mngData.sendToPrint()
-//                    stop()
-//                }
-//                else {
-////                    mngAcq.send_Command(5)   // STARTBT
-//                    btStatusUdp = 3
-//                }
-//                break
-//            case 3: // da 3 a 4 alla ricezione di udpBtRestarted
-//                break
-//            case 4:
-//                btStatusUdp = 0
-//                btOkPrint = false
-//                stop()
-//                break
-//            }
-
-//        }
-//    }
-
-
     Connections {
         id: connMainApp
         target: bridgeMain
@@ -277,6 +233,11 @@ ApplicationWindow {
              exit.open()
         }
 
+        onSg_warning: {
+            warning.testoWarning = __msg
+            warning.open()
+        }
+
         Component.onCompleted: console.log("MDataManager Ready!")
     }
 
@@ -330,36 +291,12 @@ ApplicationWindow {
         id: exit
         visible: false
     }
-    /*
-    //per la tastiera virtuale
-    InputPanelNumeric {
-        id: inputPanelNumeric
-        z: 99
-        y: parent.height
-        anchors.left: parent.left
-        anchors.right: parent.right
-       // visible: false
-        states: State {
-            name: "visible"
-            when: Qt.inputMethod.visible
-            PropertyChanges {
-                target: inputPanelNumeric
-                y: parent.height - inputPanelNumeric.height
-            }
-        }
-        transitions: Transition {
-            from: ""
-            to: "visible"
-            reversible: true
-            ParallelAnimation {
-                NumberAnimation {
-                    properties: "y"
-                    duration: 150
-                    easing.type: Easing.InOutQuad
-                }
-            }
-        }
-    }*/
+
+    WarningDlg {
+        id: warning
+        visible: false
+    }
+
     MKeyboard{
         id:appKey
         visible:false
