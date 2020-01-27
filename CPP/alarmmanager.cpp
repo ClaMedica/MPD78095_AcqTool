@@ -19,14 +19,11 @@ void AlarmTimer::send() {qDebug() << "Timeout Alarm code = " << m_code; emit tim
 
 AlarmManager::AlarmManager(QObject *parent) : QObject(parent)
 {
-    m_confAla = NULL;
+
 }
 
 AlarmManager::~AlarmManager()
 {
-    if(m_confAla == NULL)
-        delete m_confAla;
-
     foreach(AlarmTimer *a, m_ATMap)
         delete a;
 }
@@ -45,12 +42,6 @@ bool AlarmManager::loadAllarm(QMap<int,QStringList> __msg)
 
 bool AlarmManager::addAlarm(int __code)
 {
-
-    if(m_confAla == NULL) {
-        qDebug() /*qCritical()*/ << "No alarm configuration file loaded";
-        return false;
-    }
-
     if(m_enabledAlarms.contains(__code))
         if(!m_enabledAlarms[__code]) {
             return false;
@@ -69,53 +60,6 @@ bool AlarmManager::addAlarm(int __code)
         qWarning() << m_vecMap[__code] << "Alarm not found";
         return false;
     }
-
-//    //Config_Alarms TESTO DA TRADURRE
-//    static const char* stringTraslated[] = {
-//        QT_TR_NOOP("Fatal Error"),                      // 0 code 0 Text ALA_NOT_CONNECTED
-//        QT_TR_NOOP("Call the technical service"),       // 1 code 0 Help
-//        QT_TR_NOOP("Cell not connected"),               // 2 code 200 Text ALA_NOT_CONNECTED
-//        QT_TR_NOOP("Turn the cell off and on again"),   // 3 code 200/201 Help ALA_NOT_CONNECTED/ALA_NOT_ACQUIRING
-//        QT_TR_NOOP("Interrupted acquisition"),          // 4 code 201 Text ALA_NOT_ACQUIRING
-//        QT_TR_NOOP("Beaker removed"),                   // 5 code 202 Text ALA_NO_BEAKER
-//        QT_TR_NOOP("Replace the Beaker"),               // 6 code 202 Help ALA_NO_BEAKER
-//        QT_TR_NOOP("The Beaker is full"),               // 7 code 203 Text ALA_FULL_BEAKER
-//        QT_TR_NOOP("Empty the Beaker"),                 // 8 code 203 Help ALA_FULL_BEAKER
-//        QT_TR_NOOP("Wait for stabilization"),            // 9 code 204 Text ALA_STABILIZE
-//        QT_TR_NOOP("Wait some seconds"),                //10 code 204 Help ALA_STABILIZE
-//        QT_TR_NOOP("Allarm not present")                //11 code non previsto
-//    };
-
-//    int indexAllarmText = -1, indexAllarmHelp = -1;
-//    if (__code == 0 ) //fatal error
-//    {
-//        indexAllarmText = 0;
-//        indexAllarmHelp = 1;
-//    } else if (__code == ALA_NOT_CONNECTED ) //cella non connessa
-//    {
-//        indexAllarmText = 2;
-//        indexAllarmHelp = 3;
-//    } else if (__code == ALA_NOT_ACQUIRING ) //acquisizione interrotta
-//    {
-//        indexAllarmText = 4;
-//        indexAllarmHelp = 3;
-//    } else if (__code == ALA_NO_BEAKER)
-//    {
-//        indexAllarmText = 5;
-//        indexAllarmHelp = 6;
-//    } else if (__code == ALA_FULL_BEAKER)
-//    {
-//        indexAllarmText = 7;
-//        indexAllarmHelp = 8;
-//    } else if (__code == ALA_STABILIZE)
-//    {
-//        indexAllarmText = 9;
-//        indexAllarmHelp = 10;
-//    } else
-//    {
-//        indexAllarmText = 11;
-//        indexAllarmHelp = 11;
-//    }
 
     ala["message"] = m_vecMap[__code].value(0);
     ala["help"]    = m_vecMap[__code].value(1);

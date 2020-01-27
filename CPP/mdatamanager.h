@@ -78,6 +78,7 @@ signals:
     void sg_openReport(bool __disable);
     void infoValVolRes();
     void infoToSave();
+    void sg_warning(QString __msg);
 
 public slots:
     void analysis(void);

@@ -450,8 +450,25 @@ bool MAbstractManager::load()
     QFile fileMess(g_P7SettingsManager.messaggiUtenti());
     if (!fileMess.open(QIODevice::ReadOnly)) {
         qDebug() << "errore lettura file messaggi utenti";
-        return 1;
     }
+
+    //traduzioni lingue con caratteri speciali
+    const char* language;
+    QString value = g_P7SettingsManager.localization();
+    if (value == "pl")
+        language = "Windows-1250";   // CODEC Europa Centrale (polacco)
+    else if (value == "ru")
+        language = "Windows-1251";   // CODEC Russo (cirillico)
+    else if (value == "el")
+        language = "Windows-1253";   // CODEC Greco
+    else if (value == "ar")
+        language = "Windows-1256";   // CODEC Arabo
+    else if (value =="ko")
+        language = "ks_c_5601-1987"; // CODEC Coreano (HANGUL)
+    else
+        language = "Windows-1252";   // CODEC Francese/Italiano/Tedesco/Spagnolo/etc..
+
+    QTextCodec *codec = QTextCodec::codecForName(language);
 
     bool firstLine = true;
     while (!fileMess.atEnd()) {
@@ -462,8 +479,20 @@ bool MAbstractManager::load()
         }
         QList<QByteArray> row = line.split(',');
         QString code = row.at(0);
+
+        QByteArray BTesto = QByteArray(row.at(3));
+        QTextStream testo(&BTesto);
+        testo.setAutoDetectUnicode(false);
+        testo.setCodec(codec);
+        QString testoStr = testo.readAll();
+        QByteArray BHelp = QByteArray(row.at(4));
+        QTextStream help(&BHelp);
+        help.setAutoDetectUnicode(false);
+        help.setCodec(codec);
+        QString helpStr = help.readAll();
+
         QStringList testi;
-        testi << row.at(3) << row.at(4);
+        testi << testoStr << helpStr;
         m_messaggiUtente[code.toInt()] = testi;
     }
 

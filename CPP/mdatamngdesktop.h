@@ -15,7 +15,6 @@ public:
 
 signals:
     void sg_exitFromReview();
-    void sg_warning(QString __msg);
 
 public slots:
     void deleteAnMArkers();

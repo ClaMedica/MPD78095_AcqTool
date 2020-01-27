@@ -214,6 +214,8 @@ CLAUDIA {
                       /sviluppo/qt/Piattaforma70/Build-IMX6/CommonPlugin
     DISTFILES += ../MGlobal/MComponents/* \
                  ../MGlobal/MComponents/Images/*
+
+    DEFINES += nullptr=NULL
 }
 
 PICOFLOW {
@@ -240,6 +242,8 @@ PICOFLOW {
                       ../Build-IMX6/CommonPlugin
     DISTFILES += ../MGlobal/MComponents/* \
                  ../MGlobal/MComponents/Images/*
+
+    DEFINES += nullptr=NULL
 }
 
 
