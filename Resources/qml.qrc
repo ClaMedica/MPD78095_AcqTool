@@ -54,7 +54,6 @@
         <file>Config_Grafic.xml</file>
         <file>Config_Grafic_pico.xml</file>
         <file>Config_User_Prop.xml</file>
-        <file>Config_Alarms.xml</file>
         <file>Config_Printer_Desktop.xml</file>
     </qresource>
     <qresource prefix="/Dialog">
