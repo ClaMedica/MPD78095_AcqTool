@@ -107,7 +107,7 @@ void MDataMngDesktop::addAnMarker(QVariant __key, QVariant __posX, QVariantList 
             int evStart = curMap->value("xMin").toInt();
             int evEnd = curMap->value("xMax").toInt();
 
-            if (evStart < posX  &&  posX < evEnd) {
+            if (evStart <= posX  &&  posX <= evEnd) {
                 defFound = true;
                 defMap = curMap;
                 break;

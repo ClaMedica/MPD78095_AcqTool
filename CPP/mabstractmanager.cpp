@@ -10,9 +10,9 @@ MAbstractManager::MAbstractManager(QObject *parent) : QObject(parent)
     trMap["Cough"] = tr("Cough");
     trMap["Speak"] = tr("Speak");
     trMap["definer"] = tr("definer");
+    trMap["Definer"] = tr("definer");
     trMap["marker"] = tr("marker");
-
-
+    trMap["Marker"] = tr("marker");
 }
 
 MAbstractManager::~MAbstractManager()
