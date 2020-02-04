@@ -597,7 +597,7 @@ bool MAbstractManager::buildConfigurationFile()
         Ancestry * chProps = m_configUserProp.getSafeChild(XML_CHANNELSPROP);
         QStringList chNames = chProps->childrenNames();
 
-        foreach (QString chanName, m_chanInPlots[graphName]) {  //qui scrivo le proprietA  delle tracce
+        foreach (QString chanName, m_chanInPlots[graphName]) {  //qui scrivo le proprieta'  delle tracce
             Ancestry * trkN = tracks->addChild(chanName);
             Ancestry * ch = NULL;
             foreach (QString chNamePart, chNames) {
@@ -611,6 +611,7 @@ bool MAbstractManager::buildConfigurationFile()
                 axis->setAttribute(ATT_YAUTOSCALE, ch->getSafeChild(ATT_YAUTOSCALE)->getSafeAttribute(ATT_VALUE));
                 axis->setAttribute(ATT_RANGE, ch->getSafeChild(ATT_RANGE)->getSafeAttribute(ATT_MODEL));
                 axis->setAttribute(ATT_RANGEVALUE, ch->getSafeChild(ATT_RANGE)->getSafeAttribute(ATT_VALUE));
+                axis->setAttribute(ATT_BACKGROUND, ch->getSafeChild(ATT_BACKGROUND)->getSafeAttribute(ATT_VALUE));
             }
             else
                 qWarning() << "Canale" << chanName << "senza proprieta grafiche. Uso le default";

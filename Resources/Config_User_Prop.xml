@@ -1,6 +1,12 @@
 ﻿<Configuration label="Configuration">
 <ChannelsProp label="Channels Prop">
     <VV>
+    <backgroundColor
+            label="color background"
+            type="ColorBox"
+            unit=""
+            value="whitesmoke"
+    />
     <thick
             label="thick"
             type="TextField"
@@ -31,6 +37,12 @@
 
     </VV>
     <Q>
+    <backgroundColor
+            label="color background"
+            type="ColorBox"
+            unit=""
+            value="whitesmoke"
+    />
     <thick
             label="thick"
             type="TextField"
@@ -61,6 +73,12 @@
 
     </Q>
     <EMG>
+    <backgroundColor
+            label="color background"
+            type="ColorBox"
+            unit=""
+            value="whitesmoke"
+    />
     <thick
             label="thick"
             type="TextField"
