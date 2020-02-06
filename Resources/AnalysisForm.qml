@@ -22,6 +22,8 @@ MForm{
 
     color:"lightgray"
 
+
+
     //@@@@@@@@@@    Functions       @@@@@@@@@@
     function populate()
     {
@@ -87,6 +89,24 @@ MForm{
         mngCon.fileName = configurationFile
         plot.completed=true;
         mngCon.read()
+    }
+
+    function disablebuttons(__disable){
+        for (var i=0; i<gridComand.items.length; i++)
+        {
+            if (gridComand.items[i]===MDataManager.ANALISI)
+            {
+                gridComand.items[i+4] = !__disable
+                break;
+            }
+        }
+        for (i=0; i<gridComandBottom.items.length; i++)
+        {
+            if (gridComandBottom.items[i]===MDataManager.CHIUDIREV)
+                gridComandBottom.items[i+4] = !__disable
+        }
+        gridComand.populate()
+        gridComandBottom.populate()
     }
 
     //@@@@@@@@@@    Objects     @@@@@@@@@@
@@ -194,7 +214,6 @@ MForm{
         id:gridDefiners
         anchors.right: gridMarker.left
         anchors.top: parent.top
-        anchors.bottom: rectBreak.top
         width:PicoFlow ? 0 : 60
         owner:"Definers"
         itemsInRow:1
@@ -229,24 +248,53 @@ MForm{
         visible: PicoFlow ? false : true
     }
 
+    MLabel {
+        id: lbBackToResult
+        visible: false
+        anchors.right: gridMarker.left
+        anchors.top: rectBreak.bottom
+        anchors.horizontalCenter: gridDefiners.horizontalCenter
+        width: text.length
+        height: 20
+        text: qsTr("Result")
+        labelSize: layout.value("F4") - 1
+
+        MouseArea {
+            id: mouseResult
+            enabled: true
+            anchors.fill: parent
+            onClicked:
+            {
+                forAna.visible = false
+                forRes.visible = true
+            }
+        }
+    }
+
+
     MGridView{
         //@@@@@@@@@@    Properties      @@@@@@@@@@
         id:gridActions
         anchors.right: gridMarker.left
-        anchors.top: rectBreak.bottom
+        anchors.top: lbBackToResult.bottom
         anchors.bottom: parent.bottom
         width:PicoFlow ? 0 : 60
 
         owner:"Actions"
         itemsInRow:1
         delegate: MMarkerButton {
+
             onClick: {
-                if (value === "116")
+                if (value === MDataManager.DELETEALL.toString())
                     mngData.deleteAnMArkers()
                 if (value === "f1" || value === "f2" || value === "f3")
                 {
                     plot.anMarkerKey = value
                     plot.newAnMarker = true
+                }
+                if (value === MDataManager.RISULTATI.toString()) {
+                    forAna.visible = false
+                    forRes.visible = true
                 }
             }
             onTooltipActive: {
@@ -278,32 +326,45 @@ MForm{
         id:gridComand
         anchors.right: gridDefiners.left
         anchors.top: parent.top
-        anchors.bottom: rectBreakCommands.bottom
+        //anchors.bottom: rectBreakCommands.bottom
         width:60
         owner:"Commands"
         itemsInRow:1
 
         delegate: MMarkerButton{
             onClick: {
-                if (value === "111") {
+                if (value === MDataManager.ANALISI.toString()) {
                     if (!PicoFlow)
+                    {
                         mngData.saveImg(sourceImg,"GR000")
+                        //rendo abilitato il pulsante per passare ai risultati senza dover rifare l'analisi
+                        lbBackToResult.visible = true
+                        for (var i=0; i<gridActions.items.length; i++)
+                        {
+                            if (gridActions.items[i]===MDataManager.RISULTATI)
+                            {
+                                gridActions.items[i+4] = "true"
+                                break;
+                            }
+                        }
+                        gridActions.populate()
+                    }
                     mngData.analysis();
                 }
 
-                if (value === "112") {
+                if (value === MDataManager.CHIUDIREV.toString()) {
                     mngData.exitFromReview()
                 }
 
-                if (value === "113")
+                if (value === MDataManager.ZOOMIN.toString())
                     //zoom in
                     plot.zoomFromButton("zoomIn")
 
-                if (value === "114")
+                if (value === MDataManager.ZOOMOUT.toString())
                     //zoom out
                     plot.zoomFromButton("zoomOut")
 
-                if (value === "115")
+                if (value === MDataManager.ZOOMNONE.toString())
                     //zoom none
                     plot.zoomFromButton("zoomReset")
             }
@@ -352,7 +413,7 @@ MForm{
                        rectBreakCommands.buttonHeight = button.height*1.4
             }
             onClick: {
-                if (value === "112") {
+                if (value === MDataManager.CHIUDIREV.toString()) {
                     mngData.exitFromReview()
                 }
             }
@@ -369,7 +430,10 @@ MForm{
             }
         }
         visible:true
+
     }
+
+
 
     Rectangle{
         property string text: ""

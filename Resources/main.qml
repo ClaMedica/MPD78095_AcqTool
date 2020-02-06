@@ -18,9 +18,6 @@ ApplicationWindow {
     property string examFolder:settings.datafilePath
     property string configFolder:settings.appPath()
     property bool vis: false
-//    property int btStatusUdp: 0    // 0:don't care 1:stopping 2:stopped 3:restarting 4:restarted
-    property bool btStopped: false
-    property bool timBtAvail: true
     property bool btOkPrint: false
 
     //@@@@@@@@@@    Properties      @@@@@@@@@@
@@ -227,6 +224,7 @@ ApplicationWindow {
 
         onSg_openReport: {
             forRes.disablebuttons(__disable)
+            forAna.disablebuttons(__disable)
         }
 
         onSg_exitFromReview:{

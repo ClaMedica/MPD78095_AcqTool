@@ -14,8 +14,6 @@ MForm {
     //@@@@@@@@@@    Properties      @@@@@@@@@@
     property var pagesLocal:[]
     property var pagesSameAna:[]
-    property bool timBtAvail: true
-    property bool btStopped: false
 
     property int buttonTable:0
     id : resultForm
@@ -43,12 +41,10 @@ MForm {
     function disablebuttons(__disable){
         if (__disable){
             btnReport.enabled = false
-            btnBack.enabled = false
             btnExit.enabled = false
         }
         else {
             btnReport.enabled = true
-            btnBack.enabled = true
             btnExit.enabled = true
         }
     }
@@ -427,10 +423,9 @@ MForm {
             if (pagesLocal[i].visible)
                 pagesLocal[i].visible = false;
         }
+        pagesLocal[0].visible = true
         forAna.visible = true
         resultForm.visible = false
-        timBtAvail = true
-        btStopped = false
     }
 
 }

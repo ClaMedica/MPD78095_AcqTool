@@ -4,6 +4,7 @@ import QtQuick.Controls 1.4
 
 import "qrc:/Components"
 import MComponents 1.0
+import Managers 1.0
 import "qrc:/Models"
 Rectangle{
     //@@@@@@@@@@    Definitions     @@@@@@@@@@
@@ -53,10 +54,17 @@ Rectangle{
         {
             for(var i=0;i<modello.length;i+=2)
                 modM.setProperty(modello[i],modello[i+1])
+
             state="idl"
 
             rootMarkerButton.visible = modM.visible
-
+            rootMarkerButton.enabled = modM.enabled
+            if (!modM.enabled)
+                state = "dis"
+            if (modM.key === MDataManager.RISULTATI.toString())
+            {
+                testoB.visible = true
+            }
         }
     }
 
@@ -95,6 +103,14 @@ Rectangle{
         border.color: "lightgray"//Qt.rgba(1,1,0.5,1)
         border.width:radius/2
         radius:parent.width/2
+    }
+
+    Text {
+        id: testoB
+        text: "R"
+        visible: false
+        color: "white"
+        anchors.centerIn: parent
     }
 
     BuzzMouseArea{

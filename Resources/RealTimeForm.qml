@@ -156,14 +156,14 @@ MForm{
             itemsInRow:1
             delegate: MMarkerButton {
                 onClick:{
-                    if (value === "116") {
+                    if (value === MDataManager.DISCARD.toString()) {
                         //necessaria richiesta di conferma
-                    dlgDiscard.testo = qsTr("Are you sure to discard the exam?")
-                    dlgDiscard.visible = true
-                }
-                if (value === "117") {
-                    //necessaria richiesta di conferma
-                    dlgDiscard.testo = qsTr("Are you sure to exit from Stand-By?")
+                        dlgDiscard.testo = qsTr("Are you sure to discard the exam?")
+                        dlgDiscard.visible = true
+                    }
+                    if (value === MDataManager.CHIUDIREV.toString()) {
+                        //necessaria richiesta di conferma
+                        dlgDiscard.testo = qsTr("Are you sure to exit from Stand-By?")
                         dlgDiscard.visible = true
                     }
                 }

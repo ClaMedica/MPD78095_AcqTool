@@ -257,6 +257,7 @@ QVariantList MAbstractManager::actionsInfo()
     list << "img" << "qrc:/f1";
     list << "key" << "f1";
     list << "visible" << true;
+    list << "enabled" << true;
     list << "&GridElement";
 
     list << "$GridElement";
@@ -264,6 +265,7 @@ QVariantList MAbstractManager::actionsInfo()
     list << "img" << "qrc:/f2";
     list << "key" << "f2";
     list << "visible" << true;
+    list << "enabled" << true;
     list << "&GridElement";
 
     list << "$GridElement";
@@ -271,15 +273,24 @@ QVariantList MAbstractManager::actionsInfo()
     list << "img" << "qrc:/f3";
     list << "key" << "f3";
     list << "visible" << true;
+    list << "enabled" << true;
     list << "&GridElement";
 
     list << "$GridElement";
     list << "descr" << tr("delete analytical markers");
     list << "img" << "qrc:/danger";
-    list << "key" << 116;
+    list << "key" << DELETEALL;
     list << "visible" << true;
+    list << "enabled" << true;
     list << "&GridElement";
 
+    list << "$GridElement";
+    list << "descr" << tr("result");
+    list << "img" << "qrc:/vuoto";
+    list << "key" << RISULTATI;
+    list << "visible" << true;
+    list << "enabled" << false;
+    list << "&GridElement";
     return list;
 }
 
@@ -292,8 +303,9 @@ QVariantList MAbstractManager::commandsInfo()
     list << "$GridElement";
     list << "descr" << tr("analysis");
     list << "img" << "qrc:/analisi";
-    list << "key" << 111;
+    list << "key" << ANALISI;
     list << "visible" << true;
+    list << "enabled" << true;
     list << "&GridElement";
 
     //spazio vuoto
@@ -308,24 +320,27 @@ QVariantList MAbstractManager::commandsInfo()
     list << "$GridElement";
     list << "descr" << tr("zoom in");
     list << "img" << "qrc:/zoom_in";
-    list << "key" << 113;
+    list << "key" << ZOOMIN;
     list << "visible" << true;
+    list << "enabled" << true;
     list << "&GridElement";
 
     //zoom out
     list << "$GridElement";
     list << "descr" << tr("zoom out");
     list << "img" << "qrc:/zoom_out";
-    list << "key" << 114;
+    list << "key" << ZOOMOUT;
     list << "visible" << true;
+    list << "enabled" << true;
     list << "&GridElement";
 
     //zoom none
     list << "$GridElement";
     list << "descr" << tr("zoom none");
     list << "img" << "qrc:/zoom_none";
-    list << "key" << 115;
+    list << "key" << ZOOMNONE;
     list << "visible" << true;
+    list << "enabled" << true;
     list << "&GridElement";
 
 #ifdef PICOFLOW
@@ -359,8 +374,9 @@ QVariantList MAbstractManager::commandsInfoBottom()
     list << "$GridElement";
     list << "descr" << tr("save&exit");
     list << "img" << "qrc:/salvaChiudi";
-    list << "key" << 112;
+    list << "key" << CHIUDIREV;
     list << "visible" << true;
+    list << "enabled" << true;
     list << "&GridElement";
 #endif
     return list;
@@ -379,8 +395,9 @@ QVariantList MAbstractManager::acqInfo()
         list << "$GridElement";
         list << "descr" << tr("exit");
         list << "img" << "qrc:/salvaChiudi";
-        list << "key" << 117;
+        list << "key" << CHIUDIACQ;
         list << "visible" << true;
+        list << "enabled" << true;
         list << "&GridElement";
     }
     else
@@ -389,8 +406,9 @@ QVariantList MAbstractManager::acqInfo()
         list << "$GridElement";
         list << "descr" << tr("discard");
         list << "img" << "qrc:/discard";
-        list << "key" << 116;
+        list << "key" << DISCARD;
         list << "visible" << true;
+        list << "enabled" << true;
         list << "&GridElement";
     }
     return list;

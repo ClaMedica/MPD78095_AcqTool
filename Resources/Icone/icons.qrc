@@ -39,5 +39,8 @@
         <file>f3_click.png</file>
         <file>f3_off.png</file>
         <file>f2_off.png</file>
+        <file>vuoto.png</file>
+        <file>vuoto_click.png</file>
+        <file>vuoto_off.png</file>
     </qresource>
 </RCC>

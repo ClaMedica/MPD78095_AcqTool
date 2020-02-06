@@ -48,8 +48,22 @@ public:
 
     Q_PROPERTY(QString patientInfo READ patientInfo NOTIFY patientInfoChanged)
 
-    enum CODICESOFT {PICO = 0, FLOWSOFT = 4,FLWHS};
-    Q_ENUM(CODICESOFT)
+//    enum CODICESOFT {PICO = 0, FLOWSOFT = 4,FLWHS};
+//    Q_ENUM(CODICESOFT)
+
+    enum CODICIP {
+        ANALISI = 111,
+        CHIUDIREV,
+        ZOOMIN,
+        ZOOMOUT,
+        ZOOMNONE,
+        DISCARD,
+        CHIUDIACQ,
+        DELETEALL,
+        RISULTATI
+    };
+    Q_ENUM(CODICIP)
+
 
 signals:
     void patientInfoChanged();
