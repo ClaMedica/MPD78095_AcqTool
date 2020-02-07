@@ -285,7 +285,7 @@ QVariantList MAbstractManager::actionsInfo()
     list << "&GridElement";
 
     list << "$GridElement";
-    list << "descr" << tr("result");
+    list << "descr" << tr("results");
     list << "img" << "qrc:/vuoto";
     list << "key" << RISULTATI;
     list << "visible" << true;

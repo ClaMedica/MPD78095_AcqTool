@@ -3,6 +3,8 @@
 #include <QErrorMessage>
 #include <QDesktopServices>
 #include <QMessageBox>
+#include <QClipboard>
+#include <QApplication>
 
 extern bool DebugAcqTool;
 
@@ -44,8 +46,17 @@ void MDataMngDesktop::saveImg(QQuickItem *__item, QString __nome)
     connect(grabResult.data(), &QQuickItemGrabResult::ready, [=]() {
         QImage img = grabResult.data()->image();
         QPixmap pix = QPixmap::fromImage(img);
-        //QString imgName = imgName;
         pix.save(m_pathData + imgName + ".jpg");
+    });
+
+}
+
+void MDataMngDesktop::copyImg(QQuickItem *__item)
+{
+    auto grabResult = __item->grabToImage();
+    connect(grabResult.data(), &QQuickItemGrabResult::ready, [=]() {
+        QImage image = grabResult.data()->image();
+        QApplication::clipboard()->setImage(image, QClipboard::Clipboard);
     });
 
 }

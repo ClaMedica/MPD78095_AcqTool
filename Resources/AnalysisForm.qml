@@ -107,6 +107,8 @@ MForm{
         }
         gridComand.populate()
         gridComandBottom.populate()
+
+        notClose.visible = __disable
     }
 
     //@@@@@@@@@@    Objects     @@@@@@@@@@
@@ -153,6 +155,69 @@ MForm{
             mngData.addAnMarker(anMarkerKey,anMarkerPos,anMarkChNames)
         }
 
+        MouseArea {
+            id: plotMouse
+            anchors.fill: parent
+            acceptedButtons: Qt.RightButton
+            enabled: !PicoFlow
+            onClicked: {
+                clicright.y = mouse.y
+                clicright.x = mouse.x
+                DataEngine.putItemOnTop(clicright)
+                clicright.visible = true
+                delTim.start()
+            }
+        }
+
+        Rectangle
+        {
+            id:clicright
+            border.width: 1
+            border.color: "blue"
+            height:testoDel.height
+            width:testoDel.width
+            radius: 7
+            visible: false
+            Text{
+                id: testoDel
+                font.family:
+                {
+                    if (PicoFlow)
+                        if (layout !== undefined)
+                            testoDel.font.family = layout.value("FFamily")
+                        else
+                            testoDel.font.family ="Luxi Serif"
+                    else if (layout !== undefined)
+                        testoDel.font.family = layout.value("FFamilyW")
+                    else
+                        testoDel.font.family = "Calibri"
+                }
+                font.pixelSize: 15
+                anchors.centerIn: parent
+                height:font.pixelSize*2
+                width:font.pixelSize*6
+                color: "blue"
+                text: qsTr("copy")
+                horizontalAlignment: Text.AlignHCenter
+                verticalAlignment: Text.AlignVCenter
+            }
+
+            MouseArea{
+              anchors.fill:parent
+              onClicked: {
+                  delTim.stop()
+                  clicright.visible = false
+                  mngData.copyImg(sourceImg)
+              }
+            }
+        }
+
+        Timer{
+            id:delTim
+            interval: 1500
+            onTriggered:
+                clicright.visible = false
+        }
     }
 
     MLabel{
@@ -248,35 +313,11 @@ MForm{
         visible: PicoFlow ? false : true
     }
 
-    MLabel {
-        id: lbBackToResult
-        visible: false
-        anchors.right: gridMarker.left
-        anchors.top: rectBreak.bottom
-        anchors.horizontalCenter: gridDefiners.horizontalCenter
-        width: text.length
-        height: 20
-        text: qsTr("Result")
-        labelSize: layout.value("F4") - 1
-
-        MouseArea {
-            id: mouseResult
-            enabled: true
-            anchors.fill: parent
-            onClicked:
-            {
-                forAna.visible = false
-                forRes.visible = true
-            }
-        }
-    }
-
-
     MGridView{
         //@@@@@@@@@@    Properties      @@@@@@@@@@
         id:gridActions
         anchors.right: gridMarker.left
-        anchors.top: lbBackToResult.bottom
+        anchors.top: rectBreak.bottom
         anchors.bottom: parent.bottom
         width:PicoFlow ? 0 : 60
 
@@ -326,7 +367,6 @@ MForm{
         id:gridComand
         anchors.right: gridDefiners.left
         anchors.top: parent.top
-        //anchors.bottom: rectBreakCommands.bottom
         width:60
         owner:"Commands"
         itemsInRow:1
@@ -338,7 +378,6 @@ MForm{
                     {
                         mngData.saveImg(sourceImg,"GR000")
                         //rendo abilitato il pulsante per passare ai risultati senza dover rifare l'analisi
-                        lbBackToResult.visible = true
                         for (var i=0; i<gridActions.items.length; i++)
                         {
                             if (gridActions.items[i]===MDataManager.RISULTATI)
@@ -433,8 +472,6 @@ MForm{
 
     }
 
-
-
     Rectangle{
         property string text: ""
         property var grid:gridComand
@@ -468,6 +505,30 @@ MForm{
             font.pixelSize:screenH * 0.015
             text:toolTip.text
             anchors.horizontalCenter: parent.horizontalCenter
+        }
+    }
+
+    Rectangle {
+        id: notClose
+        border.width: 1
+        border.color: "black"
+        height:gridComandBottom.height/gridComandBottom.count*0.75
+        width:lbNotClose.width
+        color: "transparent"
+        radius: 5
+        visible: false
+        anchors.right: parent.right
+        anchors.left: plot.right
+        anchors.bottom: gridComandBottom.bottom
+        anchors.bottomMargin: 3
+
+        MLabel {
+            id: lbNotClose
+            labelSize: layout.value("F4")
+            anchors.fill: parent
+            anchors.margins: 5
+            color: "black"
+            text: qsTr("<p>File report open.</p>Close the file to continue.")
         }
     }
 

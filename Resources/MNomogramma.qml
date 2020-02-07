@@ -463,6 +463,86 @@ Rectangle {
         }
     }
 
+    MouseArea {
+        id: nomoMouse
+        anchors.fill: parent
+        acceptedButtons: Qt.RightButton
+        enabled: !PicoFlow
+        onClicked: {
+            clicright.y = mouse.y
+            clicright.x = mouse.x
+            DataEngine.putItemOnTop(clicright)
+            clicright.visible = true
+            delTim.start()
+        }
+    }
+
+    Rectangle
+    {
+        id:clicright
+        border.width: 1
+        border.color: "blue"
+        height:testoDel.height
+        width:testoDel.width
+        radius: 7
+        visible: false
+        Text{
+            id: testoDel
+            font.family:
+            {
+                if (PicoFlow)
+                    if (layout !== undefined)
+                        testoDel.font.family = layout.value("FFamily")
+                    else
+                        testoDel.font.family ="Luxi Serif"
+                else if (layout !== undefined)
+                    testoDel.font.family = layout.value("FFamilyW")
+                else
+                    testoDel.font.family = "Calibri"
+            }
+            font.pixelSize: 15
+            anchors.centerIn: parent
+            height:font.pixelSize*2
+            width:font.pixelSize*6
+            color: "blue"
+            text: qsTr("copy")
+            horizontalAlignment: Text.AlignHCenter
+            verticalAlignment: Text.AlignVCenter
+        }
+
+        MouseArea{
+          anchors.fill:parent
+          onClicked: {
+              delTim.stop()
+              clicright.visible = false
+              mngData.copyImg(sourceImg)
+          }
+        }
+    }
+
+    Timer{
+        id:delTim
+        interval: 1500
+        onTriggered:
+            clicright.visible = false
+    }
+
+    //non riesco a farlo funzionare
+//    Keys.onPressed: {
+
+//        switch(event.key)
+//        {
+//        case Qt.Key_Control:
+//            event.accepted = false
+
+//            break;
+//        case Qt.Key_Copy:
+//            mngData.copyImg(sourceImg);
+//            break;
+
+//        }
+//    }
+
     ShaderEffectSource {
         id: sourceImg
         width: rootPlot.width

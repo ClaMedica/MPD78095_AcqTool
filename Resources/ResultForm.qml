@@ -32,10 +32,13 @@ MForm {
 
     function clickButton(btnId){
         for (var i = 0; i < pagesLocal.length; i++) {
-            if (pagesLocal[i].visible)
+            if (pagesLocal[i].visible) {
                 pagesLocal[i].visible = false;
+                pagesLocal[i].focus = false;
+            }
         }
         pagesLocal[btnId].visible = true;
+        pagesLocal[btnId].focus = true;
     }
 
     function disablebuttons(__disable){
@@ -420,10 +423,13 @@ MForm {
     function exitFromResult()
     {
         for (var i = 0; i < pagesLocal.length; i++) {
-            if (pagesLocal[i].visible)
+            if (pagesLocal[i].visible) {
                 pagesLocal[i].visible = false;
+                pagesLocal[i].focus = false;
+            }
         }
-        pagesLocal[0].visible = true
+        pagesLocal[0].visible = true;
+        pagesLocal[0].focus = true;
         forAna.visible = true
         resultForm.visible = false
     }

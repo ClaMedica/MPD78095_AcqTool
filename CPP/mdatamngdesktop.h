@@ -12,6 +12,7 @@ public:
     explicit MDataMngDesktop(QObject *parent = 0);
 
      Q_INVOKABLE void saveImg(QQuickItem* __item, QString __nome);
+     Q_INVOKABLE void copyImg(QQuickItem* __item);
 
 signals:
     void sg_exitFromReview();

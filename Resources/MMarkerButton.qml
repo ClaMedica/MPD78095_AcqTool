@@ -61,10 +61,6 @@ Rectangle{
             rootMarkerButton.enabled = modM.enabled
             if (!modM.enabled)
                 state = "dis"
-            if (modM.key === MDataManager.RISULTATI.toString())
-            {
-                testoB.visible = true
-            }
         }
     }
 
@@ -103,14 +99,6 @@ Rectangle{
         border.color: "lightgray"//Qt.rgba(1,1,0.5,1)
         border.width:radius/2
         radius:parent.width/2
-    }
-
-    Text {
-        id: testoB
-        text: "R"
-        visible: false
-        color: "white"
-        anchors.centerIn: parent
     }
 
     BuzzMouseArea{
