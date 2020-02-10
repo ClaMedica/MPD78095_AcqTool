@@ -42,11 +42,16 @@ public:
     Q_PROPERTY(QString toSave READ getToSave WRITE setToSave NOTIFY infoToSave)
 
     Q_PROPERTY(int numAnaFlwAdv READ getNumAnaFlwAdv)
+
+    Q_PROPERTY(QString protocollo READ protocollo)
+
     Q_INVOKABLE int getNumAnaFlwAdv(){return m_aflwdatas.length();}
 
     Q_INVOKABLE bool getAutoPrint(){return m_autoPrint;}
     Q_INVOKABLE int getAutoFlow(){return m_autoFlow;}
 
+
+    Q_INVOKABLE QString protocollo(){return m_protocollo;}
     QStringList availableData(){return m_availableData;}
     QStringList availableTracks(){return m_data.keys();}
 
@@ -154,6 +159,7 @@ protected:
     int     m_etaPatient;
     QString m_firstHead;    //primo header della stmpa personalizzabile
     QString m_secondHead;   //secondo header della stampa personalizzabile
+    QString m_protocollo;
 
     QVector<mflowdatas*> m_aflwdatas; //array di analisi di tipo flussimetria
 

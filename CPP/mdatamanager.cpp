@@ -32,6 +32,8 @@ MDataManager::MDataManager(QObject *parent)
 
     m_datiCalib = "";
 
+    m_protocollo = "Picoflow2R3";
+
     setValVolRes(-999);
 }
 
@@ -149,6 +151,9 @@ void MDataManager::loadFile(QString __fileName)
         m_testNumber = m_mng->GetTestNum();
         m_patientInfo = m_mng->GetPatient().section(";",0,1);
         m_patientInfo.replace(";", " ");
+
+        m_protocollo = m_mng->GetTestDescr();
+        m_protocollo = "Picoflow2R3"; //temporaneo finchè non si sitema il database sql con i protocolli giusti
 
         QString dataNascita = m_mng->GetPatient().section(";",2,2);
         QDate datD = QDate::fromString(dataNascita,"dd/MM/yyyy");

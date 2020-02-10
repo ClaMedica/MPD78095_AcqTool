@@ -34,7 +34,7 @@ MForm{
             plot.limits=mngData.getPlotLimits();
         else
             change = false
-        lbNamePat.text = mngData.patientInfo
+       lbNamePat.testo = mngData.protocollo + " - " +mngData.patientInfo;
     }
 
 
@@ -119,8 +119,7 @@ MForm{
         anchors.top: parent.top
         anchors.left: parent.left
         anchors.right: gridComand.left
-        anchors.bottom: parent.bottom
-        height: PicoFlow?(rootAna.height - 15):(rootAna.height - 25)
+        anchors.bottom: lbNamePat.top
         plotProp:mngCon.plotSetting
 
         property real opMarkerKey: -1
@@ -220,14 +219,27 @@ MForm{
         }
     }
 
-    MLabel{
+
+
+    Rectangle
+    {
         id: lbNamePat
-        clip:true
-        visible: PicoFlow? true:false
-        anchors.top:plot.bottom
         anchors.bottom: parent.bottom
-        anchors.horizontalCenter: parent.horizontalCenter
-        text: "patientName"
+        anchors.left: parent.left
+        anchors.right: gridComandBottom.left
+        border.width: 1
+        border.color: "black"
+        height: parent.height/25
+        color: "lightgray"
+        property string testo: "datiPaziente"
+        MLabel{
+            visible: true
+            height:  parent.height
+            labelSize: 2
+            anchors.verticalCenter: parent.verticalCenter
+            anchors.horizontalCenter: parent.horizontalCenter
+            text: parent.testo
+        }
     }
 
     //Models
@@ -248,7 +260,7 @@ MForm{
     MGridView{
         //@@@@@@@@@@    Properties      @@@@@@@@@@
         id:gridMarker
-        anchors.right: rootAna.right
+        anchors.right: parent.right
         anchors.top: parent.top
         anchors.bottom: parent.bottom
         width:PicoFlow ? 0 : 60
