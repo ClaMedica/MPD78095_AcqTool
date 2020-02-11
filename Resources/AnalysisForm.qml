@@ -119,7 +119,7 @@ MForm{
         anchors.top: parent.top
         anchors.left: parent.left
         anchors.right: gridComand.left
-        anchors.bottom: lbNamePat.top
+        anchors.bottom: PicoFlow ? parent.bottom : lbNamePat.top
         plotProp:mngCon.plotSetting
 
         property real opMarkerKey: -1
@@ -229,11 +229,11 @@ MForm{
         anchors.right: gridComandBottom.left
         border.width: 1
         border.color: "black"
+        visible: PicoFlow? false : true
         height: parent.height/25
         color: "lightgray"
         property string testo: "datiPaziente"
         MLabel{
-            visible: true
             height:  parent.height
             labelSize: 2
             anchors.verticalCenter: parent.verticalCenter
