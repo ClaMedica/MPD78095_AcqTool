@@ -282,12 +282,16 @@ void MDataMngDesktop::openReport()
     Ancestry *reportEdit = m_configPrinter.getSafeChild("Report");
     QString toEdit = reportEdit->getSafeChild("HTM")->getSafeAttribute(ATT_VALUE);
 
-    if (toEdit =="true")
+    if (toEdit =="false")
         createPdf();
     else{
         // APERTURA FILE NS EDITOR
-        QString pth = g_P7SettingsManager.progPath()+"/texteditor.exe file:///" +  m_nomeReferto;
-        bool returnValue = QProcess::startDetached(pth);
+        QString pth = g_P7SettingsManager.progPath()+"/texteditor.exe";
+        QStringList arg;
+        arg << "file:///" +  m_nomeReferto;
+        //qint64 pid;
+        bool returnValue = QProcess::startDetached(pth,arg);
+        //qDebug()<<pth<<arg<<returnValue;//<<pid;
         if (returnValue)
         {
             //disabilitazione pulsante
@@ -323,8 +327,8 @@ void MDataMngDesktop::createPdf()
     textDoc.print(&printer);
 
     QUrl urlFile = QUrl::fromLocalFile(nomePDF);   //con pdf, lo apre in explorer
-    bool returnValue = QDesktopServices::openUrl(urlFile);
-    int c=0;
+    QDesktopServices::openUrl(urlFile);
+
 }
 
 HANDLE hProc;

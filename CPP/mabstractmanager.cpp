@@ -451,8 +451,13 @@ bool MAbstractManager::load()
         qCritical() << "Error on user configuration file";
 
     QString configPrinter = g_P7SettingsManager.printerSettings();
+#ifdef PICOFLOW
     if(!QFile::exists(configPrinter))
         configPrinter = ":/Config/Config_Printer.xml";
+#else
+    if(!QFile::exists(configPrinter))
+        configPrinter = ":/Config/Config_Printer_Desktop.xml";
+#endif
     m_configPrinter.erase();
     if(!m_configPrinter.loadFromXML(configPrinter))
         qCritical() << "Error on user configuration file";
