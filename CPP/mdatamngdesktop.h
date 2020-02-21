@@ -34,7 +34,7 @@ private:
     QTimer* m_reportTimer;
     bool m_winword;
     QString m_nomeReferto;
-    bool checkReportFileOpen();
+    void createPdf();
 
 private slots:
     //per referto

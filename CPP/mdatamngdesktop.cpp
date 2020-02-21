@@ -5,6 +5,8 @@
 #include <QMessageBox>
 #include <QClipboard>
 #include <QApplication>
+#include <QPrinter>
+#include <QTextDocument>
 
 extern bool DebugAcqTool;
 
@@ -48,7 +50,6 @@ void MDataMngDesktop::saveImg(QQuickItem *__item, QString __nome)
         QPixmap pix = QPixmap::fromImage(img);
         pix.save(m_pathData + imgName + ".jpg");
     });
-
 }
 
 void MDataMngDesktop::copyImg(QQuickItem *__item)
@@ -261,8 +262,7 @@ void MDataMngDesktop::openReport()
     if (reportLib.load())
     {
         bool refDone = false;
-
-        Init(g_P7SettingsManager.dataPath().toLatin1(),g_P7SettingsManager.appPath().toLatin1(),m_copyFileName.toLatin1(), 4,"Standard.rtf",g_P7SettingsManager.localization());
+        Init(g_P7SettingsManager.dataPath().toLatin1(),g_P7SettingsManager.appPath().toLatin1(),m_copyFileName.toLatin1(), 4,"Standard.htm",g_P7SettingsManager.localization());
         if (fillRef1())
             if (fillRef2())
                 if (fillRef3())
@@ -277,18 +277,54 @@ void MDataMngDesktop::openReport()
         }
     }
 
-    QString namef = "rf" + QString("%1").arg(m_testNumber,5,10,QLatin1Char('0')) + "1a" + ".rtf";
-    m_nomeReferto = g_P7SettingsManager.dataPath() + "\\ref\\" + namef;
-    QUrl urlFile = QUrl::fromLocalFile(m_nomeReferto);
-    bool returnValue = QDesktopServices::openUrl(urlFile);
+    m_nomeReferto = g_P7SettingsManager.dataPath() + "\\ref\\" +  "rf" + QString("%1").arg(m_testNumber,5,10,QLatin1Char('0')) + "1a" + ".htm";
 
-    if (returnValue)
-    {
-        //disabilitazione pulsante
-        emit sg_openReport(true);
-        m_reportOpenedTimer->setInterval(1000);
-        m_reportOpenedTimer->start();
+    Ancestry *reportEdit = m_configPrinter.getSafeChild("Report");
+    QString toEdit = reportEdit->getSafeChild("HTM")->getSafeAttribute(ATT_VALUE);
+
+    if (toEdit =="true")
+        createPdf();
+    else{
+        // APERTURA FILE NS EDITOR
+        QString pth = g_P7SettingsManager.progPath()+"/texteditor.exe file:///" +  m_nomeReferto;
+        bool returnValue = QProcess::startDetached(pth);
+        if (returnValue)
+        {
+            //disabilitazione pulsante
+            emit sg_openReport(true);
+            m_reportOpenedTimer->setInterval(1000);
+            m_reportOpenedTimer->start();
+        }
     }
+}
+
+void MDataMngDesktop::createPdf()
+{
+    QString nomePDF = "rf" + QString("%1").arg(m_testNumber,5,10,QLatin1Char('0')) + "1a" + ".pdf";
+    nomePDF = g_P7SettingsManager.dataPath() + "\\ref\\" + nomePDF;
+
+    QFile FI(m_nomeReferto);
+    FI.open(QIODevice::ReadOnly);
+    QByteArray FIByte;
+    QBuffer buffer(&FIByte);
+    buffer.open(QIODevice::WriteOnly);
+    QDataStream out(&buffer);
+    out << FI.readAll();
+
+    QString string = QTextCodec::codecForMib(106)->toUnicode(FIByte);
+    string.remove(0,4);
+
+    QTextDocument textDoc;
+    textDoc.setHtml(string);
+
+    QPrinter printer(QPrinter::HighResolution);
+    printer.setOutputFormat(QPrinter::PdfFormat);
+    printer.setOutputFileName(nomePDF);
+    textDoc.print(&printer);
+
+    QUrl urlFile = QUrl::fromLocalFile(nomePDF);   //con pdf, lo apre in explorer
+    bool returnValue = QDesktopServices::openUrl(urlFile);
+    int c=0;
 }
 
 HANDLE hProc;
@@ -301,9 +337,6 @@ void MDataMngDesktop::slot_checkReportOpened()
     int PIDpos = 1;
     const int MAX_WAIT_TO_OPEN_TIME = 100000;
     QTime tOut; tOut.start();
-    QString tmpOutput;
-
-    m_winword = false;
 
     while (!wordFound && (tOut.elapsed() < MAX_WAIT_TO_OPEN_TIME))
     {
@@ -314,16 +347,7 @@ void MDataMngDesktop::slot_checkReportOpened()
                     << "/FO" << "CSV");
         tasklist.waitForFinished();
         output = QString(tasklist.readAllStandardOutput()).split("\n");
-        //Si verifica se si apre il report con MICORSOFT WORD o OPENOFFICE
-        for (int h= 0; h<output.length(); h++)
-        {
-            tmpOutput =  output.at(h);
-            if (tmpOutput.toUpper().indexOf("WINWORD.EXE") > -1)
-            {
-                m_winword = true;
-                break;
-            }
-        }
+
         //cerco la posizione del PID in tabella
         QStringList titoliTabella = output.at(0).split(",");
         PIDpos = titoliTabella.indexOf("\"PID\"");
@@ -358,70 +382,19 @@ void MDataMngDesktop::slot_checkReportOpened()
 }
 
 void MDataMngDesktop::slot_startReport()
-{
-    //Sleep(1000);
-    static int counter = 0;
-    if (m_winword)
+{    
+    // Gestione report con EDITOR
+    unsigned long exitCode = STILL_ACTIVE;
+    GetExitCodeProcess(hProc,&exitCode);
+    if (exitCode != STILL_ACTIVE)
     {
-        // Gestione report nel caso si usi MICROSOFT WORD
-        if ( !checkReportFileOpen())
-            counter += 1;
-        else
-            counter = 0;
+        m_reportTimer->stop();
+        //riabilitazine eventuali pulsanti disabilitati
+        emit sg_openReport(false);
 
-        if (counter > 2)
-        {
-            // Report file chiuso: inizializzazione controllo apertura file report
-            counter = 0;
-            m_reportTimer->stop();
-            //riabilitazine eventuali pulsanti disabilitati
-            emit sg_openReport(false);
-        }
+        //creazione PDF
+        createPdf();
     }
-    else
-    {
-        // Gestione report nel caso si usi programmi OPENOFFICE/LIBREOFFICE, etc...
-        unsigned long exitCode = STILL_ACTIVE;
-        GetExitCodeProcess(hProc,&exitCode);
-        if (exitCode != STILL_ACTIVE)
-        {
-            m_reportTimer->stop();
-            //riabilitazine eventuali pulsanti disabilitati
-            emit sg_openReport(false);
-        }
-    }
-}
-
-// Verifica se report File e' aperto o chiuso
-bool MDataMngDesktop::checkReportFileOpen()
-{
-    QFile reportPtrFile;
-
-    // Si considera il REFERT_FILE (path completo del report file aperto)
-    reportPtrFile.setFileName(m_nomeReferto);
-
-    try
-    {
-        if (!reportPtrFile.open(QIODevice::ReadWrite | QIODevice::Text))
-        {
-            return true;
-        }
-        else
-        {
-            // Chiusura del report file.
-            reportPtrFile.close();
-            return false;
-        }
-    }
-    catch (MyException &e)
-    {
-        QMessageBox msgBox;
-        msgBox.setText("MDataManager:checkReportFileOpen() ERROR !");
-        msgBox.exec();
-
-    }
-
-    return false;
 }
 
 void MDataMngDesktop::startPrint()
@@ -453,16 +426,12 @@ void MDataMngDesktop::startPrint()
         QString img = filesList.at(i);
         QFile *FI = new QFile(m_pathData + img);
         FI->open(QIODevice::ReadOnly);
-        QByteArray FIByte;
-        QBuffer buffer(&FIByte);
-        buffer.open(QIODevice::WriteOnly);
-        QDataStream out(&buffer);
-        out << FI->readAll();
+        QByteArray FIByte = FI->readAll();
 
-        QByteArray ArrayHex = FIByte.toHex();
+        QString imgBase64 = QString(FIByte.toBase64());
         QString txt = img.left(img.indexOf("."));
-        QString value = QString(ArrayHex);
-        writer.writeTextElement(txt,value);
+        writer.writeTextElement(txt,imgBase64);
+
         FI->close();
 
         dirImgs.remove(img);
