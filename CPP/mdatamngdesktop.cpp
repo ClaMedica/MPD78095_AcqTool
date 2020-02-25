@@ -282,13 +282,31 @@ void MDataMngDesktop::openReport()
     Ancestry *reportEdit = m_configPrinter.getSafeChild("Report");
     QString toEdit = reportEdit->getSafeChild("HTM")->getSafeAttribute(ATT_VALUE);
 
-    if (toEdit =="false")
+    if (toEdit == "false"){
+        //necessario trasformare il file referto htm in htm tradotto per leggere tutti i caratteri
+        QFile f(m_nomeReferto);
+        f.open(QIODevice::ReadOnly);
+        QByteArray data = f.readAll();
+        QTextCodec *codec = QTextCodec::codecForName(m_language);
+        QString stringa = codec->toUnicode(data);
+        QTextDocument textDoc;
+        textDoc.setHtml(stringa);
+        f.close();
+        QFile f1(g_P7SettingsManager.dataPath() + "\\ref\\" + "prova.html");
+        f1.open(QIODevice::WriteOnly);
+        f1.write(textDoc.toHtml("utf-8").toUtf8());
+        f.remove();
+        f1.close();
+        f1.copy(m_nomeReferto);
+        f1.remove();
+
         createPdf();
+    }
     else{
         // APERTURA FILE NS EDITOR
         QString pth = g_P7SettingsManager.progPath()+"/texteditor.exe";
         QStringList arg;
-        arg << "file:///" +  m_nomeReferto;
+        arg << "file:///" +  m_nomeReferto << g_P7SettingsManager.localization();
         //qint64 pid;
         bool returnValue = QProcess::startDetached(pth,arg);
         //qDebug()<<pth<<arg<<returnValue;//<<pid;
@@ -386,7 +404,7 @@ void MDataMngDesktop::slot_checkReportOpened()
 }
 
 void MDataMngDesktop::slot_startReport()
-{    
+{
     // Gestione report con EDITOR
     unsigned long exitCode = STILL_ACTIVE;
     GetExitCodeProcess(hProc,&exitCode);

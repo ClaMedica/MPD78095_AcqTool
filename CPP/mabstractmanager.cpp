@@ -492,6 +492,7 @@ bool MAbstractManager::load()
         language = "Windows-1252";   // CODEC Francese/Italiano/Tedesco/Spagnolo/etc..
 
     QTextCodec *codec = QTextCodec::codecForName(language);
+    m_language = language;
 
     bool firstLine = true;
     while (!fileMess.atEnd()) {

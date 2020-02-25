@@ -77,6 +77,7 @@ public slots:
 protected:
     QString m_applicationPath,
     m_patientInfo;                      //nome e altre info paziente
+    const char* m_language; //codice lingua da usare
 
     DatafileManager *m_mng;
     Analyze *m_ana;
