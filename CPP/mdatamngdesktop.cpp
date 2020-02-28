@@ -22,10 +22,7 @@ MDataMngDesktop::MDataMngDesktop(QObject *parent)
     (void) parent;
 
     m_nomeReferto = "";
-    m_winword = false;
-    m_reportOpenedTimer = new QTimer(this);
     m_reportTimer = new QTimer(this);
-    connect(m_reportOpenedTimer, SIGNAL(timeout()), this, SLOT(slot_checkReportOpened()));
     connect(m_reportTimer, SIGNAL(timeout()), this, SLOT(slot_startReport()));
 }
 
@@ -256,6 +253,7 @@ void MDataMngDesktop::deleteAnMArkers()
 
 }
 
+HANDLE hProc;
 void MDataMngDesktop::openReport()
 {
     QLibrary reportLib("MedicalReport.dll");
@@ -307,16 +305,35 @@ void MDataMngDesktop::openReport()
         QString pth = g_P7SettingsManager.progPath()+"/texteditor.exe";
         QStringList arg;
         arg << "file:///" +  m_nomeReferto << g_P7SettingsManager.localization();
-        //qint64 pid;
-        bool returnValue = QProcess::startDetached(pth,arg);
-        //qDebug()<<pth<<arg<<returnValue;//<<pid;
+
+        qint64 pidEditor;
+        bool returnValue = QProcess::startDetached(pth,arg,QString(),&pidEditor);
+        //qDebug()<<pth<<arg<<returnValue<<pidEditor;
         if (returnValue)
         {
             //disabilitazione pulsante
             emit sg_openReport(true);
-            m_reportOpenedTimer->setInterval(1000);
-            m_reportOpenedTimer->start();
+            hProc = OpenProcess(PROCESS_QUERY_INFORMATION ,FALSE,pidEditor);
+
+            m_reportTimer->setInterval(1000);
+            m_reportTimer->start();
         }
+    }
+}
+
+void MDataMngDesktop::slot_startReport()
+{
+    // Gestione report con EDITOR
+    unsigned long exitCode = STILL_ACTIVE;
+    GetExitCodeProcess(hProc,&exitCode);
+    if (exitCode != STILL_ACTIVE)
+    {
+        m_reportTimer->stop();
+        //riabilitazione eventuali pulsanti disabilitati
+        emit sg_openReport(false);
+
+        //creazione PDF
+        createPdf();
     }
 }
 
@@ -332,6 +349,8 @@ void MDataMngDesktop::createPdf()
     buffer.open(QIODevice::WriteOnly);
     QDataStream out(&buffer);
     out << FI.readAll();
+    //rimuoviamo eventuali scritte per visualizzare all'utente nell'editor il page break
+    FIByte.replace("Page Break"," ");
 
     QString string = QTextCodec::codecForMib(106)->toUnicode(FIByte);
     string.remove(0,4);
@@ -347,76 +366,6 @@ void MDataMngDesktop::createPdf()
     QUrl urlFile = QUrl::fromLocalFile(nomePDF);   //con pdf, lo apre in explorer
     QDesktopServices::openUrl(urlFile);
 
-}
-
-HANDLE hProc;
-void MDataMngDesktop::slot_checkReportOpened()
-{
-    QStringList output;
-    bool wordFound = false;
-    QString namef = "rf" + QString("%1").arg(m_testNumber,5,10,QLatin1Char('0')) + "1a";
-
-    int PIDpos = 1;
-    const int MAX_WAIT_TO_OPEN_TIME = 100000;
-    QTime tOut; tOut.start();
-
-    while (!wordFound && (tOut.elapsed() < MAX_WAIT_TO_OPEN_TIME))
-    {
-        QProcess tasklist;
-        tasklist.start(
-                    "tasklist",
-                    QStringList() << "/V"
-                    << "/FO" << "CSV");
-        tasklist.waitForFinished();
-        output = QString(tasklist.readAllStandardOutput()).split("\n");
-
-        //cerco la posizione del PID in tabella
-        QStringList titoliTabella = output.at(0).split(",");
-        PIDpos = titoliTabella.indexOf("\"PID\"");
-        QStringList foundFiles = output.filter(namef);
-        wordFound =  foundFiles.size() > 0;
-    }
-
-    m_reportOpenedTimer->stop();
-
-    if (!wordFound || PIDpos == -1)
-    {
-        //riabilitazine eventuali pulsanti disabilitati
-        emit sg_openReport(false);
-        return;
-    }
-
-    QStringList proc;
-    for (int i=0;i<output.length();i++){
-        if (output.at(i).contains(namef)) {
-            proc  = QString(output.at(i)).split(",");
-           break;
-        }
-    }
-
-    QString pidOutput = proc.at(PIDpos);//Posizione del PID
-    QString pidString = pidOutput.remove("\"");
-    int pid = pidString.toInt();
-    hProc = OpenProcess(PROCESS_QUERY_INFORMATION ,FALSE,pid);
-
-    m_reportTimer->setInterval(1000);
-    m_reportTimer->start();
-}
-
-void MDataMngDesktop::slot_startReport()
-{
-    // Gestione report con EDITOR
-    unsigned long exitCode = STILL_ACTIVE;
-    GetExitCodeProcess(hProc,&exitCode);
-    if (exitCode != STILL_ACTIVE)
-    {
-        m_reportTimer->stop();
-        //riabilitazine eventuali pulsanti disabilitati
-        emit sg_openReport(false);
-
-        //creazione PDF
-        createPdf();
-    }
 }
 
 void MDataMngDesktop::startPrint()

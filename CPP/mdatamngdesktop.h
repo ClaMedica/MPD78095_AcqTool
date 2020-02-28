@@ -32,13 +32,12 @@ private:
     //referto
     QTimer* m_reportOpenedTimer;
     QTimer* m_reportTimer;
-    bool m_winword;
     QString m_nomeReferto;
+
     void createPdf();
 
 private slots:
     //per referto
-    void slot_checkReportOpened();
     void slot_startReport();
 
 };
