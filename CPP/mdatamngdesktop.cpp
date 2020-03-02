@@ -366,6 +366,8 @@ void MDataMngDesktop::createPdf()
     QUrl urlFile = QUrl::fromLocalFile(nomePDF);   //con pdf, lo apre in explorer
     QDesktopServices::openUrl(urlFile);
 
+    FI.close();
+    FI.remove();
 }
 
 void MDataMngDesktop::startPrint()
