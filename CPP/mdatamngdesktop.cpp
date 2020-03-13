@@ -304,11 +304,10 @@ void MDataMngDesktop::openReport()
         // APERTURA FILE NS EDITOR
         QString pth = g_P7SettingsManager.progPath()+"/texteditor.exe";
         QStringList arg;
-        arg << "file:///" +  m_nomeReferto << g_P7SettingsManager.localization();
+        arg << "file:///" +  m_nomeReferto << g_P7SettingsManager.localization() << g_P7SettingsManager.dataPath();
 
         qint64 pidEditor;
         bool returnValue = QProcess::startDetached(pth,arg,QString(),&pidEditor);
-        //qDebug()<<pth<<arg<<returnValue<<pidEditor;
         if (returnValue)
         {
             //disabilitazione pulsante
@@ -367,7 +366,7 @@ void MDataMngDesktop::createPdf()
     QDesktopServices::openUrl(urlFile);
 
     FI.close();
-    FI.remove();
+    //FI.remove();
 }
 
 void MDataMngDesktop::startPrint()
