@@ -280,7 +280,7 @@ void MDataMngDesktop::openReport()
     Ancestry *reportEdit = m_configPrinter.getSafeChild("Report");
     QString toEdit = reportEdit->getSafeChild("HTM")->getSafeAttribute(ATT_VALUE);
 
-    if (toEdit == "false"){
+    if (toEdit == "false") {
         //necessario trasformare il file referto htm in htm tradotto per leggere tutti i caratteri
         QFile f(m_nomeReferto);
         f.open(QIODevice::ReadOnly);
@@ -300,12 +300,34 @@ void MDataMngDesktop::openReport()
 
         createPdf();
     }
-    else{
+    else {
         // APERTURA FILE NS EDITOR
         QString pth = g_P7SettingsManager.progPath()+"/texteditor.exe";
         QStringList arg;
-        arg << "file:///" +  m_nomeReferto << g_P7SettingsManager.localization() << g_P7SettingsManager.dataPath();
 
+        //Nome analisi
+        QString tempFile, resultFile, nomeAnalisi;
+        QDir ResPath = QDir(g_P7SettingsManager.datafilePath());
+        QStringList filesList = ResPath.entryList(QStringList("*.xml"),QDir::Files);
+        for (int i=0; i<filesList.size();i++)
+        {
+            QString file = filesList.at(i);
+            if (file.contains(QString("%1").arg(m_testNumber,5,10,QLatin1Char('0')) + ".xml"))
+            {
+                tempFile = file;
+                break;
+            }
+            if (file.contains(QString("%1").arg(m_testNumber,5,10,QLatin1Char('0')) + "1a.xml"))
+                resultFile = file;
+        }
+
+        //if refert button is enabled MUST be a temp or result file of analysis
+        if (tempFile.size() != 0)
+            nomeAnalisi = g_P7SettingsManager.datafilePath() + "\\" + tempFile;
+        else
+            nomeAnalisi = g_P7SettingsManager.datafilePath() + "\\" + resultFile;
+
+        arg << "file:///" +  m_nomeReferto << g_P7SettingsManager.localization() << nomeAnalisi;
         qint64 pidEditor;
         bool returnValue = QProcess::startDetached(pth,arg,QString(),&pidEditor);
         if (returnValue)
@@ -313,8 +335,7 @@ void MDataMngDesktop::openReport()
             //disabilitazione pulsante
             emit sg_openReport(true);
             hProc = OpenProcess(PROCESS_QUERY_INFORMATION ,FALSE,pidEditor);
-
-            m_reportTimer->setInterval(1000);
+            m_reportTimer->setInterval(2000);
             m_reportTimer->start();
         }
     }
@@ -392,7 +413,11 @@ void MDataMngDesktop::startPrint()
 
     QXmlStreamWriter writer(xmlFile);
     writer.writeStartElement("images");
-
+    writer.writeTextElement("testNumber",QString::number(m_testNumber));
+    foreach (int key, m_analysisMap.keys()) {
+        QString ana = QString::number(m_analysisMap[key]);
+        writer.writeTextElement("Analisi",ana);
+    }
     for (int i=0;i<filesList.size();i++)
     {
         QString img = filesList.at(i);
@@ -479,6 +504,7 @@ void MDataMngDesktop::exitFromReview()
             if (QFile::exists(filenameAna)) {
                 QString newname = filenameAna;
                 newname.replace("temp","an");
+                newname.replace(".xml","1a.xml");
                 qDebug()<<"salvo file analisi"<<QFile::rename(filenameAna,newname);
             }
         }
