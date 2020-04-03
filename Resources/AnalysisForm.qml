@@ -154,23 +154,20 @@ MForm{
 
         onToCopyPlotChanged: {
             if (plot.toCopyPlot[0]){
-                clicright.y = plotMouse.mouseY
-                clicright.x = plotMouse.mouseX-plot.toCopyPlot[0]
-                DataEngine.putItemOnTop(clicright)
-                clicright.visible = true
-                delTim.start()
+                activeMouse = true
+                startDelTim.start()
             }
         }
-
+        property bool activeMouse: false
         //necessario per capire la posizione del mouse per far apparire clicright
         //per il copy del plot
         MouseArea {
             id: plotMouse
             anchors.fill: parent
-            acceptedButtons: Qt.NoButton
             enabled: !PicoFlow
+            acceptedButtons: Qt.NoButton
             propagateComposedEvents: true
-            hoverEnabled: true
+            hoverEnabled: plot.activeMouse
         }
 
         Rectangle
@@ -210,6 +207,7 @@ MForm{
               anchors.fill:parent
               onClicked: {
                   delTim.stop()
+                  plot.activeMouse = false
                   clicright.visible = false
                   mngData.copyImg(sourceImg)
               }
@@ -217,10 +215,23 @@ MForm{
         }
 
         Timer{
+            id:startDelTim
+            interval: 100
+            onTriggered:{
+                clicright.y = plotMouse.mouseY
+                clicright.x = plotMouse.mouseX-plot.toCopyPlot[0]
+                DataEngine.putItemOnTop(clicright)
+                clicright.visible = true
+                delTim.start()
+            }
+        }
+        Timer{
             id:delTim
             interval: 1500
-            onTriggered:
+            onTriggered:{
+                plot.activeMouse = false
                 clicright.visible = false
+            }
         }
     }
 
@@ -245,6 +256,15 @@ MForm{
             anchors.horizontalCenter: parent.horizontalCenter
             text: parent.testo
         }
+
+//        MouseArea {
+//            id: plotMouse
+//            anchors.fill: parent
+//            enabled: !PicoFlow
+//            acceptedButtons: Qt.NoButton
+//            propagateComposedEvents: true
+//            hoverEnabled: plot.activeMouse
+//        }
     }
 
     //Models
