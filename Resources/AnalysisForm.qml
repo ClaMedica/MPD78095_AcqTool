@@ -154,18 +154,23 @@ MForm{
             mngData.addAnMarker(anMarkerKey,anMarkerPos,anMarkChNames)
         }
 
+        onToCopyPlotChanged: {
+            clicright.y = plotMouse.mouseY
+            clicright.x = plotMouse.mouseX-plot.toCopyPlot[0]
+            DataEngine.putItemOnTop(clicright)
+            clicright.visible = true
+            delTim.start()
+        }
+
+        //necessario per capire la posizione del mouse per far apparire clicright
+        //per il copy del plot
         MouseArea {
             id: plotMouse
             anchors.fill: parent
-            acceptedButtons: Qt.RightButton
+            acceptedButtons: Qt.NoButton
             enabled: !PicoFlow
-            onClicked: {
-                clicright.y = mouse.y
-                clicright.x = mouse.x
-                DataEngine.putItemOnTop(clicright)
-                clicright.visible = true
-                delTim.start()
-            }
+            propagateComposedEvents: true
+            hoverEnabled: true
         }
 
         Rectangle
