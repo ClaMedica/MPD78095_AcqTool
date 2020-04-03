@@ -11,7 +11,7 @@ import "qrc:/Components"
 MForm{
     //@@@@@@@@@@    Definitions     @@@@@@@@@@
     //cambiamenti effettuati nel plot ma che non modificano i suoi limiti (definitori, marker)
-    //in caso di plot zoomato il cambiamento deilimiti genera un reset dello zoom
+    //in caso di plot zoomato il cambiamento dei limiti genera un reset dello zoom
     property bool change: false
 
     signal back
@@ -21,8 +21,6 @@ MForm{
     anchors.fill: parent.fill
 
     color:"lightgray"
-
-
 
     //@@@@@@@@@@    Functions       @@@@@@@@@@
     function populate()
@@ -155,11 +153,13 @@ MForm{
         }
 
         onToCopyPlotChanged: {
-            clicright.y = plotMouse.mouseY
-            clicright.x = plotMouse.mouseX-plot.toCopyPlot[0]
-            DataEngine.putItemOnTop(clicright)
-            clicright.visible = true
-            delTim.start()
+            if (plot.toCopyPlot[0]){
+                clicright.y = plotMouse.mouseY
+                clicright.x = plotMouse.mouseX-plot.toCopyPlot[0]
+                DataEngine.putItemOnTop(clicright)
+                clicright.visible = true
+                delTim.start()
+            }
         }
 
         //necessario per capire la posizione del mouse per far apparire clicright
