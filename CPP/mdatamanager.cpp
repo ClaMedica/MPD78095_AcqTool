@@ -473,10 +473,11 @@ void MDataManager::loadFile(QString __fileName)
         //carico le info necessarie dal file di config
         Ancestry *autoflow = m_configUser.getSafeChild("AutomaticFlow");
         m_autoFlow = (autoflow->getSafeChild("Auto")->getSafeAttribute(ATT_VALUE) == "true" ? 0 : 2);
-#ifdef PICOFLOW
+
         Ancestry *autoprint = m_configPrinter.getSafeChild("Settings");
         m_autoPrint = (autoprint->getSafeChild("AutoPrint")->getSafeAttribute(ATT_VALUE) == "true" ? true : false);
 
+#ifdef PICOFLOW
         Ancestry *siroky = m_configPrinter.getSafeChild("Settings");
         m_Siroky = (siroky->getSafeChild("Siroky")->getSafeAttribute(ATT_VALUE) == "true" ? true : false);
 
