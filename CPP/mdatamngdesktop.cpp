@@ -32,14 +32,14 @@ void MDataMngDesktop::saveImg(QQuickItem *__item, QString __nome)
     //caso nomogrammi
     if (__nome.startsWith("Live"))
         if (__nome.contains("Ave"))
-            imgName = "GR202";
-        else
             imgName = "GR203";
+        else
+            imgName = "GR202";
     else if (__nome.startsWith("Siro"))
         if (__nome.contains("Ave"))
             imgName = "GR204";
         else
-            imgName = "GR210";
+            imgName = "GR205";
 
     auto grabResult = __item->grabToImage();
     connect(grabResult.data(), &QQuickItemGrabResult::ready, [=]() {
@@ -327,7 +327,7 @@ void MDataMngDesktop::openReport()
         else
             nomeAnalisi = g_P7SettingsManager.datafilePath() + "\\" + resultFile;
 
-        arg << "file:///" +  m_nomeReferto << g_P7SettingsManager.localization() << nomeAnalisi;
+        arg << "file:///" +  m_nomeReferto << "r" << g_P7SettingsManager.localization() << nomeAnalisi;
         qint64 pidEditor;
         bool returnValue = QProcess::startDetached(pth,arg,QString(),&pidEditor);
         if (returnValue)
