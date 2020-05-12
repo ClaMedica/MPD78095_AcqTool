@@ -254,13 +254,17 @@ void MDataMngDesktop::deleteAnMArkers()
 }
 
 HANDLE hProc;
-void MDataMngDesktop::openReport()
+void MDataMngDesktop::openReport(QString __nomeReport)
 {
+    if (__nomeReport == "")
+        __nomeReport = "Standard";
+
     QLibrary reportLib("MedicalReport.dll");
     if (reportLib.load())
     {
         bool refDone = false;
-        Init(g_P7SettingsManager.dataPath().toLatin1(),g_P7SettingsManager.appPath().toLatin1(),m_copyFileName.toLatin1(), 4,"Standard.htm",g_P7SettingsManager.localization());
+        QString nomeR = __nomeReport+".htm";
+        Init(g_P7SettingsManager.dataPath().toLatin1(),g_P7SettingsManager.appPath().toLatin1(),m_copyFileName.toLatin1(), 4,nomeR.toLatin1(),g_P7SettingsManager.localization());
         if (fillRef1())
             if (fillRef2())
                 if (fillRef3())
@@ -442,7 +446,7 @@ void MDataMngDesktop::startPrint()
 
     //stampo: apro il file in word
     if (m_autoPrint) {
-        openReport();
+        openReport("Standard");
         m_autoPrint = false; //non deve ristampare se l'utente riapre subito l'esame
     }
 }
@@ -525,3 +529,26 @@ void MDataMngDesktop::exitFromReview()
             exit(0);
     }
 }
+
+QList<QString> MDataMngDesktop::getListReports()
+{
+    QList<QString> list;
+
+    QString pathTemplate = g_P7SettingsManager.progPath() + "/grpbase/MRTemplate_" + g_P7SettingsManager.localization();
+    QDir pathDir = QDir(pathTemplate);
+    QFileInfoList entriesPath = pathDir.entryInfoList(QDir::Files);
+    for(QList<QFileInfo>::iterator it = entriesPath.begin(); it!=entriesPath.end();++it)
+    {
+        QFileInfo &finfo = *it;
+        QString name = finfo.baseName();
+        if (name == "StandardSource") //questo è il template che teniamo come copia
+            continue;
+
+        list.push_back(name);
+    }
+
+    return list;
+
+}
+
+

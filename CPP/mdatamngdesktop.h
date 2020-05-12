@@ -19,13 +19,15 @@ signals:
 
 public slots:
     void deleteAnMArkers();
-    void openReport();
+    void openReport(QString __nomeReport);
     void addOpMarker(QVariant __key, QVariant __posX);
     void addDefiner(QVariant __key, QVector<double> __pos);
     void addAnMarker(QVariant __key, QVariant __posX, QVariantList __chName);
     QString getNameOfObj(QVariantList __whoAmI);
     void startPrint();
     void exitFromReview();
+    //gestione referti
+    QList<QString> getListReports();
 
 
 private:

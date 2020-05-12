@@ -161,7 +161,8 @@ Column {
                 if (labelAttr === "width track" || labelAttr === "Margin" || labelAttr === "Fonts")
                     continue
 
-                if (CODSOFT === AcqModuleManager.FLOWSOFT && (labelAttr === "Range" || labelAttr === "Auto Range"))
+                console.log("CHEPALLE",labelAttr,CODSOFT)
+                if (CODSOFT === AcqModuleManager.FLOWSOFT && (labelAttr === "Range" || labelAttr === "Auto Range" || labelAttr === "Settings"))
                     continue
 
                 if(pchild.isYoungest()) {//creo un parametro modificabile

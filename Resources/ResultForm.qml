@@ -15,6 +15,7 @@ MForm {
     property var pagesLocal:[]
     property var pagesSameAna:[]
 
+
     property int buttonTable:0
     id : resultForm
     anchors.fill: parent
@@ -387,10 +388,55 @@ MForm {
         labelSize: layout.value("F4")
         visible: PicoFlow ? false : true
         onClicked: {
-            mngData.openReport()
+            mngData.openReport(comboReport.currentText)
         }
     }
 
+    MLabel{
+        id: lblPrinting
+        anchors.left: btnReport.right
+        anchors.bottom: coverCombo.top
+        anchors.bottomMargin: 5
+        anchors.leftMargin: 10
+        width: screenW*grafic.valueOf("Button","width")/2
+        height: screenH*grafic.valueOf("Button","height")/2
+        labelSize: layout.value("F4")-2
+        text: qsTr("Basic printing")
+    }
+
+    Rectangle {
+        id:coverCombo
+        anchors.left: btnReport.right
+        anchors.bottom: parent.bottom
+        anchors.bottomMargin: 10
+        anchors.leftMargin: 10
+        width: screenW*grafic.valueOf("Button","width")/2
+        height: screenH*grafic.valueOf("Button","height")/2
+        color: "transparent"
+        visible: PicoFlow ? false : true
+    }
+
+    MComboBox {
+        id: comboReport
+        property var listReports:["Standard"]
+        anchors.left: btnReport.right
+        anchors.bottom: parent.bottom
+        anchors.bottomMargin: 10
+        anchors.leftMargin: 10
+        width: screenW*grafic.valueOf("Button","width")/2
+        height: screenH*grafic.valueOf("Button","height")/2
+        labelSize: layout.value("F4")-2
+        visible: PicoFlow ? false : true
+        model: listReports === [] ? ["Standard"] : listReports
+        currentIndex:1
+        numElementiMax:5
+        Component.onCompleted:{
+            listReports = []
+            var referti = mngData.getListReports()
+            for (var i=0; i<referti.length;i++)
+                listReports.push(referti[i])
+        }
+    }
 
     MButton {
         id:btnBack
