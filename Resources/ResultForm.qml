@@ -401,7 +401,7 @@ MForm {
         width: screenW*grafic.valueOf("Button","width")/2
         height: screenH*grafic.valueOf("Button","height")/2
         labelSize: layout.value("F4")-2
-        text: qsTr("Basic printing")
+        text: qsTr("Template")
     }
 
     Rectangle {
@@ -427,7 +427,7 @@ MForm {
         height: screenH*grafic.valueOf("Button","height")/2
         labelSize: layout.value("F4")-2
         visible: PicoFlow ? false : true
-        model: listReports === [] ? ["Standard"] : listReports
+        model: listReports
         currentIndex:1
         numElementiMax:5
         Component.onCompleted:{
