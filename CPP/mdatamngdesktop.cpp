@@ -281,8 +281,8 @@ void MDataMngDesktop::openReport(QString __nomeReport)
 
     m_nomeReferto = g_P7SettingsManager.dataPath() + "\\ref\\" +  "rf" + QString("%1").arg(m_testNumber,5,10,QLatin1Char('0')) + "1a" + ".htm";
 
-    Ancestry *reportEdit = m_configPrinter.getSafeChild("Report");
-    QString toEdit = reportEdit->getSafeChild("HTM")->getSafeAttribute(ATT_VALUE);
+    m_reportEdit = m_configPrinter.getSafeChild("Report");
+    QString toEdit = m_reportEdit->getSafeChild("HTM")->getSafeAttribute(ATT_VALUE);
 
     if (toEdit == "false") {
         //necessario trasformare il file referto htm in htm tradotto per leggere tutti i caratteri
@@ -387,11 +387,14 @@ void MDataMngDesktop::createPdf()
     printer.setOutputFileName(nomePDF);
     textDoc.print(&printer);
 
-    QUrl urlFile = QUrl::fromLocalFile(nomePDF);   //con pdf, lo apre in explorer
-    QDesktopServices::openUrl(urlFile);
+    QString toEdit = m_reportEdit->getSafeChild("HTM")->getSafeAttribute(ATT_VALUE);
+    if (toEdit == "false") {
+        QUrl urlFile = QUrl::fromLocalFile(nomePDF);   //con pdf, lo apre in explorer
+        QDesktopServices::openUrl(urlFile);
+    }
 
     FI.close();
-    //FI.remove();
+    FI.remove();
 }
 
 void MDataMngDesktop::startPrint()

@@ -35,6 +35,7 @@ private:
     QTimer* m_reportOpenedTimer;
     QTimer* m_reportTimer;
     QString m_nomeReferto;
+    Ancestry * m_reportEdit;
 
     void createPdf();
 

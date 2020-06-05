@@ -1,5 +1,5 @@
 TEMPLATE = app
-VERSION = 1.1.0
+VERSION = 1.1.1
 
 QT += qml quick widgets sql network multimedia xml core serialport gui
 
@@ -9,85 +9,6 @@ RESOURCES += Resources/Icone/icons.qrc
 DEFINES += QT_MESSAGELOGCONTEXT
 #debug campioni di acquisizione
 DEFINES += DEBUG_ACQ
-
-SOURCES += \
-    main.cpp \
-    CPP/alarmmanager.cpp \
-    CPP/androidmanager.cpp \
-    CPP/mabstractmanager.cpp \
-    CPP/macqmanager.cpp \
-    CPP/manatablemodel.cpp \
-    CPP/mdatamanager.cpp \
-    CPP/mflowdatas.cpp \
-    CPP/modelmanager.cpp \
-    CPP/mstorage.cpp \
-    CPP/native.cpp \
-    CPP/nomogramma.cpp \
-    CPP/parametermanager.cpp \
-    CPP/printermanager.cpp \
-    CPP/TCP/SimpleTCPChannel.cpp \
-    CPP/TCP/SimpleTCPClient.cpp \
-    CPP/TCP/TcpServers.cpp \
-    CPP/TCP/TcpSettingFile.cpp \
-    ../MGlobal/ancestry.cpp \
-    ../MGlobal/appbridge.cpp \
-    ../MGlobal/global.cpp \
-    ../MGlobal/layoutmanager.cpp \
-    ../MGlobal/msignal.cpp \
-    ../MGlobal/MyMessageOutput.cpp \
-    ../MGlobal/p7settingsmanager.cpp \
-    ../MGlobal/systemmanager.cpp \
-    ../MGlobal/UdmImpl.cpp \
-    ../AnaUro/anauro.cpp \
-    ../AnaUro/analysis.cpp \
-    ../AnaUro/anautils.cpp \
-    ../MGlobal/fileio.cpp \
-    ../MGlobal/udpmsgs.cpp \
-    CPP/graficmanager.cpp
-
-HEADERS += \
-    CPP/alarmmanager.h \
-    CPP/androidmanager.h \
-    CPP/mabstractmanager.h \
-    CPP/macqmanager.h \
-    CPP/manatablemodel.h \
-    CPP/mdatamanager.h \
-    CPP/mflowdatas.h \
-    CPP/modelmanager.h \
-    CPP/mstorage.h \
-    CPP/nomogramma.h \
-    CPP/parametermanager.h \
-    CPP/printermanager.h \
-    CPP/TCP/SimpleTCPChannel.h \
-    CPP/TCP/SimpleTCPClient.h \
-    CPP/TCP/TcpServers.h \
-    CPP/TCP/TcpSettingFile.h \
-    CPP/bitmapsv.h \
-    CPP/graficmanager.h \
-    ../AnaUro/anauro.h\
-    ../AnaUro/anauro_global.h \
-    ../AnaUro/analysis.h \
-    ../AnaUro/Anaerrorcodes.h \
-    ../AnaUro/anautils.h \
-    ../MGlobal/ancestry.h \
-    ../MGlobal/appbridge.h \
-    ../MGlobal/global.h \
-    ../MGlobal/layoutmanager.h \
-    ../MGlobal/msignal.h \
-    ../MGlobal/p7settingsmanager.h \
-    ../MGlobal/systemmanager.h \
-    ../MGlobal/UdmImpl.h \
-    ../MGlobal/udpmsgs.h \
-    ../MGlobal/fileio.h
-
-
-INCLUDEPATH +=  CPP \
-                CPP/TCP \
-                ../AnaUro \
-                ../MGlobal \
-                ../MPF78003-Picoflow2R3Supe \
-                ../DataFileManager \
-                ../SupeFlowBT
 
 # Default rules for deployment.
 include(deployment.pri)
@@ -99,12 +20,6 @@ TRANSLATIONS += acqtool.xlf \
                 acqtool_no.xlf \
                 acqtool_pl.xlf \
                 acqtool_fr.xlf
-
-lupdate_only{
-    SOURCES += Resources/*.qml \
-             ../MGlobal/MComponents/*.qml
-}
-
 
 
 contains(ANDROID_TARGET_ARCH,armeabi-v7a) {
@@ -129,8 +44,8 @@ win32 {
     SOURCES += CPP/mdatamngdesktop.cpp
     HEADERS += CPP/mdatamngdesktop.h
 
-    INCLUDEPATH +=  ../MedicalReport
-    INCLUDEPATH +=  ../MGlobal
+    INCLUDEPATH +=  ../MPD78099_MedicalReport
+    INCLUDEPATH +=  ../M8078027_MGlobal
 
     rootPath = E:\Piattaforma70
     #creo la cartella da copiare in giro
@@ -145,15 +60,91 @@ win32 {
     win32:CONFIG(release, debug|release): LIBS += -L$$PWD/../Build/MedicalReport/release/ -lMedicalReport
     else:win32:CONFIG(debug, debug|release): LIBS += -L$$PWD/../Build/MedicalReport/debug/ -lMedicalReport
 
-
-    # Additional import path used to resolve QML modules in Qt Creator's code model
-#    QML_IMPORT_PATH = ../MGlobal \
-#                      Modules
-
-#    DISTFILES += ../MGlobal/MComponents/* \
-#                 ../MGlobal/MComponents/Images/*
-
     QT += printsupport
+
+    lupdate_only{
+        SOURCES += Resources/*.qml \
+                 ../M8078027_MGlobal/MComponents/*.qml
+    }
+
+    SOURCES += \
+        main.cpp \
+        CPP/alarmmanager.cpp \
+        CPP/androidmanager.cpp \
+        CPP/mabstractmanager.cpp \
+        CPP/macqmanager.cpp \
+        CPP/manatablemodel.cpp \
+        CPP/mdatamanager.cpp \
+        CPP/mflowdatas.cpp \
+        CPP/modelmanager.cpp \
+        CPP/mstorage.cpp \
+        CPP/native.cpp \
+        CPP/nomogramma.cpp \
+        CPP/parametermanager.cpp \
+        CPP/printermanager.cpp \
+        CPP/TCP/SimpleTCPChannel.cpp \
+        CPP/TCP/SimpleTCPClient.cpp \
+        CPP/TCP/TcpServers.cpp \
+        CPP/TCP/TcpSettingFile.cpp \
+        ../M8078027_MGlobal/ancestry.cpp \
+        ../M8078027_MGlobal/appbridge.cpp \
+        ../M8078027_MGlobal/global.cpp \
+        ../M8078027_MGlobal/layoutmanager.cpp \
+        ../M8078027_MGlobal/msignal.cpp \
+        ../M8078027_MGlobal/MyMessageOutput.cpp \
+        ../M8078027_MGlobal/p7settingsmanager.cpp \
+        ../M8078027_MGlobal/systemmanager.cpp \
+        ../M8078027_MGlobal/UdmImpl.cpp \
+        ../MPD78096_AnaUro/anauro.cpp \
+        ../MPD78096_AnaUro/analysis.cpp \
+        ../MPD78096_AnaUro/anautils.cpp \
+        ../M8078027_MGlobal/fileio.cpp \
+        ../M8078027_MGlobal/udpmsgs.cpp \
+        CPP/graficmanager.cpp
+
+    HEADERS += \
+        CPP/alarmmanager.h \
+        CPP/androidmanager.h \
+        CPP/mabstractmanager.h \
+        CPP/macqmanager.h \
+        CPP/manatablemodel.h \
+        CPP/mdatamanager.h \
+        CPP/mflowdatas.h \
+        CPP/modelmanager.h \
+        CPP/mstorage.h \
+        CPP/nomogramma.h \
+        CPP/parametermanager.h \
+        CPP/printermanager.h \
+        CPP/TCP/SimpleTCPChannel.h \
+        CPP/TCP/SimpleTCPClient.h \
+        CPP/TCP/TcpServers.h \
+        CPP/TCP/TcpSettingFile.h \
+        CPP/bitmapsv.h \
+        CPP/graficmanager.h \
+        ../MPD78096_AnaUro/anauro.h\
+        ../MPD78096_AnaUro/anauro_global.h \
+        ../MPD78096_AnaUro/analysis.h \
+        ../MPD78096_AnaUro/Anaerrorcodes.h \
+        ../MPD78096_AnaUro/anautils.h \
+        ../M8078027_MGlobal/ancestry.h \
+        ../M8078027_MGlobal/appbridge.h \
+        ../M8078027_MGlobal/global.h \
+        ../M8078027_MGlobal/layoutmanager.h \
+        ../M8078027_MGlobal/msignal.h \
+        ../M8078027_MGlobal/p7settingsmanager.h \
+        ../M8078027_MGlobal/systemmanager.h \
+        ../M8078027_MGlobal/UdmImpl.h \
+        ../M8078027_MGlobal/udpmsgs.h \
+        ../M8078027_MGlobal/fileio.h
+
+
+    INCLUDEPATH +=  CPP \
+                    CPP/TCP \
+                    ../MPD78096_AnaUro \
+                    ../M8078027_MGlobal \
+                    ../MPF78003-Picoflow2R3Supe \
+                    ../MPD78098_DataFileManager \
+                    ../SupeFlowBT
 }
 
 unix {
@@ -163,15 +154,7 @@ unix {
 #tastiera virtuale
 CONFIG += link_pkgconfig
 
-#linux-buildroot-g++ {
-#    deployment.files = *.qml *.otf *.ttf *.svg
-#    target.path = /vktest
-#    deployment.path = /vktest
-#    INSTALLS += target deployment
-#} else {
-    #target.path = $$[QT_INSTALL_PLUGINS]/virtualkeyboard
-    #INSTALLS += target
-#}
+
 
 LINUXDESKTOP {
     QMAKE_CXXFLAGS += -Wno-psabi
@@ -191,6 +174,91 @@ LINUXDESKTOP {
 
     DISTFILES += ../MGlobal/MComponents/* \
                  ../MGlobal/MComponents/Images/* \
+
+    lupdate_only{
+        SOURCES += Resources/*.qml \
+                 ../MGlobal/MComponents/*.qml
+    }
+
+    SOURCES += \
+        main.cpp \
+        CPP/alarmmanager.cpp \
+        CPP/androidmanager.cpp \
+        CPP/mabstractmanager.cpp \
+        CPP/macqmanager.cpp \
+        CPP/manatablemodel.cpp \
+        CPP/mdatamanager.cpp \
+        CPP/mflowdatas.cpp \
+        CPP/modelmanager.cpp \
+        CPP/mstorage.cpp \
+        CPP/native.cpp \
+        CPP/nomogramma.cpp \
+        CPP/parametermanager.cpp \
+        CPP/printermanager.cpp \
+        CPP/TCP/SimpleTCPChannel.cpp \
+        CPP/TCP/SimpleTCPClient.cpp \
+        CPP/TCP/TcpServers.cpp \
+        CPP/TCP/TcpSettingFile.cpp \
+        ../MGlobal/ancestry.cpp \
+        ../MGlobal/appbridge.cpp \
+        ../MGlobal/global.cpp \
+        ../MGlobal/layoutmanager.cpp \
+        ../MGlobal/msignal.cpp \
+        ../MGlobal/MyMessageOutput.cpp \
+        ../MGlobal/p7settingsmanager.cpp \
+        ../MGlobal/systemmanager.cpp \
+        ../MGlobal/UdmImpl.cpp \
+        ../AnaUro/anauro.cpp \
+        ../AnaUro/analysis.cpp \
+        ../AnaUro/anautils.cpp \
+        ../MGlobal/fileio.cpp \
+        ../MGlobal/udpmsgs.cpp \
+        CPP/graficmanager.cpp
+
+    HEADERS += \
+        CPP/alarmmanager.h \
+        CPP/androidmanager.h \
+        CPP/mabstractmanager.h \
+        CPP/macqmanager.h \
+        CPP/manatablemodel.h \
+        CPP/mdatamanager.h \
+        CPP/mflowdatas.h \
+        CPP/modelmanager.h \
+        CPP/mstorage.h \
+        CPP/nomogramma.h \
+        CPP/parametermanager.h \
+        CPP/printermanager.h \
+        CPP/TCP/SimpleTCPChannel.h \
+        CPP/TCP/SimpleTCPClient.h \
+        CPP/TCP/TcpServers.h \
+        CPP/TCP/TcpSettingFile.h \
+        CPP/bitmapsv.h \
+        CPP/graficmanager.h \
+        ../AnaUro/anauro.h\
+        ../AnaUro/anauro_global.h \
+        ../AnaUro/analysis.h \
+        ../AnaUro/Anaerrorcodes.h \
+        ../AnaUro/anautils.h \
+        ../MGlobal/ancestry.h \
+        ../MGlobal/appbridge.h \
+        ../MGlobal/global.h \
+        ../MGlobal/layoutmanager.h \
+        ../MGlobal/msignal.h \
+        ../MGlobal/p7settingsmanager.h \
+        ../MGlobal/systemmanager.h \
+        ../MGlobal/UdmImpl.h \
+        ../MGlobal/udpmsgs.h \
+        ../MGlobal/fileio.h
+
+
+    INCLUDEPATH +=  CPP \
+                    CPP/TCP \
+                    ../AnaUro \
+                    ../MGlobal \
+                    ../MPF78003-Picoflow2R3Supe \
+                    ../DataFileManager \
+                    ../SupeFlowBT
+
 }
 
 CLAUDIA {
@@ -217,6 +285,90 @@ CLAUDIA {
                  ../MGlobal/MComponents/Images/*
 
     DEFINES += nullptr=NULL
+
+    lupdate_only{
+        SOURCES += Resources/*.qml \
+                 ../MGlobal/MComponents/*.qml
+    }
+
+    SOURCES += \
+        main.cpp \
+        CPP/alarmmanager.cpp \
+        CPP/androidmanager.cpp \
+        CPP/mabstractmanager.cpp \
+        CPP/macqmanager.cpp \
+        CPP/manatablemodel.cpp \
+        CPP/mdatamanager.cpp \
+        CPP/mflowdatas.cpp \
+        CPP/modelmanager.cpp \
+        CPP/mstorage.cpp \
+        CPP/native.cpp \
+        CPP/nomogramma.cpp \
+        CPP/parametermanager.cpp \
+        CPP/printermanager.cpp \
+        CPP/TCP/SimpleTCPChannel.cpp \
+        CPP/TCP/SimpleTCPClient.cpp \
+        CPP/TCP/TcpServers.cpp \
+        CPP/TCP/TcpSettingFile.cpp \
+        ../MGlobal/ancestry.cpp \
+        ../MGlobal/appbridge.cpp \
+        ../MGlobal/global.cpp \
+        ../MGlobal/layoutmanager.cpp \
+        ../MGlobal/msignal.cpp \
+        ../MGlobal/MyMessageOutput.cpp \
+        ../MGlobal/p7settingsmanager.cpp \
+        ../MGlobal/systemmanager.cpp \
+        ../MGlobal/UdmImpl.cpp \
+        ../AnaUro/anauro.cpp \
+        ../AnaUro/analysis.cpp \
+        ../AnaUro/anautils.cpp \
+        ../MGlobal/fileio.cpp \
+        ../MGlobal/udpmsgs.cpp \
+        CPP/graficmanager.cpp
+
+    HEADERS += \
+        CPP/alarmmanager.h \
+        CPP/androidmanager.h \
+        CPP/mabstractmanager.h \
+        CPP/macqmanager.h \
+        CPP/manatablemodel.h \
+        CPP/mdatamanager.h \
+        CPP/mflowdatas.h \
+        CPP/modelmanager.h \
+        CPP/mstorage.h \
+        CPP/nomogramma.h \
+        CPP/parametermanager.h \
+        CPP/printermanager.h \
+        CPP/TCP/SimpleTCPChannel.h \
+        CPP/TCP/SimpleTCPClient.h \
+        CPP/TCP/TcpServers.h \
+        CPP/TCP/TcpSettingFile.h \
+        CPP/bitmapsv.h \
+        CPP/graficmanager.h \
+        ../AnaUro/anauro.h\
+        ../AnaUro/anauro_global.h \
+        ../AnaUro/analysis.h \
+        ../AnaUro/Anaerrorcodes.h \
+        ../AnaUro/anautils.h \
+        ../MGlobal/ancestry.h \
+        ../MGlobal/appbridge.h \
+        ../MGlobal/global.h \
+        ../MGlobal/layoutmanager.h \
+        ../MGlobal/msignal.h \
+        ../MGlobal/p7settingsmanager.h \
+        ../MGlobal/systemmanager.h \
+        ../MGlobal/UdmImpl.h \
+        ../MGlobal/udpmsgs.h \
+        ../MGlobal/fileio.h
+
+
+    INCLUDEPATH +=  CPP \
+                    CPP/TCP \
+                    ../AnaUro \
+                    ../MGlobal \
+                    ../MPF78003-Picoflow2R3Supe \
+                    ../DataFileManager \
+                    ../SupeFlowBT
 }
 
 PICOFLOW {
@@ -245,6 +397,90 @@ PICOFLOW {
                  ../MGlobal/MComponents/Images/*
 
     DEFINES += nullptr=NULL
+
+    lupdate_only{
+        SOURCES += Resources/*.qml \
+                 ../MGlobal/MComponents/*.qml
+    }
+
+    SOURCES += \
+        main.cpp \
+        CPP/alarmmanager.cpp \
+        CPP/androidmanager.cpp \
+        CPP/mabstractmanager.cpp \
+        CPP/macqmanager.cpp \
+        CPP/manatablemodel.cpp \
+        CPP/mdatamanager.cpp \
+        CPP/mflowdatas.cpp \
+        CPP/modelmanager.cpp \
+        CPP/mstorage.cpp \
+        CPP/native.cpp \
+        CPP/nomogramma.cpp \
+        CPP/parametermanager.cpp \
+        CPP/printermanager.cpp \
+        CPP/TCP/SimpleTCPChannel.cpp \
+        CPP/TCP/SimpleTCPClient.cpp \
+        CPP/TCP/TcpServers.cpp \
+        CPP/TCP/TcpSettingFile.cpp \
+        ../MGlobal/ancestry.cpp \
+        ../MGlobal/appbridge.cpp \
+        ../MGlobal/global.cpp \
+        ../MGlobal/layoutmanager.cpp \
+        ../MGlobal/msignal.cpp \
+        ../MGlobal/MyMessageOutput.cpp \
+        ../MGlobal/p7settingsmanager.cpp \
+        ../MGlobal/systemmanager.cpp \
+        ../MGlobal/UdmImpl.cpp \
+        ../AnaUro/anauro.cpp \
+        ../AnaUro/analysis.cpp \
+        ../AnaUro/anautils.cpp \
+        ../MGlobal/fileio.cpp \
+        ../MGlobal/udpmsgs.cpp \
+        CPP/graficmanager.cpp
+
+    HEADERS += \
+        CPP/alarmmanager.h \
+        CPP/androidmanager.h \
+        CPP/mabstractmanager.h \
+        CPP/macqmanager.h \
+        CPP/manatablemodel.h \
+        CPP/mdatamanager.h \
+        CPP/mflowdatas.h \
+        CPP/modelmanager.h \
+        CPP/mstorage.h \
+        CPP/nomogramma.h \
+        CPP/parametermanager.h \
+        CPP/printermanager.h \
+        CPP/TCP/SimpleTCPChannel.h \
+        CPP/TCP/SimpleTCPClient.h \
+        CPP/TCP/TcpServers.h \
+        CPP/TCP/TcpSettingFile.h \
+        CPP/bitmapsv.h \
+        CPP/graficmanager.h \
+        ../AnaUro/anauro.h\
+        ../AnaUro/anauro_global.h \
+        ../AnaUro/analysis.h \
+        ../AnaUro/Anaerrorcodes.h \
+        ../AnaUro/anautils.h \
+        ../MGlobal/ancestry.h \
+        ../MGlobal/appbridge.h \
+        ../MGlobal/global.h \
+        ../MGlobal/layoutmanager.h \
+        ../MGlobal/msignal.h \
+        ../MGlobal/p7settingsmanager.h \
+        ../MGlobal/systemmanager.h \
+        ../MGlobal/UdmImpl.h \
+        ../MGlobal/udpmsgs.h \
+        ../MGlobal/fileio.h
+
+
+    INCLUDEPATH +=  CPP \
+                    CPP/TCP \
+                    ../AnaUro \
+                    ../MGlobal \
+                    ../MPF78003-Picoflow2R3Supe \
+                    ../DataFileManager \
+                    ../SupeFlowBT
 }
 
 
