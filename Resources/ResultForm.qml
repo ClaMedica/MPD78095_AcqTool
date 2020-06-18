@@ -22,6 +22,15 @@ MForm {
     color : "steelblue"
     visible: false
 
+    onVisibleChanged: {
+        if (visible) {
+            comboReport.listReports = []
+            var referti = mngData.getListReports()
+            for (var i=0; i<referti.length;i++)
+                comboReport.listReports.push(referti[i])
+        }
+    }
+
     //@@@@@@@@@@    Functions      @@@@@@@@@@
     function clickButtonSameAna(btnId) {
         for (var i = 0; i < pagesSameAna.length; i++) {
@@ -418,7 +427,7 @@ MForm {
 
     MComboBox {
         id: comboReport
-        property var listReports:["Standard"]
+        property var listReports:[]
         anchors.left: btnReport.right
         anchors.bottom: parent.bottom
         anchors.bottomMargin: 10
@@ -430,12 +439,6 @@ MForm {
         model: listReports
         currentIndex:1
         numElementiMax:5
-        Component.onCompleted:{
-            listReports = []
-            var referti = mngData.getListReports()
-            for (var i=0; i<referti.length;i++)
-                listReports.push(referti[i])
-        }
     }
 
     MButton {
