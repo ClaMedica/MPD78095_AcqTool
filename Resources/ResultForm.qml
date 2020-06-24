@@ -23,7 +23,7 @@ MForm {
     visible: false
 
     onVisibleChanged: {
-        if (visible) {
+        if (visible && !PicoFlow) {
             comboReport.listReports = []
             var referti = mngData.getListReports()
             for (var i=0; i<referti.length;i++)

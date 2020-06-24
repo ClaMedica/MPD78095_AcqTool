@@ -1,4 +1,4 @@
-import QtQuick 2.5
+﻿import QtQuick 2.5
 import QtQuick.Controls 1.4
 import QtQuick.Dialogs 1.2
 import QtQuick.Controls.Styles 1.4
@@ -14,6 +14,7 @@ Rectangle {
     property bool switchEnabled:false
     property bool checked:control.checked
     property bool orange: false
+    property bool greytext: false
 
     signal clicked(var id)
     signal pressed(var id)
@@ -69,7 +70,7 @@ Rectangle {
         text:rootBtn.text
         anchors.fill: rootBtn
         labelSize: rootBtn.labelSize
-        color: control.pressed?"white":"black"
+        color: control.pressed?"white": greytext ? "darkslateblue" : "black"
         horizontalAlignment: Text.AlignHCenter
         verticalAlignment: Text.AlignVCenter
         Behavior on color {

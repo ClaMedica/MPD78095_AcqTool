@@ -635,7 +635,9 @@ bool MAbstractManager::buildConfigurationFile()
                 axis->setAttribute(ATT_YAUTOSCALE, ch->getSafeChild(ATT_YAUTOSCALE)->getSafeAttribute(ATT_VALUE));
                 axis->setAttribute(ATT_RANGE, ch->getSafeChild(ATT_RANGE)->getSafeAttribute(ATT_MODEL));
                 axis->setAttribute(ATT_RANGEVALUE, ch->getSafeChild(ATT_RANGE)->getSafeAttribute(ATT_VALUE));
+#ifndef PICOFLOW
                 axis->setAttribute(ATT_BACKGROUND, ch->getSafeChild(ATT_BACKGROUND)->getSafeAttribute(ATT_VALUE));
+#endif
             }
             else
                 qWarning() << "Canale" << chanName << "senza proprieta grafiche. Uso le default";
