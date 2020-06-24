@@ -410,6 +410,7 @@ MForm {
         width: screenW*grafic.valueOf("Button","width")/2
         height: screenH*grafic.valueOf("Button","height")/2
         labelSize: layout.value("F4")-2
+        visible: PicoFlow ? false : true
         text: qsTr("Template")
     }
 
