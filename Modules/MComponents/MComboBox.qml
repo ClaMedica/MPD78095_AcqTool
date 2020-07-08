@@ -1,4 +1,4 @@
-import QtQuick.Controls 1.4
+﻿import QtQuick.Controls 1.4
 import QtQuick.Controls.Styles 1.4
 import QtQuick 2.5
 import QtQuick.Window 2.0
@@ -8,7 +8,7 @@ import "Images"
 
 Rectangle {
     id: rootComboBox
-    property string currentText: ""
+    property string currentText: if (currentIndex != -1) model[currentIndex]
     property int currentIndex: -1
     property var model: []
     property int oriH: height
@@ -23,7 +23,13 @@ Rectangle {
     Behavior on height { NumberAnimation { duration:300; easing.type: Easing.OutExpo}}
     border.width: screenH*0.005
 //    onModelChanged:        if(modelOk) currentIndex = 0
-    onCurrentIndexChanged: if(modelOk && model[currentIndex] !== undefined) curEle.text = model[currentIndex]
+    onCurrentIndexChanged: {
+        if (modelOk && model[currentIndex] !== undefined)
+        {
+            currentText = model[currentIndex]
+            curEle.text = currentText
+        }
+    }
 
     signal clicked
 

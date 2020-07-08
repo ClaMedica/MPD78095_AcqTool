@@ -512,6 +512,8 @@ void MDataMngDesktop::exitFromReview()
                 QString newname = filenameAna;
                 newname.replace("temp","an");
                 newname.replace(".xml","1a.xml");
+                if (QFile::exists(newname))
+                    QFile::remove(newname);
                 qDebug()<<"salvo file analisi"<<QFile::rename(filenameAna,newname);
             }
         }
