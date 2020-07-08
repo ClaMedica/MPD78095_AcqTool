@@ -2,8 +2,9 @@
 #define MDATAMNGDESKTOP_H
 
 #include <QObject>
-#include "mdatamanager.h"
 #include <QQuickItemGrabResult>
+#include "mdatamanager.h"
+
 
 class MDataMngDesktop : public MDataManager
 {

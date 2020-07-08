@@ -95,7 +95,7 @@ TRANSLATIONS += acqtool.xlf \
         ../M8078027_MGlobal/systemmanager.h \
         ../M8078027_MGlobal/UdmImpl.h \
         ../M8078027_MGlobal/udpmsgs.h \
-        ../M8078027_MGlobal/fileio.h
+        ../M8078027_MGlobal/fileio.h \
 
 
     INCLUDEPATH +=  CPP \
@@ -125,11 +125,46 @@ win32 {
     DEFINES += WIN32
     TARGET = acqTool
 
-    SOURCES += CPP/mdatamngdesktop.cpp
-    HEADERS += CPP/mdatamngdesktop.h
+    SOURCES += CPP/mdatamngdesktop.cpp \
+            ../MPD78097_Database/mdatabase.cpp \
+            ../MPD78097_Database/msqlabstract.cpp \
+            ../MPD78097_Database/msqlanalysistypes.cpp \
+            ../MPD78097_Database/msqlarrangana.cpp \
+            ../MPD78097_Database/msqlarrangements.cpp \
+            ../MPD78097_Database/msqlboards.cpp \
+            ../MPD78097_Database/msqlcategories.cpp \
+            ../MPD78097_Database/msqlcomments.cpp \
+            ../MPD78097_Database/msqldiagnosiscodes.cpp \
+            ../MPD78097_Database/msqlpatientdiagnosiscodes.cpp \
+            ../MPD78097_Database/msqlpatients.cpp \
+            ../MPD78097_Database/msqlpatientsubcategory.cpp \
+            ../MPD78097_Database/msqlresults.cpp \
+            ../MPD78097_Database/msqlroutinearrangement.cpp \
+            ../MPD78097_Database/msqlsubcategories.cpp \
+            ../MPD78097_Database/msqltests.cpp \
 
-    INCLUDEPATH +=  ../MPD78099_MedicalReport
-    INCLUDEPATH +=  ../M8078027_MGlobal
+    HEADERS += CPP/mdatamngdesktop.h \
+            ../MPD78097_Database/dbStatements.h \
+            ../MPD78097_Database/mdatabase.h \
+            ../MPD78097_Database/msqlabstract.h \
+            ../MPD78097_Database/msqlanalysistypes.h \
+            ../MPD78097_Database/msqlarrangana.h \
+            ../MPD78097_Database/msqlarrangements.h \
+            ../MPD78097_Database/msqlboards.h \
+            ../MPD78097_Database/msqlcategories.h \
+            ../MPD78097_Database/msqlcomments.h \
+            ../MPD78097_Database/msqldiagnosiscodes.h \
+            ../MPD78097_Database/msqlpatientdiagnosiscodes.h \
+            ../MPD78097_Database/msqlpatients.h \
+            ../MPD78097_Database/msqlpatientsubcategory.h \
+            ../MPD78097_Database/msqlresults.h \
+            ../MPD78097_Database/msqlroutinearrangement.h \
+            ../MPD78097_Database/msqlsubcategories.h \
+            ../MPD78097_Database/msqltests.h \
+
+    INCLUDEPATH +=  ../MPD78099_MedicalReport \
+                    ../MPD78097_Database
+
 
     rootPath = E:\Piattaforma70
     #creo la cartella da copiare in giro
