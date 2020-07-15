@@ -122,8 +122,6 @@ private:
     QString m_VolRes;
     QString m_toSave;
 
-    bool    m_analized;
-
     int m_numAna; //numero di analisi --> non sappiamo se serve
 
     void updateAvailableData();
@@ -139,6 +137,7 @@ protected:
     bool saveDataAndUpdate(QString __family, QString __name, VarMapVec*__elements,bool __whatIfAlreadyPresent=OVERWRITE);
     bool updateInfoList();
 
+    bool    m_analyzed;
     bool    m_autoPrint;
     QString m_pathData;
     QString m_fileName;

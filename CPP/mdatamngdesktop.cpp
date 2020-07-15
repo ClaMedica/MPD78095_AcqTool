@@ -508,12 +508,18 @@ void MDataMngDesktop::exitFromReview()
                 qDebug()<<"copio le modifiche"<<QFile::rename(m_copyFileName,m_fileName);
             }
 
-            if (QFile::exists(filenameAna)) {
+            if (QFile::exists(filenameAna))
+            {
                 QString newname = filenameAna;
                 newname.replace("temp","an");
                 newname.replace(".xml","1a.xml");
+                if (QFile::exists(newname))
+                    QFile::remove(newname);
                 qDebug()<<"salvo file analisi"<<QFile::rename(filenameAna,newname);
             }
+
+            if (m_analyzed) //è un test analizzato, devo scrivere sul database 1 nel campo Saved dei tests
+                g_mainAppBridge->testsAnalyzed();
         }
         else //"no"
         {

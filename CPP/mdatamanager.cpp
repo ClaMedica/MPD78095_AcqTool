@@ -16,7 +16,7 @@ MDataManager::MDataManager(QObject *parent)
 
     m_end = 3600;   //fine esame di default a 1 ora
 
-    m_analized = false;
+    m_analyzed = false;
     m_autoPrint = false;
     m_autoFlow = 2;
     m_Siroky = false;
@@ -96,6 +96,7 @@ void MDataManager::loadFile(QString __fileName)
         return;
     }
 
+    m_analyzed = false;
     m_fileName = __fileName;
     m_pathData = m_fileName.left(m_fileName.lastIndexOf("/")+1);
 
@@ -1221,7 +1222,7 @@ qDebug() << "INIZIO";
             if (found) {
                 //                                        'Salva l'immagine dei tracciati all'interno del definitore
                 //                                        myGraphPlot.RedrawGraphForPrint("GR200", MarkerUtils.getOpMarkerAn(mkOpAnIn - 1).myNumStart(myGraphPlot.GetTruePosChannel(myGraphPlot.MaxNASCh)), MarkerUtils.getOpMarkerAn(mkOpAnIn - 1).myNumEnd(myGraphPlot.GetTruePosChannel(myGraphPlot.MaxNASCh)))
-                m_analized = true;
+                m_analyzed = true;
                 //                                            UpdateTestOther()
                 //Lancia analisi e Inizializza nomogrammi
                 InitPageGraphs(FLW_AVD_STUDY);
