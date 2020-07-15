@@ -67,7 +67,6 @@
                         unit="ml/sec"
                         value="-2"
                         alfanum="false"
-                        visible = "false"
                     />
                     <max
                         label="Maximum"
@@ -75,7 +74,6 @@
                         unit="ml/sec"
                         value="2"
                         alfanum="false"
-                        visible = "false"
                     />
                 </Value>
                 <Duration label="Duration">
@@ -131,14 +129,14 @@
                     label="Auto Range"
                     type="CheckBox"
                     unit=""
-                    value="1"
+                    value="true"
                 />
                 <Range
                     label="Range"
                     type="SpinBox"
                     dt="real"
                     unit="ml"
-                    model="2100#150#100#0#"
+                    model="2000#200#100#0#"
                     value="200"
                 />
 
@@ -161,14 +159,14 @@
                     label="Auto Range"
                     type="CheckBox"
                     unit=""
-                    value="1"
+                    value="true"
                 />
                 <Range
                     label="Range"
                     type="SpinBox"
                     dt="real"
                     unit="ml/sec"
-                    model="150#15#5#0#"
+                    model="100#10#10#0#"
                     value="50"
                 />
 
@@ -191,14 +189,14 @@
                     label="Auto Range"
                     type="CheckBox"
                     unit=""
-                    value="1"
+                    value="true"
                 />
                 <Range
                     label="Range"
                     type="SpinBox"
                     dt="real"
                     unit="uV"
-                    model="2100#300#100#0#"
+                    model="5000#500#500#0#"
                     value="1000"
                 />
 
