@@ -19,10 +19,11 @@
                 <Amplitude label="Amplitude">
                     <min
                         label="Minimum"
-                        type="TextField"
-                        unit="ml/sec"
+                        type="SpinBox"
+                        unit="ml"
+                        dt="real"
                         value="1"
-                        alfanum="false"
+                        model="2#1#1#0#"
                      />
                      <max
                         label="Maximum"
@@ -30,15 +31,17 @@
                         unit="ml/sec"
                         value="150"
                         alfanum="false"
+                        visible="false"
                      />
                 </Amplitude>
                 <Duration label="Duration">
                     <min
                         label="Minimum"
-                        type="TextField"
+                        type="SpinBox"
+                        dt="real"
                         unit="sec"
                         value="2"
-                        alfanum="false"
+                        model="5#1#1#0#"
                     />
                 </Duration>
                 <chanType
@@ -57,13 +60,14 @@
                  />
         </AutoStarts>
         <AutoStops label="Auto Stops">
-                <Value label="Value">
+                <Value label="Value" visible = "false">
                     <min
                         label="Minimum"
                         type="TextField"
                         unit="ml/sec"
                         value="-2"
                         alfanum="false"
+                        visible = "false"
                     />
                     <max
                         label="Maximum"
@@ -71,15 +75,17 @@
                         unit="ml/sec"
                         value="2"
                         alfanum="false"
+                        visible = "false"
                     />
                 </Value>
                 <Duration label="Duration">
                     <min
                         label="Minimum"
-                        type="TextField"
+                        type="SpinBox"
+                        dt="real"
                         unit="sec"
                         value="20"
-                        alfanum="false"
+                        model="95#5#5#0#"
                     />
                </Duration>
                <chanType
@@ -132,7 +138,7 @@
                     type="SpinBox"
                     dt="real"
                     unit="ml"
-                    model="2000#200#100#0#"
+                    model="2100#150#100#0#"
                     value="200"
                 />
 
@@ -162,7 +168,7 @@
                     type="SpinBox"
                     dt="real"
                     unit="ml/sec"
-                    model="100#25#1#0#"
+                    model="150#15#5#0#"
                     value="50"
                 />
 
@@ -192,7 +198,7 @@
                     type="SpinBox"
                     dt="real"
                     unit="uV"
-                    model="5000#500#500#0#"
+                    model="2100#300#100#0#"
                     value="1000"
                 />
 
