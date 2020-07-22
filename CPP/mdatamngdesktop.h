@@ -33,16 +33,10 @@ public slots:
 
 private:
     //referto
-    QTimer* m_reportOpenedTimer;
-    QTimer* m_reportTimer;
     QString m_nomeReferto;
     Ancestry * m_reportEdit;
 
     void createPdf();
-
-private slots:
-    //per referto
-    void slot_startReport();
 
 };
 
