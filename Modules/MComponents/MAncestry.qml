@@ -204,6 +204,9 @@ Column {
                 {
                     //console.log("creo una sub ancestry")
                     //console.log(child.name(),"ancestry")
+                    var visi = pchild.getAttribute("visible")
+                    if (visi === "false")
+                        continue
                     c = Qt.createQmlObject('import MComponents 1.0 ;MAncestry{}', recChildren)
                     c.anchors.left = recChildren.left
                     c.anchors.right = recChildren.right
