@@ -362,6 +362,23 @@ QVariantList MAbstractManager::commandsInfo()
     list << "key" << 112;
     list << "visible" << true;
     list << "&GridElement";
+#else
+    //spazio vuoto
+    list << "$GridElement";
+    list << "descr" << "";
+    list << "img" << "";
+    list << "key" << 0;
+    list << "visible" << false;
+    list << "&GridElement";
+
+    //export
+    list << "$GridElement";
+    list << "descr" << tr("export");
+    list << "img" << "qrc:/export";
+    list << "key" << EXPORT;
+    list << "visible" << true;
+    list << "enabled" << false;
+    list << "&GridElement";
 #endif
     return list;
 }

@@ -61,7 +61,7 @@ ListModel {
     property real yALDecimalsMin: 2
     property string yALDateTimeformatMaj: ""
     property string yALDateTimeformatMin: ""
-    property bool yAutoScale:false
+    property bool yAutoScale: false
     //Y Proprietà del testo Major
     property string yALMajFontFamily: "Luxi Serif"
     property string yALMajFontColor: "grey"
@@ -265,7 +265,12 @@ ListModel {
         case "yALDecimalsMin":yALDecimalsMin=value;break;
         case "yALDateTimeformatMaj":yALDateTimeformatMaj=value;break;
         case "yALDateTimeformatMin":yALDateTimeformatMin=value;break;
-        case "yAutoScale":yAutoScale=value;break;
+        case "yAutoScale":
+            if (value === "false")
+                yAutoScale = false;
+            if (value === "true")
+                yAutoScale = true;
+            break;
         case "yALMajFontFamily":yALMajFontFamily=value;break;
         case "yALMajFontColor":yALMajFontColor=value;break;
         case "yALMajFontSize":yALMajFontSize=value;break;

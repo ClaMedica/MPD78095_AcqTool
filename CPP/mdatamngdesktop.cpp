@@ -554,4 +554,31 @@ QList<QString> MDataMngDesktop::getListReports()
 
 }
 
+void MDataMngDesktop::openExportTool()
+{
+    QString pth = g_P7SettingsManager.progPath()+"/exportTool.exe";
+    QProcess *proc = new QProcess();
+    proc->setProgram(pth);
+
+    QStringList arg;
+    arg << "s" << QString::number(m_testNumber);
+    proc->setArguments(arg);
+
+    connect(proc,  QOverload<int, QProcess::ExitStatus>::of(&QProcess::finished),
+    [=](int exitCode, QProcess::ExitStatus exitStatus)
+    {
+     // qDebug()<< exitCode << exitStatus;
+      delete proc;
+    });
+
+//    connect(proc, &QProcess::started,[=]()
+//    {
+//      qDebug()<< "STARTED";
+
+//    });
+
+
+    proc->start();
+}
+
 

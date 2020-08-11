@@ -42,5 +42,8 @@
         <file>vuoto.png</file>
         <file>vuoto_click.png</file>
         <file>vuoto_off.png</file>
+        <file>export.jpg</file>
+        <file>export_click.jpg</file>
+        <file>export_off.jpg</file>
     </qresource>
 </RCC>

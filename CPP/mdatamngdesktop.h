@@ -27,6 +27,7 @@ public slots:
     QString getNameOfObj(QVariantList __whoAmI);
     void startPrint();
     void exitFromReview();
+    void openExportTool();
     //gestione referti
     QList<QString> getListReports();
 
