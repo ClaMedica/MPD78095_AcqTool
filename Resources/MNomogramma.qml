@@ -517,12 +517,15 @@ Rectangle {
               clicright.visible = false
               mngData.copyImg(sourceImg)
           }
+          hoverEnabled: true
+          onEntered: cursorShape = Qt.PointingHandCursor
+          onExited: cursorShape = Qt.ArrowCursor
         }
     }
 
     Timer{
         id:delTim
-        interval: 1500
+        interval: 2000
         onTriggered:
             clicright.visible = false
     }
