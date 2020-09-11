@@ -555,7 +555,9 @@ QList<QString> MDataMngDesktop::getListReports()
 }
 
 void MDataMngDesktop::openExportTool()
-{
+{    
+    //necessario salvare prima di fare l'esportazione per avere i dati risultati su pic
+    saveChanges();
     QString pth = g_P7SettingsManager.progPath()+"/exportTool.exe";
     QProcess *proc = new QProcess();
     proc->setProgram(pth);
