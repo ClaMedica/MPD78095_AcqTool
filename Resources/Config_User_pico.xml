@@ -1,4 +1,8 @@
 <Configuration label="Configuration">
+    <Versione
+        label="1.0"
+        visible="false"
+    />
     <AutomaticFlow label="Automatic Flow">
         <Auto
             label="Automatic flow"
