@@ -215,18 +215,18 @@ void MAcqManager::udpBtDecode(enum WHO __from, QByteArray __msg)
     }
 }
 
-void MAcqManager::dataOnTCP(QObject *__pParent, SimpleTCPClient *__pTCP, QByteArray __block)
+void MAcqManager::dataOnTCP(QObject *__pParent, SimpleTCPClient *__pTCP, QByteArray __blocco)
 {
     //arriviamo qua dentro ogni volta che arriva qualcosa da uno dei server a cui siamo collegati
 
     if(__pParent != NULL) {     //punta a qualcosa andiamo avanti
         if(__pTCP != NULL) {    //punta a qualcosa proviamo a gestirlo
-            ((MAcqManager *) __pParent)->handleTCP(__pTCP, __block);
+            ((MAcqManager *) __pParent)->handleTCP(__pTCP, __blocco);
             return;
         }
     }
-    int s = __block.size();  int sm = (s < 16) ? s : 16;
-    qDebug() << "dataOnTCP() dati ignorati" << s << QByteArray(__block.constData(),sm);
+    int s = __blocco.size();  int sm = (s < 16) ? s : 16;
+    qDebug() << "dataOnTCP() dati ignorati" << s << QByteArray(__blocco.constData(),sm);
 }
 
 bool MAcqManager::newAcquisition(QString __dataFile)
@@ -616,7 +616,7 @@ void MAcqManager::updateAcqData()
 
 static bool acqStarted = false;
 
-void MAcqManager::handleTCP(SimpleTCPClient *__client, QByteArray __block)
+void MAcqManager::handleTCP(SimpleTCPClient *__client, QByteArray __blocco)
 {
     flowBT_status_t stBT;
     picoFlow_status_t stPico;
@@ -632,7 +632,7 @@ void MAcqManager::handleTCP(SimpleTCPClient *__client, QByteArray __block)
             qint8  * dest;
             qint32   numBytes;
             m_supeConnected = true;
-            staticblock += __block;
+            staticblock += __blocco;
             while(staticblock.size() > (int)(sizeof(qint32))) {
                 QDataStream in(&staticblock, QIODevice::ReadOnly);
                 in >> numBytes;
@@ -702,7 +702,7 @@ void MAcqManager::handleTCP(SimpleTCPClient *__client, QByteArray __block)
         else if(who == "VAL") {
             if ((m_autoStartStop || m_startAcqManuale) && !m_noBeaker) {
                 // riempo i buffer
-                fillBuffers(__block);
+                fillBuffers(__blocco);
 
                 // finche' i buffer hanno abbastanza campioni
                 // faccio le mie operazioni e rimuovo i primi campioni
@@ -734,8 +734,8 @@ void MAcqManager::handleTCP(SimpleTCPClient *__client, QByteArray __block)
             }
         }
         else if(who == "CMD") {
-            qDebug() << "CMD __block[4]" << __block[4];
-            if(__block[4] == '5' && m_acqFileOpened) {
+            qDebug() << "CMD __block[4]" << __blocco[4];
+            if(__blocco[4] == '5' && m_acqFileOpened) {
                 if(!m_saving) {
                     //parte immediatamente l'acquisizione
                     //azzero
@@ -1301,11 +1301,11 @@ void MAcqManager::applyOperations()
      * - samples, type qreal, lenght numChanData. Channel's samples
      */
 
-void MAcqManager::fillBuffers(QByteArray __block)
+void MAcqManager::fillBuffers(QByteArray __blocco)
 {
     uchar maxNumChan = m_mng->GetChanNum();
     static QByteArray staticblock;
-    staticblock += __block;
+    staticblock += __blocco;
 
     bool samplesToRead = true;
     while(samplesToRead)

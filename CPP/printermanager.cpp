@@ -196,7 +196,7 @@ void printermanager::imagePrintForward(int __dotlines)
 void printermanager::imagePrintStr(char *__str, int __str_len)
 {
     static char trailer[1] = { 0x03 };
-    char header[6] = { 0x5a, 0xa5, 0xa5, 0x5a, __str_len & 0xff, (__str_len >> 8) & 0xff };
+    char header[6] = { 0x5a, static_cast<char>(0xa5), static_cast<char>(0xa5), 0x5a, static_cast<char>(__str_len & 0xff), static_cast<char>((__str_len >> 8) & 0xff) };
 
     m_file->write(header, sizeof(header));
     m_file->write(__str, __str_len);

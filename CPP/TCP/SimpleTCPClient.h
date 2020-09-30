@@ -29,7 +29,7 @@ public:
     QTcpSocket::SocketError getSocketError(){return m_channelTcpSocket->error();}
     bool socketInUsed(){return m_channelInUse;}
 
-    void registerDataReadyCallBack(void (*__pCallBAck)(QObject *__pParent, SimpleTCPClient *__pTCP, QByteArray __block)){m_pFDataReadyCallBack = __pCallBAck;}
+    void registerDataReadyCallBack(void (*__pCallBAck)(QObject *__pParent, SimpleTCPClient *__pTCP, QByteArray __blocco)){m_pFDataReadyCallBack = __pCallBAck;}
 
 signals:
     void connectedToHost();
@@ -54,7 +54,7 @@ protected:
     bool m_channelInUse;
 
     QObject *m_pParent;
-    void (*m_pFDataReadyCallBack)(QObject *__pParent, SimpleTCPClient *__pTCP, QByteArray __block);
+    void (*m_pFDataReadyCallBack)(QObject *__pParent, SimpleTCPClient *__pTCP, QByteArray __blocco);
 };
 
 #endif // SIMPLETCPCLIENT_H

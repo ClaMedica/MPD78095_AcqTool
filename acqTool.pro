@@ -102,23 +102,49 @@ TRANSLATIONS += acqtool.xlf \
                     CPP/TCP \
                     ../MPD78096_AnaUro \
                     ../M8078027_MGlobal \
-                    ../MPF78003-Picoflow2R3Supe \
+                    ../MPF78003_Picoflow2R3Supe \
                     ../MPD78098_DataFileManager \
                     ../SupeFlowBT
 
-contains(ANDROID_TARGET_ARCH,armeabi-v7a) {
-    DEFINES += ANDROID
-    QT += androidextras
-        ANDROID_EXTRA_LIBS = \
-            $$PWD/../Build/Emulator/DataBuild/libDatafileManager.so \
-            $$PWD/../Build/Emulator/MPlotModule/libQmlPlotter.so
+#contains(ANDROID_TARGET_ARCH,armeabi-v7a) {
+#    DEFINES += ANDROID
+#    QT += androidextras
+#        ANDROID_EXTRA_LIBS = \
+#            $$PWD/../Build/Emulator/DataBuild/libDatafileManager.so \
+#            $$PWD/../Build/Emulator/MPlotModule/libQmlPlotter.so
 
-    ANDROID_PACKAGE_SOURCE_DIR = $$PWD/android-sources
+#    ANDROID_PACKAGE_SOURCE_DIR = $$PWD/android-sources
 
-    unix:!macx: LIBS += -L$$PWD/../../build/DatafileManager/Debug/Desktop_Qt_5_5_1_GCC_64bit -lDatafileManager
+#    unix:!macx: LIBS += -L$$PWD/../../build/DatafileManager/Debug/Desktop_Qt_5_5_1_GCC_64bit -lDatafileManager
 
-    #INCLUDEPATH += $$PWD/../Build/Emulator/DataBuild
-    #DEPENDPATH += $$PWD/../Build/Emulator/DataBuild
+#    #INCLUDEPATH += $$PWD/../Build/Emulator/DataBuild
+#    #DEPENDPATH += $$PWD/../Build/Emulator/DataBuild
+#}
+
+
+macx {
+    DEFINES += MAC
+    TARGET = acqTool
+
+    SOURCES += CPP/mdatamngdesktop.cpp
+    HEADERS += CPP/mdatamngdesktop.h
+
+    INCLUDEPATH +=  ../MPD78099_MedicalReport
+    INCLUDEPATH +=  ../M8078027_MGlobal
+
+#    rootPath = E:\Piattaforma70
+#    plugin.path = $${rootPath}\build\standalone
+#    plugin.files += $$shell_path($$OUT_PWD)\release\acqTool.exe
+#    INSTALLS += plugin
+
+    CONFIG(release, debug|release): LIBS += -L$$PWD/../Build/Release/DatafileManager/ -lDatafileManager
+    CONFIG(debug, debug|release): LIBS += -L$$PWD/../Build/Debug/DatafileManager/ -lDatafileManager
+    CONFIG(release, debug|release): LIBS += -L$$PWD/../Build/Release/MedicalReport/ -lMedicalReport
+    CONFIG(debug, debug|release): LIBS += -L$$PWD/../Build/Debug/MedicalReport/ -lMedicalReport
+
+
+CONFIG+=sdk_no_version_check
+    QT += printsupport
 }
 
 win32 {

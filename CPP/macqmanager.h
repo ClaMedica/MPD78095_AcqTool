@@ -24,7 +24,7 @@ public:
     QVariantList alarms(){return m_alarmList;}
     QVariantList acqMarkers(){return m_acqMarkerList;}
 
-    static void dataOnTCP(QObject *__pParent=NULL, SimpleTCPClient *__pTCP=NULL, QByteArray __block=QByteArray());
+    static void dataOnTCP(QObject *__pParent=NULL, SimpleTCPClient *__pTCP=NULL, QByteArray __blocco=QByteArray());
     Q_INVOKABLE void send_Command(int __command);    
     Q_INVOKABLE int manAutoQml();
 
@@ -112,7 +112,7 @@ private:
     MSignal m_stopBuffer;
 
     void updateAcqData();
-    void handleTCP(SimpleTCPClient *__client, QByteArray __block);
+    void handleTCP(SimpleTCPClient *__client, QByteArray __blocco);
     void initializeServers();
     bool loadConnectivityInfo(Ancestry *__info);
     void analyzeStatus(uint8_t __currState, bool __isBT);
@@ -125,7 +125,7 @@ private:
     void removeLastFrame();
     bool handleDataFile();
     void applyOperations();
-    void fillBuffers(QByteArray __block);
+    void fillBuffers(QByteArray __blocco);
     bool buffersReady();
     bool readConfigurationFile();
 

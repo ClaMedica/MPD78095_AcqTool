@@ -52,7 +52,7 @@ public:
     void listen();
     void close();
 
-    void registerDataReadyCallBack(void (*__pCallBAck)(QObject *__pParent, SimpleTCPChannel *__pTCP, QByteArray __block)){m_pFDataReadyCallBack = __pCallBAck;}
+    void registerDataReadyCallBack(void (*__pCallBAck)(QObject *__pParent, SimpleTCPChannel *__pTCP, QByteArray __blocco)){m_pFDataReadyCallBack = __pCallBAck;}
 
 public slots:
     /**
@@ -83,7 +83,7 @@ protected slots:
     virtual void onDataReady();
 
 protected:
-     void (*m_pFDataReadyCallBack)(QObject *__pParent, SimpleTCPChannel*__pTCP, QByteArray __block);
+     void (*m_pFDataReadyCallBack)(QObject *__pParent, SimpleTCPChannel*__pTCP, QByteArray __blocco);
 
 private:
     //// information for channel - BEGIN ////
