@@ -1,5 +1,5 @@
 TEMPLATE = app
-VERSION = 1.1.1
+VERSION = 1.1.3
 
 QT += qml quick widgets sql network multimedia xml core serialport gui
 
@@ -95,7 +95,7 @@ TRANSLATIONS += acqtool.xlf \
         ../M8078027_MGlobal/systemmanager.h \
         ../M8078027_MGlobal/UdmImpl.h \
         ../M8078027_MGlobal/udpmsgs.h \
-        ../M8078027_MGlobal/fileio.h
+        ../M8078027_MGlobal/fileio.h \
 
 
     INCLUDEPATH +=  CPP \
@@ -151,11 +151,11 @@ win32 {
     DEFINES += WIN32
     TARGET = acqTool
 
-    SOURCES += CPP/mdatamngdesktop.cpp
-    HEADERS += CPP/mdatamngdesktop.h
+    SOURCES += CPP/mdatamngdesktop.cpp \
+
+    HEADERS += CPP/mdatamngdesktop.h \
 
     INCLUDEPATH +=  ../MPD78099_MedicalReport
-    INCLUDEPATH +=  ../M8078027_MGlobal
 
     rootPath = E:\Piattaforma70
     #creo la cartella da copiare in giro

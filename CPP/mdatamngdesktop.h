@@ -2,8 +2,9 @@
 #define MDATAMNGDESKTOP_H
 
 #include <QObject>
-#include "mdatamanager.h"
 #include <QQuickItemGrabResult>
+#include "mdatamanager.h"
+
 
 class MDataMngDesktop : public MDataManager
 {
@@ -26,22 +27,17 @@ public slots:
     QString getNameOfObj(QVariantList __whoAmI);
     void startPrint();
     void exitFromReview();
+    void openExportTool();
     //gestione referti
     QList<QString> getListReports();
 
 
 private:
     //referto
-    QTimer* m_reportOpenedTimer;
-    QTimer* m_reportTimer;
     QString m_nomeReferto;
     Ancestry * m_reportEdit;
 
     void createPdf();
-
-private slots:
-    //per referto
-    void slot_startReport();
 
 };
 

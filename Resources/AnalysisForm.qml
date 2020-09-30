@@ -415,6 +415,7 @@ MForm{
                     {
                         mngData.saveImg(sourceImg,"GR000")
                         //rendo abilitato il pulsante per passare ai risultati senza dover rifare l'analisi
+                        //abilito anche il pulsante export
                         for (var i=0; i<gridActions.items.length; i++)
                         {
                             if (gridActions.items[i]===MDataManager.RISULTATI)
@@ -424,6 +425,15 @@ MForm{
                             }
                         }
                         gridActions.populate()
+                        for (i=0; i<gridComand.items.length; i++)
+                        {
+                            if (gridComand.items[i]===MDataManager.EXPORT)
+                            {
+                                gridComand.items[i+4] = "true"
+                                break;
+                            }
+                        }
+                        gridComand.populate()
                     }
                     mngData.analysis();
                 }
@@ -443,6 +453,10 @@ MForm{
                 if (value === MDataManager.ZOOMNONE.toString())
                     //zoom none
                     plot.zoomFromButton("zoomReset")
+
+                if (value === MDataManager.EXPORT.toString())
+                    //export
+                    mngData.openExportTool()
             }
             onTooltipActive: {
                 if (testo === "")

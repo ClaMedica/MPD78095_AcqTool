@@ -60,7 +60,8 @@ public:
         DISCARD,
         CHIUDIACQ,
         DELETEALL,
-        RISULTATI
+        RISULTATI,
+        EXPORT
     };
     Q_ENUM(CODICIP)
 

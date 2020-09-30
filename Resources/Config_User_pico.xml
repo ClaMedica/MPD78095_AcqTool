@@ -1,4 +1,8 @@
 <Configuration label="Configuration">
+    <Versione
+        label="1.0"
+        visible="false"
+    />
     <AutomaticFlow label="Automatic Flow">
         <Auto
             label="Automatic flow"
@@ -19,10 +23,11 @@
                 <Amplitude label="Amplitude">
                     <min
                         label="Minimum"
-                        type="TextField"
-                        unit="ml/sec"
+                        type="SpinBox"
+                        unit="ml"
+                        dt="real"
                         value="1"
-                        alfanum="false"
+                        model="2#1#1#0#"
                      />
                      <max
                         label="Maximum"
@@ -30,15 +35,17 @@
                         unit="ml/sec"
                         value="150"
                         alfanum="false"
+                        visible="false"
                      />
                 </Amplitude>
                 <Duration label="Duration">
                     <min
                         label="Minimum"
-                        type="TextField"
+                        type="SpinBox"
+                        dt="real"
                         unit="sec"
                         value="2"
-                        alfanum="false"
+                        model="5#1#1#0#"
                     />
                 </Duration>
                 <chanType
@@ -57,7 +64,7 @@
                  />
         </AutoStarts>
         <AutoStops label="Auto Stops">
-                <Value label="Value">
+                <Value label="Value" visible = "false">
                     <min
                         label="Minimum"
                         type="TextField"
@@ -76,10 +83,11 @@
                 <Duration label="Duration">
                     <min
                         label="Minimum"
-                        type="TextField"
+                        type="SpinBox"
+                        dt="real"
                         unit="sec"
                         value="20"
-                        alfanum="false"
+                        model="95#5#5#0#"
                     />
                </Duration>
                <chanType
@@ -125,7 +133,7 @@
                     label="Auto Range"
                     type="CheckBox"
                     unit=""
-                    value="1"
+                    value="true"
                 />
                 <Range
                     label="Range"
@@ -155,14 +163,14 @@
                     label="Auto Range"
                     type="CheckBox"
                     unit=""
-                    value="1"
+                    value="true"
                 />
                 <Range
                     label="Range"
                     type="SpinBox"
                     dt="real"
                     unit="ml/sec"
-                    model="100#25#1#0#"
+                    model="100#10#10#0#"
                     value="50"
                 />
 
@@ -185,7 +193,7 @@
                     label="Auto Range"
                     type="CheckBox"
                     unit=""
-                    value="1"
+                    value="true"
                 />
                 <Range
                     label="Range"
