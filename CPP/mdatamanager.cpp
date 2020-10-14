@@ -138,6 +138,7 @@ void MDataManager::loadFile(QString __fileName)
         m_mng = new DatafileManager;
         m_mng->SetFileName(m_copyFileName);
         m_mng->SetFileType(7);
+        m_mng->SetLanguage(g_P7SettingsManager.localization());
         bool res = m_mng->Open();
         qDebug() << "File Aperto?" << res;
         res = m_mng->GetParameters();

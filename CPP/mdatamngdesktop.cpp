@@ -288,7 +288,7 @@ void MDataMngDesktop::openReport(QString __nomeReport)
         f.open(QIODevice::ReadOnly);
         QByteArray data = f.readAll();
         QTextCodec *codec = QTextCodec::codecForName(m_language);
-        QString stringa = codec->toUnicode(data);
+        QString stringa = codec->codecForMib(106)->toUnicode(data);
         QTextDocument textDoc;
         textDoc.setHtml(stringa);
         f.close();
