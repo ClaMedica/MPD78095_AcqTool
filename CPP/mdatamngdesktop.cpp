@@ -22,6 +22,7 @@ MDataMngDesktop::MDataMngDesktop(QObject *parent)
     (void) parent;
 
     m_nomeReferto = "";
+    m_nomeRefertoPdf = "";
 }
 
 void MDataMngDesktop::saveImg(QQuickItem *__item, QString __nome)
@@ -251,7 +252,17 @@ void MDataMngDesktop::deleteAnMArkers()
 
 }
 
-//HANDLE hProc;
+bool MDataMngDesktop::checkReport()
+{
+    QString nomePDF = "rf" + QString("%1").arg(m_testNumber,5,10,QLatin1Char('0')) + "1a" + ".pdf";
+    m_nomeRefertoPdf = g_P7SettingsManager.dataPath() + "\\ref\\" + nomePDF;
+    QFile filePdf(m_nomeRefertoPdf);
+    if (filePdf.exists())
+        return true;
+    else
+        return false;
+}
+
 void MDataMngDesktop::openReport(QString __nomeReport)
 {
     if (__nomeReport == "")
@@ -357,9 +368,6 @@ void MDataMngDesktop::openReport(QString __nomeReport)
 
 void MDataMngDesktop::createPdf()
 {
-    QString nomePDF = "rf" + QString("%1").arg(m_testNumber,5,10,QLatin1Char('0')) + "1a" + ".pdf";
-    nomePDF = g_P7SettingsManager.dataPath() + "\\ref\\" + nomePDF;
-
     QFile FI(m_nomeReferto);
     FI.open(QIODevice::ReadOnly);
     QByteArray FIByte;
@@ -378,12 +386,12 @@ void MDataMngDesktop::createPdf()
 
     QPrinter printer(QPrinter::HighResolution);
     printer.setOutputFormat(QPrinter::PdfFormat);
-    printer.setOutputFileName(nomePDF);
+    printer.setOutputFileName(m_nomeRefertoPdf);
     textDoc.print(&printer);
 
     QString toEdit = m_reportEdit->getSafeChild("HTM")->getSafeAttribute(ATT_VALUE);
     if (toEdit == "false") {
-        QUrl urlFile = QUrl::fromLocalFile(nomePDF);   //con pdf, lo apre in explorer
+        QUrl urlFile = QUrl::fromLocalFile(m_nomeRefertoPdf);   //con pdf, lo apre in explorer
         QDesktopServices::openUrl(urlFile);
     }
 
