@@ -102,7 +102,7 @@ TRANSLATIONS += acqtool.xlf \
                     CPP/TCP \
                     ../MPD78096_AnaUro \
                     ../M8078027_MGlobal \
-                    ../MPF78003-Picoflow2R3Supe \
+                    ../MPF78003_Picoflow2R3Supe \
                     ../MPD78098_DataFileManager \
                     ../SupeFlowBT
 
