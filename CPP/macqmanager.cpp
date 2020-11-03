@@ -1000,7 +1000,8 @@ void MAcqManager::checkAutomaticStartStop(QString __which)
             Ancestry *childVal = condition->getSafeChild(XML_VALUE);
 
             //per prima cosa controlliamo la durata minima
-            int min = childDur->getSafeChild(ATT_MIN)->getSafeAttribute(ATT_VALUE).toUInt();
+            double mind = childDur->getSafeChild(ATT_MIN)->getSafeAttribute(ATT_VALUE).toDouble();
+            int min = round(mind);
 
             qreal valMin = childVal->getSafeChild(ATT_MIN)->getSafeAttribute(ATT_VALUE).toDouble();
             qreal valMax = childVal->getSafeChild(ATT_MAX)->getSafeAttribute(ATT_VALUE).toDouble();
