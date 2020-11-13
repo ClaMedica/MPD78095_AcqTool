@@ -283,19 +283,27 @@ Rectangle {
             y:index*rootPlotStack.height/plotNumber
             height:rootPlotStack.height/plotNumber
             width:rootPlotStack.width
+            firstPlot: index === 0
             onCurrentObjectChanged:
             {
                 if(currentObject.length!==0) {
-                    curObj=currentObject
-                    if (currentObject.length === 3) //sto modificando un marker operativo, devo aggiornare la posizione negli altri plot
-                        for(var i=0;i<lista.count;i++){
-                            lista.itemAt(i).markerTochange=curObj
+                    if (currentObject.length === 2) {//sto selezionando un definitore, devo selezionare lo stesso negli altri plot
+                        for(var j=0;j<lista.count;j++){
+                            lista.itemAt(j).defToSelect=currentObject
                         }
+                    }
+                    else {
+                        curObj=currentObject
+                        if (currentObject.length === 3) //sto modificando un marker operativo, devo aggiornare la posizione negli altri plot
+                            for(var i=0;i<lista.count;i++){
+                                lista.itemAt(i).markerTochange=curObj
+                            }
 
-                    if (currentObject.length === 9) //sto modificando un definitore, devo aggiornare i limti del definitore relativi ai marker analitici
-                        for(i=0;i<lista.count;i++){
-                            lista.itemAt(i).newLimitiDef=curObj
-                        }
+                        if (currentObject.length === 9) //sto modificando un definitore, devo aggiornare i limti del definitore relativi ai marker analitici
+                            for(i=0;i<lista.count;i++){
+                                lista.itemAt(i).newLimitiDef=curObj
+                            }
+                    }
                 }
             }
 
@@ -304,7 +312,7 @@ Rectangle {
                     //console.log(timeMarker,currentTime)
                     timeMarker=currentTime
                     for(var i=0;i<lista.count;i++)
-                        if(i!=index){
+                        if(i!==index){
                             lista.itemAt(i).currentTime=timeMarker
                            //console.log(timeMarker,currentTime, i)
                         }

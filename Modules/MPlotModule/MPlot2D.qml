@@ -38,6 +38,8 @@ Rectangle {
     property var anMarkerChNames:[]
     // proprieta' che ha il deinitore di cui mi interessano i nuovi limiti per gestire gli spostamenti dei marker analitici
     property var newLimitiDef:[]
+    //selezione del definatore su altri plot
+    property var defToSelect:[]
 
     //markermanager
     property alias markerItems:mark.items
@@ -56,6 +58,8 @@ Rectangle {
 
     //Colormap
     property var colorMap:[]
+
+    property bool firstPlot: false
 
     id: rootPlot
     focus: false
@@ -133,6 +137,10 @@ Rectangle {
 
     onNewLimitiDefChanged: {
         mark.limDefChanged = newLimitiDef
+    }
+
+    onDefToSelectChanged: {
+        fra.toselect = defToSelect
     }
 
     PlotModel {
@@ -580,6 +588,7 @@ Rectangle {
             xMax:plotter.xMax
             yMin:plotter.yMin
             yMax:plotter.yMax
+            inFirstPlot: firstPlot
             onZoomThisChanged: {
                 zoomer.oldZoom = zoomThis
                 zoomer.setZoom(zoomThis)

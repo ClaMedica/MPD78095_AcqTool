@@ -21,12 +21,9 @@
         <file>zoom_out.jpg</file>
         <file>zoom_out_click.jpg</file>
         <file>zoom_out_off.jpg</file>
-        <file>cmDefFlo.jpg</file>
         <file>discard.png</file>
         <file>discard_click.png</file>
         <file>discard_off.png</file>
-        <file>cmDefFlo_click.jpg</file>
-        <file>cmDefFlo_off.jpg</file>
         <file>danger.png</file>
         <file>danger_click.png</file>
         <file>danger_off.png</file>
@@ -45,5 +42,8 @@
         <file>export.jpg</file>
         <file>export_click.jpg</file>
         <file>export_off.jpg</file>
+        <file>cmDefFlo.png</file>
+        <file>cmDefFlo_click.png</file>
+        <file>cmDefFlo_off.png</file>
     </qresource>
 </RCC>
