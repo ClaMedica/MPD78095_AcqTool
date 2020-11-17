@@ -1,4 +1,4 @@
-import QtQuick 2.2
+﻿import QtQuick 2.2
 import MPlotModule 1.0
 //da decommentare per debug con Test
 //import QuickRealTimeGraph 1.0
@@ -44,6 +44,8 @@ Rectangle {
 
     property real leftMargin:50
     property real rightMargin:50
+
+    property bool regolarStep: false
     //Proprietà dell'oggetto
     color:"transparent"
 
@@ -61,6 +63,7 @@ Rectangle {
         numberDecimalMin: axis.decimalsMin
         dateTimeFormatMaj: axis.dateTimeformatMaj
         dateTimeFormatMin: axis.dateTimeformatMin
+        regolarStep: axis.regolarStep
     }
     Rectangle{
         anchors.left: parent.left
@@ -72,7 +75,7 @@ Rectangle {
         Row{
             id:rowGrid
             visible: textMajVisible
-            x: leftMargin - ( axesEffectiveWidth()/(major-1)/2)
+            x: axis.regolarStep ? leftMargin - (axesEffectiveWidth()/(axis.max - axis.min)/2) : leftMargin - ( axesEffectiveWidth()/(major-1)/2)
             Repeater{
                 id: gridRepeater
                 model: axisLabels.gridLables
@@ -80,7 +83,7 @@ Rectangle {
                 {
                     id: rGrid
                     color:"transparent"
-                    width: axesEffectiveWidth()/(major-1)
+                    width: axis.regolarStep ? axesEffectiveWidth() / (axis.max - axis.min) : axesEffectiveWidth()/(major-1)
                     height:axis.height
                     Rectangle{
                         id:gridSpacer
@@ -98,8 +101,23 @@ Rectangle {
                         color: fontMajColor
                         font.pointSize: fontMajSize
                         opacity: opacityMaj
-
-                        text: modelData
+                        text: {
+                            if (axis.regolarStep) {
+                                var step = 10
+                                if (axisLabels.gridLables.length-1 > 60)
+                                    step = 15
+                                if (axisLabels.gridLables.length-1 > 120)
+                                    step = 60
+                                var v = Math.round(index/step)
+                                var mod = index-(v*step)
+                                if (mod === 0 || index === axisLabels.gridLables.length-1)
+                                    text = modelData
+                                else
+                                    text= ""
+                            }
+                            else
+                                text = modelData
+                        }
                     }
                 }
             }

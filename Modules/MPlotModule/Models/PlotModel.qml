@@ -109,6 +109,9 @@ ListModel {
     //time cursor
     property int enableTimeCursor:0
 
+    //step regolare
+    property bool regolarStep: true
+
     //Real Time
 
     property int serverPort // server port
@@ -199,6 +202,7 @@ ListModel {
         "rightMargin",
         "zoomSpeed",
         "enableTimeCursor",
+        "regolarStep",
         "serverPort",
         "serverAddress",
         "running",
@@ -302,6 +306,7 @@ ListModel {
         case "rightMargin":rightMargin=value;break;
         case "zoomSpeed":zoomSpeed=value;break;
         case "enableTimeCursor":enableTimeCursor=value;break;
+        case "regolarStep":regolarStep=value;break;
         case "serverPort":serverPort=value;break;
         case "serverAddress":serverAddress=value;break;
         case "running":running=value;break;

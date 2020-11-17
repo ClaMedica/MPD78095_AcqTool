@@ -62,6 +62,7 @@ Rectangle {
         dateTimeFormatMaj: axis.dateTimeformatMaj
         dateTimeFormatMin: axis.dateTimeformatMin
         invert: true
+        regolarStep: false
     }
 
     Rectangle{
