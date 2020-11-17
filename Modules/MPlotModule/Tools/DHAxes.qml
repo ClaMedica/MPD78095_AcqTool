@@ -107,6 +107,8 @@ Rectangle {
                                 if (axisLabels.gridLables.length-1 > 60)
                                     step = 15
                                 if (axisLabels.gridLables.length-1 > 120)
+                                    step = 30
+                                if (axisLabels.gridLables.length-1 > 300)
                                     step = 60
                                 var v = Math.round(index/step)
                                 var mod = index-(v*step)
