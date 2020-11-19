@@ -35,6 +35,8 @@ public:
     Q_INVOKABLE Nomogramma * getLiverpoolAve()  {return m_liverpoolAve;}
     Q_INVOKABLE Nomogramma * getSirokyMax()     {return m_sirokyMax;}
     Q_INVOKABLE Nomogramma * getSirokyAve()     {return m_sirokyAve;}
+    Q_INVOKABLE Nomogramma * getMiskolcMax()     {return m_miskolcMax;}
+    Q_INVOKABLE Nomogramma * getMiskolcAve()     {return m_miskolcAve;}
 
     float getWaitingTime()              {return m_waitingTime;}
     void setWaitingTime(float __val)    {m_waitingTime = __val;}
@@ -101,9 +103,12 @@ public:
     void addCQ(float __val)             {m_cQ += __val;}
 
     void buildTable();
-    void buildNomogrammi(bool __sex, int __age);
+    void buildNomogrammi(bool __sex, int __age, int __peso, int __altezza);
 
     void setAutoFlow(bool __auto)       {m_autoflow = __auto;}
+
+    int getLineMiskolcMax() { return m_miskolcLines;}
+    int getLineMiskolcAve() { return 2;}
 
 signals:
 
@@ -136,10 +141,16 @@ private:
     Nomogramma *m_liverpoolAve;
     Nomogramma *m_sirokyMax;
     Nomogramma *m_sirokyAve;
+    //pediatrico
+    Nomogramma *m_miskolcMax;
+    Nomogramma *m_miskolcAve;
 
     void SetLineaInterpolata(QVector <double> __yVal, int __max, int __step, int __nLinea);
     void ReadLiverpoolParameter(bool __flowMax, bool __sex, int __age);
     void ReadSirokyParameter(bool __flowAve);
+    QVector<QVector<double>> MiskolcLinesCostruct(QString __tipoQ, double __bodyS, bool __sex, int __len);
+    void MiskolcMaxInit();
+    void MiskolcAveInit();
 
     QVector<double> m_arrLineX1;
     QVector<double> m_arrLineY1;
@@ -156,6 +167,30 @@ private:
 
     QVector<double> m_arrAve;
     QVector<double> m_arrMax;
+
+    double m_miskolcLines;
+
+    //struttura necessaria per disegnare il nomogramma di Miskolc
+    //BS1 = Body Surface minore 0.92
+    //BS2 = Body surface tra 0.92 e 1.42
+    //BS3 = Body surface maggiore di 1.42
+    typedef struct {
+        double BS1_QmA; //Q massima valore A
+        double BS1_QaA; //Q media valore A
+        double BS1_QmB; //Q massima valore B
+        double BS1_QaB; //Q media valore B
+        double BS2_QmA;
+        double BS2_QaA;
+        double BS2_QmB;
+        double BS2_QaB;
+        double BS3_QmA;
+        double BS3_QaA;
+        double BS3_QmB;
+        double BS3_QaB;
+    } MiskolcStruct;
+
+    QVector<MiskolcStruct> m_sMiskolcBoy;
+    QVector<MiskolcStruct> m_sMiskolcGirl;
 
     bool m_autoflow;
 

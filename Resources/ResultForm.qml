@@ -344,8 +344,110 @@ MForm {
                     buttonSQA.labelSize= layout.value("F4")
                     buttonSQA.myText = nameNomo
                     buttonSQA.clicked.connect(clickButton)
-                    //btnLeftMargin += 110
+                    btnLeftMargin += buttonSQA.width + 5
                     pagesLocal.push(SQA)
+                }
+
+                //Miskolc QMax
+                nameNomo = mngData.getFlowDatas(1).getMiskolcMax().getTitle()
+                if (nameNomo !== "" )
+                {
+                    var MQM =  Qt.createQmlObject('import "qrc:/Components"; MNomogramma {}', rectdata)
+                    MQM.clip = true
+                    MQM.height = screenH*grafic.valueOf("Nomogrammi","height")
+                    MQM.width = screenW*grafic.valueOf("Nomogrammi","width")
+                    MQM.anchors.left = rectdata.left
+                    MQM.anchors.top = rectdata.top
+                    MQM.anchors.topMargin = 20
+                    MQM.anchors.leftMargin = 20
+                    MQM.xMin = mngData.getFlowDatas(i).getMiskolcMax().getXmin()
+                    MQM.xMax = mngData.getFlowDatas(i).getMiskolcMax().getXmax()
+                    MQM.yMin = mngData.getFlowDatas(i).getMiskolcMax().getYmin()
+                    MQM.yMax = mngData.getFlowDatas(i).getMiskolcMax().getYmax()
+                    MQM.nome = nameNomo
+                    MQM.xPoint = mngData.getFlowDatas(i).getMiskolcMax().getDatoX()
+                    MQM.yPoint = mngData.getFlowDatas(i).getMiskolcMax().getDatoY()
+
+                    if (MQM.xPoint > MQM.xMin && MQM.xPoint < MQM.xMax && MQM.yPoint > MQM.yMin && MQM.yPoint < MQM.yMax)
+                        MQM.isVis = true
+                    else
+                        MQM.isVis = false
+
+                    MQM.udmX =  mngData.getFlowDatas(i).getMiskolcMax().getUnitx()
+                    MQM.udmY =  mngData.getFlowDatas(i).getMiskolcMax().getUnity()
+                    MQM.tracksWidth = [2,2,2,2,2]
+                    MQM.traksToDraw =  mngData.getFlowDatas(i).getMiskolcMax().getTracce()
+                    MQM.tracksColors =  mngData.getFlowDatas(i).getMiskolcMax().getColors()
+                    MQM.drawTracks()
+
+                    MQM.visible = false
+                    MQM.saveImgNomogramma()
+
+                    //button
+                    var buttonMQM = Qt.createQmlObject('import "qrc:/Components"; MAnaButton {}', rectdata)
+                    buttonMQM.buttonId = pagesLocal.length
+                    buttonMQM.anchors.bottom = rectdata.bottom
+                    buttonMQM.anchors.left = rectdata.left
+                    buttonMQM.anchors.bottomMargin = rectf.height/9
+                    buttonMQM.anchors.leftMargin = btnLeftMargin
+                    buttonMQM.width = screenW*grafic.valueOf("Button","width")
+                    buttonMQM.height = screenH*grafic.valueOf("Button","height")
+                    buttonMQM.labelSize= layout.value("F4")
+                    buttonMQM.myText = nameNomo
+                    buttonMQM.clicked.connect(clickButton)
+                    btnLeftMargin += buttonMQM.width + 5
+                    pagesLocal.push(MQM)
+                }
+
+                //Miskolc QAve Sergio:non deve essere visibile
+                nameNomo = "";//mngData.getFlowDatas(1).getMiskolcAve().getTitle()
+                if (nameNomo !== "" )
+                {
+                    var MQA =  Qt.createQmlObject('import "qrc:/Components"; MNomogramma {}', rectdata)
+                    MQA.clip = true
+                    MQA.height = screenH*grafic.valueOf("Nomogrammi","height")
+                    MQA.width = screenW*grafic.valueOf("Nomogrammi","width")
+                    MQA.anchors.left = rectdata.left
+                    MQA.anchors.top = rectdata.top
+                    MQA.anchors.topMargin = 20
+                    MQA.anchors.leftMargin = 20
+                    MQA.xMin = mngData.getFlowDatas(i).getMiskolcAve().getXmin()
+                    MQA.xMax = mngData.getFlowDatas(i).getMiskolcAve().getXmax()
+                    MQA.yMin = mngData.getFlowDatas(i).getMiskolcAve().getYmin()
+                    MQA.yMax = mngData.getFlowDatas(i).getMiskolcAve().getYmax()
+                    MQA.nome = nameNomo
+                    MQA.xPoint = mngData.getFlowDatas(i).getMiskolcAve().getDatoX()
+                    MQA.yPoint = mngData.getFlowDatas(i).getMiskolcAve().getDatoY()
+
+                    if (MQA.xPoint > MQA.xMin && MQA.xPoint < MQA.xMax && MQA.yPoint > MQA.yMin && MQA.yPoint < MQA.yMax)
+                        MQA.isVis = true
+                    else
+                        MQA.isVis = false
+
+                    MQA.udmX =  mngData.getFlowDatas(i).getMiskolcAve().getUnitx()
+                    MQA.udmY =  mngData.getFlowDatas(i).getMiskolcAve().getUnity()
+                    MQA.tracksWidth = [2,2,2,2,2]
+                    MQA.traksToDraw =  mngData.getFlowDatas(i).getMiskolcAve().getTracce()
+                    MQA.tracksColors =  mngData.getFlowDatas(i).getMiskolcAve().getColors()
+                    MQA.drawTracks()
+
+                    MQA.visible = false
+                    MQA.saveImgNomogramma()
+
+                    //button
+                    var buttonMQA = Qt.createQmlObject('import "qrc:/Components"; MAnaButton {}', rectdata)
+                    buttonMQA.buttonId = pagesLocal.length
+                    buttonMQA.anchors.bottom = rectdata.bottom
+                    buttonMQA.anchors.left = rectdata.left
+                    buttonMQA.anchors.bottomMargin = rectf.height/9
+                    buttonMQA.anchors.leftMargin = btnLeftMargin
+                    buttonMQA.width = screenW*grafic.valueOf("Button","width")
+                    buttonMQA.height = screenH*grafic.valueOf("Button","height")
+                    buttonMQA.labelSize= layout.value("F4")
+                    buttonMQA.myText = nameNomo
+                    buttonMQA.clicked.connect(clickButton)
+                    btnLeftMargin += buttonMQA.width + 5
+                    pagesLocal.push(MQA)
                 }
             }
 

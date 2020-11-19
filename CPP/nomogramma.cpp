@@ -1,4 +1,4 @@
-#include "nomogramma.h"
+﻿#include "nomogramma.h"
 
 
 
@@ -6,6 +6,7 @@ Nomogramma::Nomogramma(QString __tipoAna, int __tipoNomograma)
 {
     m_tipoAna = __tipoAna;
     m_tipoNomogramma = __tipoNomograma;
+    m_bodySurf = 0;
 }
 
 Nomogramma::~Nomogramma()

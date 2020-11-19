@@ -5,6 +5,8 @@
 #include "mstorage.h"
 #include "modelmanager.h"
 #include "mflowdatas.h"
+#include "dbStatements.h"
+#include <mdatabase.h>
 
 typedef struct {
     float waiting_time;			// waiting time
@@ -156,6 +158,8 @@ protected:
     bool    m_landscape;    //modalità di stampa: portrait o landascape (ture se landscape)
     bool    m_sexPatient;   //true se donna, false se uomo
     int     m_etaPatient;
+    int     m_peso;
+    int     m_altezza;
     QString m_firstHead;    //primo header della stmpa personalizzabile
     QString m_secondHead;   //secondo header della stampa personalizzabile
     QString m_protocollo;
