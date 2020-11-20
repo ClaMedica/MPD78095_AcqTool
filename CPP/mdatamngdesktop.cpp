@@ -39,6 +39,8 @@ void MDataMngDesktop::saveImg(QQuickItem *__item, QString __nome)
             imgName = "GR204";
         else
             imgName = "GR205";
+    else if (__nome.startsWith("Pediat"))
+            imgName = "GR210";
 
     auto grabResult = __item->grabToImage();
     connect(grabResult.data(), &QQuickItemGrabResult::ready, [=]() {
