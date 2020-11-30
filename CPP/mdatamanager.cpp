@@ -155,7 +155,7 @@ void MDataManager::loadFile(QString __fileName)
         m_patientInfo.replace(";", " ");
 
         m_protocollo = m_mng->GetTestDescr();
-        m_protocollo = "Picoflow2R3"; //temporaneo finchè non si sitema il database sql con i protocolli giusti
+        //m_protocollo = "Picoflow2R3"; //temporaneo finchè non si sitema il database sql con i protocolli giusti
 
         QString dataNascita = m_mng->GetPatient().section(";",2,2);
         QDate datD = QDate::fromString(dataNascita,"dd/MM/yyyy");

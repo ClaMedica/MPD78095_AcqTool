@@ -19,7 +19,7 @@
             visible="false"
             pesoBeaker="70"
         />
-        <AutoStarts label="Auto Starts">
+        <AutoStarts label="Automatic Flow Start Time">
                 <Amplitude label="Amplitude">
                     <min
                         label="Minimum"
@@ -63,7 +63,7 @@
                     visible = "false"
                  />
         </AutoStarts>
-        <AutoStops label="Auto Stops">
+        <AutoStops label="Automatic Flow Stop Time">
                 <Value label="Value" visible = "false">
                     <min
                         label="Minimum"

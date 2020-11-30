@@ -10,7 +10,7 @@ Column {
     property var ancestry//si suppone che sia una classe ancestry altrimenti non funziona
     property string childName:"No name"
     property int itemHeight:40
-    property real labelSize:3
+    property real labelSize: PicoFlow ? 4 : 3
     property var father
 
     spacing: 21

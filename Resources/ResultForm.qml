@@ -94,7 +94,7 @@ MForm {
                 else
                     namePage = "Flow " + i.toString()
 
-                var btnLeftMargin = 20
+                var btnLeftMargin = 10
                 if (mngData.getNumAnaFlwAdv() !== 2)
                 {
                     var buttonfn = Qt.createQmlObject('import "qrc:/Components"; MAnaButton {}', rectf)
