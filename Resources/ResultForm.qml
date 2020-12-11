@@ -14,8 +14,8 @@ MForm {
     //@@@@@@@@@@    Properties      @@@@@@@@@@
     property var pagesLocal:[]
     property var pagesSameAna:[]
-
-
+    property var buttons:[]
+    property var rectf
     property int buttonTable:0
     id : resultForm
     anchors.fill: parent
@@ -29,6 +29,7 @@ MForm {
             for (var i=0; i<referti.length;i++)
                 comboReport.listReports.push(referti[i])
         }
+
     }
 
     //@@@@@@@@@@    Functions      @@@@@@@@@@
@@ -67,17 +68,13 @@ MForm {
         if (mngData.getNumAnaFlwAdv() > 0)
         {
             //pages for flowmetry
-            var rectf = Qt.createQmlObject('import QtQuick 2.5; Rectangle {}',this)
+            rectf = Qt.createQmlObject('import QtQuick 2.5; Rectangle {}',this)
             rectf.width = forAna.width
             rectf.height = forAna.height
             rectf.anchors.fill = parent
             rectf.color = "transparent"
             rectf.border.color = "blue"
             rectf.border.width = 2
-            //rectf.anchors.right = resultForm.right
-            //rectf.anchors.top = resultForm.top
-           // rectf.anchors.topMargin = 5
-            //rectf.anchors.rightMargin = resultForm.width/2 - rectf.width/2
 
             var namePage = ""
             var nameNomo = ""
@@ -94,7 +91,7 @@ MForm {
                 else
                     namePage = "Flow " + i.toString()
 
-                var btnLeftMargin = 20
+                var btnLeftMargin = 10
                 if (mngData.getNumAnaFlwAdv() !== 2)
                 {
                     var buttonfn = Qt.createQmlObject('import "qrc:/Components"; MAnaButton {}', rectf)
@@ -146,6 +143,7 @@ MForm {
                 resultForm.buttonTable = buttonT.buttonId
                 // btnLeftMargin += 110
                 pagesLocal.push(tablefn)
+                buttons.push(buttonT)
 
                 //nomogrammi flussimetria
                 //liverpool Qmax
@@ -194,6 +192,7 @@ MForm {
                 buttonLQM.clicked.connect(clickButton)
                 btnLeftMargin += buttonLQM.width + 5
                 pagesLocal.push(LQM)
+                buttons.push(buttonLQM)
 
                 //liverpool QAve
                 nameNomo = mngData.getFlowDatas(1).getLiverpoolAve().getTitle()
@@ -240,6 +239,7 @@ MForm {
                 buttonLQA.clicked.connect(clickButton)
                 btnLeftMargin += buttonLQA.width + 5
                 pagesLocal.push(LQA)
+                buttons.push(buttonLQA)
 
                 //siroky QMax
                 nameNomo = mngData.getFlowDatas(1).getSirokyMax().getTitle()
@@ -294,6 +294,7 @@ MForm {
                     buttonSQM.clicked.connect(clickButton)
                     btnLeftMargin += buttonSQM.width + 5
                     pagesLocal.push(SQM)
+                    buttons.push(buttonSQM)
 
                     //siroky QAve
                     nameNomo = mngData.getFlowDatas(i).getSirokyAve().getTitle()
@@ -346,6 +347,7 @@ MForm {
                     buttonSQA.clicked.connect(clickButton)
                     btnLeftMargin += buttonSQA.width + 5
                     pagesLocal.push(SQA)
+                    buttons.push(buttonSQA)
                 }
 
                 //Miskolc QMax
@@ -397,6 +399,7 @@ MForm {
                     buttonMQM.clicked.connect(clickButton)
                     btnLeftMargin += buttonMQM.width + 5
                     pagesLocal.push(MQM)
+                    buttons.push(buttonMQM)
                 }
 
                 //Miskolc QAve Sergio:non deve essere visibile
@@ -448,6 +451,7 @@ MForm {
                     buttonMQA.clicked.connect(clickButton)
                     btnLeftMargin += buttonMQA.width + 5
                     pagesLocal.push(MQA)
+                    buttons.push(buttonMQA)
                 }
             }
 
@@ -615,15 +619,16 @@ MForm {
 
     function exitFromResult()
     {
-        for (var i = 0; i < pagesLocal.length; i++) {
-            if (pagesLocal[i].visible) {
-                pagesLocal[i].visible = false;
-                pagesLocal[i].focus = false;
-            }
-        }
-        pagesLocal[0].visible = true;
-        pagesLocal[0].focus = true;
+        for (var i = 0; i < pagesLocal.length; i++)
+            pagesLocal[i].destroy();
+        pagesLocal = []
+        for (i = 0; i < buttons.length; i++)
+            buttons[i].destroy();
+        buttons = []
+        rectf.destroy()
+
         forAna.visible = true
+
         resultForm.visible = false
     }
 

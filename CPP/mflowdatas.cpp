@@ -451,7 +451,7 @@ void mflowdatas::buildNomogrammi(bool __sex, int __age, int __peso, int __altezz
         m_miskolcMax->setDatoX(getVoidedVolume());
         m_miskolcMax->setDatoY(getQMax());
 
-        QVector<QVector<double>> lineey = MiskolcLinesCostruct("MAX",bodySurf,__sex,m_miskolcMax->getXmax());
+        QVector<QVector<double> > lineey = MiskolcLinesCostruct("MAX",bodySurf,__sex,m_miskolcMax->getXmax());
         for (int i=0; i< lineey.length(); i++)
             for (int j=0; j<m_miskolcMax->getXmax(); j++)
                 m_miskolcMax->addToLiney(i,lineey[i][j]);
@@ -1445,9 +1445,9 @@ void mflowdatas::ReadSirokyParameter(bool __flowAve)
     }
 }
 
-QVector<QVector<double>> mflowdatas::MiskolcLinesCostruct(QString __tipoQ, double __bodyS, bool __sex, int __len)
+QVector<QVector<double> > mflowdatas::MiskolcLinesCostruct(QString __tipoQ, double __bodyS, bool __sex, int __len)
 {
-    QVector<QVector<double>> line;
+    QVector<QVector<double> > line;
     line.resize(m_miskolcLines);
 
     for (int j=0; j< m_miskolcLines; j++)

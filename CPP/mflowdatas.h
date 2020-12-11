@@ -148,7 +148,7 @@ private:
     void SetLineaInterpolata(QVector <double> __yVal, int __max, int __step, int __nLinea);
     void ReadLiverpoolParameter(bool __flowMax, bool __sex, int __age);
     void ReadSirokyParameter(bool __flowAve);
-    QVector<QVector<double>> MiskolcLinesCostruct(QString __tipoQ, double __bodyS, bool __sex, int __len);
+    QVector<QVector<double> > MiskolcLinesCostruct(QString __tipoQ, double __bodyS, bool __sex, int __len);
     void MiskolcMaxInit();
     void MiskolcAveInit();
 

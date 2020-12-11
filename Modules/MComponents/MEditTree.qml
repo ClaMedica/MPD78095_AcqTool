@@ -1,6 +1,5 @@
 ﻿import QtQuick 2.4
 import QtQuick.Controls 1.2
-import QtQuick.Controls 2.15
 import QtQuick.Dialogs 1.2
 import "qrc:/GeneralData.js" as DataEngine
 import Settings 1.0
@@ -37,6 +36,7 @@ Rectangle {
         anctree.destroyAncestry()
     }
 
+
     Flickable{
         id:flick
         anchors.fill:parent
@@ -49,14 +49,7 @@ Rectangle {
             labelSize: rootTree.labelSize
             itemHeight: rootTree.height/divH
         }
-
-        ScrollBar.vertical: ScrollBar {
-                parent: flickable.parent
-                anchors.top: flickable.top
-                anchors.left: flickable.right
-                anchors.bottom: flickable.bottom
-                width: flick.width*0.02
-            }
     }
+
 
 }
