@@ -7,6 +7,7 @@
 #include <QApplication>
 #include <QPrinter>
 #include <QTextDocument>
+#include <QProcess>
 
 extern bool DebugAcqTool;
 
@@ -393,8 +394,11 @@ void MDataMngDesktop::createPdf()
 
     QString toEdit = m_reportEdit->getSafeChild("HTM")->getSafeAttribute(ATT_VALUE);
     if (toEdit == "false") {
-        QUrl urlFile = QUrl::fromLocalFile(m_nomeRefertoPdf);   //con pdf, lo apre in explorer
-        QDesktopServices::openUrl(urlFile);
+        QUrl urlFile = QUrl::fromLocalFile(m_nomeRefertoPdf);
+        QProcess *viewer = new QProcess();
+        viewer->setProgram(g_P7SettingsManager.progPath()+"/PDFviewer.exe");
+        viewer->setArguments(QStringList() << urlFile.toString());
+        bool ret = viewer->startDetached();
     }
 
     FI.close();
