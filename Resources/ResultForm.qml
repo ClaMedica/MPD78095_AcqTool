@@ -377,7 +377,7 @@ MForm {
 
                     MQM.udmX =  mngData.getFlowDatas(i).getMiskolcMax().getUnitx()
                     MQM.udmY =  mngData.getFlowDatas(i).getMiskolcMax().getUnity()
-                    MQM.tracksWidth = [2,2,2,2,2]
+                    MQM.tracksWidth = [1,1,1,1,1]
                     MQM.traksToDraw =  mngData.getFlowDatas(i).getMiskolcMax().getTracce()
                     MQM.tracksColors =  mngData.getFlowDatas(i).getMiskolcMax().getColors()
                     MQM.drawTracks()

@@ -68,11 +68,14 @@ public:
     void setMode(unsigned char   __val)         {m_modal_e = __val;}
     void setPrintSiroky(bool __val)             {m_printSiroky = __val;}
     void setPrintLiverpool(bool __val)          {m_printLiverpool = __val;}
+    void setPrintMiskolc(bool __val)            {m_printMiskolc = __val;}
     void setPrintModeUser(bool __val)           {m_printModeUser = __val;}
     void setTipoEsame(unsigned char __val)      {m_test_type = __val;}
     void setVersione(QString __vers)            {m_versione = __vers;}
 
-    void Report_BitMap(bool __isSiro = false);
+    //void Report_BitMap(bool __isSiro = false);
+    void Report_BitMap(int __nomo); //0 = Siro; 1 = Liver; 2 = Misk
+
     void getGrabbedImage(QObject *__gi, QString __nome);
     void getImage(QImage __img, QString __nome);
     void setPrintHeaders(QString __first, QString __second)     {m_printFirstHeader = __first; m_printSecondHeader = __second;}
@@ -110,6 +113,7 @@ private:
     bool    m_printModeUser;
     bool    m_printSiroky;
     bool    m_printLiverpool;
+    bool    m_printMiskolc;
 
     QString m_printFirstHeader;
     QString m_printSecondHeader;
@@ -172,6 +176,7 @@ private:
     int        m_resultBm_w, m_resultBm_h;
     QByteArray m_bitmapSiroky;
     QByteArray m_bitmapLiverpool;
+    QByteArray m_bitmapMiskolc;
 
     void smooting_PRINT_flow();
     void pri_rep_review();

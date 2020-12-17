@@ -21,6 +21,7 @@ MDataManager::MDataManager(QObject *parent)
     m_autoFlow = 2;
     m_Siroky = false;
     m_Liverpool = false;
+    m_Miskolc = false;
     m_landscape = false;
 
     m_numAna = 0;
@@ -501,6 +502,9 @@ void MDataManager::loadFile(QString __fileName)
 
         Ancestry *liverpool = m_configPrinter.getSafeChild("Settings");
         m_Liverpool = (liverpool->getSafeChild("Liverpool")->getSafeAttribute(ATT_VALUE) == "true" ? true : false);
+
+        Ancestry *miskolc = m_configPrinter.getSafeChild("Settings");
+        m_Miskolc = (miskolc->getSafeChild("Miskolc")->getSafeAttribute(ATT_VALUE) == "true" ? true : false);
 
         Ancestry *printmode = m_configPrinter.getSafeChild("Settings");
         m_landscape = (printmode->getSafeChild("PrinterMode")->getSafeAttribute(ATT_VALUE) == "true" ? true : false);
@@ -1641,7 +1645,7 @@ bool MDataManager::InitArraysFLW(int __start,
                 signs[j]->setName(QString("linea %1").arg(j));
 
                 tracce<< "$Track"<<"family"<<signs[j]->getName()<<"name"<<"Signal"<<"Category"<<CAT_TRACK<<"descr"<<QString("linea%1").arg(j)<<"pointer"<<(qulonglong)signs[j]<<"&Track";
-                colori << "green";
+                colori << "black";
             }
 
             m_aflwdatas.at(i+1)->getMiskolcMax()->setColors(colori);

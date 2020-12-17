@@ -155,6 +155,7 @@ protected:
     bool    m_autoLoop;     //se modalita loop
     bool    m_Siroky;       //se stampare Siroky
     bool    m_Liverpool;    //se stampare Liverpool
+    bool    m_Miskolc;    //se stampare Miskolc - Pediatrico
     bool    m_landscape;    //modalità di stampa: portrait o landascape (ture se landscape)
     bool    m_sexPatient;   //true se donna, false se uomo
     int     m_etaPatient;
