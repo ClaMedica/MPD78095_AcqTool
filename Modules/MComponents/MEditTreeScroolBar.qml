@@ -8,6 +8,7 @@ import "qrc:/"
 import "qrc:/Forms"
 import MComponents 1.0
 
+//Uguale a MEditTree ma con la scroolbar
 Rectangle {
     id: rootTree
     property real labelSize: 4
