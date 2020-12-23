@@ -926,7 +926,7 @@ void printermanager::Report_result()
     txstrList.append(tr("Descent time ................")); txstrList.append(QString::asprintf(" : %5.1f s"         , m_tem_dis));
     txstrList.append(tr("Voiding time ................")); txstrList.append(QString::asprintf(" : %5.1f s"         , m_tem_svu));
     txstrList.append(tr("Volume to maximum flow ......")); txstrList.append(QString::asprintf(" : %5.1f ml"        , m_vol_max));
-    txstrList.append(tr("Voided Volume ...............")); txstrList.append(QString::asprintf(" : %5.1f ml"        , (double) m_vol_vuo));
+    txstrList.append(tr("Voided Volume ...............")); txstrList.append(QString::asprintf(" : %5.0f ml"        , (double) m_vol_vuo));
     txstrList.append(tr("Corrected maximum flow ......")); txstrList.append(QString::asprintf(" : %5.1f ml^(1/2)/s", m_cQ     ));
     txstrList.append(tr("Flow acceleration ...........")); txstrList.append(QString::asprintf(" : %5.1f ml/s^2"    , m_flu_acc));    //?=2 apice
     txstrList.append(tr("Maximum contraction speed ...")); txstrList.append(QString::asprintf(" : %5.1f mm/s"      , m_vDetMax));

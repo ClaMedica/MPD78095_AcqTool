@@ -85,7 +85,7 @@ void mflowdatas::buildTable()
     m_datasInfo->setData(count+8,"value",QString::number((float)(qRound(getVolAtQqmax()*10))/10, 'f', 1));
 
     m_datasInfo->setData(count+9,"descr",tr(" Voided volume (ml)"));
-    m_datasInfo->setData(count+9,"value",QString::number(getVoidedVolume(), 'f', 1));
+    m_datasInfo->setData(count+9,"value",QString::number(getVoidedVolume(), 'f', 0));
 
     m_datasInfo->setData(count+10,"descr",tr(" Corrected maximum flow (ml^(1/2)/s)"));
     m_datasInfo->setData(count+10,"value",QString::number((float)(qRound(getCQ()*10))/10, 'f', 1));
