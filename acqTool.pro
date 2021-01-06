@@ -140,6 +140,12 @@ TRANSLATIONS += acqtool.xlf \
                     ../MPD78098_DataFileManager \
                     ../SupeFlowBT
 
+DISTFILES += \
+    ../M8078027_MGlobal/MComponents/* \
+    ../M8078027_MGlobal/MComponents/Images/*
+
+
+
 contains(ANDROID_TARGET_ARCH,armeabi-v7a) {
     DEFINES += ANDROID
     QT += androidextras
@@ -162,6 +168,9 @@ win32 {
     SOURCES += CPP/mdatamngdesktop.cpp \
 
     HEADERS += CPP/mdatamngdesktop.h \
+
+# Additional import path used to resolve QML modules in Qt Creator's code model
+QML_IMPORT_PATH = ../M8078027_MGlobal \
 
     INCLUDEPATH +=  ../MPD78099_MedicalReport
 
@@ -208,10 +217,6 @@ LINUXDESKTOP {
     QML_IMPORT_PATH = ../MGlobal
     QML_IMPORT_PATH +=  Modules
 
-    DISTFILES += ../M8078027_MGlobal/MComponents/* \
-                 ../M8078027_MGlobal/MComponents/Images/* \
-
-
 }
 
 CLAUDIA {
@@ -232,10 +237,8 @@ CLAUDIA {
     DEPENDPATH  +=   /sviluppo/qt/Piattaforma70/Build-IMX6/DatafileManager
 
     # Additional import path used to resolve QML modules in Qt Creator's code model
-    QML_IMPORT_PATH = ../MGlobal \
+    QML_IMPORT_PATH = ../M8078027_MGlobal \
                       /sviluppo/qt/Piattaforma70/Build-IMX6/CommonPlugin
-    DISTFILES += ../M8078027_MGlobal/MComponents/* \
-                 ../M8078027_MGlobal/MComponents/Images/*
 
     DEFINES += nullptr=NULL
 
@@ -262,10 +265,9 @@ PICOFLOW {
     DEPENDPATH  +=   $$PWD/../Build-IMX6/DatafileManager
 
     # Additional import path used to resolve QML modules in Qt Creator's code model
-    QML_IMPORT_PATH = ../MGlobal \
+    QML_IMPORT_PATH = ../M8078027_MGlobal \
                       ../Build-IMX6/CommonPlugin
-    DISTFILES += ../M8078027_MGlobal/MComponents/* \
-                 ../M8078027_MGlobal/MComponents/Images/*
+
 
     DEFINES += nullptr=NULL
 
