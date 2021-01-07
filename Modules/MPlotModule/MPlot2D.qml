@@ -486,7 +486,7 @@ Rectangle {
 
             numXlines:   modP.regolarStep ? 0 : modP.xGridLines
             numYlines:   modP.yGridLines
-            numXlinesSub:0//modP.xSubGridLines
+            numXlinesSub:modP.regolarStep ? 0 : modP.xSubGridLines
             numYlinesSub:modP.ySubGridLines
 
         }

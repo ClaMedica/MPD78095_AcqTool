@@ -16,9 +16,9 @@ ListModel {
     property real gridLineWidth: 1
     property color subGridLineColor: "grey"
     property real subGridLineWidth: 1
-    property real xGridLines: 5
+    property real xGridLines: 7
     property real yGridLines: 3
-    property real xSubGridLines: 2
+    property real xSubGridLines: 0
     property real ySubGridLines: 2
 
     property real xNotchLenght: 5

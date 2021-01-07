@@ -112,7 +112,7 @@ Rectangle {
                                     step = 60
                                 var v = Math.round(index/step)
                                 var mod = index-(v*step)
-                                if (mod === 0 || index === axisLabels.gridLables.length-1)
+                                if (mod === 0)
                                     text = modelData
                                 else
                                     text= ""
