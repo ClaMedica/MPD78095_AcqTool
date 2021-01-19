@@ -65,19 +65,17 @@ Rectangle{
 
     Timer{
         id: timIncDec
-        property int val: 1
         property bool dir: true
-        function startInc() { dir = true;  val = 1; start() }
-        function startDec() { dir = false; val = 1; start() }
-        interval: 100
+        function startInc() { dir = true; start() }
+        function startDec() { dir = false; start() }
+        interval: 200
         repeat: true
         onTriggered:
         {
             if(dir)
-                changeValue(value + step * Math.log(val))
+                changeValue(value + step)
             else
-                changeValue(value - step * Math.log(val))
-            val++
+                changeValue(value - step)
         }
     }
 
