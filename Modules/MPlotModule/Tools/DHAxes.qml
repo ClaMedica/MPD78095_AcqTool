@@ -51,6 +51,22 @@ Rectangle {
 
     function numNotches() { return axis.major+axis.minor*(axis.major-1)}
     function axesEffectiveWidth(){return axis.width-leftMargin-rightMargin}
+    function step()
+    {
+        var step = 10;
+        if (axis.regolarStep)
+        {
+            var numGridLanes = Math.round(axis.max - axis.min);
+
+            if (numGridLanes > 60) //sopra il  minuto
+                step = 15;
+            if (numGridLanes > 120)
+                step = 30;
+            if (numGridLanes > 300)
+                step = 60;
+        }
+        return step
+    }
 
     AxisSettings{
         id: axisLabels
@@ -75,7 +91,7 @@ Rectangle {
         Row{
             id:rowGrid
             visible: textMajVisible
-            x: axis.regolarStep ? leftMargin - (axesEffectiveWidth()/(axis.max - axis.min)/2) : leftMargin - ( axesEffectiveWidth()/(major-1)/2)
+            x: axis.regolarStep ? leftMargin - (axesEffectiveWidth()/((axis.max - axis.min)/step())/2) : leftMargin - ( axesEffectiveWidth()/(major-1)/2)
             Repeater{
                 id: gridRepeater
                 model: axisLabels.gridLables
@@ -83,7 +99,7 @@ Rectangle {
                 {
                     id: rGrid
                     color:"transparent"
-                    width: axis.regolarStep ? axesEffectiveWidth() / (axis.max - axis.min) : axesEffectiveWidth()/(major-1)
+                    width: axis.regolarStep ? axesEffectiveWidth() / ((axis.max - axis.min)/step()) : axesEffectiveWidth()/(major-1)
                     height:axis.height
                     Rectangle{
                         id:gridSpacer
@@ -101,25 +117,7 @@ Rectangle {
                         color: fontMajColor
                         font.pointSize: fontMajSize
                         opacity: opacityMaj
-                        text: {
-                            if (axis.regolarStep) {
-                                var step = 10
-                                if (axisLabels.gridLables.length-1 > 60)
-                                    step = 15
-                                if (axisLabels.gridLables.length-1 > 120)
-                                    step = 30
-                                if (axisLabels.gridLables.length-1 > 300)
-                                    step = 60
-                                var v = Math.round(index/step)
-                                var mod = index-(v*step)
-                                if (mod === 0)
-                                    text = modelData
-                                else
-                                    text= ""
-                            }
-                            else
-                                text = modelData
-                        }
+                        text: modelData
                     }
                 }
             }
