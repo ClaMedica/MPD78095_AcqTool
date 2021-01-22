@@ -31,7 +31,7 @@ Rectangle {
     property var polygonXpoints: [0]
     property int numPunti: 0
     property var bandeColore: ["lightgreen", "peachpuff"]
-    property int numBande: 1
+    property int numBande: 0
 
     property int labelSize: layout.value("F4")-1//grafic.valueOf("Nomogrammi","labelSize")
     property int dimPoint: grafic.valueOf("Nomogrammi","dimPoint")

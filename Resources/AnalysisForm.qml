@@ -372,6 +372,7 @@ MForm{
                 }
                 if (value === MDataManager.RISULTATI.toString()) {
                     forAna.visible = false
+                    forRes.loadPageAnalysis()
                     forRes.visible = true
                 }
             }
