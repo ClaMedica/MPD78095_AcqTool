@@ -1,5 +1,5 @@
 TEMPLATE = app
-VERSION = 1.1.6
+VERSION = 2.0.0
 
 QT += qml quick widgets sql network multimedia xml core serialport gui
 
@@ -182,14 +182,21 @@ QML_IMPORT_PATH = ../M8078027_MGlobal \
     plugin.files += $$shell_path($$OUT_PWD)\release\acqTool.exe
     INSTALLS += plugin
 
+    QT += printsupport
+}
+
+DINAMICO {
     win32:CONFIG(release, debug|release): LIBS += -L$$PWD/../Build/DatafileManager/release/ -lDatafileManager
     else:win32:CONFIG(debug, debug|release): LIBS += -L$$PWD/../Build/DatafileManager/debug/ -lDatafileManager
     win32:CONFIG(release, debug|release): LIBS += -L$$PWD/../Build/MedicalReport/release/ -lMedicalReport
     else:win32:CONFIG(debug, debug|release): LIBS += -L$$PWD/../Build/MedicalReport/debug/ -lMedicalReport
+}
 
-    QT += printsupport
-
-
+STATICO {
+    LIBS += -L$$PWD/../BuildStatic/DatafileManager/release/ -lDatafileManager
+    LIBS += -L$$PWD/../BuildStatic/Medicalreport/release/ -lMedicalReport
+    LIBS += -L$$PWD/../BuildStatic/QmlPlotter/release/ -lQmlPlotter
+    DEFINES += STATICO
 }
 
 unix {

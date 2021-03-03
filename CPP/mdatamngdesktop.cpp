@@ -271,6 +271,18 @@ void MDataMngDesktop::openReport(QString __nomeReport)
     if (__nomeReport == "")
         __nomeReport = "Standard";
 
+#ifdef STATICO
+    QString nomeR = __nomeReport+".htm";
+    MedicalReport m;
+    int res = m.CreaMedicalReport(g_P7SettingsManager.dataPath().toLatin1(),g_P7SettingsManager.appPath().toLatin1(),m_copyFileName.toLatin1(), 4,nomeR.toLatin1(),g_P7SettingsManager.localization());
+    if (res != 0)
+    {
+        QErrorMessage errorMessage;
+        errorMessage.showMessage(tr("problems in the report writing"));
+        errorMessage.exec();
+        return;
+    }
+#else
     QLibrary reportLib("MedicalReport.dll");
     if (reportLib.load())
     {
@@ -290,6 +302,7 @@ void MDataMngDesktop::openReport(QString __nomeReport)
             return;
         }
     }
+#endif
 
     m_nomeReferto = g_P7SettingsManager.dataPath() + "\\ref\\" +  "rf" + QString("%1").arg(m_testNumber,5,10,QLatin1Char('0')) + "1a" + ".htm";
 
@@ -397,7 +410,7 @@ void MDataMngDesktop::createPdf()
         QUrl urlFile = QUrl::fromLocalFile(m_nomeRefertoPdf);
         QProcess *viewer = new QProcess();
         viewer->setProgram(g_P7SettingsManager.progPath()+"/PDFviewer.exe");
-        viewer->setArguments(QStringList() << urlFile.toString());
+        viewer->setArguments(QStringList() << urlFile.toString() << g_P7SettingsManager.localization());
         bool ret = viewer->startDetached();
     }
 
