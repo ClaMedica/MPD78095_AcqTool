@@ -11,18 +11,31 @@ class SimpleTCPClient : public QObject
 
 public:
     explicit SimpleTCPClient(QHostAddress __address = QHostAddress::LocalHost, int __currentPort = 2000, QObject *__pParent = 0);
+#ifdef STATICO
     inline ~SimpleTCPClient();
+#else
+    ~SimpleTCPClient();
+#endif
 
     QHostAddress hostAddress(){return m_hostAddress;}
     int hostPort(){return m_hostPort;}
-
+#ifdef STATICO
     inline void sendData(char* msg, quint32 len);
     inline bool setHostAddress(QHostAddress __address);
     inline bool setHostPort(int __port);
     inline bool connectToHost();
     inline bool connectToHost(QHostAddress __address, int __port);
-    bool waitForConnected(int __timeout = 30000){return m_channelTcpSocket->waitForConnected(__timeout);}
     inline bool disconnectToHost();
+#else
+    void sendData(char* msg, quint32 len);
+    bool setHostAddress(QHostAddress __address);
+    bool setHostPort(int __port);
+    bool connectToHost();
+    bool connectToHost(QHostAddress __address, int __port);
+    bool disconnectToHost();
+#endif
+
+    bool waitForConnected(int __timeout = 30000){return m_channelTcpSocket->waitForConnected(__timeout);}
     bool waitForDisconnected(int __timeout = 30000){return m_channelTcpSocket->waitForDisconnected(__timeout);}
 
     QTcpSocket::SocketState getSocketState(){return m_channelTcpSocket->state();}
@@ -40,10 +53,17 @@ signals:
 public slots:
 
 protected slots:
+#ifdef STATICO
     void onDataReady();
     void onTcpError(QAbstractSocket::SocketError);
     void onConnectedToHost();
     void onDisconnectedFromHost();
+#else
+    virtual void onDataReady();
+    virtual void onTcpError(QAbstractSocket::SocketError);
+    virtual void onConnectedToHost();
+    virtual void onDisconnectedFromHost();
+#endif
 
 protected:
     //single socket of interest
