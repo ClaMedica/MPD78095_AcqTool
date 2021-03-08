@@ -193,6 +193,7 @@ DINAMICO {
 }
 
 STATICO {
+    RESOURCES += modules_picoflow.qrc
     LIBS += -L$$PWD/../BuildStatic/DatafileManager/release/ -lDatafileManager
     LIBS += -L$$PWD/../BuildStatic/Medicalreport/release/ -lMedicalReport
     LIBS += -L$$PWD/../BuildStatic/QmlPlotter/release/ -lQmlPlotter
