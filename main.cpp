@@ -91,11 +91,15 @@ int main(int argc, char *argv[])
     g_P7SettingsManager.loadSettings(true);
     //localizzazione
     QString local = g_P7SettingsManager.localization();
-    qDebug()<<"Language to load: "<<g_P7SettingsManager.appPath() + "/acqtool_" + local;
+    QString pathTranslations = g_P7SettingsManager.appPath();
+#ifdef STATICO
+    pathTranslations += "/translations";
+#endif
+    qDebug()<<"Language to load: "<< pathTranslations + "/acqtool_" + local;
     QTranslator translator;
-    qDebug() << translator.load(g_P7SettingsManager.appPath() + "/acqtool_" + local);
+    qDebug() << translator.load(pathTranslations + "/acqtool_" + local);
     QTranslator translatorPlotter;
-    translatorPlotter.load(g_P7SettingsManager.appPath() + "/QmlPlotter_" + local);
+    translatorPlotter.load(pathTranslations + "/QmlPlotter_" + local);
     app.installTranslator(&translatorPlotter);
     app.installTranslator(&translator);
     //versione
