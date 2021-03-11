@@ -974,7 +974,6 @@ bool MDataManager::saveDataAndUpdate(QString __family, QString __name, VarMapVec
             if(!m_data[__family].contains(__name))
                 m_data[__family].append(__name);
         updateAvailableData();
-        setToSave("");  //necessario chiedere se salvare
         return true;
     }
     else
@@ -1063,6 +1062,7 @@ qDebug() << "INIZIO";
         return;
 
     saveChanges();
+    setToSave("");  //necessario chiedere se salvare
 
     m_mng = new DatafileManager;
     m_mng->SetFileName(m_copyFileName);

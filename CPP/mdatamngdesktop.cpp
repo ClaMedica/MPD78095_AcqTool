@@ -92,6 +92,7 @@ void MDataMngDesktop::addOpMarker(QVariant __key,QVariant __posX)
     mrkAnVec->append(mrk);
     QString family = "Markers";
     QString name = "Operative";
+    setToSave("");
     saveDataAndUpdate(family, name, mrkAnVec,APPEND);
 
     updateInfoList();
@@ -169,6 +170,7 @@ void MDataMngDesktop::addAnMarker(QVariant __key, QVariant __posX, QVariantList 
                         if(!mrkAnVec->isEmpty()) {
                             QString family = "Markers";
                             QString name = "Analitical";
+                            setToSave("");
                             saveDataAndUpdate(family, name, mrkAnVec,APPEND);
                         }
 
@@ -232,6 +234,7 @@ void MDataMngDesktop::addDefiner(QVariant __key, QVector<double> __pos)
 
     VarMapVec *defVec = new VarMapVec;
     defVec->append(def);
+    setToSave("");
     saveDataAndUpdate(family, name, defVec,APPEND);
 
     updateInfoList();
