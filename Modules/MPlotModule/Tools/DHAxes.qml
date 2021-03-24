@@ -1,4 +1,4 @@
-import QtQuick 2.2
+﻿import QtQuick 2.2
 import MPlotModule 1.0
 //da decommentare per debug con Test
 //import QuickRealTimeGraph 1.0
@@ -44,11 +44,29 @@ Rectangle {
 
     property real leftMargin:50
     property real rightMargin:50
+
+    property bool regolarStep: false
     //Proprietà dell'oggetto
     color:"transparent"
 
     function numNotches() { return axis.major+axis.minor*(axis.major-1)}
     function axesEffectiveWidth(){return axis.width-leftMargin-rightMargin}
+    function step()
+    {
+        var step = 10;
+        if (axis.regolarStep)
+        {
+            var numGridLanes = Math.round(axis.max - axis.min);
+
+            if (numGridLanes > 60) //sopra il  minuto
+                step = 15;
+            if (numGridLanes > 120)
+                step = 30;
+            if (numGridLanes > 300)
+                step = 60;
+        }
+        return step
+    }
 
     AxisSettings{
         id: axisLabels
@@ -61,6 +79,7 @@ Rectangle {
         numberDecimalMin: axis.decimalsMin
         dateTimeFormatMaj: axis.dateTimeformatMaj
         dateTimeFormatMin: axis.dateTimeformatMin
+        regolarStep: axis.regolarStep
     }
     Rectangle{
         anchors.left: parent.left
@@ -72,7 +91,7 @@ Rectangle {
         Row{
             id:rowGrid
             visible: textMajVisible
-            x: leftMargin - ( axesEffectiveWidth()/(major-1)/2)
+            x: axis.regolarStep ? leftMargin - (axesEffectiveWidth()/((axis.max - axis.min)/step())/2) : leftMargin - ( axesEffectiveWidth()/(major-1)/2)
             Repeater{
                 id: gridRepeater
                 model: axisLabels.gridLables
@@ -80,7 +99,7 @@ Rectangle {
                 {
                     id: rGrid
                     color:"transparent"
-                    width: axesEffectiveWidth()/(major-1)
+                    width: axis.regolarStep ? axesEffectiveWidth() / ((axis.max - axis.min)/step()) : axesEffectiveWidth()/(major-1)
                     height:axis.height
                     Rectangle{
                         id:gridSpacer
@@ -98,7 +117,6 @@ Rectangle {
                         color: fontMajColor
                         font.pointSize: fontMajSize
                         opacity: opacityMaj
-
                         text: modelData
                     }
                 }

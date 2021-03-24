@@ -7,7 +7,6 @@ import QtQuick.Layouts 1.1
 TextField {
     id: rootLabel
     property real labelSize: 8
-    property string safeText: ""
     property bool onlyNumber: false
 
     IntValidator { id: intval  }
@@ -20,12 +19,6 @@ TextField {
             rootLabel.validator = regexp
     }
 
-    onTextChanged: {
-        if(acceptableInput)
-            safeText = text
-        else
-            text = safeText
-    }
     text: ""
     font.family:
     {

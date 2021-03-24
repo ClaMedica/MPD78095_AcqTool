@@ -1,4 +1,4 @@
-#include "mflowdatas.h"
+﻿#include "mflowdatas.h"
 #include <QtMath>
 
 mflowdatas::mflowdatas(QObject *parent) : QObject(parent)
@@ -20,6 +20,10 @@ mflowdatas::mflowdatas(QObject *parent) : QObject(parent)
     m_vDetMax = DUMMYVALUE;
     m_cQ = DUMMYVALUE;
 
+    m_miskolcLines = 5;
+    m_sMiskolcGirl.resize(m_miskolcLines);
+    m_sMiskolcBoy.resize(m_miskolcLines);
+
     m_datasInfo = new mflowdatasModel();
 
     m_liverpoolMax = new Nomogramma("flowmetry",G_LIVERPOOL_MAX);
@@ -31,6 +35,11 @@ mflowdatas::mflowdatas(QObject *parent) : QObject(parent)
     m_sirokyMax->setParent(this);
     m_sirokyAve = new Nomogramma("flowmetry",G_SIROKY_AVE);
     m_sirokyAve->setParent(this);
+
+    m_miskolcMax = new Nomogramma("flowmetry",G_MISKOLC_MAX);
+    m_miskolcMax->setParent(this);
+    m_miskolcAve = new Nomogramma("flowmetry",G_MISKOLC_AVE);
+    m_miskolcAve->setParent(this);
 
     m_autoflow = false;
 }
@@ -76,7 +85,7 @@ void mflowdatas::buildTable()
     m_datasInfo->setData(count+8,"value",QString::number((float)(qRound(getVolAtQqmax()*10))/10, 'f', 1));
 
     m_datasInfo->setData(count+9,"descr",tr(" Voided volume (ml)"));
-    m_datasInfo->setData(count+9,"value",QString::number(getVoidedVolume(), 'f', 1));
+    m_datasInfo->setData(count+9,"value",QString::number(getVoidedVolume(), 'f', 0));
 
     m_datasInfo->setData(count+10,"descr",tr(" Corrected maximum flow (ml^(1/2)/s)"));
     m_datasInfo->setData(count+10,"value",QString::number((float)(qRound(getCQ()*10))/10, 'f', 1));
@@ -92,7 +101,7 @@ void mflowdatas::buildTable()
 
 }
 
-void mflowdatas::buildNomogrammi(bool __sex, int __age)
+void mflowdatas::buildNomogrammi(bool __sex, int __age, int __peso, int __altezza)
 {
     if (__age == -1){
         qDebug()<<"Error: età paziente non valida";
@@ -424,6 +433,51 @@ void mflowdatas::buildNomogrammi(bool __sex, int __age)
                 }
             }
         }
+    }
+
+    if (__age < 18 && __age > 3 && __peso > 0 && __altezza > 0)
+    {
+        //Miskolc Max
+        double bodySurf = qSqrt(__altezza*__peso/3600);
+        this->MiskolcMaxInit();
+        m_miskolcMax->setTitle(tr("Pediatric (Q Max)"));
+        m_miskolcMax->setUnitx("Vol. (ml)");
+        m_miskolcMax->setUnity("Q (ml/sec)");
+        m_miskolcMax->setBodySurf(bodySurf);
+        m_miskolcMax->setXmin(0);
+        m_miskolcMax->setYmin(0);
+        m_miskolcMax->setXmax(bodySurf < 0.92 ? 300 : 600);
+        m_miskolcMax->setYmax(bodySurf < 0.92 ? 30 : 60);
+        m_miskolcMax->setDatoX(getVoidedVolume());
+        m_miskolcMax->setDatoY(getQMax());
+
+        QVector<QVector<double> > lineey = MiskolcLinesCostruct("MAX",bodySurf,__sex,m_miskolcMax->getXmax());
+        for (int i=0; i< lineey.length(); i++)
+            for (int j=0; j<m_miskolcMax->getXmax(); j++)
+                m_miskolcMax->addToLiney(i,lineey[i][j]);
+
+        //Miskolc Ave
+        this->MiskolcAveInit();
+        m_miskolcAve->setTitle(tr("Pediatric (Q Ave)"));
+        m_miskolcAve->setUnitx("Vol. (ml)");
+        m_miskolcAve->setUnity("Q (ml/sec)");
+        m_miskolcAve->setBodySurf(bodySurf);
+        m_miskolcAve->setXmin(0);
+        m_miskolcAve->setYmin(0);
+        m_miskolcAve->setXmax(bodySurf < 0.92 ? 300 : 600);
+        m_miskolcAve->setYmax(bodySurf < 0.92 ? 30 : 60);
+        m_miskolcAve->setDatoX(getVoidedVolume());
+        m_miskolcAve->setDatoY(getQAve());
+
+        lineey = MiskolcLinesCostruct("AVE",bodySurf,__sex,m_miskolcAve->getXmax());
+        for (int i=0; i< lineey.length(); i++)
+            for (int j=0; j<m_miskolcAve->getXmax(); j++)
+            {
+                if (i == 0)
+                    m_miskolcAve->addToLiney(0,lineey[i][j]);
+                if (i == 4)
+                    m_miskolcAve->addToLiney(1,lineey[i][j]);
+            }
     }
 }
 
@@ -1389,5 +1443,185 @@ void mflowdatas::ReadSirokyParameter(bool __flowAve)
         m_arrMax.append(23.1);
         m_arrMax.append(29.4);
     }
+}
+
+QVector<QVector<double> > mflowdatas::MiskolcLinesCostruct(QString __tipoQ, double __bodyS, bool __sex, int __len)
+{
+    QVector<QVector<double> > line;
+    line.resize(m_miskolcLines);
+
+    for (int j=0; j< m_miskolcLines; j++)
+    {
+        line[j].resize(__len);
+        for (int i=0; i< __len; i++)
+        {
+            if (__tipoQ == "MAX")
+            {
+                if (__sex)
+                {
+                    if (__bodyS < 0.92)
+                        line[j][i] = m_sMiskolcGirl[j].BS1_QmA * qLn(i + 1) + m_sMiskolcGirl[j].BS1_QmB;
+                    else if (__bodyS < 1.42)
+                        line[j][i] = m_sMiskolcGirl[j].BS2_QmA * qLn(i + 1) + m_sMiskolcGirl[j].BS2_QmB;
+                    else
+                        line[j][i] = m_sMiskolcGirl[j].BS3_QmA * qLn(i + 1) + m_sMiskolcGirl[j].BS3_QmB;
+                }
+                else
+                {
+                    if (__bodyS < 0.92)
+                        line[j][i] = m_sMiskolcBoy[j].BS1_QmA * qLn(i + 1) + m_sMiskolcBoy[j].BS1_QmB;
+                    else if (__bodyS < 1.42)
+                        line[j][i] = m_sMiskolcBoy[j].BS2_QmA * qLn(i + 1) + m_sMiskolcBoy[j].BS2_QmB;
+                    else
+                        line[j][i] = m_sMiskolcBoy[j].BS3_QmA * qLn(i + 1) + m_sMiskolcBoy[j].BS3_QmB;
+                }
+            }
+            //__tipoQ = "AVE"
+            else if (__tipoQ == "AVE")
+            {
+                if (j == 0 || j == 4)
+                {
+                    if (__sex)
+                    {
+                        if (__bodyS < 0.92)
+                            line[j][i] = m_sMiskolcGirl[j].BS1_QaA * qLn(i + 1) + m_sMiskolcGirl[j].BS1_QaB;
+                        else if (__bodyS < 1.42)
+                            line[j][i] = m_sMiskolcGirl[j].BS2_QaA * qLn(i + 1) + m_sMiskolcGirl[j].BS2_QaB;
+                        else
+                            line[j][i] = m_sMiskolcGirl[j].BS3_QaA * qLn(i + 1) + m_sMiskolcGirl[j].BS3_QaB;
+                    }
+                    else
+                    {
+                        if (__bodyS < 0.92)
+                            line[j][i] = m_sMiskolcBoy[j].BS1_QaA * qLn(i + 1) + m_sMiskolcBoy[j].BS1_QaB;
+                        else if (__bodyS < 1.42)
+                            line[j][i] = m_sMiskolcBoy[j].BS2_QaA * qLn(i + 1) + m_sMiskolcBoy[j].BS2_QaB;
+                        else
+                            line[j][i] = m_sMiskolcBoy[j].BS3_QaA * qLn(i + 1) + m_sMiskolcBoy[j].BS3_QaB;
+                    }
+                }
+                else
+                {
+                    line[j][i] = 0;//linee da non disegnare
+                }
+            }
+        }
+    }
+
+
+    return line;
+}
+
+void mflowdatas::MiskolcMaxInit()
+{
+    //5%
+    m_sMiskolcBoy[0].BS1_QmA = 5.7244;
+    m_sMiskolcBoy[0].BS1_QmB = -13.6033;
+    m_sMiskolcBoy[0].BS2_QmA = 5.244;
+    m_sMiskolcBoy[0].BS2_QmB = -14.1997;
+    m_sMiskolcBoy[0].BS3_QmA = 5.415;
+    m_sMiskolcBoy[0].BS3_QmB = -16.1122;
+
+    m_sMiskolcGirl[0].BS1_QmA = 3.822;
+    m_sMiskolcGirl[0].BS1_QmB = -7.1682;
+    m_sMiskolcGirl[0].BS2_QmA = 6.508;
+    m_sMiskolcGirl[0].BS2_QmB = -16.4075;
+    m_sMiskolcGirl[0].BS3_QmA = 6.2849;
+    m_sMiskolcGirl[0].BS3_QmB = -17.9921;
+
+    //25%
+    m_sMiskolcBoy[1].BS1_QmA = 5.06278;
+    m_sMiskolcBoy[1].BS1_QmB = -7.9901;
+    m_sMiskolcBoy[1].BS2_QmA = 4.41159;
+    m_sMiskolcBoy[1].BS2_QmB = -6.31788;
+    m_sMiskolcBoy[1].BS3_QmA = 6.60207;
+    m_sMiskolcBoy[1].BS3_QmB = -16.90806;
+
+    m_sMiskolcGirl[1].BS1_QmA = 3.7984;
+    m_sMiskolcGirl[1].BS1_QmB = -5.0478;
+    m_sMiskolcGirl[1].BS2_QmA = 7.3074;
+    m_sMiskolcGirl[1].BS2_QmB = -16.1037;
+    m_sMiskolcGirl[1].BS3_QmA = 7.79356;
+    m_sMiskolcGirl[1].BS3_QmB = -18.1362;
+
+    //50%
+    m_sMiskolcBoy[2].BS1_QmA = 5.1693;
+    m_sMiskolcBoy[2].BS1_QmB = -6.2696;
+    m_sMiskolcBoy[2].BS2_QmA = 4.23436;
+    m_sMiskolcBoy[2].BS2_QmB = -1.62346;
+    m_sMiskolcBoy[2].BS3_QmA = 8.64433;
+    m_sMiskolcBoy[2].BS3_QmB = -20.7577;
+
+    m_sMiskolcGirl[2].BS1_QmA = 3.92649;
+    m_sMiskolcGirl[2].BS1_QmB = -2.80226;
+    m_sMiskolcGirl[2].BS2_QmA = 6.9362;
+    m_sMiskolcGirl[2].BS2_QmB = -9.67738;
+    m_sMiskolcGirl[2].BS3_QmA = 9.7873;
+    m_sMiskolcGirl[2].BS3_QmB = -22.11156;
+
+    //75%
+    m_sMiskolcBoy[3].BS1_QmA = 4.90249;
+    m_sMiskolcBoy[3].BS1_QmB = -1.9973;
+    m_sMiskolcBoy[3].BS2_QmA = 4.9685;
+    m_sMiskolcBoy[3].BS2_QmB = -1.27401;
+    m_sMiskolcBoy[3].BS3_QmA = 8.7533;
+    m_sMiskolcBoy[3].BS3_QmB = -14.63767;
+
+    m_sMiskolcGirl[3].BS1_QmA = 3.99411;
+    m_sMiskolcGirl[3].BS1_QmB = -0.28633;
+    m_sMiskolcGirl[3].BS2_QmA = 6.9631;
+    m_sMiskolcGirl[3].BS2_QmB = -6.06274;
+    m_sMiskolcGirl[3].BS3_QmA = 10.16645;
+    m_sMiskolcGirl[3].BS3_QmB = -16.01321;
+
+    //95%
+    m_sMiskolcBoy[4].BS1_QmA = 3.8131;
+    m_sMiskolcBoy[4].BS1_QmB = 6.5131;
+    m_sMiskolcBoy[4].BS2_QmA = 4.9923;
+    m_sMiskolcBoy[4].BS2_QmB = 3.456;
+    m_sMiskolcBoy[4].BS3_QmA = 8.5447;
+    m_sMiskolcBoy[4].BS3_QmB = -7.4559;
+
+    m_sMiskolcGirl[4].BS1_QmA = 5.0358;
+    m_sMiskolcGirl[4].BS1_QmB = 0.1052;
+    m_sMiskolcGirl[4].BS2_QmA = 6.8139;
+    m_sMiskolcGirl[4].BS2_QmB = -1.4532;
+    m_sMiskolcGirl[4].BS3_QmA = 9.9828;
+    m_sMiskolcGirl[4].BS3_QmB = -8.6552;
+
+}
+
+void mflowdatas::MiskolcAveInit()
+{
+
+    //5%
+    m_sMiskolcBoy[0].BS1_QaA = 3.401;
+    m_sMiskolcBoy[0].BS1_QaB = -7.4933;
+    m_sMiskolcBoy[0].BS2_QaA = 3.1713;
+    m_sMiskolcBoy[0].BS2_QaB = -8.5399;
+    m_sMiskolcBoy[0].BS3_QaA = 4.3957;
+    m_sMiskolcBoy[0].BS3_QaB = -14.526;
+
+    m_sMiskolcGirl[0].BS1_QaA = 3.0786;
+    m_sMiskolcGirl[0].BS1_QaB = -7.7868;
+    m_sMiskolcGirl[0].BS2_QaA = 3.2481;
+    m_sMiskolcGirl[0].BS2_QaB = -8.734;
+    m_sMiskolcGirl[0].BS3_QaA = 4.7596;
+    m_sMiskolcGirl[0].BS3_QaB = 15.7719;
+
+    //95%
+    m_sMiskolcBoy[4].BS1_QaA = 4.9999;
+    m_sMiskolcBoy[4].BS1_QaB = -7.8369;
+    m_sMiskolcBoy[4].BS2_QaA = 4.08;
+    m_sMiskolcBoy[4].BS2_QaB = -2.6337;
+    m_sMiskolcBoy[4].BS3_QaA = 6.881;
+    m_sMiskolcBoy[4].BS3_QaB = -11.03;
+
+    m_sMiskolcGirl[4].BS1_QaA = 4.1957;
+    m_sMiskolcGirl[4].BS1_QaB = -3.8714;
+    m_sMiskolcGirl[4].BS2_QaA = 5.9935;
+    m_sMiskolcGirl[4].BS2_QaB = -8.2586;
+    m_sMiskolcGirl[4].BS3_QaA = 7.5517;
+    m_sMiskolcGirl[4].BS3_QaB = -12.297;
 }
 

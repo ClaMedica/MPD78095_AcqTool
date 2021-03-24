@@ -1,6 +1,6 @@
 <Configuration label="Configuration">
     <Versione
-        label="1.0"
+        label="2"
         visible="false"
     />
     <AutomaticFlow label="Automatic Flow">
@@ -19,7 +19,7 @@
             visible="false"
             pesoBeaker="70"
         />
-        <AutoStarts label="Auto Starts">
+        <AutoStarts label="Automatic Flow Start Time">
                 <Amplitude label="Amplitude">
                     <min
                         label="Minimum"
@@ -63,7 +63,7 @@
                     visible = "false"
                  />
         </AutoStarts>
-        <AutoStops label="Auto Stops">
+        <AutoStops label="Automatic Flow Stop Time">
                 <Value label="Value" visible = "false">
                     <min
                         label="Minimum"
@@ -87,7 +87,7 @@
                         dt="real"
                         unit="sec"
                         value="20"
-                        model="95#5#5#0#"
+                        model="95#5#1#0#"
                     />
                </Duration>
                <chanType

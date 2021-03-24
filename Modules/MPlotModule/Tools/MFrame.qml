@@ -14,8 +14,10 @@ Rectangle{
     property real yMax:modF.yMax
     property real whoAmI:modF.whoAmI
     property var zoomMe
+    property var iconVisible
     signal modifyMe
     signal deleteMe
+    signal selectMe(var desc,var sel)
 
     id:rootFrame
     color:"transparent"
@@ -28,6 +30,15 @@ Rectangle{
     border.color: modF.color
     clip:true
 
+    function selectFrame(data)
+    {
+        if (!PicoFlow && modF.descr === data[0] ){
+            if (data[1] === true)
+                sfondo.opacity=1
+            else
+                sfondo.opacity=0
+        }
+    }
 
     Rectangle{
         id:sizeRecH
@@ -86,31 +97,30 @@ Rectangle{
         radius:10
         Behavior on opacity {NumberAnimation { duration: 300 }}
 
-        Text{
-            id:testoDef
+        Image {
+            id: iconDef
             anchors.top: parent.top
-            anchors.horizontalCenter: parent.horizontalCenter
-            text:modF.descr
-            color:"white"
-            horizontalAlignment: Text.AlignHCenter
-            verticalAlignment: Text.AlignVCenter
-            font.pixelSize: screenH * 0.015
-
+            anchors.left: parent.left
+            source: "qrc:/cmDefFlo.png"
+            width: screenH * 0.025
+            height: screenH * 0.025
+            visible: iconVisible
             MouseArea{
-                anchors.fill:testoDef
+                anchors.fill:iconDef
                 acceptedButtons: Qt.RightButton
                 onPressed: {
-                     if (!isTouch && mouse.button === Qt.RightButton)
-                     {
-                         clicright.y = testoDef.y
-                         clicright.x = testoDef.x
-                         clicright.visible = true
-                         delTim.start()
-                     }
+                    if (!isTouch && mouse.button === Qt.RightButton)
+                    {
+                        clicright.y = iconDef.y
+                        clicright.x = iconDef.x
+                        clicright.visible = true
+                        delTim.start()
+                    }
                 }
                 preventStealing: true
             }
         }
+
         clip:true
     }
 
@@ -138,11 +148,19 @@ Rectangle{
 
         onEntered: {
             rootFrame.focus=true
-            if (!PicoFlow) sfondo.opacity=1
+            if (!PicoFlow)
+            {
+                sfondo.opacity=1
+                rootFrame.selectMe(modF.descr,true)
+            }
         }
         onExited: {
             rootFrame.focus=false
-            sfondo.opacity=0
+            if (!PicoFlow)
+            {
+                sfondo.opacity=0
+                rootFrame.selectMe(modF.descr,false)
+            }
         }
 
         onDoubleClicked: {

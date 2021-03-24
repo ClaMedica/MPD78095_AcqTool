@@ -938,10 +938,14 @@ void MAcqManager::checkAutomaticStartStop(QString __which)
             Ancestry *childAmp = condition->getSafeChild(XML_AMPLITUDE);
 
             //per prima cosa controlliamo quanti campioni
-            int      minSec = childDur->getSafeChild(ATT_MIN)->getSafeAttribute(ATT_VALUE).toUInt();
+            double minSecd = childDur->getSafeChild(ATT_MIN)->getSafeAttribute(ATT_VALUE).toDouble();
+            int minSec = round(minSecd);
+
             //le ampiezze sono ml/s
-            qreal ampMin = childAmp->getSafeChild(ATT_MIN)->getSafeAttribute(ATT_VALUE).toInt();
-            qreal ampMax = childAmp->getSafeChild(ATT_MAX)->getSafeAttribute(ATT_VALUE).toInt();
+            double ampMind = childAmp->getSafeChild(ATT_MIN)->getSafeAttribute(ATT_VALUE).toDouble();
+            double ampMaxd = childAmp->getSafeChild(ATT_MAX)->getSafeAttribute(ATT_VALUE).toDouble();
+            int ampMin = round(ampMind);
+            int ampMax = round(ampMaxd);
             ampMax = ampMax*minSec;
 
             //campioni
@@ -1000,7 +1004,8 @@ void MAcqManager::checkAutomaticStartStop(QString __which)
             Ancestry *childVal = condition->getSafeChild(XML_VALUE);
 
             //per prima cosa controlliamo la durata minima
-            int min = childDur->getSafeChild(ATT_MIN)->getSafeAttribute(ATT_VALUE).toUInt();
+            double mind = childDur->getSafeChild(ATT_MIN)->getSafeAttribute(ATT_VALUE).toDouble();
+            int min = round(mind);
 
             qreal valMin = childVal->getSafeChild(ATT_MIN)->getSafeAttribute(ATT_VALUE).toDouble();
             qreal valMax = childVal->getSafeChild(ATT_MAX)->getSafeAttribute(ATT_VALUE).toDouble();

@@ -1,5 +1,5 @@
 TEMPLATE = app
-VERSION = 1.1.3
+VERSION = 2.0.0
 
 QT += qml quick widgets sql network multimedia xml core serialport gui
 
@@ -46,6 +46,7 @@ TRANSLATIONS += acqtool.xlf \
         CPP/TCP/SimpleTCPClient.cpp \
         CPP/TCP/TcpServers.cpp \
         CPP/TCP/TcpSettingFile.cpp \
+        CPP/graficmanager.cpp \
         ../M8078027_MGlobal/ancestry.cpp \
         ../M8078027_MGlobal/appbridge.cpp \
         ../M8078027_MGlobal/global.cpp \
@@ -60,7 +61,22 @@ TRANSLATIONS += acqtool.xlf \
         ../MPD78096_AnaUro/anautils.cpp \
         ../M8078027_MGlobal/fileio.cpp \
         ../M8078027_MGlobal/udpmsgs.cpp \
-        CPP/graficmanager.cpp
+        ../MPD78097_Database/mdatabase.cpp \
+        ../MPD78097_Database/msqlabstract.cpp \
+        ../MPD78097_Database/msqlanalysistypes.cpp \
+        ../MPD78097_Database/msqlarrangana.cpp \
+        ../MPD78097_Database/msqlarrangements.cpp \
+        ../MPD78097_Database/msqlboards.cpp \
+        ../MPD78097_Database/msqlcategories.cpp \
+        ../MPD78097_Database/msqlcomments.cpp \
+        ../MPD78097_Database/msqldiagnosiscodes.cpp \
+        ../MPD78097_Database/msqlpatientdiagnosiscodes.cpp \
+        ../MPD78097_Database/msqlpatients.cpp \
+        ../MPD78097_Database/msqlpatientsubcategory.cpp \
+        ../MPD78097_Database/msqlresults.cpp \
+        ../MPD78097_Database/msqlroutinearrangement.cpp \
+        ../MPD78097_Database/msqlsubcategories.cpp \
+        ../MPD78097_Database/msqltests.cpp
 
     HEADERS += \
         CPP/alarmmanager.h \
@@ -96,55 +112,53 @@ TRANSLATIONS += acqtool.xlf \
         ../M8078027_MGlobal/UdmImpl.h \
         ../M8078027_MGlobal/udpmsgs.h \
         ../M8078027_MGlobal/fileio.h \
+        ../MPD78097_Database/dbStatements.h \
+        ../MPD78097_Database/mdatabase.h \
+        ../MPD78097_Database/msqlabstract.h \
+        ../MPD78097_Database/msqlanalysistypes.h \
+        ../MPD78097_Database/msqlarrangana.h \
+        ../MPD78097_Database/msqlarrangements.h \
+        ../MPD78097_Database/msqlboards.h \
+        ../MPD78097_Database/msqlcategories.h \
+        ../MPD78097_Database/msqlcomments.h \
+        ../MPD78097_Database/msqldiagnosiscodes.h \
+        ../MPD78097_Database/msqlpatientdiagnosiscodes.h \
+        ../MPD78097_Database/msqlpatients.h \
+        ../MPD78097_Database/msqlpatientsubcategory.h \
+        ../MPD78097_Database/msqlresults.h \
+        ../MPD78097_Database/msqlroutinearrangement.h \
+        ../MPD78097_Database/msqlsubcategories.h \
+        ../MPD78097_Database/msqltests.h
 
 
     INCLUDEPATH +=  CPP \
                     CPP/TCP \
                     ../MPD78096_AnaUro \
                     ../M8078027_MGlobal \
+                    ../MPD78097_Database \
                     ../MPF78003_Picoflow2R3Supe \
                     ../MPD78098_DataFileManager \
                     ../SupeFlowBT
 
-#contains(ANDROID_TARGET_ARCH,armeabi-v7a) {
-#    DEFINES += ANDROID
-#    QT += androidextras
-#        ANDROID_EXTRA_LIBS = \
-#            $$PWD/../Build/Emulator/DataBuild/libDatafileManager.so \
-#            $$PWD/../Build/Emulator/MPlotModule/libQmlPlotter.so
-
-#    ANDROID_PACKAGE_SOURCE_DIR = $$PWD/android-sources
-
-#    unix:!macx: LIBS += -L$$PWD/../../build/DatafileManager/Debug/Desktop_Qt_5_5_1_GCC_64bit -lDatafileManager
-
-#    #INCLUDEPATH += $$PWD/../Build/Emulator/DataBuild
-#    #DEPENDPATH += $$PWD/../Build/Emulator/DataBuild
-#}
+DISTFILES += \
+    ../M8078027_MGlobal/MComponents/* \
+    ../M8078027_MGlobal/MComponents/Images/*
 
 
-macx {
-    DEFINES += MAC
-    TARGET = acqTool
 
-    SOURCES += CPP/mdatamngdesktop.cpp
-    HEADERS += CPP/mdatamngdesktop.h
+contains(ANDROID_TARGET_ARCH,armeabi-v7a) {
+    DEFINES += ANDROID
+    QT += androidextras
+        ANDROID_EXTRA_LIBS = \
+            $$PWD/../Build/Emulator/DataBuild/libDatafileManager.so \
+            $$PWD/../Build/Emulator/MPlotModule/libQmlPlotter.so
 
-    INCLUDEPATH +=  ../MPD78099_MedicalReport
-    INCLUDEPATH +=  ../M8078027_MGlobal
+    ANDROID_PACKAGE_SOURCE_DIR = $$PWD/android-sources
 
-#    rootPath = E:\Piattaforma70
-#    plugin.path = $${rootPath}\build\standalone
-#    plugin.files += $$shell_path($$OUT_PWD)\release\acqTool.exe
-#    INSTALLS += plugin
+    unix:!macx: LIBS += -L$$PWD/../../build/DatafileManager/Debug/Desktop_Qt_5_5_1_GCC_64bit -lDatafileManager
 
-    CONFIG(release, debug|release): LIBS += -L$$PWD/../Build/Release/DatafileManager/ -lDatafileManager
-    CONFIG(debug, debug|release): LIBS += -L$$PWD/../Build/Debug/DatafileManager/ -lDatafileManager
-    CONFIG(release, debug|release): LIBS += -L$$PWD/../Build/Release/MedicalReport/ -lMedicalReport
-    CONFIG(debug, debug|release): LIBS += -L$$PWD/../Build/Debug/MedicalReport/ -lMedicalReport
-
-
-CONFIG+=sdk_no_version_check
-    QT += printsupport
+    #INCLUDEPATH += $$PWD/../Build/Emulator/DataBuild
+    #DEPENDPATH += $$PWD/../Build/Emulator/DataBuild
 }
 
 win32 {
@@ -154,6 +168,9 @@ win32 {
     SOURCES += CPP/mdatamngdesktop.cpp \
 
     HEADERS += CPP/mdatamngdesktop.h \
+
+# Additional import path used to resolve QML modules in Qt Creator's code model
+QML_IMPORT_PATH = ../M8078027_MGlobal \
 
     INCLUDEPATH +=  ../MPD78099_MedicalReport
 
@@ -165,14 +182,22 @@ win32 {
     plugin.files += $$shell_path($$OUT_PWD)\release\acqTool.exe
     INSTALLS += plugin
 
+    QT += printsupport
+}
+
+DINAMICO {
     win32:CONFIG(release, debug|release): LIBS += -L$$PWD/../Build/DatafileManager/release/ -lDatafileManager
     else:win32:CONFIG(debug, debug|release): LIBS += -L$$PWD/../Build/DatafileManager/debug/ -lDatafileManager
     win32:CONFIG(release, debug|release): LIBS += -L$$PWD/../Build/MedicalReport/release/ -lMedicalReport
     else:win32:CONFIG(debug, debug|release): LIBS += -L$$PWD/../Build/MedicalReport/debug/ -lMedicalReport
+}
 
-    QT += printsupport
-
-
+STATICO {
+    RESOURCES += modules_picoflow.qrc
+    LIBS += -L$$PWD/../BuildStatic/DatafileManager/release/ -lDatafileManager
+    LIBS += -L$$PWD/../BuildStatic/Medicalreport/release/ -lMedicalReport
+    LIBS += -L$$PWD/../BuildStatic/QmlPlotter/release/ -lQmlPlotter
+    DEFINES += STATICO
 }
 
 unix {
@@ -200,10 +225,6 @@ LINUXDESKTOP {
     QML_IMPORT_PATH = ../MGlobal
     QML_IMPORT_PATH +=  Modules
 
-    DISTFILES += ../M8078027_MGlobal/MComponents/* \
-                 ../M8078027_MGlobal/MComponents/Images/* \
-
-
 }
 
 CLAUDIA {
@@ -224,10 +245,8 @@ CLAUDIA {
     DEPENDPATH  +=   /sviluppo/qt/Piattaforma70/Build-IMX6/DatafileManager
 
     # Additional import path used to resolve QML modules in Qt Creator's code model
-    QML_IMPORT_PATH = ../MGlobal \
+    QML_IMPORT_PATH = ../M8078027_MGlobal \
                       /sviluppo/qt/Piattaforma70/Build-IMX6/CommonPlugin
-    DISTFILES += ../M8078027_MGlobal/MComponents/* \
-                 ../M8078027_MGlobal/MComponents/Images/*
 
     DEFINES += nullptr=NULL
 
@@ -254,10 +273,9 @@ PICOFLOW {
     DEPENDPATH  +=   $$PWD/../Build-IMX6/DatafileManager
 
     # Additional import path used to resolve QML modules in Qt Creator's code model
-    QML_IMPORT_PATH = ../MGlobal \
+    QML_IMPORT_PATH = ../M8078027_MGlobal \
                       ../Build-IMX6/CommonPlugin
-    DISTFILES += ../M8078027_MGlobal/MComponents/* \
-                 ../M8078027_MGlobal/MComponents/Images/*
+
 
     DEFINES += nullptr=NULL
 

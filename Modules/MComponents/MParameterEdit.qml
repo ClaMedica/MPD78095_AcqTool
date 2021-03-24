@@ -23,6 +23,7 @@ Rectangle {
     property int comboNumMaxEle:5
     property string containerBorderColor: "transparent"
     property bool virtualKeyOpen: false
+    property int maxText: 255
     readonly property int currentIndex:type===typComboBox && component!=undefined?component.currentIndex:-1
     readonly property string typTextField:"TextField"
     readonly property string typComboBox: "ComboBox"
@@ -276,6 +277,9 @@ Rectangle {
 
             if (type === typDateEdit || type === typComboBox)
                 c.clicked.connect(cliccato)
+
+            if(type === typTextField)
+                c.maximumLength = maxText
 
             component=c
             created=true

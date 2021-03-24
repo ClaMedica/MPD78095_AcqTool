@@ -50,6 +50,10 @@ int main(int argc, char *argv[])
     bool bool_true  = true;  (void) bool_true;
 
     Q_INIT_RESOURCE(qml);
+#ifdef STATICO
+    Q_IMPORT_PLUGIN(QmlPlotterPlugin)
+    Q_INIT_RESOURCE(qmlplotter);
+#endif
 
     QGuiApplication app(argc, argv);
 
@@ -87,11 +91,15 @@ int main(int argc, char *argv[])
     g_P7SettingsManager.loadSettings(true);
     //localizzazione
     QString local = g_P7SettingsManager.localization();
-    qDebug()<<"Language to load: "<<g_P7SettingsManager.appPath() + "/acqtool_" + local;
+    QString pathTranslations = g_P7SettingsManager.appPath();
+#ifdef STATICO
+    pathTranslations += "/translations";
+#endif
+    qDebug()<<"Language to load: "<< pathTranslations + "/acqtool_" + local;
     QTranslator translator;
-    qDebug() << translator.load(g_P7SettingsManager.appPath() + "/acqtool_" + local);
+    qDebug() << translator.load(pathTranslations + "/acqtool_" + local);
     QTranslator translatorPlotter;
-    translatorPlotter.load(g_P7SettingsManager.appPath() + "/QmlPlotter_" + local);
+    translatorPlotter.load(pathTranslations + "/QmlPlotter_" + local);
     app.installTranslator(&translatorPlotter);
     app.installTranslator(&translator);
     //versione
@@ -119,9 +127,9 @@ int main(int argc, char *argv[])
  //   qmlRegisterType<MDataManager>("Managers", 1, 0, "MDataManager");
     qmlRegisterType<fileIO>("FileIO", 1, 0, "FileIO");
 
-    qmlRegisterUncreatableType<mflowdatas>("Managers", 1, 0, "mflowdata", "error on anaFlwAdv creation");
-    qmlRegisterUncreatableType<mflowdatasModel>("Managers", 1, 0, "mflowdatamodel", "error on anaFlwAdv creation");
-    qmlRegisterUncreatableType<Nomogramma>("Managers", 1, 0, "nomogramma", "error on Nomogramma creation");
+    qmlRegisterUncreatableType<mflowdatas>("Managers", 1, 0, "Mflowdata", "error on anaFlwAdv creation");
+    qmlRegisterUncreatableType<mflowdatasModel>("Managers", 1, 0, "Mflowdatamodel", "error on anaFlwAdv creation");
+    qmlRegisterUncreatableType<Nomogramma>("Managers", 1, 0, "Nomogramma", "error on Nomogramma creation");
 
     QQmlApplicationEngine engine;
 
@@ -129,12 +137,11 @@ int main(int argc, char *argv[])
     LayoutManager mngLayout;
     GraficManager mngGrafic;
 
-    engine.addImportPath("qrc:/Modules/");
-    //engine.addImportPath("../standalone");
+    engine.addImportPath("qrc:/Modules");
+    engine.addImportPath("qrc:/");
+#ifndef STATICO
     engine.addImportPath(QApplication::applicationDirPath());
-
-    if(DebugAcqTool)
-        engine.addImportPath(QApplication::applicationDirPath() + "/Modules");
+#endif
 
 #ifdef PICOFLOW//metto questo altrimenti su target non carica il plugin cpp
     engine.rootContext()->setContextProperty(QLatin1String("platform"), "linux");
@@ -142,7 +149,6 @@ int main(int argc, char *argv[])
     engine.rootContext()->setContextProperty("screenW", 640);
     engine.rootContext()->setContextProperty("isTouch", bool_true);
     engine.rootContext()->setContextProperty("PicoFlow", bool_true);
-    //engine.addPluginPath("../PicoFlow");
 #endif
 
 #ifdef ANDROID
@@ -168,6 +174,10 @@ int main(int argc, char *argv[])
     engine.rootContext()->setContextProperty("screenH", size.height());
     engine.rootContext()->setContextProperty("screenW", size.width());
     engine.rootContext()->setContextProperty("PicoFlow", bool_false);
+#ifndef STATICO
+    if(DebugAcqTool)
+        engine.addImportPath(QApplication::applicationDirPath() + "/Modules");
+#endif
 #endif
 
     engine.rootContext()->setContextProperty("layout", &mngLayout);

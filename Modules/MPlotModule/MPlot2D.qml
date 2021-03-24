@@ -38,6 +38,8 @@ Rectangle {
     property var anMarkerChNames:[]
     // proprieta' che ha il deinitore di cui mi interessano i nuovi limiti per gestire gli spostamenti dei marker analitici
     property var newLimitiDef:[]
+    //selezione del definatore su altri plot
+    property var defToSelect:[]
 
     //markermanager
     property alias markerItems:mark.items
@@ -56,6 +58,8 @@ Rectangle {
 
     //Colormap
     property var colorMap:[]
+
+    property bool firstPlot: false
 
     id: rootPlot
     focus: false
@@ -133,6 +137,10 @@ Rectangle {
 
     onNewLimitiDefChanged: {
         mark.limDefChanged = newLimitiDef
+    }
+
+    onDefToSelectChanged: {
+        fra.toselect = defToSelect
     }
 
     PlotModel {
@@ -220,16 +228,16 @@ Rectangle {
         MLegend {
             id:legend
             anchors.fill: parent
+        }
 
-            MouseArea{
-                id: mousePlot
-                anchors.fill: legend
-                acceptedButtons: Qt.LeftButton
-                enabled: !PicoFlow
-                propagateComposedEvents: true
-                onClicked: {
-                    toCopyPlot = [parent.width]
-                }
+        MouseArea{
+            id: mousePlot
+            anchors.fill: rRightMargin
+            acceptedButtons: Qt.LeftButton
+            enabled: !PicoFlow
+            propagateComposedEvents: true
+            onClicked: {
+                toCopyPlot = [parent.width]
             }
         }
     }
@@ -336,6 +344,7 @@ Rectangle {
         textUOMDist:                 modP.yATextUOMDist
         opacityUOM:                  modP.yAOpacityUOM
         unitOfMeasureRotation:       modP.yAUOMRotation
+
     }
 
     PlotGrid2D { //Y AXIS NOTECHES
@@ -372,10 +381,10 @@ Rectangle {
         id: xAxisLabels
         color:"transparent"
         anchors.bottom: rootPlot.bottom
-        anchors.top: xAxisNotches.bottom
+        anchors.top: rCenter.bottom
         anchors.right: parent.right
         anchors.left: parent.left
-        major:modP.xGridLines
+        major: modP.regolarStep ? plotter.xMax : modP.xGridLines
         minor:modP.xSubGridLines
         max: plotter.xMax
         min: plotter.xMin
@@ -400,7 +409,7 @@ Rectangle {
         fontMinColor:      modP.xALMinFontColor
         fontMinSize:       modP.xALMinFontSize
         textMinDist:       modP.xALMinTextDist
-        textMinVisible:    modP.xALMinTextVisible
+        textMinVisible:    true//modP.xALMinTextVisible
         opacityMin:        modP.xALMinOpacity
         // X Axis unit of measure
         unitOfMeasure:               modP.xAUOM
@@ -411,6 +420,8 @@ Rectangle {
         textUOMDist:                 modP.xATextUOMDist
         opacityUOM:                  modP.xAOpacityUOM
         unitOfMeasureRotation:       modP.xAUOMRotation
+
+        regolarStep: modP.regolarStep
     }
 
     PlotGrid2D { //X AXIS NOTECHES
@@ -473,9 +484,9 @@ Rectangle {
             lineColorSub:modP.subGridLineColor
             lineWidthSub:modP.subGridLineWidth
 
-            numXlines:   modP.xGridLines
+            numXlines:   modP.regolarStep ? 0 : modP.xGridLines
             numYlines:   modP.yGridLines
-            numXlinesSub:modP.xSubGridLines
+            numXlinesSub:modP.regolarStep ? 0 : modP.xSubGridLines
             numYlinesSub:modP.ySubGridLines
 
         }
@@ -522,8 +533,8 @@ Rectangle {
         //cursore tempo
         MCursorX {
             id:curTime
-            min:2               //margini
-            max:rCenter.width-2 //margini
+            min:1               //margini
+            max:rCenter.width-1 //margini
             lineLength: rCenter.height
             vMax:plotter.xMax
             vMin:plotter.xMin
@@ -532,6 +543,13 @@ Rectangle {
             onValueChanged:
             {
                 legend.valori = plotter.trackInfo("values",value)
+                var valueRoundes = Math.round(value)
+                var min = Math.floor(valueRoundes/60)
+                var minString = min < 10 ? "0"+min : min
+                var sec = valueRoundes - (min*60)
+                var secString = sec < 10 ? "0"+sec : sec
+                var string = "%1:%2"
+                legend.tempo = string.arg(minString).arg(secString)
                 if(curTime.selected)
                     rootPlot.currentTime = value
             }
@@ -580,6 +598,7 @@ Rectangle {
             xMax:plotter.xMax
             yMin:plotter.yMin
             yMax:plotter.yMax
+            inFirstPlot: firstPlot
             onZoomThisChanged: {
                 zoomer.oldZoom = zoomThis
                 zoomer.setZoom(zoomThis)

@@ -1,7 +1,7 @@
 ﻿import QtQuick 2.4
 import QtQuick.Controls 1.3
 import QtQuick.Dialogs 1.2
-//import Resources 1.0
+
 import "qrc:/Forms"
 import "qrc:/Dialog"
 
@@ -25,8 +25,8 @@ ApplicationWindow {
     flags:Qt.Window | Qt.FramelessWindowHint
     visible: false
 
-    width:platform==="linux"?640:Screen.width//*0.94
-    height:platform==="linux"?480:Screen.height//*0.94
+    width:platform==="linux"?640:Screen.width
+    height:platform==="linux"?480:Screen.height+1
 
     color:"steelblue"
 

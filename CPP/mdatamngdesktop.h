@@ -21,6 +21,7 @@ signals:
 public slots:
     void deleteAnMArkers();
     void openReport(QString __nomeReport);
+    bool checkReport();
     void addOpMarker(QVariant __key, QVariant __posX);
     void addDefiner(QVariant __key, QVector<double> __pos);
     void addAnMarker(QVariant __key, QVariant __posX, QVariantList __chName);
@@ -35,6 +36,7 @@ public slots:
 private:
     //referto
     QString m_nomeReferto;
+    QString m_nomeRefertoPdf;
     Ancestry * m_reportEdit;
 
     void createPdf();

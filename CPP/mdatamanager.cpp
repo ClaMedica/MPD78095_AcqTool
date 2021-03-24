@@ -21,6 +21,7 @@ MDataManager::MDataManager(QObject *parent)
     m_autoFlow = 2;
     m_Siroky = false;
     m_Liverpool = false;
+    m_Miskolc = false;
     m_landscape = false;
 
     m_numAna = 0;
@@ -138,6 +139,7 @@ void MDataManager::loadFile(QString __fileName)
         m_mng = new DatafileManager;
         m_mng->SetFileName(m_copyFileName);
         m_mng->SetFileType(7);
+        m_mng->SetLanguage(g_P7SettingsManager.localization());
         bool res = m_mng->Open();
         qDebug() << "File Aperto?" << res;
         res = m_mng->GetParameters();
@@ -154,7 +156,7 @@ void MDataManager::loadFile(QString __fileName)
         m_patientInfo.replace(";", " ");
 
         m_protocollo = m_mng->GetTestDescr();
-        m_protocollo = "Picoflow2R3"; //temporaneo finchè non si sitema il database sql con i protocolli giusti
+        //m_protocollo = "Picoflow2R3"; //temporaneo finchè non si sitema il database sql con i protocolli giusti
 
         QString dataNascita = m_mng->GetPatient().section(";",2,2);
         QDate datD = QDate::fromString(dataNascita,"dd/MM/yyyy");
@@ -171,6 +173,22 @@ void MDataManager::loadFile(QString __fileName)
         m_sexPatient = false;
         if (m_mng->GetPatient().section(";", 12, 12) == "F")
             m_sexPatient = true;
+
+        //cerco peso e altezza paziente nel database
+        MSQLPatients                *tesPatient;
+        MSQLTests                   *tesTest;
+        MDatabase db;
+        db.connectDatabase(g_P7SettingsManager.dataPath() + "/db.sqlite3");
+        tesPatient = (MSQLPatients*) db.modelPointer(TAB_Patients);
+        tesTest = (MSQLTests*) db.modelPointer(TAB_Tests);
+
+        QVariantList numTest;
+        numTest << m_testNumber;
+        QVariantList ID = tesTest->getPKOfPairs(QStringList(TES_TestNumber),numTest);
+        int IDPat = tesTest->patientID(tesTest->indexOfPK(ID.at(0).toInt()));
+        m_peso = tesPatient->valueOfPK(IDPat,PAT_weight).toInt();
+        m_altezza = tesPatient->valueOfPK(IDPat,PAT_height).toInt();
+
 
         //dati calibrazione
         m_datiCalib = "none;";
@@ -484,6 +502,9 @@ void MDataManager::loadFile(QString __fileName)
 
         Ancestry *liverpool = m_configPrinter.getSafeChild("Settings");
         m_Liverpool = (liverpool->getSafeChild("Liverpool")->getSafeAttribute(ATT_VALUE) == "true" ? true : false);
+
+        Ancestry *miskolc = m_configPrinter.getSafeChild("Settings");
+        m_Miskolc = (miskolc->getSafeChild("Miskolc")->getSafeAttribute(ATT_VALUE) == "true" ? true : false);
 
         Ancestry *printmode = m_configPrinter.getSafeChild("Settings");
         m_landscape = (printmode->getSafeChild("PrinterMode")->getSafeAttribute(ATT_VALUE) == "true" ? true : false);
@@ -953,7 +974,6 @@ bool MDataManager::saveDataAndUpdate(QString __family, QString __name, VarMapVec
             if(!m_data[__family].contains(__name))
                 m_data[__family].append(__name);
         updateAvailableData();
-        setToSave("");  //necessario chiedere se salvare
         return true;
     }
     else
@@ -1042,6 +1062,7 @@ qDebug() << "INIZIO";
         return;
 
     saveChanges();
+    setToSave("");  //necessario chiedere se salvare
 
     m_mng = new DatafileManager;
     m_mng->SetFileName(m_copyFileName);
@@ -1607,7 +1628,53 @@ bool MDataManager::InitArraysFLW(int __start,
             linee.append(1);
             m_aflwdatas.at(i+1)->getSirokyAve()->setLinea(linee);
         }
+
+        qDebug() << "nomogramma Miskolc Max & Ave";
+        if (m_aflwdatas.at(i+1)->getMiskolcMax()->getTitle() != "")
+        {
+            int linee = m_aflwdatas.at(i+1)->getLineMiskolcMax();
+            lunx = m_aflwdatas.at(i+1)->getMiskolcMax()->getXmax();
+            QVector<MSignal*> signs;
+            signs.resize(linee);
+            tracce.clear();
+            colori.clear();
+            for (int j=0; j<linee; j++)
+            {
+                signs[j] = new MSignal;
+                signs[j]->setData(m_aflwdatas.at(i+1)->getMiskolcMax()->getLineY(j).data(),lunx);
+                signs[j]->setName(QString("linea %1").arg(j));
+
+                tracce<< "$Track"<<"family"<<signs[j]->getName()<<"name"<<"Signal"<<"Category"<<CAT_TRACK<<"descr"<<QString("linea%1").arg(j)<<"pointer"<<(qulonglong)signs[j]<<"&Track";
+                colori << "black";
+            }
+
+            m_aflwdatas.at(i+1)->getMiskolcMax()->setColors(colori);
+            m_aflwdatas.at(i+1)->getMiskolcMax()->setTracce(tracce);
+        }
+
+        if (m_aflwdatas.at(i+1)->getMiskolcAve()->getTitle() != "")
+        {
+            int linee = m_aflwdatas.at(i+1)->getLineMiskolcAve();
+            lunx = m_aflwdatas.at(i+1)->getMiskolcAve()->getXmax();
+            QVector<MSignal*> signs;
+            signs.resize(linee);
+            tracce.clear();
+            colori.clear();
+            for (int j=0; j<linee; j++)
+            {
+                signs[j] = new MSignal;
+                signs[j]->setData(m_aflwdatas.at(i+1)->getMiskolcAve()->getLineY(j).data(),lunx);
+                signs[j]->setName(QString("linea %1").arg(j));
+
+                tracce<< "$Track"<<"family"<<signs[j]->getName()<<"name"<<"Signal"<<"Category"<<CAT_TRACK<<"descr"<<QString("linea%1").arg(j)<<"pointer"<<(qulonglong)signs[j]<<"&Track";
+                colori << "green";
+            }
+
+            m_aflwdatas.at(i+1)->getMiskolcAve()->setColors(colori);
+            m_aflwdatas.at(i+1)->getMiskolcAve()->setTracce(tracce);
+        }
     }
+
     qDebug() << "Fine";
     return true;
 }
@@ -1672,7 +1739,7 @@ int MDataManager::ReadResult(int & __numEv)
             m_aflwdatas.last()->setCQ(structureFlow->cQ);
             m_aflwdatas.last()->setAutoFlow(m_autoFlow == 0);
             m_aflwdatas.last()->buildTable();
-            m_aflwdatas.last()->buildNomogrammi(m_sexPatient, m_etaPatient);
+            m_aflwdatas.last()->buildNomogrammi(m_sexPatient, m_etaPatient, m_peso, m_altezza);
         }
 
         //calcolo la media

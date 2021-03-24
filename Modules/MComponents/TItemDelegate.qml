@@ -1,5 +1,7 @@
-import QtQuick 2.5
+﻿import QtQuick 2.5
 import MComponents 1.0
+import Database 1.0
+
 Rectangle{
     property var itemData:Item{
         property bool selected:false
@@ -36,6 +38,9 @@ Rectangle{
         text: {
             if (itemData.value!==undefined && (colonna[itemData.column] === "BirthDate" || colonna[itemData.column] === "TestDate" || colonna[itemData.column] === "Date")){
                 Qt.formatDate(new Date(itemData.value), "dd/MM/yyyy")
+            }
+            else if (colonna[itemData.column] === "Arrangement"/* || colonna[itemData.column] === "ArrangDesc"*/) {
+                itemData.value===undefined?"none":qsTranslate("ProtocolContext",itemData.value)
             }
             else
                 itemData.value===undefined?"none":itemData.value

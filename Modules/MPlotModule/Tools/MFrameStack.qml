@@ -1,4 +1,4 @@
-import QtQuick 2.0
+﻿import QtQuick 2.0
 import MPlotModule 1.0
 
 Rectangle {
@@ -11,6 +11,8 @@ Rectangle {
     property int frameCount
     property var zoomThis
     property bool completed
+    property var toselect:[]
+    property bool inFirstPlot: false
 
     id:rootFrameStack
     color:"transparent"
@@ -71,6 +73,13 @@ Rectangle {
         if(frameCount>0)
             modify(frames)
     }
+
+    onToselectChanged: {
+        for(var j=0;j<listFra.count;j++){
+            listFra.itemAt(j).selectFrame(toselect)
+        }
+    }
+
     Repeater{
         id:listFra
         onItemAdded:listFra.itemAt(index).opacity=1
@@ -83,6 +92,7 @@ Rectangle {
             vMaxX:rootFrameStack.xMax
             vMinY:rootFrameStack.yMin
             vMaxY:rootFrameStack.yMax
+            iconVisible: inFirstPlot
             onZoomMeChanged: rootFrameStack.zoomThis=zoomMe
             onModifyMe: rootFrameStack.newFrame=[whoAmI,
                                                  "xMin",xMin,
@@ -90,6 +100,7 @@ Rectangle {
                                                  "yMin",yMin,
                                                  "yMax",yMax]
             onDeleteMe: rootFrameStack.newFrame=[whoAmI]
+            onSelectMe: rootFrameStack.newFrame=[desc,sel]
         }
     }
 }

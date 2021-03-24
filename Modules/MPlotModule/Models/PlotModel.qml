@@ -16,9 +16,9 @@ ListModel {
     property real gridLineWidth: 1
     property color subGridLineColor: "grey"
     property real subGridLineWidth: 1
-    property real xGridLines: 5
+    property real xGridLines: 7
     property real yGridLines: 3
-    property real xSubGridLines: 2
+    property real xSubGridLines: 0
     property real ySubGridLines: 2
 
     property real xNotchLenght: 5
@@ -101,13 +101,16 @@ ListModel {
     property real topMargin: 20
     property real bottomMargin: 30
     property real leftMargin: 80
-    property real rightMargin: 65
+    property real rightMargin: PicoFlow ? 65 : 76
 
     //zoomer
     property real zoomSpeed:300
 
     //time cursor
     property int enableTimeCursor:0
+
+    //step regolare
+    property bool regolarStep: true
 
     //Real Time
 
@@ -199,6 +202,7 @@ ListModel {
         "rightMargin",
         "zoomSpeed",
         "enableTimeCursor",
+        "regolarStep",
         "serverPort",
         "serverAddress",
         "running",
@@ -302,6 +306,7 @@ ListModel {
         case "rightMargin":rightMargin=value;break;
         case "zoomSpeed":zoomSpeed=value;break;
         case "enableTimeCursor":enableTimeCursor=value;break;
+        case "regolarStep":regolarStep=value;break;
         case "serverPort":serverPort=value;break;
         case "serverAddress":serverAddress=value;break;
         case "running":running=value;break;

@@ -31,6 +31,10 @@ void MDataMngPico::initPrinter()
     m_mngPrint = new printermanager(m_copyFileName);
     m_mngPrint->setPrintSiroky(m_Siroky);
     m_mngPrint->setPrintLiverpool(m_Liverpool);
+    if (m_etaPatient < 18 && m_etaPatient > 3 && m_peso > 0 && m_altezza > 0)
+        m_mngPrint->setPrintMiskolc(m_Miskolc);
+    else
+        m_mngPrint->setPrintMiskolc(false);
     m_mngPrint->setPrintModeUser(m_landscape);
     m_mngPrint->setPrintHeaders(m_firstHead,m_secondHead);
 }

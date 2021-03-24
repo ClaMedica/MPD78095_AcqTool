@@ -67,12 +67,18 @@ printermanager::printermanager(QString __namefile, QObject *parent) : QObject(pa
     m_printFirstHeader = "";
     m_printSecondHeader = "";
 
+    m_printSiroky = false;
+    m_printLiverpool = false;
+    m_printMiskolc = false;
+
     m_resultBm_w = 103*8; // 103 bytes * 8 bit
     m_resultBm_h = 300;
     m_bitmapSiroky.   resize((m_resultBm_w * m_resultBm_h) / 8);
     m_bitmapLiverpool.resize((m_resultBm_w * m_resultBm_h) / 8);
-    m_bitmapSiroky.   fill(0);
+    m_bitmapSiroky.fill(0);
     m_bitmapLiverpool.fill(0);
+    m_bitmapMiskolc.resize((m_resultBm_w * m_resultBm_h) / 8);
+    m_bitmapMiskolc.fill(0);
 
     buffer_emg = NULL;
     buffer_flw = NULL;
@@ -632,10 +638,13 @@ void printermanager::Pri_Rep(double xscale)
     qDebug() << "dopo Report XXX";
 
     if(m_printLiverpool)
-        Report_BitMap(false);           // Grafico Liverpool
+        Report_BitMap(1);           // Grafico Liverpool
 
     if(m_printSiroky && m_sex != "F")
-        Report_BitMap(true);            // Grafico Siroky, solo se paziente maschio oppure generico (sesso non indicato)
+        Report_BitMap(0);            // Grafico Siroky, solo se paziente maschio oppure generico (sesso non indicato)
+
+    if (m_printMiskolc)
+        Report_BitMap(2);
 
     // 	Risultati dell'esame ricavati dall'analisi semplificata, implementata nel firmware
     Report_result();    // scrive in elenco i dati calcolati dall'analisi dell'esame
@@ -854,19 +863,23 @@ void printermanager::Report_Real_TimeSingle(QString msg, QPoint * points, double
 /**
 Stampa dei nomogrammi
 */
-void printermanager::Report_BitMap(bool __isSiro)
+void printermanager::Report_BitMap(int __nomo) //0 = Siro; 1 = Liver; 2 = Misk
 {
     qDebug("inizio pr bitm");
     int     sz;
     char  * p;
 
-    if (__isSiro) {
+    if (__nomo == 0) { //siroky
         sz = m_bitmapSiroky.size();
         p = m_bitmapSiroky.data();
     }
-    else {
+    else if (__nomo == 1) { //liverpool
         sz = m_bitmapLiverpool.size();
         p = m_bitmapLiverpool.data();
+    }
+    else { //nomo = 2 pediatrico
+        sz = m_bitmapMiskolc.size();
+        p = m_bitmapMiskolc.data();
     }
 
     int szchunk = 103;  // 824/8
@@ -913,7 +926,7 @@ void printermanager::Report_result()
     txstrList.append(tr("Descent time ................")); txstrList.append(QString::asprintf(" : %5.1f s"         , m_tem_dis));
     txstrList.append(tr("Voiding time ................")); txstrList.append(QString::asprintf(" : %5.1f s"         , m_tem_svu));
     txstrList.append(tr("Volume to maximum flow ......")); txstrList.append(QString::asprintf(" : %5.1f ml"        , m_vol_max));
-    txstrList.append(tr("Voided Volume ...............")); txstrList.append(QString::asprintf(" : %5.1f ml"        , (double) m_vol_vuo));
+    txstrList.append(tr("Voided Volume ...............")); txstrList.append(QString::asprintf(" : %5.0f ml"        , (double) m_vol_vuo));
     txstrList.append(tr("Corrected maximum flow ......")); txstrList.append(QString::asprintf(" : %5.1f ml^(1/2)/s", m_cQ     ));
     txstrList.append(tr("Flow acceleration ...........")); txstrList.append(QString::asprintf(" : %5.1f ml/s^2"    , m_flu_acc));    //?=2 apice
     txstrList.append(tr("Maximum contraction speed ...")); txstrList.append(QString::asprintf(" : %5.1f mm/s"      , m_vDetMax));
@@ -973,12 +986,15 @@ void printermanager::getImage(QImage __img, QString __nome)
 {
     bool isSiro = __nome.startsWith("Siro");
     bool isLive = __nome.startsWith("Live");
+    bool isMisk = __nome.startsWith("Pedi");
 
     QByteArray *cur_bitmap;
     if (isSiro && m_printSiroky)
         cur_bitmap = &m_bitmapSiroky;
     else if (isLive && m_printLiverpool)
         cur_bitmap = &m_bitmapLiverpool;
+    else if (isMisk && m_printMiskolc)
+        cur_bitmap = &m_bitmapMiskolc;
     else
         return;
 

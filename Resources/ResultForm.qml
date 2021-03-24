@@ -14,8 +14,8 @@ MForm {
     //@@@@@@@@@@    Properties      @@@@@@@@@@
     property var pagesLocal:[]
     property var pagesSameAna:[]
-
-
+    property var buttons:[]
+    property var rectf
     property int buttonTable:0
     id : resultForm
     anchors.fill: parent
@@ -29,6 +29,7 @@ MForm {
             for (var i=0; i<referti.length;i++)
                 comboReport.listReports.push(referti[i])
         }
+
     }
 
     //@@@@@@@@@@    Functions      @@@@@@@@@@
@@ -67,17 +68,13 @@ MForm {
         if (mngData.getNumAnaFlwAdv() > 0)
         {
             //pages for flowmetry
-            var rectf = Qt.createQmlObject('import QtQuick 2.5; Rectangle {}',this)
+            rectf = Qt.createQmlObject('import QtQuick 2.5; Rectangle {}',this)
             rectf.width = forAna.width
             rectf.height = forAna.height
             rectf.anchors.fill = parent
             rectf.color = "transparent"
             rectf.border.color = "blue"
             rectf.border.width = 2
-            //rectf.anchors.right = resultForm.right
-            //rectf.anchors.top = resultForm.top
-           // rectf.anchors.topMargin = 5
-            //rectf.anchors.rightMargin = resultForm.width/2 - rectf.width/2
 
             var namePage = ""
             var nameNomo = ""
@@ -94,7 +91,7 @@ MForm {
                 else
                     namePage = "Flow " + i.toString()
 
-                var btnLeftMargin = 20
+                var btnLeftMargin = 10
                 if (mngData.getNumAnaFlwAdv() !== 2)
                 {
                     var buttonfn = Qt.createQmlObject('import "qrc:/Components"; MAnaButton {}', rectf)
@@ -146,6 +143,7 @@ MForm {
                 resultForm.buttonTable = buttonT.buttonId
                 // btnLeftMargin += 110
                 pagesLocal.push(tablefn)
+                buttons.push(buttonT)
 
                 //nomogrammi flussimetria
                 //liverpool Qmax
@@ -194,6 +192,7 @@ MForm {
                 buttonLQM.clicked.connect(clickButton)
                 btnLeftMargin += buttonLQM.width + 5
                 pagesLocal.push(LQM)
+                buttons.push(buttonLQM)
 
                 //liverpool QAve
                 nameNomo = mngData.getFlowDatas(1).getLiverpoolAve().getTitle()
@@ -240,6 +239,7 @@ MForm {
                 buttonLQA.clicked.connect(clickButton)
                 btnLeftMargin += buttonLQA.width + 5
                 pagesLocal.push(LQA)
+                buttons.push(buttonLQA)
 
                 //siroky QMax
                 nameNomo = mngData.getFlowDatas(1).getSirokyMax().getTitle()
@@ -294,6 +294,7 @@ MForm {
                     buttonSQM.clicked.connect(clickButton)
                     btnLeftMargin += buttonSQM.width + 5
                     pagesLocal.push(SQM)
+                    buttons.push(buttonSQM)
 
                     //siroky QAve
                     nameNomo = mngData.getFlowDatas(i).getSirokyAve().getTitle()
@@ -344,8 +345,113 @@ MForm {
                     buttonSQA.labelSize= layout.value("F4")
                     buttonSQA.myText = nameNomo
                     buttonSQA.clicked.connect(clickButton)
-                    //btnLeftMargin += 110
+                    btnLeftMargin += buttonSQA.width + 5
                     pagesLocal.push(SQA)
+                    buttons.push(buttonSQA)
+                }
+
+                //Miskolc QMax
+                nameNomo = mngData.getFlowDatas(1).getMiskolcMax().getTitle()
+                if (nameNomo !== "" )
+                {
+                    var MQM =  Qt.createQmlObject('import "qrc:/Components"; MNomogramma {}', rectdata)
+                    MQM.clip = true
+                    MQM.height = screenH*grafic.valueOf("Nomogrammi","height")
+                    MQM.width = screenW*grafic.valueOf("Nomogrammi","width")
+                    MQM.anchors.left = rectdata.left
+                    MQM.anchors.top = rectdata.top
+                    MQM.anchors.topMargin = 20
+                    MQM.anchors.leftMargin = 20
+                    MQM.xMin = mngData.getFlowDatas(i).getMiskolcMax().getXmin()
+                    MQM.xMax = mngData.getFlowDatas(i).getMiskolcMax().getXmax()
+                    MQM.yMin = mngData.getFlowDatas(i).getMiskolcMax().getYmin()
+                    MQM.yMax = mngData.getFlowDatas(i).getMiskolcMax().getYmax()
+                    MQM.nome = nameNomo
+                    MQM.xPoint = mngData.getFlowDatas(i).getMiskolcMax().getDatoX()
+                    MQM.yPoint = mngData.getFlowDatas(i).getMiskolcMax().getDatoY()
+
+                    if (MQM.xPoint > MQM.xMin && MQM.xPoint < MQM.xMax && MQM.yPoint > MQM.yMin && MQM.yPoint < MQM.yMax)
+                        MQM.isVis = true
+                    else
+                        MQM.isVis = false
+
+                    MQM.udmX =  mngData.getFlowDatas(i).getMiskolcMax().getUnitx()
+                    MQM.udmY =  mngData.getFlowDatas(i).getMiskolcMax().getUnity()
+                    MQM.tracksWidth = [1,1,1,1,1]
+                    MQM.traksToDraw =  mngData.getFlowDatas(i).getMiskolcMax().getTracce()
+                    MQM.tracksColors =  mngData.getFlowDatas(i).getMiskolcMax().getColors()
+                    MQM.drawTracks()
+
+                    MQM.visible = false
+                    MQM.saveImgNomogramma()
+
+                    //button
+                    var buttonMQM = Qt.createQmlObject('import "qrc:/Components"; MAnaButton {}', rectdata)
+                    buttonMQM.buttonId = pagesLocal.length
+                    buttonMQM.anchors.bottom = rectdata.bottom
+                    buttonMQM.anchors.left = rectdata.left
+                    buttonMQM.anchors.bottomMargin = rectf.height/9
+                    buttonMQM.anchors.leftMargin = btnLeftMargin
+                    buttonMQM.width = screenW*grafic.valueOf("Button","width")
+                    buttonMQM.height = screenH*grafic.valueOf("Button","height")
+                    buttonMQM.labelSize= layout.value("F4")
+                    buttonMQM.myText = nameNomo
+                    buttonMQM.clicked.connect(clickButton)
+                    btnLeftMargin += buttonMQM.width + 5
+                    pagesLocal.push(MQM)
+                    buttons.push(buttonMQM)
+                }
+
+                //Miskolc QAve Sergio:non deve essere visibile
+                nameNomo = "";//mngData.getFlowDatas(1).getMiskolcAve().getTitle()
+                if (nameNomo !== "" )
+                {
+                    var MQA =  Qt.createQmlObject('import "qrc:/Components"; MNomogramma {}', rectdata)
+                    MQA.clip = true
+                    MQA.height = screenH*grafic.valueOf("Nomogrammi","height")
+                    MQA.width = screenW*grafic.valueOf("Nomogrammi","width")
+                    MQA.anchors.left = rectdata.left
+                    MQA.anchors.top = rectdata.top
+                    MQA.anchors.topMargin = 20
+                    MQA.anchors.leftMargin = 20
+                    MQA.xMin = mngData.getFlowDatas(i).getMiskolcAve().getXmin()
+                    MQA.xMax = mngData.getFlowDatas(i).getMiskolcAve().getXmax()
+                    MQA.yMin = mngData.getFlowDatas(i).getMiskolcAve().getYmin()
+                    MQA.yMax = mngData.getFlowDatas(i).getMiskolcAve().getYmax()
+                    MQA.nome = nameNomo
+                    MQA.xPoint = mngData.getFlowDatas(i).getMiskolcAve().getDatoX()
+                    MQA.yPoint = mngData.getFlowDatas(i).getMiskolcAve().getDatoY()
+
+                    if (MQA.xPoint > MQA.xMin && MQA.xPoint < MQA.xMax && MQA.yPoint > MQA.yMin && MQA.yPoint < MQA.yMax)
+                        MQA.isVis = true
+                    else
+                        MQA.isVis = false
+
+                    MQA.udmX =  mngData.getFlowDatas(i).getMiskolcAve().getUnitx()
+                    MQA.udmY =  mngData.getFlowDatas(i).getMiskolcAve().getUnity()
+                    MQA.tracksWidth = [2,2,2,2,2]
+                    MQA.traksToDraw =  mngData.getFlowDatas(i).getMiskolcAve().getTracce()
+                    MQA.tracksColors =  mngData.getFlowDatas(i).getMiskolcAve().getColors()
+                    MQA.drawTracks()
+
+                    MQA.visible = false
+                    MQA.saveImgNomogramma()
+
+                    //button
+                    var buttonMQA = Qt.createQmlObject('import "qrc:/Components"; MAnaButton {}', rectdata)
+                    buttonMQA.buttonId = pagesLocal.length
+                    buttonMQA.anchors.bottom = rectdata.bottom
+                    buttonMQA.anchors.left = rectdata.left
+                    buttonMQA.anchors.bottomMargin = rectf.height/9
+                    buttonMQA.anchors.leftMargin = btnLeftMargin
+                    buttonMQA.width = screenW*grafic.valueOf("Button","width")
+                    buttonMQA.height = screenH*grafic.valueOf("Button","height")
+                    buttonMQA.labelSize= layout.value("F4")
+                    buttonMQA.myText = nameNomo
+                    buttonMQA.clicked.connect(clickButton)
+                    btnLeftMargin += buttonMQA.width + 5
+                    pagesLocal.push(MQA)
+                    buttons.push(buttonMQA)
                 }
             }
 
@@ -365,6 +471,44 @@ MForm {
     }
 
     //@@@@@@@@@@    Graphics      @@@@@@@@@@
+    MDialogYesNo
+    {
+        id: dialogMain
+        property var owner: dialogMain
+        height:screenH*0.3
+        width:screenW*0.3
+
+        onOwnerChanged: {
+            switch(owner) {
+            case dialogMain: break;
+            case btnReport:
+                message = qsTr("Report already exists. Do you want overwrite it?")
+                break
+            default:console.error("Owner sconosciuto", owner)
+            }
+            if(owner != dialogMain)
+                dialogMain.open()
+        }
+        onAccepted: {
+            switch(owner) {
+            case dialogMain: break
+            case btnReport:
+                mngData.openReport(comboReport.currentText)
+                break
+            default:
+                console.error("Owner sconosciuto",owner)
+            }
+        }
+        onRejected: {
+            switch(owner) {
+            case dialogMain: break;
+            case btnReport:
+                break;
+            default: console.error("Owner sconosciuto",owner)
+            }
+        }
+    }
+
 
     MButton{
         id: btnPrint
@@ -397,7 +541,10 @@ MForm {
         labelSize: layout.value("F4")
         visible: PicoFlow ? false : true
         onClicked: {
-            mngData.openReport(comboReport.currentText)
+            if( mngData.checkReport())
+                dialogMain.owner = btnReport
+            else
+                mngData.openReport(comboReport.currentText)
         }
     }
 
@@ -472,15 +619,16 @@ MForm {
 
     function exitFromResult()
     {
-        for (var i = 0; i < pagesLocal.length; i++) {
-            if (pagesLocal[i].visible) {
-                pagesLocal[i].visible = false;
-                pagesLocal[i].focus = false;
-            }
-        }
-        pagesLocal[0].visible = true;
-        pagesLocal[0].focus = true;
+        for (var i = 0; i < pagesLocal.length; i++)
+            pagesLocal[i].destroy();
+        pagesLocal = []
+        for (i = 0; i < buttons.length; i++)
+            buttons[i].destroy();
+        buttons = []
+        rectf.destroy()
+
         forAna.visible = true
+
         resultForm.visible = false
     }
 

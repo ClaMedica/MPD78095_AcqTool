@@ -1,4 +1,4 @@
-#ifndef NOMOGRAMMA_H
+﻿#ifndef NOMOGRAMMA_H
 #define NOMOGRAMMA_H
 
 #include <QQuickItem>
@@ -9,6 +9,8 @@
 #define G_LIVERPOOL_AVE 3
 #define G_SIROKY_AVE 4
 #define G_SIROKY_MAX 5
+#define G_MISKOLC_AVE 11
+#define G_MISKOLC_MAX 10
 
 class Nomogramma : public QObject
 {
@@ -70,6 +72,10 @@ public:
     Q_INVOKABLE double getYmin(){return m_yMin;}
     Q_INVOKABLE void setYmin(double __min){m_yMin = __min;}
 
+    Q_PROPERTY(double bodySurf READ getBodySurf WRITE setBodySurf)
+    Q_INVOKABLE double getBodySurf(){return m_bodySurf;}
+    Q_INVOKABLE void setBodySurf(double __val){m_bodySurf = __val;}
+
 
     QVector<double> getLineY(int __num);
 
@@ -112,6 +118,9 @@ private:
 
     //traccia di cui prendere i valori in Y per disegnare i poligoni irregolari
     QVector<int> m_aline;
+
+    //Miskloc
+    double m_bodySurf;
 };
 
 

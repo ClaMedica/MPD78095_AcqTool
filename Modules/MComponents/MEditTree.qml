@@ -36,6 +36,7 @@ Rectangle {
         anctree.destroyAncestry()
     }
 
+
     Flickable{
         id:flick
         anchors.fill:parent
@@ -49,5 +50,6 @@ Rectangle {
             itemHeight: rootTree.height/divH
         }
     }
+
 
 }

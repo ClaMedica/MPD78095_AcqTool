@@ -7,6 +7,7 @@
 #include <QApplication>
 #include <QPrinter>
 #include <QTextDocument>
+#include <QProcess>
 
 extern bool DebugAcqTool;
 
@@ -22,6 +23,7 @@ MDataMngDesktop::MDataMngDesktop(QObject *parent)
     (void) parent;
 
     m_nomeReferto = "";
+    m_nomeRefertoPdf = "";
 }
 
 void MDataMngDesktop::saveImg(QQuickItem *__item, QString __nome)
@@ -38,6 +40,8 @@ void MDataMngDesktop::saveImg(QQuickItem *__item, QString __nome)
             imgName = "GR204";
         else
             imgName = "GR205";
+    else if (__nome.startsWith("Pediat"))
+            imgName = "GR210";
 
     auto grabResult = __item->grabToImage();
     connect(grabResult.data(), &QQuickItemGrabResult::ready, [=]() {
@@ -88,6 +92,7 @@ void MDataMngDesktop::addOpMarker(QVariant __key,QVariant __posX)
     mrkAnVec->append(mrk);
     QString family = "Markers";
     QString name = "Operative";
+    setToSave("");
     saveDataAndUpdate(family, name, mrkAnVec,APPEND);
 
     updateInfoList();
@@ -165,6 +170,7 @@ void MDataMngDesktop::addAnMarker(QVariant __key, QVariant __posX, QVariantList 
                         if(!mrkAnVec->isEmpty()) {
                             QString family = "Markers";
                             QString name = "Analitical";
+                            setToSave("");
                             saveDataAndUpdate(family, name, mrkAnVec,APPEND);
                         }
 
@@ -228,6 +234,7 @@ void MDataMngDesktop::addDefiner(QVariant __key, QVector<double> __pos)
 
     VarMapVec *defVec = new VarMapVec;
     defVec->append(def);
+    setToSave("");
     saveDataAndUpdate(family, name, defVec,APPEND);
 
     updateInfoList();
@@ -251,12 +258,34 @@ void MDataMngDesktop::deleteAnMArkers()
 
 }
 
-//HANDLE hProc;
+bool MDataMngDesktop::checkReport()
+{
+    QString nomePDF = "rf" + QString("%1").arg(m_testNumber,5,10,QLatin1Char('0')) + "1a" + ".pdf";
+    m_nomeRefertoPdf = g_P7SettingsManager.dataPath() + "\\ref\\" + nomePDF;
+    QFile filePdf(m_nomeRefertoPdf);
+    if (filePdf.exists())
+        return true;
+    else
+        return false;
+}
+
 void MDataMngDesktop::openReport(QString __nomeReport)
 {
     if (__nomeReport == "")
         __nomeReport = "Standard";
 
+#ifdef STATICO
+    QString nomeR = __nomeReport+".htm";
+    MedicalReport m;
+    int res = m.CreaMedicalReport(g_P7SettingsManager.dataPath().toLatin1(),g_P7SettingsManager.appPath().toLatin1(),m_copyFileName.toLatin1(), 4,nomeR.toLatin1(),g_P7SettingsManager.localization());
+    if (res != 0)
+    {
+        QErrorMessage errorMessage;
+        errorMessage.showMessage(tr("problems in the report writing"));
+        errorMessage.exec();
+        return;
+    }
+#else
     QLibrary reportLib("MedicalReport.dll");
     if (reportLib.load())
     {
@@ -276,6 +305,7 @@ void MDataMngDesktop::openReport(QString __nomeReport)
             return;
         }
     }
+#endif
 
     m_nomeReferto = g_P7SettingsManager.dataPath() + "\\ref\\" +  "rf" + QString("%1").arg(m_testNumber,5,10,QLatin1Char('0')) + "1a" + ".htm";
 
@@ -288,7 +318,7 @@ void MDataMngDesktop::openReport(QString __nomeReport)
         f.open(QIODevice::ReadOnly);
         QByteArray data = f.readAll();
         QTextCodec *codec = QTextCodec::codecForName(m_language);
-        QString stringa = codec->toUnicode(data);
+        QString stringa = codec->codecForMib(106)->toUnicode(data);
         QTextDocument textDoc;
         textDoc.setHtml(stringa);
         f.close();
@@ -357,9 +387,6 @@ void MDataMngDesktop::openReport(QString __nomeReport)
 
 void MDataMngDesktop::createPdf()
 {
-    QString nomePDF = "rf" + QString("%1").arg(m_testNumber,5,10,QLatin1Char('0')) + "1a" + ".pdf";
-    nomePDF = g_P7SettingsManager.dataPath() + "\\ref\\" + nomePDF;
-
     QFile FI(m_nomeReferto);
     FI.open(QIODevice::ReadOnly);
     QByteArray FIByte;
@@ -378,13 +405,16 @@ void MDataMngDesktop::createPdf()
 
     QPrinter printer(QPrinter::HighResolution);
     printer.setOutputFormat(QPrinter::PdfFormat);
-    printer.setOutputFileName(nomePDF);
+    printer.setOutputFileName(m_nomeRefertoPdf);
     textDoc.print(&printer);
 
     QString toEdit = m_reportEdit->getSafeChild("HTM")->getSafeAttribute(ATT_VALUE);
     if (toEdit == "false") {
-        QUrl urlFile = QUrl::fromLocalFile(nomePDF);   //con pdf, lo apre in explorer
-        QDesktopServices::openUrl(urlFile);
+        QUrl urlFile = QUrl::fromLocalFile(m_nomeRefertoPdf);
+        QProcess *viewer = new QProcess();
+        viewer->setProgram(g_P7SettingsManager.progPath()+"/PDFviewer.exe");
+        viewer->setArguments(QStringList() << urlFile.toString() << g_P7SettingsManager.localization());
+        bool ret = viewer->startDetached();
     }
 
     FI.close();
