@@ -435,7 +435,7 @@ void mflowdatas::buildNomogrammi(bool __sex, int __age, int __peso, int __altezz
         }
     }
 
-    if (__age < 18 && __age > 3 && __peso > 0 && __altezza > 0)
+    if (__age <= 18 && __age >= 3 && __peso > 0 && __altezza > 0)
     {
         //Miskolc Max
         double bodySurf = qSqrt(__altezza*__peso/3600);
