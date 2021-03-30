@@ -45,6 +45,7 @@ Rectangle {
     // has clicked. The id must be unique
     property int parameterId: 0
     signal clicked()
+    signal lostFocusTarget()
 
     onComponentChanged: if(component !== undefined) connection.target = component
 
@@ -101,6 +102,8 @@ Rectangle {
                         component.onlyNumber = true
                 }
             }
+            else
+                lostFocusTarget()
         }
     }
 

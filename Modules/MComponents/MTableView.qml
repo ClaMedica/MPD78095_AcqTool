@@ -54,6 +54,13 @@ BuzzTableView{
         onTriggered: rootTable.positionViewAtRow(rowSel,ListView.Contain)
     }
 
+    function selectPatID(patID)
+    {
+        var row = model.indexOfPK(patID)
+        rootTable.selection.select(row)
+        rootTable.currentRow = row
+    }
+
     function selectRowFromPK(pk)
     {
         if (pk !== -1)

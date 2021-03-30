@@ -19,6 +19,7 @@ MDataManager::MDataManager(QObject *parent)
     m_analyzed = false;
     m_autoPrint = false;
     m_autoFlow = 2;
+    m_autoLoop = false;
     m_Siroky = false;
     m_Liverpool = false;
     m_Miskolc = false;
@@ -1008,8 +1009,8 @@ bool MDataManager::checkForVolRes()
         setValVolRes(0);
         m_mng->SetOther(otherString);
         m_mng->CommitParameters();
-        //se è la prima volta che apro un esame di flussimetria automatica la stampa è automatica
-        if (m_autoFlow == 0)
+        //se sono in loop la stampa è automatica
+        if (m_autoLoop)
             m_autoPrint =  true;
     }
     else

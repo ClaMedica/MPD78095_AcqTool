@@ -26,9 +26,9 @@ Rectangle{
     Rectangle{
         id:recSel
         anchors.fill:parent
-        opacity: 0.5
+        opacity: PicoFlow ? 0.7 : 0.6
         visible: itemData.selected
-        color:DataEngine.sr
+        color: PicoFlow ? "darkblue" : "#001681"
     }
     MLabel{
         anchors.fill:parent
@@ -36,6 +36,10 @@ Rectangle{
         color: DataEngine.TASKBAR_COLOR
         elide: itemData.elideMode
         text: {
+            if (itemData.selected)
+                color = "white"
+            else
+                color = "black"
             if (itemData.value!==undefined && (colonna[itemData.column] === "BirthDate" || colonna[itemData.column] === "TestDate" || colonna[itemData.column] === "Date")){
                 Qt.formatDate(new Date(itemData.value), "dd/MM/yyyy")
             }
@@ -48,7 +52,6 @@ Rectangle{
         labelSize:layout.value("F4")
         horizontalAlignment: Text.AlignHCenter        
     }
-
 
 }
 
