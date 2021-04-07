@@ -46,7 +46,7 @@ public:
     void imagePrintStr(char *__str, int __str_len);
     void imagePrint();
     void imageGraph(QString head, QString baset, double xscale, int maxL, int maxR, double *bufL, double *bufR);
-    void imageGraphSingle(QPoint leftBottom, QPoint *pts, int npts, double kx, double ky, double *bufV);
+    void imageGraphSingle(QPoint leftBottom, QPoint *pts, int npts, double kx, double ky, double *bufV, int maxy);
     void imageText(QString txt, int fontSize, bool restoreFont);
     void print(QString __datiCalib);
 
@@ -72,6 +72,10 @@ public:
     void setPrintModeUser(bool __val)           {m_printModeUser = __val;}
     void setTipoEsame(unsigned char __val)      {m_test_type = __val;}
     void setVersione(QString __vers)            {m_versione = __vers;}
+
+    void setRangeChQ(int __r)                     {m_rangeChQ = __r;}
+    void setRangeChVV(int __r)                    {m_rangeChVV = __r;}
+    void setRangeChEMG(int __r)                   {m_rangeChEMG = __r;}
 
     //void Report_BitMap(bool __isSiro = false);
     void Report_BitMap(int __nomo); //0 = Siro; 1 = Liver; 2 = Misk
@@ -137,6 +141,11 @@ private:
     int     m_numTest;
     QString m_datiCalib;
     QString m_versione; //versione del Pico
+
+    //gestione parametro autorange: se diverso da -1 il range di quel canale non è in auto-range
+    int     m_rangeChVV;
+    int     m_rangeChQ;
+    int     m_rangeChEMG;
 
     int     m_num_sam; //numero campioni minimo nas (vol)
 

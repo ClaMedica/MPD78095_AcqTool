@@ -20,6 +20,11 @@ MDataManager::MDataManager(QObject *parent)
     m_autoPrint = false;
     m_autoFlow = 2;
     m_autoLoop = false;
+
+    m_rangeChVV = -1;
+    m_rangeChQ = -1;
+    m_rangeChEMG = -1;
+
     m_Siroky = false;
     m_Liverpool = false;
     m_Miskolc = false;
@@ -282,7 +287,6 @@ void MDataManager::loadFile(QString __fileName)
             sig->setGraph(m_mng->GetGraph(h)-1);
             sig->setCh(h);
             sig->setSamplingFrequency(m_mng->GetNAS(h));
-            sig->setSupLim(m_mng->GetSupLim(h));
 
             double M = sig->maximum();
             double m = sig->minimum();
@@ -293,6 +297,7 @@ void MDataManager::loadFile(QString __fileName)
 
             double supLim = m_mng->GetSupLim(h);
             double infLim = m_mng->GetInfLim(h);
+
 #ifdef PICOFLOW
             Ancestry *chProp = m_configUser.getSafeChild(XML_CHANNELSPROP);
 #else
@@ -301,25 +306,44 @@ void MDataManager::loadFile(QString __fileName)
             Ancestry *chName = chProp->getSafeChild(m_mng->GetChanName(h).remove("1"));
             //max#min#step#decimals
             QStringList rangesDef = chName->getSafeChild(ATT_RANGE)->getSafeAttribute(ATT_MODEL).split("#");
+            //autorange
+            QString autorange = chName->getSafeChild(ATT_YAUTOSCALE)->getSafeAttribute(ATT_VALUE);
+            if (autorange == "true") {
 
-            while (M > supLim)
-            {
-                double newSupLim = supLim + rangesDef.at(2).toInt();//aggiungo lo step
-                if (newSupLim <= rangesDef.at(0).toInt())
-                    supLim = newSupLim;
-                else
-                    break;
+                while (M > supLim)
+                {
+                    double newSupLim = supLim + rangesDef.at(2).toInt();//aggiungo lo step
+                    if (newSupLim <= rangesDef.at(0).toInt())
+                        supLim = newSupLim;
+                    else
+                        break;
+                }
+                while (m < infLim)
+                {
+                    double newInfLim = infLim - rangesDef.at(2).toInt();//aggiungo lo step
+                    if (newInfLim >= -rangesDef.at(0).toInt())
+                        infLim = newInfLim;
+                    else
+                        break;
+                }
+
+                if (sig->getName().startsWith("VV"))
+                    m_rangeChVV = -1;
+                else if (sig->getName().startsWith("Q"))
+                    m_rangeChQ = -1;
+                else if (sig->getName().startsWith("EMG"))
+                    m_rangeChEMG = -1;
+            }
+            else { //picoflow2r3 devo passare i range dei canali alla stampa
+                if (sig->getName().startsWith("VV"))
+                    m_rangeChVV = supLim;
+                else if (sig->getName().startsWith("Q"))
+                    m_rangeChQ = supLim;
+                else if (sig->getName().startsWith("EMG"))
+                    m_rangeChEMG = supLim;
             }
 
             sig->setSupLim(supLim);
-            while (m < infLim)
-            {
-                double newInfLim = infLim - rangesDef.at(2).toInt();//aggiungo lo step
-                if (newInfLim >= -rangesDef.at(0).toInt())
-                    infLim = newInfLim;
-                else
-                    break;
-            }
             sig->setInfLim(infLim);
             this->addSignal(sig);
         }
