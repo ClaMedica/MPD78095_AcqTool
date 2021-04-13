@@ -49,7 +49,7 @@ public:
 
     Q_INVOKABLE int getNumAnaFlwAdv(){return m_aflwdatas.length();}
 
-    Q_INVOKABLE int getAutoFlow(){return m_autoFlow;}
+    Q_INVOKABLE bool getAutoAna(){return m_autoAna;}
 
     Q_INVOKABLE QString protocollo(){return m_protocollo;}
     QStringList availableData(){return m_availableData;}
@@ -139,6 +139,7 @@ protected:
 
     bool    m_analyzed;
     bool    m_autoPrint;
+    bool    m_autoAna;
     QString m_pathData;
     QString m_fileName;
     QString m_copyFileName;

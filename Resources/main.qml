@@ -159,7 +159,7 @@ ApplicationWindow {
         }
         onAnaAutomatica:
         {
-            if (vis && mngData.getAutoFlow() === 0){
+            if (vis && mngData.getAutoAna()){
                 console.log("analisi automatica");
                 mngData.analysis()
             }
