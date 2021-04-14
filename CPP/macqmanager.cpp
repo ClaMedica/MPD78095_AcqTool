@@ -1230,6 +1230,14 @@ void MAcqManager::applyOperations()
                             m_channelMap[type].at(index)->append(mediato);
                             m_valPrecVolume = mediato;
                         }
+                        //se il canale è EMG non devo registrare i picco sopra 3276 (limite per qint16 del datafilemanager)
+                        else if (type == "EMG")
+                        {
+                            if (v >= 3200)
+                                v= 3200;
+                            m_channelMap[type].at(index)->append(v);
+
+                        }
                         else
                             m_channelMap[type].at(index)->append(v);
                     }
