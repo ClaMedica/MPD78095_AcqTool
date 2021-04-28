@@ -591,11 +591,12 @@ MForm {
 
     MButton {
         id:btnBack
+        property real wbt: grafic.valueOf("Button","width")
         text: qsTr("back to graphs")
         anchors.bottom: parent.bottom
         anchors.bottomMargin: 10
         anchors.horizontalCenter: parent.horizontalCenter
-        width:  screenW*grafic.valueOf("Button","width")
+        width:  screenW*(0.01+btnBack.wbt)
         height: screenH*grafic.valueOf("Button","height")
         labelSize: layout.value("F4")
         onClicked:exitFromResult()
