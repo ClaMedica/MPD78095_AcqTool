@@ -412,7 +412,10 @@ void MDataMngDesktop::createPdf()
     if (toEdit == "false") {
         QUrl urlFile = QUrl::fromLocalFile(m_nomeRefertoPdf);
         QProcess *viewer = new QProcess();
+        QString p = g_P7SettingsManager.progPath()+"/PDFviewer.exe";
         viewer->setProgram(g_P7SettingsManager.progPath()+"/PDFviewer.exe");
+        QStringList l;
+        l << urlFile.toString() << g_P7SettingsManager.localization();
         viewer->setArguments(QStringList() << urlFile.toString() << g_P7SettingsManager.localization());
         bool ret = viewer->startDetached();
     }
@@ -567,7 +570,7 @@ QList<QString> MDataMngDesktop::getListReports()
 {
     QList<QString> list;
 
-    QString pathTemplate = g_P7SettingsManager.progPath() + "/grpbase/MRTemplate_" + g_P7SettingsManager.localization();
+    QString pathTemplate = g_P7SettingsManager.dataPath() + "/grpbase/MRTemplate_" + g_P7SettingsManager.localization();
     QDir pathDir = QDir(pathTemplate);
     QFileInfoList entriesPath = pathDir.entryInfoList(QDir::Files);
     for(QList<QFileInfo>::iterator it = entriesPath.begin(); it!=entriesPath.end();++it)
