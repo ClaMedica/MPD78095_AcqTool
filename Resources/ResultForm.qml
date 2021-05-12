@@ -73,7 +73,7 @@ MForm {
             rectf.height = forAna.height
             rectf.anchors.fill = parent
             rectf.color = "transparent"
-            rectf.border.color = "blue"
+            rectf.border.color = "transparent"//layout.value("THC2")//"blue"
             rectf.border.width = 2
 
             var namePage = ""

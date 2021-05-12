@@ -14,7 +14,7 @@ Rectangle {
     height: 100
     color: layout.value("BackgroundColor")
     state:"opt1"
-    border.color: "white"
+    border.color: layout.value("THC2")
     border.width: 3
     clip:true
 
@@ -127,7 +127,7 @@ Rectangle {
             id:recHover
             anchors.fill:parent
             anchors.margins: rootSwitch.border.width
-            color: DataEngine.c_btn_enabled
+            color: layout.value("c_btn_enabled")
             opacity: 0.7
             radius:10
         }

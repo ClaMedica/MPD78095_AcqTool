@@ -16,30 +16,42 @@ Rectangle{
     Component.onDestruction: opacity=0
     Behavior on opacity {NumberAnimation {duration: 200}}
     color:itemData.column%2?
-    itemData.row%2?DataEngine.ir2:DataEngine.ir0:
-    itemData.row%2?DataEngine.ir3:DataEngine.ir1
+    itemData.row%2?layout.value("ir2"):layout.value("ir0"):
+    itemData.row%2?layout.value("ir3"):layout.value("ir1")
+//    color:itemData.column%2?
+//    itemData.row%2?DataEngine.ir2:DataEngine.ir0:
+//    itemData.row%2?DataEngine.ir3:DataEngine.ir1
     Behavior on color {
         ColorAnimation {
             duration: 200
         }
     }
+    border.color: "gainsboro"
+    border.width: 1
     Rectangle{
         id:recSel
         anchors.fill:parent
-        opacity: PicoFlow ? 0.7 : 0.6
+        opacity: layout.value("opacita")//0.5
         visible: itemData.selected
-        color: PicoFlow ? "darkblue" : "#001681"
+        color: layout.value("sr")
     }
+//    Rectangle{
+//        id:recSel
+//        anchors.fill:parent
+//        opacity: PicoFlow ? 0.7 : 0.6
+//        visible: itemData.selected
+//        color: PicoFlow ? "darkblue" : "#001681"
+//    }
     MLabel{
         anchors.fill:parent
         anchors.margins: 2
-        color: DataEngine.TASKBAR_COLOR
+        //color: layout.value("textTable")
         elide: itemData.elideMode
         text: {
             if (itemData.selected)
                 color = "white"
             else
-                color = "black"
+                color = layout.value("textTable")
             if (itemData.value!==undefined && (colonna[itemData.column] === "BirthDate" || colonna[itemData.column] === "TestDate" || colonna[itemData.column] === "Date")){
                 Qt.formatDate(new Date(itemData.value), "dd/MM/yyyy")
             }
@@ -49,7 +61,12 @@ Rectangle{
             else
                 itemData.value===undefined?"none":itemData.value
         }
-        labelSize:layout.value("F4")
+        labelSize:{
+            if (itemData.selected)
+                layout.value("F4")
+            else
+                layout.value("F4")-1
+        }
         horizontalAlignment: Text.AlignHCenter        
     }
 

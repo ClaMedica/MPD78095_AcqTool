@@ -182,7 +182,7 @@ int main(int argc, char *argv[])
 
     engine.rootContext()->setContextProperty("layout", &mngLayout);
     engine.rootContext()->setContextProperty("grafic", &mngGrafic);
-    engine.rootContext()->setContextProperty("settings", &g_P7SettingsManager);
+    //engine.rootContext()->setContextProperty("settings", &g_P7SettingsManager);
     engine.rootContext()->setContextProperty("bridgeMain", g_mainAppBridge);    
     engine.rootContext()->setContextProperty("mngSys", &g_systemManager);
 

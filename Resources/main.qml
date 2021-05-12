@@ -15,8 +15,8 @@ import FileIO 1.0
 ApplicationWindow {
     //@@@@@@@@@@ Definitions @@@@@@@@@@
     //property var keyboard:appKey
-    property string examFolder:settings.datafilePath
-    property string configFolder:settings.appPath()
+//    property string examFolder:settings.datafilePath
+//    property string configFolder:settings.appPath()
     property bool vis: false
     property bool btOkPrint: false
 

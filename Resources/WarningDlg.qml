@@ -10,6 +10,8 @@ Rectangle {
     anchors.centerIn: parent
     visible: false
     color : layout.value("BackgroundColor")
+    border.color: layout.value("THC2")
+    border.width: 5
     property string testoWarning: ""
 
     function open()
@@ -32,7 +34,7 @@ Rectangle {
         horizontalAlignment: Text.AlignHCenter
         labelSize: layout.value("F4")
         verticalAlignment: Text.AlignVCenter
-        color : "white"
+        color : layout.value("textTable")
         wrapMode: Text.WordWrap
     }
 

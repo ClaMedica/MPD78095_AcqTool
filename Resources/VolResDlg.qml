@@ -9,7 +9,9 @@ MForm {
     width:screenW*grafic.valueOf("Dialog","width")
     anchors.centerIn: parent
     visible: false
-    color : layout.value("BackgroundColor")
+  //  color : layout.value("BackgroundColor")
+    border.color: layout.value("THC2")
+    border.width: 5
 
     property string titleDlg: ""
 
@@ -37,7 +39,7 @@ MForm {
     }
 
     Rectangle{
-        color:"dodgerblue"
+        color:layout.value("THC2")
         width: parent.width
         height: parent.height/5
         anchors.top: parent.top
@@ -49,7 +51,7 @@ MForm {
             horizontalAlignment: Text.AlignHCenter
             labelSize: layout.value("F4")
             verticalAlignment: Text.AlignVCenter
-            color : "white"
+            color : layout.value("textTable")
         }
     }
 
@@ -61,7 +63,7 @@ MForm {
         anchors.horizontalCenter: parent.horizontalCenter
         anchors.margins: layout.value("Margin")
         type:typTextField
-        labelColor: "white"
+        labelColor: layout.value("textTable")
         labelSize: layout.value("F4")
         viewPerc:0.75
         role:qsTr("Insert Residual Volume")

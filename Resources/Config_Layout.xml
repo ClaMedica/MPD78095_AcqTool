@@ -1,85 +1,24 @@
-﻿<Layout label="Layout">
-        <Windows label="Windows Layout">
-            <BackgroundColor
-            label="Background Color"
-            type="ColorBox"
-            dt="string"
-            unit=""
-            value="#355667"
-            />
-            <Margin
-            label="Margin"
-            type="ComboBox"
-            dt="int"
-            unit=""
-            model="2#3#4#5#6#7#8#9#10"
-            value="2"
-            />
-        </Windows>
-        <Fonts label="Fonts">
-            <FFamily
-            label="Font Family"
-            type="ComboFont"
-            dt="string"
-            unit=""
-            model=""
-            value="Luxi Serif"
-            />
-            <FFamilyW
-            label="Font Family"
-            type="ComboBox"
-            dt="string"
-            unit=""
-            model=""
-            value="Calibri"
-            />
-            <F3
-            label="Font"
-            type="SpinBox"
-            dt="real"
-            unit="%"
-            model="30#1#0.1#1#"
-            value="4"
-            />
-            <F4
-            label="Font"
-            type="SpinBox"
-            dt="real"
-            unit="%"
-            model="30#1#0.1#1#"
-            value="4"
-            />
-            </Fonts>
-        <Tables label="Tables Layout">
-            <THF
-            label="Table Header Dim."
-            type="SpinBox"
-            dt="height"
-            unit="%"
-            model="30#1#0.1#1#"
-            value="10"
-            />
-            <TIF
-            label="Table Element Dim."
-            type="SpinBox"
-            dt="height"
-            unit="%"
-            model="30#1#0.1#1#"
-            value="10"
-            />
-            <THC1
-            label="Table Header Col. 1"
-            type="ColorBox"
-            dt="string"
-            unit=""
-            value="#6666FF"
-            />
-            <THC2
-            label="Table Header Col. 2"
-            type="ColorBox"
-            dt="string"
-            unit=""
-            value="#3333FF"
-            />
-        </Tables>
-</Layout>
+﻿<?xml version="1.0" encoding="UTF-8"?><Layout><Windows label="Windows Layout" >
+        <BackgroundColor dt="string" label="Background Color" type="ColorBox" unit="" value="#becad7" />
+        <TaskBarColor dt="string" label="TaskBar Color" type="ColorBox" unit="" value="#0040ff" />
+        <Margin dt="int" label="Margin" model="2#3#4#5#6#7#8#9#10" type="ComboBox" unit="" value="2" /></Windows>
+        <Fonts label="Fonts" >
+            <FFamily dt="string" label="Font Family" model="" type="ComboFont" unit="" value="Luxi Serif" />
+            <FFamilyW dt="string" label="Font Family" model="" type="ComboBox" unit="" value="Calibri" />
+            <F3 dt="real" label="Font" model="30#1#0.1#1#" type="SpinBox" unit="%" value="4" />
+            <F4 dt="real" label="Font" model="30#1#0.1#1#" type="SpinBox" unit="%" value="4" />
+        </Fonts>
+        <Tables label="Tables Layout" >
+        <THF dt="height" label="Table Header Dim." model="30#1#0.1#1#" type="SpinBox" unit="%" value="10" />
+        <TIF dt="height" label="Table Element Dim." model="30#1#0.1#1#" type="SpinBox" unit="%" value="10" />
+        <THC1 dt="string" label="Table Header Col. 1" type="ColorBox" unit="" value="#6666ff" />
+        <THC2 dt="string" label="Table Header Col. 2" type="ColorBox" unit="" value="#3333ff" />
+        <ir0 dt="string" label="Colonna Pari Riga Dispari" type="ColorBox" unit="" value="#FFFFFF" />
+        <ir1 dt="string" label="Colonna Dispari Riga Dispari" type="ColorBox" unit="" value="#FFFFFF" />
+        <ir2 dt="string" label="Colonna Pari Riga Pari" type="ColorBox" unit="" value="#FFFFFF" />
+        <ir3 dt="string" label="Colonna Dispari Riga Pari" type="ColorBox" unit="" value="#FFFFFF" />
+        <sr dt="string" label="Selezione riga" type="ColorBox" unit="" value="#001681" />
+        <textTable dt="string" label="testo" type="ColorBox" unit="" value="#000000" />
+        <opacita label="opacita selezione" dt="string" type="TextField" unit="" value="0.5" alfanum="false"/></Tables>
+        <Button label="Buttons">
+        <c_btn_idle dt="string" label="Pulsante" type="ColorBox" unit="" value="#c0c0c0" /><c_btn_hovered dt="string" label="Pulsante hovered" type="ColorBox" unit="" value="#cce5ff" /><c_btn_enabled dt="string" label="Pulsante enabled" type="ColorBox" unit="" value="#99ccff" /><c_btn_checked dt="string" label="Pulsante checked" type="ColorBox" unit="" value="#3399ff" /><c_btn_pressed dt="string" label="Pulsante pressed" type="ColorBox" unit="" value="#0066cc" /><c_btn_orange_hovered dt="string" label="Pulsante Evidenziato hovered" type="ColorBox" unit="" value="#f4bc69" /><c_btn_orange_enabled dt="string" label="Pulsante Evidenziato enabled" type="ColorBox" unit="" value="#ffa41c" /><c_btn_orange_checked dt="string" label="Pulsante Evidenziato checked" type="ColorBox" unit="" value="#f46400" /><c_btn_orange_pressed dt="string" label="Pulsante Evidenziato pressed" type="ColorBox" unit="" value="#f45000" /></Button></Layout>
