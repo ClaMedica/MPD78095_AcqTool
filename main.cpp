@@ -77,7 +77,7 @@ int main(int argc, char *argv[])
 #endif
 #endif
 
-#ifdef WIN32
+#if defined(MAC) || defined(WIN32)
      QString logFile = "acqTool_log_" + QDateTime::currentDateTime().toString("yyyyMMdd_hhmmss")+".htm";
      gPath_log = QApplication::applicationDirPath() + "/"+ logFile;
      qDebug() << "Start. log:" << gPath_log;
@@ -167,13 +167,16 @@ int main(int argc, char *argv[])
     engine.rootContext()->setContextProperty("PicoFlow", bool_false);
 #endif
 
-#ifdef WIN32
+#if defined(WIN32) || defined(MAC)
     engine.rootContext()->setContextProperty(QLatin1String("platform"), "window");
     engine.rootContext()->setContextProperty("isTouch", bool_false);
     QSize size = app.primaryScreen()->size();
     engine.rootContext()->setContextProperty("screenH", size.height());
     engine.rootContext()->setContextProperty("screenW", size.width());
     engine.rootContext()->setContextProperty("PicoFlow", bool_false);
+#ifdef MAC
+    engine.rootContext()->setContextProperty("Mac", true);
+#endif
 #ifndef STATICO
     if(DebugAcqTool)
         engine.addImportPath(QApplication::applicationDirPath() + "/Modules");

@@ -17,7 +17,19 @@ GraficManager::GraficManager(QObject *parent) : QObject(parent)
         f.close();
         f2.close();
     }
-
+#elif MAC
+    path= g_P7SettingsManager.dataPath() + SUBDIR_CONFIG + GRAFIC_CONFIG_MAC;
+    QFile f, f2;
+    f.setFileName(":/Config/Config_Grafic_mac.xml");
+    f2.setFileName(path);
+    if(!f2.exists()) {  //se non esiste lo creo
+        qDebug() << "Creo file" << f2.fileName();
+        f2.open(QIODevice::WriteOnly);
+        f.open(QIODevice::ReadOnly);
+        f2.write(f.readAll());
+        f.close();
+        f2.close();
+    }
 #else
     path= g_P7SettingsManager.dataPath() + SUBDIR_CONFIG + GRAFIC_CONFIG;
     QFile f, f2;

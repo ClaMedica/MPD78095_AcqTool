@@ -185,18 +185,43 @@ QML_IMPORT_PATH = ../M8078027_MGlobal \
     QT += printsupport
 }
 
+macx {
+    DEFINES += MAC
+    TARGET = acqTool
+
+    SOURCES += CPP/mdatamngdesktop.cpp \
+
+    HEADERS += CPP/mdatamngdesktop.h \
+
+# Additional import path used to resolve QML modules in Qt Creator's code model
+QML_IMPORT_PATH = ../M8078027_MGlobal \
+
+    INCLUDEPATH +=  ../MPD78099_MedicalReport
+
+    QT += printsupport
+}
+
 DINAMICO {
     win32:CONFIG(release, debug|release): LIBS += -L$$PWD/../Build/DatafileManager/release/ -lDatafileManager
     else:win32:CONFIG(debug, debug|release): LIBS += -L$$PWD/../Build/DatafileManager/debug/ -lDatafileManager
     win32:CONFIG(release, debug|release): LIBS += -L$$PWD/../Build/MedicalReport/release/ -lMedicalReport
     else:win32:CONFIG(debug, debug|release): LIBS += -L$$PWD/../Build/MedicalReport/debug/ -lMedicalReport
+
+    macx:CONFIG(release, debug|release): LIBS += -L$$PWD/../Build/Release/DatafileManager/ -lDatafileManager
+    else:macx:CONFIG(debug, debug|release): LIBS += -L$$PWD/../Build/Debug/DatafileManager/ -lDatafileManager
+    macx:CONFIG(release, debug|release): LIBS += -L$$PWD/../Build/Release/MedicalReport/ -lMedicalReport
+    else:macx:CONFIG(debug, debug|release): LIBS += -L$$PWD/../Build/Debug/MedicalReport/ -lMedicalReport
 }
 
 STATICO {
     RESOURCES += modules_picoflow.qrc
-    LIBS += -L$$PWD/../BuildStatic/DatafileManager/release/ -lDatafileManager
-    LIBS += -L$$PWD/../BuildStatic/Medicalreport/release/ -lMedicalReport
-    LIBS += -L$$PWD/../BuildStatic/QmlPlotter/release/ -lQmlPlotter
+    win32:LIBS += -L$$PWD/../BuildStatic/DatafileManager/release/ -lDatafileManager
+    win32:LIBS += -L$$PWD/../BuildStatic/Medicalreport/release/ -lMedicalReport
+    win32:LIBS += -L$$PWD/../BuildStatic/QmlPlotter/release/ -lQmlPlotter
+
+    macx:LIBS += -L$$PWD/../BuildStatic/DatafileManager/ -lDatafileManager
+    macx:LIBS += -L$$PWD/../BuildStatic/Medicalreport/ -lMedicalReport
+    macx:LIBS += -L$$PWD/../BuildStatic/QmlPlotter/ -lQmlPlotter
     DEFINES += STATICO
 }
 

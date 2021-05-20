@@ -261,7 +261,11 @@ void MDataMngDesktop::deleteAnMArkers()
 bool MDataMngDesktop::checkReport()
 {
     QString nomePDF = "rf" + QString("%1").arg(m_testNumber,5,10,QLatin1Char('0')) + "1a" + ".pdf";
+#if MAC
+    m_nomeRefertoPdf = g_P7SettingsManager.dataPath() + "/ref/" + nomePDF;
+#else
     m_nomeRefertoPdf = g_P7SettingsManager.dataPath() + "\\ref\\" + nomePDF;
+#endif
     QFile filePdf(m_nomeRefertoPdf);
     if (filePdf.exists())
         return true;
@@ -306,9 +310,11 @@ void MDataMngDesktop::openReport(QString __nomeReport)
         }
     }
 #endif
-
+#ifdef MAC
+    m_nomeReferto = g_P7SettingsManager.dataPath() + "/ref/" +  "rf" + QString("%1").arg(m_testNumber,5,10,QLatin1Char('0')) + "1a" + ".htm";
+#else
     m_nomeReferto = g_P7SettingsManager.dataPath() + "\\ref\\" +  "rf" + QString("%1").arg(m_testNumber,5,10,QLatin1Char('0')) + "1a" + ".htm";
-
+#endif
     m_reportEdit = m_configPrinter.getSafeChild("Report");
     QString toEdit = m_reportEdit->getSafeChild("HTM")->getSafeAttribute(ATT_VALUE);
 
@@ -322,7 +328,11 @@ void MDataMngDesktop::openReport(QString __nomeReport)
         QTextDocument textDoc;
         textDoc.setHtml(stringa);
         f.close();
+#ifdef MAC
+        QFile f1(g_P7SettingsManager.dataPath() + "/ref/" + "prova.html");
+#else
         QFile f1(g_P7SettingsManager.dataPath() + "\\ref\\" + "prova.html");
+#endif
         f1.open(QIODevice::WriteOnly);
         f1.write(textDoc.toHtml("utf-8").toUtf8());
         f.remove();
@@ -352,15 +362,22 @@ void MDataMngDesktop::openReport(QString __nomeReport)
         }
 
         //if refert button is enabled MUST be a temp or result file of analysis
+#ifdef MAC
+        nomeAnalisi = g_P7SettingsManager.datafilePath() + "/";
+#else
+        nomeAnalisi = g_P7SettingsManager.datafilePath() + "\\";
+#endif
         if (tempFile.size() != 0)
-            nomeAnalisi = g_P7SettingsManager.datafilePath() + "\\" + tempFile;
+            nomeAnalisi += tempFile;
         else
-            nomeAnalisi = g_P7SettingsManager.datafilePath() + "\\" + resultFile;
+            nomeAnalisi += resultFile;
 
         QStringList arg;
         arg << "file:///" +  m_nomeReferto << "r" << g_P7SettingsManager.localization() << nomeAnalisi;
-        QString pth = g_P7SettingsManager.progPath()+"/texteditor.exe";
-
+        QString pth = g_P7SettingsManager.progPath()+"/texteditor";
+#ifndef MAC
+        pth += ".exe";
+#endif
         QProcess *editor = new QProcess();
         editor->setProgram(pth);
         editor->setArguments(arg);
@@ -412,13 +429,16 @@ void MDataMngDesktop::createPdf()
     if (toEdit == "false") {
         QUrl urlFile = QUrl::fromLocalFile(m_nomeRefertoPdf);
         QProcess *viewer = new QProcess();
-        viewer->setProgram(g_P7SettingsManager.progPath()+"/PDFviewer.exe");
+        QString namep = "/PDFviewer";
+#ifndef MAC
+        namep += ".exe";
+#endif
+        viewer->setProgram(g_P7SettingsManager.progPath()+namep);
         viewer->setArguments(QStringList() << urlFile.toString() << g_P7SettingsManager.localization());
         bool ret = viewer->startDetached();
     }
-
     FI.close();
-    FI.remove();
+   // FI.remove();
 }
 
 void MDataMngDesktop::startPrint()
@@ -588,7 +608,12 @@ void MDataMngDesktop::openExportTool()
 {    
     //necessario salvare prima di fare l'esportazione per avere i dati risultati su pic
     saveChanges();
-    QString pth = g_P7SettingsManager.progPath()+"/exportTool.exe";
+    QString pth;
+#ifdef win32
+    pth = g_P7SettingsManager.progPath()+"/exportTool.exe";
+#elif MAC
+    pth = g_P7SettingsManager.progPath()+"/ExportTool";
+#endif
     QProcess *proc = new QProcess();
     proc->setProgram(pth);
 

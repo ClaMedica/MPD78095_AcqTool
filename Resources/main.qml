@@ -1,4 +1,5 @@
-﻿import QtQuick 2.4
+﻿import QtQuick.Window 2.2
+import QtQuick 2.4
 import QtQuick.Controls 1.3
 import QtQuick.Dialogs 1.2
 
@@ -7,7 +8,7 @@ import "qrc:/Dialog"
 
 import MComponents 1.0
 import Managers 1.0
-import QtQuick.Window 2.2
+
 import FileIO 1.0
 
 //import QtQuick.VirtualKeyboard 1.0
@@ -22,8 +23,10 @@ ApplicationWindow {
 
     //@@@@@@@@@@    Properties      @@@@@@@@@@
     id: root
-    flags:Qt.Window | Qt.FramelessWindowHint
+
+    flags: if (!Mac) Qt.Window | Qt.FramelessWindowHint
     visible: false
+
 
     width:platform==="linux"?640:Screen.width
     height:platform==="linux"?480:Screen.height+1
@@ -67,6 +70,7 @@ ApplicationWindow {
      Component.onCompleted: {
          acqLoaded.createFileLoaded()
          console.log("debug??? ", Qt.application.arguments[4])
+
          if (Qt.application.arguments[4] === "debug") {
              root.visible = true
              launchDEBUG(Qt.application.arguments[1],Qt.application.arguments[2], Qt.application.arguments[3])
