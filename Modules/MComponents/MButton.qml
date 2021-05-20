@@ -31,32 +31,32 @@ Rectangle {
 
 
     border.width: control.activeFocus ? 3 : 1
-    border.color: DataEngine.TASKBAR_COLOR
+    border.color: layout.value("TaskBarColor")
     radius: height*0.1
     color:{
         if (!control.enabled)
-            return DataEngine.c_btn_idle
+            return layout.value("c_btn_idle")
         if (rootBtn.orange)
         {
             if (control.pressed)
-                return DataEngine.c_btn_orange_pressed
+                return layout.value("c_btn_orange_pressed")
             if (control.checked)
-                return DataEngine.c_btn_orange_checked
+                return layout.value("c_btn_orange_checked")
             if (control.hovered)
-                return DataEngine.c_btn_orange_hovered
+                return layout.value("c_btn_orange_hovered")
             if (control.enabled)
-                return DataEngine.c_btn_orange_enabled
+                return layout.value("c_btn_orange_enabled")
         }
         else
         {
             if (control.pressed)
-                return DataEngine.c_btn_pressed
+                return layout.value("c_btn_pressed")
             if (control.checked)
-                return DataEngine.c_btn_checked
+                return layout.value("c_btn_checked")
             if (control.hovered)
-                return DataEngine.c_btn_hovered
+                return layout.value("c_btn_hovered")
             if (control.enabled)
-                return DataEngine.c_btn_enabled
+                return layout.value("c_btn_enabled")
         }
     }
 
@@ -70,7 +70,8 @@ Rectangle {
         text:rootBtn.text
         anchors.fill: rootBtn
         labelSize: rootBtn.labelSize
-        color: control.pressed?"white": greytext ? "darkslateblue" : "black"
+        color: control.pressed?"white": layout.value("textTable")
+        //color: control.pressed?"white": greytext ? "darkslateblue" : "black"
         horizontalAlignment: Text.AlignHCenter
         verticalAlignment: Text.AlignVCenter
         Behavior on color {

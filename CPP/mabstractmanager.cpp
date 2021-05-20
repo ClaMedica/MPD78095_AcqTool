@@ -543,8 +543,8 @@ bool MAbstractManager::load()
 
 QString MAbstractManager::plotConfigFileName()
 {
-#ifdef ANDROID
-    return "/mnt/sdcard/Medica/cur.xml";
+#ifdef WIN32
+    return g_P7SettingsManager.tempPath() + "/cur.xml";
 #else
     return m_applicationPath + "/cur.xml";
 #endif
@@ -606,7 +606,7 @@ bool MAbstractManager::buildConfigurationFile()
         Ancestry *  network = prop->addChild(XML_NETWORK);
 
         Ancestry m_configAcq;
-        if(!m_configAcq.loadFromXML(g_P7SettingsManager.progPath() + "/Config_Acq.xml"))
+        if(!m_configAcq.loadFromXML(g_P7SettingsManager.configChannels()))
             qCritical() << "Error on acq configuration file";
 
         Ancestry *channels = m_configAcq.getChild(XML_CHANNELS);
@@ -662,8 +662,8 @@ bool MAbstractManager::buildConfigurationFile()
     }
 
     //ora salvo il file di configurazione come cur.xml
-#ifdef ANDROID
-    configPlot.saveToXML("/mnt/sdcard/Medica/cur.xml");
+#ifdef WIN32
+    configPlot.saveToXML(g_P7SettingsManager.tempPath() + "/cur.xml");
 #else
     configPlot.saveToXML(m_applicationPath+"/cur.xml");
 #endif

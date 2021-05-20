@@ -23,6 +23,7 @@ void MDataMngPico::loadFile(QString __fileName)
     MDataManager::loadFile(__fileName);
     Ancestry *autoloop = m_configUser.getSafeChild("AutomaticFlow");
     m_autoLoop = (autoloop->getSafeChild("Loop")->getSafeAttribute(ATT_VALUE) == "true" ? true : false);
+
     initPrinter();
 }
 
@@ -31,12 +32,15 @@ void MDataMngPico::initPrinter()
     m_mngPrint = new printermanager(m_copyFileName);
     m_mngPrint->setPrintSiroky(m_Siroky);
     m_mngPrint->setPrintLiverpool(m_Liverpool);
-    if (m_etaPatient < 18 && m_etaPatient > 3 && m_peso > 0 && m_altezza > 0)
+    if (m_etaPatient <=18 && m_etaPatient >= 3 && m_peso > 0 && m_altezza > 0)
         m_mngPrint->setPrintMiskolc(m_Miskolc);
     else
         m_mngPrint->setPrintMiskolc(false);
     m_mngPrint->setPrintModeUser(m_landscape);
     m_mngPrint->setPrintHeaders(m_firstHead,m_secondHead);
+    m_mngPrint->setRangeChQ(m_rangeChQ);
+    m_mngPrint->setRangeChVV(m_rangeChVV);
+    m_mngPrint->setRangeChEMG(m_rangeChEMG);
 }
 
 void MDataMngPico::sendToPrint()
@@ -93,6 +97,7 @@ void MDataMngPico::startPrint()
     //mi dice se la flussimetria automatica o manuale
     m_mngPrint->setMode(m_autoFlow);
     //stampo
+
     if (m_autoPrint) {
         sendToPrint();
         m_autoPrint = false; //non deve ristampare se l'utente riapre subito l'esame

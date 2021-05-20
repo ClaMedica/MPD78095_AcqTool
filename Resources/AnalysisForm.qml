@@ -346,7 +346,7 @@ MForm{
         width: 60
         anchors.right: gridMarker.left
         y: PicoFlow ? parent.height : parent.height/2
-        color: "black"
+        color: layout.value("textTable")//"black"
         visible: PicoFlow ? false : true
     }
 
@@ -482,7 +482,7 @@ MForm{
         width: 60
         anchors.right: gridDefiners.left
         y: PicoFlow ? parent.height : parent.height - buttonHeight*gridComandBottom.count
-        color: "black"
+        color: layout.value("textTable")//"black"
         visible: false
     }
 
@@ -563,7 +563,7 @@ MForm{
     Rectangle {
         id: notClose
         border.width: 1
-        border.color: "black"
+        border.color:layout.value("textTable")// "black"
         height:gridComandBottom.height/gridComandBottom.count*0.75
         width:lbNotClose.width
         color: "transparent"
@@ -579,7 +579,7 @@ MForm{
             labelSize: layout.value("F4")
             anchors.fill: parent
             anchors.margins: 5
-            color: "black"
+            color: layout.value("textTable")//"black"
             text: qsTr("<p>File report open.</p>Close the file to continue.")
         }
     }

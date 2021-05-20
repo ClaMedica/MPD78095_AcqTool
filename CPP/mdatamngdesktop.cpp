@@ -1,4 +1,4 @@
-﻿#include "mdatamngdesktop.h"
+#include "mdatamngdesktop.h"
 #include "medicalreport.h"
 #include <QErrorMessage>
 #include <QDesktopServices>
@@ -438,7 +438,7 @@ void MDataMngDesktop::createPdf()
         bool ret = viewer->startDetached();
     }
     FI.close();
-   // FI.remove();
+    FI.remove();
 }
 
 void MDataMngDesktop::startPrint()
@@ -587,7 +587,7 @@ QList<QString> MDataMngDesktop::getListReports()
 {
     QList<QString> list;
 
-    QString pathTemplate = g_P7SettingsManager.progPath() + "/grpbase/MRTemplate_" + g_P7SettingsManager.localization();
+    QString pathTemplate = g_P7SettingsManager.dataPath() + "/grpbase/MRTemplate_" + g_P7SettingsManager.localization();
     QDir pathDir = QDir(pathTemplate);
     QFileInfoList entriesPath = pathDir.entryInfoList(QDir::Files);
     for(QList<QFileInfo>::iterator it = entriesPath.begin(); it!=entriesPath.end();++it)

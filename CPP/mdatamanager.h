@@ -49,9 +49,7 @@ public:
 
     Q_INVOKABLE int getNumAnaFlwAdv(){return m_aflwdatas.length();}
 
-    Q_INVOKABLE bool getAutoPrint(){return m_autoPrint;}
-    Q_INVOKABLE int getAutoFlow(){return m_autoFlow;}
-
+    Q_INVOKABLE bool getAutoAna(){return m_autoAna;}
 
     Q_INVOKABLE QString protocollo(){return m_protocollo;}
     QStringList availableData(){return m_availableData;}
@@ -141,6 +139,7 @@ protected:
 
     bool    m_analyzed;
     bool    m_autoPrint;
+    bool    m_autoAna;
     QString m_pathData;
     QString m_fileName;
     QString m_copyFileName;
@@ -164,6 +163,10 @@ protected:
     QString m_firstHead;    //primo header della stmpa personalizzabile
     QString m_secondHead;   //secondo header della stampa personalizzabile
     QString m_protocollo;
+    //valore range dei diversi canali, usati e diversi da -1 solo se autorange disabilitato (per stampa PICOFLOW2r3)
+    int     m_rangeChVV;
+    int     m_rangeChQ;
+    int     m_rangeChEMG;
 
     QVector<mflowdatas*> m_aflwdatas; //array di analisi di tipo flussimetria
 

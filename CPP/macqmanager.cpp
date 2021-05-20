@@ -48,7 +48,7 @@ MAcqManager::MAcqManager(QObject *parent)
 //a seconda del protocollo scelto e della scheda di acquisizione. Di conseguenza in questa parte di codice
 //il file di config_acq non esiste ancora e queste istruzioni vanno effettuate nella funzione NewAcquisition
 #ifdef PICOFLOW
-    if(!m_configAcq.loadFromXML(g_P7SettingsManager.progPath() + "/Config_Acq.xml"))
+    if(!m_configAcq.loadFromXML(g_P7SettingsManager.configChannels()))
         qCritical() << "Error on acq configuration file";
     //carico info di connettivitA
     loadConnectivityInfo(m_configAcq.getSafeChild(XML_CONNECTIONS));
@@ -238,7 +238,7 @@ bool MAcqManager::newAcquisition(QString __dataFile)
     {
         qDebug() << "carico la configurazione per l'acquisizione";
         qDebug() << g_P7SettingsManager.progPath();
-        if(!m_configAcq.loadFromXML(g_P7SettingsManager.progPath() + "/Config_Acq.xml"))
+        if(!m_configAcq.loadFromXML(g_P7SettingsManager.configChannels()))
             qDebug() << "Error on acq configuration file";
 
         //e infine carico il file degli allarmi
@@ -1229,6 +1229,14 @@ void MAcqManager::applyOperations()
 
                             m_channelMap[type].at(index)->append(mediato);
                             m_valPrecVolume = mediato;
+                        }
+                        //se il canale è EMG non devo registrare i picco sopra 3276 (limite per qint16 del datafilemanager)
+                        else if (type == "EMG")
+                        {
+                            if (v >= 3200)
+                                v= 3200;
+                            m_channelMap[type].at(index)->append(v);
+
                         }
                         else
                             m_channelMap[type].at(index)->append(v);

@@ -146,7 +146,7 @@ MForm{
         anchors.top: parent.top
         anchors.bottom: parent.bottom
         width: 60
-        color: "lightGrey"
+        color: layout.value("BackgroundColor")
 
         MGridView{
             //@@@@@@@@@@    Properties      @@@@@@@@@@
@@ -229,7 +229,7 @@ MForm{
              anchors.right:parent.right
              height:parent.height*0.8
              labelSize: layout.value("F4")
-             color: "white"
+             color: layout.value("textTable")
              horizontalAlignment: Text.AlignHCenter
              verticalAlignment: Text.AlignVCenter
              text: dlgDiscard.testo

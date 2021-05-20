@@ -6,11 +6,11 @@ Rectangle {
     id: anaBtn
     width: 130
     height: 30
-    color:"whitesmoke"
+    color:layout.value("c_btn_enabled")
     border.width: anaBtn.activeFocus ? 3 : 1
-    border.color: DataEngine.TASKBAR_COLOR
+    border.color: layout.value("TaskBarColor")
     radius: height*0.1
-    property real labelSize:4
+    property real labelSize:layout.value("F4")
 
     //Since the buttons are created on the fly,
     //we need to identify the button on which the user
@@ -33,8 +33,8 @@ Rectangle {
         anchors.fill: parent
         onClicked: parent.clicked(parent.buttonId)
 
-        onPressed:  anaBtn.color = "lightgrey"
-        onReleased: anaBtn.color = "whitesmoke"
+        onPressed:  anaBtn.color = layout.value("c_btn_pressed")//"lightgrey"
+        onReleased: anaBtn.color = layout.value("c_btn_enabled")//"whitesmoke"
     }
 }
 

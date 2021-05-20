@@ -18,11 +18,21 @@ MDataManager::MDataManager(QObject *parent)
 
     m_analyzed = false;
     m_autoPrint = false;
+    m_autoAna = false;
     m_autoFlow = 2;
+    m_autoLoop = false;
+
+    m_rangeChVV = -1;
+    m_rangeChQ = -1;
+    m_rangeChEMG = -1;
+
     m_Siroky = false;
     m_Liverpool = false;
     m_Miskolc = false;
     m_landscape = false;
+
+    m_peso = 0;
+    m_altezza = 0;
 
     m_numAna = 0;
     m_toSave = "ret";
@@ -162,7 +172,7 @@ void MDataManager::loadFile(QString __fileName)
         QDate datD = QDate::fromString(dataNascita,"dd/MM/yyyy");
         QDate dateExam = QDate(1899, 12, 30).addDays(m_mng->GetDataEsame());
         m_etaPatient = dateExam.year() - datD.year();
-        qDebug()<<"Eta' paziente"<< m_etaPatient;
+        //qDebug()<<"Eta' paziente"<< m_etaPatient;
 
         if (!m_patientInfo.contains("Anonymous"))
         {
@@ -185,10 +195,11 @@ void MDataManager::loadFile(QString __fileName)
         QVariantList numTest;
         numTest << m_testNumber;
         QVariantList ID = tesTest->getPKOfPairs(QStringList(TES_TestNumber),numTest);
-        int IDPat = tesTest->patientID(tesTest->indexOfPK(ID.at(0).toInt()));
-        m_peso = tesPatient->valueOfPK(IDPat,PAT_weight).toInt();
-        m_altezza = tesPatient->valueOfPK(IDPat,PAT_height).toInt();
-
+        if (ID.length() > 0) {
+            int IDPat = tesTest->patientID(tesTest->indexOfPK(ID.at(0).toInt()));
+            m_peso = tesPatient->valueOfPK(IDPat,PAT_weight).toInt();
+            m_altezza = tesPatient->valueOfPK(IDPat,PAT_height).toInt();
+        }
 
         //dati calibrazione
         m_datiCalib = "none;";
@@ -221,6 +232,13 @@ void MDataManager::loadFile(QString __fileName)
         }
 
         qDebug()<<"Check OTHER Load"<<otherString << "calib:" << m_datiCalib;
+
+        //analisi automatica:
+        //teniamo conto se è un file aperto successivamente ad una acquisizione
+        //in questo caso other string ha dimensione 2.
+        bool anaAuto = false;
+        if (stringSplit.length() == 2)
+            anaAuto = true;
 
         m_end = m_mng->GetDuration() / 1000;
         qDebug() << "Durata esame = " << m_end;
@@ -281,7 +299,6 @@ void MDataManager::loadFile(QString __fileName)
             sig->setGraph(m_mng->GetGraph(h)-1);
             sig->setCh(h);
             sig->setSamplingFrequency(m_mng->GetNAS(h));
-            sig->setSupLim(m_mng->GetSupLim(h));
 
             double M = sig->maximum();
             double m = sig->minimum();
@@ -292,6 +309,7 @@ void MDataManager::loadFile(QString __fileName)
 
             double supLim = m_mng->GetSupLim(h);
             double infLim = m_mng->GetInfLim(h);
+
 #ifdef PICOFLOW
             Ancestry *chProp = m_configUser.getSafeChild(XML_CHANNELSPROP);
 #else
@@ -300,25 +318,44 @@ void MDataManager::loadFile(QString __fileName)
             Ancestry *chName = chProp->getSafeChild(m_mng->GetChanName(h).remove("1"));
             //max#min#step#decimals
             QStringList rangesDef = chName->getSafeChild(ATT_RANGE)->getSafeAttribute(ATT_MODEL).split("#");
+            //autorange
+            QString autorange = chName->getSafeChild(ATT_YAUTOSCALE)->getSafeAttribute(ATT_VALUE);
+            if (autorange == "true") {
 
-            while (M > supLim)
-            {
-                double newSupLim = supLim + rangesDef.at(2).toInt();//aggiungo lo step
-                if (newSupLim <= rangesDef.at(0).toInt())
-                    supLim = newSupLim;
-                else
-                    break;
+                while (M > supLim)
+                {
+                    double newSupLim = supLim + rangesDef.at(2).toInt();//aggiungo lo step
+                    if (newSupLim <= rangesDef.at(0).toInt())
+                        supLim = newSupLim;
+                    else
+                        break;
+                }
+                while (m < infLim)
+                {
+                    double newInfLim = infLim - rangesDef.at(2).toInt();//aggiungo lo step
+                    if (newInfLim >= -rangesDef.at(0).toInt())
+                        infLim = newInfLim;
+                    else
+                        break;
+                }
+
+                if (sig->getName().startsWith("VV"))
+                    m_rangeChVV = -1;
+                else if (sig->getName().startsWith("Q"))
+                    m_rangeChQ = -1;
+                else if (sig->getName().startsWith("EMG"))
+                    m_rangeChEMG = -1;
+            }
+            else { //picoflow2r3 devo passare i range dei canali alla stampa
+                if (sig->getName().startsWith("VV"))
+                    m_rangeChVV = supLim;
+                else if (sig->getName().startsWith("Q"))
+                    m_rangeChQ = supLim;
+                else if (sig->getName().startsWith("EMG"))
+                    m_rangeChEMG = supLim;
             }
 
             sig->setSupLim(supLim);
-            while (m < infLim)
-            {
-                double newInfLim = infLim - rangesDef.at(2).toInt();//aggiungo lo step
-                if (newInfLim >= -rangesDef.at(0).toInt())
-                    infLim = newInfLim;
-                else
-                    break;
-            }
             sig->setInfLim(infLim);
             this->addSignal(sig);
         }
@@ -515,6 +552,12 @@ void MDataManager::loadFile(QString __fileName)
 
         Ancestry *head2 = m_configPrinter.getSafeChild("Headers");
         m_secondHead = head2->getSafeChild("Second")->getSafeAttribute(ATT_VALUE);
+
+        //Se apriamo un file di esame con other string di lunghezza = 2 significa che è un esame appena acquisito
+        if ((anaAuto && m_autoPrint) || m_autoFlow == 0)
+            m_autoAna = true;
+        else
+            m_autoAna = false;
 
 //        if (m_Liverpool) //da sentire sergio
 //            m_Siroky = false;
@@ -997,19 +1040,18 @@ bool MDataManager::checkForVolRes()
 
     //gestione campo Other del file .pic
     QString otherString = m_mng->GetOther();
-    qDebug() << "m_mng->GetOther() ==" << otherString;
     if(otherString == "none")
         otherString  += ";";
     QStringList stringSplit = otherString.split(";");
-    qDebug() << "m_mng->GetOther() ==" << otherString << stringSplit;
+    qDebug() << "m_mng->GetOther() ==" << otherString << stringSplit.length();
     if (stringSplit.length() == 2)
     {
         otherString  += "0;" + QString::number(m_autoFlow) + ";";
         setValVolRes(0);
         m_mng->SetOther(otherString);
         m_mng->CommitParameters();
-        //se è la prima volta che apro un esame di flussimetria automatica la stampa è automatica
-        if (m_autoFlow == 0)
+        //se sono in loop la stampa è automatica
+        if (m_autoLoop)
             m_autoPrint =  true;
     }
     else

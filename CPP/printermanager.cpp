@@ -71,6 +71,10 @@ printermanager::printermanager(QString __namefile, QObject *parent) : QObject(pa
     m_printLiverpool = false;
     m_printMiskolc = false;
 
+    m_rangeChVV = -1;
+    m_rangeChEMG = -1;
+    m_rangeChQ = -1;
+
     m_resultBm_w = 103*8; // 103 bytes * 8 bit
     m_resultBm_h = 300;
     m_bitmapSiroky.   resize((m_resultBm_w * m_resultBm_h) / 8);
@@ -351,9 +355,9 @@ void printermanager::imageGraph(QString head, QString baset, double xscale, int 
         }
         QPoint * points = new QPoint[w];
         qDebug()<<"w,m_num_sam:"<<w<<m_num_sam<<" --> xscale:"<<xscale;
-        imageGraphSingle(lb, points, m_num_sam, xscale, (double)h/maxL, bufL);
+        imageGraphSingle(lb, points, m_num_sam, xscale, (double)h/maxL, bufL, h);
         if(maxR > 0)
-            imageGraphSingle(lb, points, m_num_sam, xscale, (double)h/maxR, bufR);
+            imageGraphSingle(lb, points, m_num_sam, xscale, (double)h/maxR, bufR, h);
         delete points;
     }
     imagePainter->setFont(savedFont);
@@ -361,12 +365,15 @@ void printermanager::imageGraph(QString head, QString baset, double xscale, int 
     imagePt.ry() += 50;
 }
 
-void printermanager::imageGraphSingle(QPoint leftBottom, QPoint *pts, int npts, double kx, double ky, double *bufV)
+void printermanager::imageGraphSingle(QPoint leftBottom, QPoint *pts, int npts, double kx, double ky, double *bufV, int maxy)
 {
     qDebug()<<"npts,kx:"<<npts<<kx;
     for (int ix = 0; ix < npts; ix++ ) {
-        int x = leftBottom.rx() + (int)(kx * ix);
-        int y = leftBottom.ry() - (int)(ky * bufV[ix]);
+        int x  = leftBottom.rx() + (int)(kx * ix);
+        int ty = (int)(ky * bufV[ix]);
+        if(ty > maxy)
+            ty = maxy;
+        int y = leftBottom.ry() - ty;
         pts[ix] = QPoint(x, y);
     }
     imagePainter->drawPolyline(pts, npts);
@@ -379,6 +386,7 @@ void printermanager::print(QString __datiCalib)
 {
     m_datiCalib = __datiCalib;
     qDebug() << m_namefilePrn << "calib:" << __datiCalib;
+
     //dati paziente e esame
     m_dfm->Open();
     m_dfm->GetParameters();
@@ -483,6 +491,7 @@ void printermanager::pri_rep_review()
 
     // emg: allineamento lunghezze e decimazione valori
     if(m_chEmg >= 0) {
+
         int lim = real_lenght * 10;
 
         if(lim > n_chEmg) {                     // allineamento lunghezze
@@ -502,6 +511,7 @@ void printermanager::pri_rep_review()
                 v += fabs(buffer_emg[m]);
             p[i] = v / 10.0;
         }
+
         delete buffer_emg;
         buffer_emg = p;
 
@@ -650,7 +660,7 @@ void printermanager::Pri_Rep(double xscale)
     Report_result();    // scrive in elenco i dati calcolati dall'analisi dell'esame
 
     //	Scrive i dati riguardanti versione firmware e date/ora ultima calibrazione
-       //Report_dati_macchina(numCurve);	// scrive data e ora della stampa e la versione attuale del FW
+    //Report_dati_macchina(numCurve);	// scrive data e ora della stampa e la versione attuale del FW
 
     qDebug() << "Pri_Rep FINE file:" << m_namefile;
 }
@@ -857,7 +867,7 @@ void printermanager::Report_Real_TimeSingle(QString msg, QPoint * points, double
         imagePainter->setPen(Qt::SolidLine);
     }
 
-    imageGraphSingle(QPoint(txtW,-y0), points, m_num_sam, 1.0, n_dots/(double)max_val, buffer);
+    imageGraphSingle(QPoint(txtW,-y0), points, m_num_sam, 1.0, n_dots/(double)max_val, buffer, n_dots);
 }
 
 /**
@@ -1113,21 +1123,29 @@ void printermanager::Calc_Max(double xscale)
     qDebug("m_max_x:%d m_i_max_x:%d",max_x,m_i_max_x);
     qDebug("label time >>%s<<",str_label_time[m_i_max_x]);
 
-    int decina = m_flu_max / 10;
-    m_max_y = (decina + 1) * 10;			// trovo la decina minima superiore al valore max
+    if (m_rangeChQ == -1) //auto-range abilitato
+    {
+        int decina = m_flu_max / 10;
+        m_max_y = (decina + 1) * 10;			// trovo la decina minima superiore al valore max
 
-    if (m_max_y <=  10) m_max_y =  10; else
-    if (m_max_y <=  15) m_max_y =  15; else
-    if (m_max_y <=  20) m_max_y =  20; else
-    if (m_max_y <=  25) m_max_y =  25; else
-    if (m_max_y <=  30) m_max_y =  30; else
-    if (m_max_y <=  40) m_max_y =  40; else
-    if (m_max_y <=  50) m_max_y =  50; else
-    if (m_max_y <=  65) m_max_y =  65; else
-    if (m_max_y <=  80) m_max_y =  80; else
-    m_max_y = 100;
+        if (m_max_y <=  10) m_max_y =  10; else
+        if (m_max_y <=  15) m_max_y =  15; else
+        if (m_max_y <=  20) m_max_y =  20; else
+        if (m_max_y <=  25) m_max_y =  25; else
+        if (m_max_y <=  30) m_max_y =  30; else
+        if (m_max_y <=  40) m_max_y =  40; else
+        if (m_max_y <=  50) m_max_y =  50; else
+        if (m_max_y <=  65) m_max_y =  65; else
+        if (m_max_y <=  80) m_max_y =  80; else
+            m_max_y = 100;
+    }
+    else //auto-range disabilitato
+        m_max_y = m_rangeChQ;
 
-    m_max_y_gr2 = ((long) ((m_max_vol + 10) / 100) + 1) * 100;	// 05 dicembre
+    if (m_rangeChVV == -1)//auto-range abilitato
+        m_max_y_gr2 = ((long) ((m_max_vol + 10) / 100) + 1) * 100;	// 05 dicembre
+    else //auto-range disabilitato
+        m_max_y_gr2 = m_rangeChVV;
 }
 
 void printermanager::Calc_Max_EMG()
@@ -1146,11 +1164,23 @@ void printermanager::Calc_Max_EMG()
                           2000,  2250,  2500,  2750,  3000,    -1
                         };
 
-    for(int i = 0; v_max_y[i] > 0; i++)
-        if(m_max_emg <= v_max_y[i]) {
-            m_max_y = v_max_y[i];
-            return;
-        }
+
+    //auto-range abilitato
+    if (m_rangeChEMG == -1) {
+        for(int i = 0; v_max_y[i] > 0; i++)
+            if(m_max_emg <= v_max_y[i]) {
+                m_max_y = v_max_y[i];
+                qDebug() << "m_max_y:"<<m_max_y;
+                return;
+            }
+    }
+    else if (m_rangeChEMG < 3250) //auto-range disabilitato
+    {
+        m_max_y = m_rangeChEMG;
+        qDebug() << "m_max_y autono:"<<m_max_y;
+        return;
+    }
+
     m_max_y = 3250;
     return;
 }
@@ -1175,7 +1205,9 @@ long printermanager::Calc_Max_Flw()
 //    else //if(flw_max <= 160)
 //        flw_max = 100;
 
-    qDebug("fine Calc_Max_Flw()");
+    if (m_rangeChQ > 0 && m_rangeChQ < 50) //auto-range disabilitato
+        flw_max = m_rangeChQ;
+
     return flw_max;
 }
 
@@ -1202,6 +1234,7 @@ void printermanager::Calc_Max_RealReport_rel2(short __num_sample)
         vol_max = 750;
     else
         vol_max = 1000;
+    m_max_vol = vol_max;
 
     if(m_emgPresent) {
         for(int j = 0; j < __num_sample; j++) {
@@ -1227,7 +1260,13 @@ void printermanager::Calc_Max_RealReport_rel2(short __num_sample)
         else if(emg_max <= 3500)
             emg_max = 3500;
     }
-    m_max_vol = vol_max;
     m_max_emg = emg_max;
+
+    if (m_rangeChVV > 0 && m_rangeChVV < 1000) //auto-range disabilitato
+        m_max_vol = m_rangeChVV;
+
+    if (m_rangeChEMG > 0 && m_rangeChEMG < 3500) //auto-range disabilitato
+        m_max_emg = m_rangeChEMG;
+
     qDebug("vmax:%d emgMax:%d", vol_max, emg_max);
 }

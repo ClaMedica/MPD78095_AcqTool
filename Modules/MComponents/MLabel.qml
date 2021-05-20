@@ -22,10 +22,10 @@ Text {
         else
             rootLabel.font.family = "Calibri"
     }
-    font.bold: true
+    font.bold: false
     font.pixelSize: screenH * 0.01 * labelSize
     fontSizeMode: Text.Fit
     verticalAlignment: Text.AlignVCenter
-    color: "black"
+    color: layout.value("textTable")
 }
 

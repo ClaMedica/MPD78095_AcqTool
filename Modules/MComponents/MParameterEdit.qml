@@ -17,7 +17,7 @@ Rectangle {
     property string unit:""
     property bool created:false
     property bool editable:true
-    property color labelColor:"white"//colore della role
+    property color labelColor:layout.value("textTable")//colore della role
     property var beginInfo:undefined//è il valore che ha la info la prima volta
     property bool keyboardAlfaNum: true
     property int comboNumMaxEle:5
@@ -45,6 +45,7 @@ Rectangle {
     // has clicked. The id must be unique
     property int parameterId: 0
     signal clicked()
+    signal lostFocusTarget()
 
     onComponentChanged: if(component !== undefined) connection.target = component
 
@@ -101,6 +102,8 @@ Rectangle {
                         component.onlyNumber = true
                 }
             }
+            else
+                lostFocusTarget()
         }
     }
 

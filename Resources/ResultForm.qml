@@ -73,7 +73,7 @@ MForm {
             rectf.height = forAna.height
             rectf.anchors.fill = parent
             rectf.color = "transparent"
-            rectf.border.color = "blue"
+            rectf.border.color = "transparent"//layout.value("THC2")//"blue"
             rectf.border.width = 2
 
             var namePage = ""
@@ -591,11 +591,12 @@ MForm {
 
     MButton {
         id:btnBack
+        property real wbt: grafic.valueOf("Button","width")
         text: qsTr("back to graphs")
         anchors.bottom: parent.bottom
         anchors.bottomMargin: 10
         anchors.horizontalCenter: parent.horizontalCenter
-        width:  screenW*grafic.valueOf("Button","width")
+        width:  screenW*(0.01+btnBack.wbt)
         height: screenH*grafic.valueOf("Button","height")
         labelSize: layout.value("F4")
         onClicked:exitFromResult()
