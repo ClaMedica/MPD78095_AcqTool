@@ -10,7 +10,7 @@ Rectangle {
     anchors.centerIn: parent
     visible: false
     color : layout.value("BackgroundColor")
-    border.color: layout.value("THC2")
+    border.color: layout.value("textTable")
     border.width: 5
 
     function open()

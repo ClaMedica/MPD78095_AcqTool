@@ -480,9 +480,11 @@ void MAcqManager::endAcquisition(bool discard)
         Ancestry *autoflow = m_configUser.getSafeChild("AutomaticFlow");
         Ancestry *child = autoflow->getSafeChild("Auto");
         child->setAttribute("value","false");
+#ifdef PICOFLOW
         //devo resettare il parametro di loop a false per non far partire una nuova acquisiszione alla successiva acquisizione
         Ancestry *childLoop = autoflow->getSafeChild("Loop");
         childLoop->setAttribute("value","false");
+#endif
         QString configUser = g_P7SettingsManager.userSettings();
             m_configUser.saveToXML(configUser);
 #ifdef PICOFLOW

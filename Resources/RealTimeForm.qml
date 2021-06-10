@@ -158,7 +158,7 @@ MForm{
                 onClick:{
                     if (value === MDataManager.DISCARD.toString()) {
                         //necessaria richiesta di conferma
-                        dlgDiscard.testo = qsTr("Are you sure to discard the exam?")
+                        dlgDiscard.testo = qsTr("Are you sure to discard the study?")
                         dlgDiscard.visible = true
                     }
                     if (value === MDataManager.CHIUDIACQ.toString()) {

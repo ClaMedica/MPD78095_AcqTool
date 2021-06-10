@@ -346,13 +346,17 @@ void MDataManager::loadFile(QString __fileName)
                 else if (sig->getName().startsWith("EMG"))
                     m_rangeChEMG = -1;
             }
-            else { //picoflow2r3 devo passare i range dei canali alla stampa
+            else
+            {
+                //picoflow2r3 devo passare i range dei canali alla stampa
                 if (sig->getName().startsWith("VV"))
                     m_rangeChVV = supLim;
                 else if (sig->getName().startsWith("Q"))
                     m_rangeChQ = supLim;
-                else if (sig->getName().startsWith("EMG"))
+                else if (sig->getName().startsWith("EMG")) {
+                    if (supLim < 3500) supLim = 3500;
                     m_rangeChEMG = supLim;
+                }
             }
 
             sig->setSupLim(supLim);

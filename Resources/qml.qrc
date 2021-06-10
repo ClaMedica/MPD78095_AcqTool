@@ -5,7 +5,6 @@
     <qresource prefix="/Forms">
         <file>AnalysisForm.qml</file>
         <file>RealTimeForm.qml</file>
-        <file>SupervisorForm.qml</file>
         <file>ResultForm.qml</file>
     </qresource>
     <qresource prefix="/Components">

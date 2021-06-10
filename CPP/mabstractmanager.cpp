@@ -403,9 +403,12 @@ QVariantList MAbstractManager::acqInfo()
 {
     QVariantList list;
 
+    QString valueLoop = "false";
+#ifdef PICOFLOW
     Ancestry *autoflow = m_configUser.getSafeChild("AutomaticFlow");
     Ancestry *childLoop = autoflow->getSafeChild("Loop");
-    QString valueLoop = childLoop->getAttribute("value");
+    valueLoop = childLoop->getAttribute("value");
+#endif
     if (valueLoop == "true")
     {
         //esci senza salvare

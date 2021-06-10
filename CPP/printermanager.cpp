@@ -712,8 +712,8 @@ void printermanager::Report_data()
 
     const char puntini[] = ". . . . . . . . . . . . . . . . . . . . .";
 
-    Report_row(tr("Test Number ....: "), QString::number(m_numTest));
-    Report_row(tr("Test Date ......: "), m_dateofexam);
+    Report_row(tr("Study Number ...: "), QString::number(m_numTest));
+    Report_row(tr("Study Date .....: "), m_dateofexam);
     Report_row(tr("Surname ........: "), m_test_type ? puntini : m_surname);
     Report_row(tr("Name ...........: "), m_test_type ? puntini : m_name);
     Report_row(tr("Birth Date .....: "), m_test_type ? puntini : m_dateofbirth);
