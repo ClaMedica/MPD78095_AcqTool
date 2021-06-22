@@ -44,6 +44,8 @@ ApplicationWindow {
              forReal.displayMessage(qsTr("Wait for ..."), -1,2)
              forHome.whoIsVisible = forReal.name
              forReal.setAcqInfo(mngAcq.acqInfo())
+             forReal.setCommandsBottom(mngAcq.commandsBottomAcq())
+
          }
          else if(mode === "vis")
          {
@@ -88,6 +90,7 @@ ApplicationWindow {
             forReal.displayMessage(qsTr("Wait for ..."), -1,1)
             forHome.whoIsVisible = forReal.name
             forReal.setAcqInfo(mngAcq.acqInfo())
+            forReal.setCommandsBottom(mngAcq.commandsBottomAcq())
         }
         else if(mode === "vis")
         {
@@ -136,28 +139,28 @@ ApplicationWindow {
         id: connMainApp
         target: bridgeMain
         ignoreUnknownSignals: true
-        onNewAcquisition:
+        function onNewAcquisition()
         {
             console.log(datafile);
             launch("acq", datafile, codSoft)
             vis = false
         }
-        onNewVisualization:
+        function onNewVisualization()
         {
             console.log(datafile);
             launch("vis", datafile, codSoft)
             vis = true
         }
-        onStampaProva:
+        function onStampaProva()
         {
             console.log("Stampa di prova");
             launch("sta","")
         }
-        onClosePico:
+        function onClosePico()
         {
             mngData.exitFromReview()
         }
-        onAnaAutomatica:
+        function onAnaAutomatica()
         {
             if (vis && mngData.getAutoAna()){
                 console.log("analisi automatica");
@@ -172,7 +175,9 @@ ApplicationWindow {
         id:mngAcq
 
         //@@@@@@@@@@    Events          @@@@@@@@@@
-        Component.onCompleted: console.log("MAcqManager Ready!")
+        Component.onCompleted: {
+            console.log("MAcqManager Ready!")
+        }
         onSystemInAcqStatus:
         {
             console.log("Go Go Go");

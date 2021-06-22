@@ -61,13 +61,13 @@ Rectangle {
         id:connection
         //target: viene assegnato dal rootParEdit in onComponentChanged
         ignoreUnknownSignals: true
-        onInfoChanged:{
+        function onInfoChanged(){
             if(target === undefined)
                 return
             rootParEdit.info = connection.target.info
         }
 
-        onFocusChanged:
+        function onFocusChanged()
         {
             if(target.focus)
             {

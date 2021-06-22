@@ -200,7 +200,7 @@
                     type="SpinBox"
                     dt="real"
                     unit="uV"
-                    model="5000#500#500#0#"
+                    model="3500#500#500#0#"
                     value="3500"
                 />
 

@@ -42,14 +42,12 @@ public:
                                          QVariantList __filterValues = QVariantList());
     Q_INVOKABLE QVariantList commandsInfo();
     Q_INVOKABLE QVariantList commandsInfoBottom();
+    Q_INVOKABLE QVariantList commandsBottomAcq();
     Q_INVOKABLE QVariantList definersInfo();
     Q_INVOKABLE QVariantList actionsInfo();
     Q_INVOKABLE QVariantList acqInfo();
 
     Q_PROPERTY(QString patientInfo READ patientInfo NOTIFY patientInfoChanged)
-
-//    enum CODICESOFT {PICO = 0, FLOWSOFT = 4,FLWHS};
-//    Q_ENUM(CODICESOFT)
 
     enum CODICIP {
         ANALISI = 111,
@@ -61,7 +59,10 @@ public:
         CHIUDIACQ,
         DELETEALL,
         RISULTATI,
-        EXPORT
+        EXPORT,
+        STARTACQ,
+        SAVEREW,
+        PAUSA
     };
     Q_ENUM(CODICIP)
 

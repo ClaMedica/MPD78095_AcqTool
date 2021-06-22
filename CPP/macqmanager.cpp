@@ -1,5 +1,7 @@
 ﻿#include "macqmanager.h"
 
+extern bool DebugAcqTool;
+
 MAcqManager::MAcqManager(QObject *parent)
 {
     (void) parent;
@@ -54,10 +56,10 @@ MAcqManager::MAcqManager(QObject *parent)
     loadConnectivityInfo(m_configAcq.getSafeChild(XML_CONNECTIONS));
 
     QTimer::singleShot(1000, this, SLOT(connectToServers()));
-    //connetto il gestore degli allarmi alla proprietA  alarms
-    connect(&m_alarmMng, SIGNAL(alarmsUpdated(QVariantList)), this, SLOT(setAlarms(QVariantList)));
-#endif
 
+#endif
+    //connetto il gestore degli allarmi alla proprieta  alarms
+    connect(&m_alarmMng, SIGNAL(alarmsUpdated(QVariantList)), this, SLOT(setAlarms(QVariantList)));
     connect(&udpConn, SIGNAL(receivedUdp(enum WHO, QByteArray)), this, SLOT(udpBtDecode(WHO,QByteArray)));
     udpConn.iAmAcq();
     udpConn.connessioni();
@@ -350,7 +352,7 @@ bool MAcqManager::newAcquisition(QString __dataFile)
         m_newStateQ.clear();
 
         //dico a medica di salvare il file nel db
-        g_mainAppBridge->sendSave();
+        if (!DebugAcqTool) g_mainAppBridge->sendSave();
 
         //inizializzo i server di comunicazione con i plotter
         initializeServers();
@@ -361,7 +363,7 @@ bool MAcqManager::newAcquisition(QString __dataFile)
         m_alarmMng.resetAlarm(ALA_FULL_BEAKER);
 
         //connessioni
-        connectToServers();
+        if (!DebugAcqTool) connectToServers();
 
         m_disableWeightFilt = QFile::exists(m_fileVerifica);    // "/tmp/disableDebounce"
     }
@@ -382,7 +384,7 @@ void MAcqManager::connectToServers()
     //mi connetto ai server
     qDebug() << "Connecting to servers ..." << m_tcpClients.keys();
     foreach (SimpleTCPClient *client, m_tcpClients) {
-        if(!client->getSocketState() != QAbstractSocket::ConnectedState) {
+        if (client->getSocketState() != QAbstractSocket::ConnectedState) {
             client->registerDataReadyCallBack(&(this->dataOnTCP));
             client->connectToHost();
             retry |= true;
@@ -394,7 +396,7 @@ void MAcqManager::connectToServers()
         qDebug() << "TCP connected m_supeConnected:" << m_supeConnected;
 }
 
-void MAcqManager::endAcquisitionSave()
+void MAcqManager::endAcquisitionSave(bool __rivedi)
 {
     qDebug() << "endAcquisitionSave()";
 #ifdef PICOFLOW
@@ -406,7 +408,8 @@ void MAcqManager::endAcquisitionSave()
     }
 #else
     endAcquisition();
-    g_mainAppBridge->sendOpen();
+    //chiudi
+    if (__rivedi) g_mainAppBridge->sendOpen();
 #endif
 
 }
@@ -418,7 +421,7 @@ void MAcqManager::endAcquisitionDiscard()
     g_mainAppBridge->sendDiscard();
 }
 
-void MAcqManager::endAcquisition(bool discard)
+void MAcqManager::endAcquisition(bool __discard)
 {
 #ifdef PICOFLOW
     QFile tempVerifica;
@@ -431,7 +434,7 @@ void MAcqManager::endAcquisition(bool discard)
     m_alarmMng.disableAll();
 
     //interrompo la connessione
-    qDebug() << "endAcquisition discard:" << discard;
+    qDebug() << "endAcquisition discard:" << __discard;
     sendStopAcq();
 
 //    foreach (SimpleTCPClient *client, m_tcpClients) {
@@ -473,7 +476,7 @@ void MAcqManager::endAcquisition(bool discard)
     *out << m_itsok;
     OutFile->close();
 
-    if (discard)  //devo cancellare il file
+    if (__discard)  //devo cancellare il file
     {
         qDebug() << QFile::remove(m_mng->GetFileName());
         //devo resettare il parametro di flusso automatico a false per non far partire sempre l'analisi in automatico all'apertura in review di un file
@@ -576,7 +579,6 @@ void MAcqManager::send_Command(int __command)
 bool MAcqManager::sendCommand(tcp_flow_bt_cmd_t __command)
 {
     qDebug() << "traccia start-stop";
-    qDebug() << "Sending command: " << __command;
     if(m_tcpClients.contains("CMD")) {
         quint8 c = (quint8) __command;
         m_tcpClients["CMD"]->sendData((char *) &c, sizeof(quint8));
@@ -584,7 +586,7 @@ bool MAcqManager::sendCommand(tcp_flow_bt_cmd_t __command)
         return true;
     }
     else {
-        qCritical() << "No CMD channel loaded";
+        qWarning() << "No CMD channel loaded";
         return false;
     }
 }
@@ -668,20 +670,17 @@ void MAcqManager::handleTCP(SimpleTCPClient *__client, QByteArray __block)
                     int newState = selBtPf ? (int) stBT.currState : (int) stPico.currState;
 
                     static bool inAcq = false;
-//                    static bool acqStarted = false;
                     bool tmpInAcq = (m_acqFileOpened && !m_acqFinished);
                     if(tmpInAcq && !inAcq) {    // inizio acq: transizione stato
                         acqStarted = true;
-                        //qDebug() << "(tmpInAcq && !inAcq): sendStartAcq()";
+                     //   qDebug() << "(tmpInAcq && !inAcq): sendStartAcq()";
                         sendStartAcq();
-//                        if(selBtPf)
-//                            m_oldState = ESTATE_IDLE_CONNECTED;
                     }
                     inAcq = tmpInAcq;
 
                     if(acqStarted && (newState == ESTATE_ACQUIRING)) {
                         acqStarted = false;
-                        //qDebug() << "transizione: emit systemInAcqStatus()";
+                    //   qDebug() << "transizione: emit systemInAcqStatus()";
                         emit systemInAcqStatus();
                     }
 
@@ -738,45 +737,51 @@ void MAcqManager::handleTCP(SimpleTCPClient *__client, QByteArray __block)
         else if(who == "CMD") {
             qDebug() << "CMD __block[4]" << __block[4];
             if(__block[4] == '5' && m_acqFileOpened) {
-                if(!m_saving) {
-                    //parte immediatamente l'acquisizione
-                    //azzero
-                    qDebug() << "CMD __block[4] == '5': Start acquiring sendStartAcq()";
-                    acqStarted = true;
-
-                    m_startAcqManuale = true;
-                    int secToSave = 0.0;
-                    //in caso di flussimetria manuale non devo tenermi buffer di dati:
-                    //i dati salvati partono dal momento dello start acquisizione da parte dell'utente
-                    if (m_autoStartStop)  { //in caso di flussimetria automatica
-                        //effetto buffer tengo solo gli ultimi 5 secondi
-                        secToSave = 5.0;
-                        //devo resettare il buffer del controllo dei min secondi per lo stop automatico
-                        m_stopBuffer.clear();
-                    }
-                    foreach(QString type, m_channelMap.keys())
-                        foreach(MSignal *sig, m_channelMap[type])
-                            sig->saveLastSec(secToSave);
-
-
-                    udpConn.sendSup("WDebounceStop");
-
-                    m_saving = true;    //posso iniziare a salvare i dati
-                  //  emit systemInAcqStatus();
-                    m_acqFinished = false;
-
-                    sendStartAcq();
-                }
-                else {
-                    //ferma immediatamente l'acquisizione
-                    qDebug() << "Stop acquiring";
-                    endAcquisitionSave();
-                    m_startAcqManuale = false;
-                    m_acqFinished = true;
-                }
+                if (!m_saving)
+                    startAcq();
+                else
+                    stopAcq();
             }
         }
     }
+}
+
+void MAcqManager::startAcq()
+{
+    //parte immediatamente l'acquisizione
+    //azzero
+    qDebug() << "Start acquisizione sendStartAcq()";
+    acqStarted = true;
+
+    m_startAcqManuale = true;
+    int secToSave = 0.0;
+    //in caso di flussimetria manuale non devo tenermi buffer di dati:
+    //i dati salvati partono dal momento dello start acquisizione da parte dell'utente
+    if (m_autoStartStop)  { //in caso di flussimetria automatica
+        //effetto buffer tengo solo gli ultimi 5 secondi
+        secToSave = 5.0;
+        //devo resettare il buffer del controllo dei min secondi per lo stop automatico
+        m_stopBuffer.clear();
+    }
+    foreach(QString type, m_channelMap.keys())
+        foreach(MSignal *sig, m_channelMap[type])
+            sig->saveLastSec(secToSave);
+
+
+    udpConn.sendSup("WDebounceStop");
+
+    m_saving = true;    //posso iniziare a salvare i dati
+    m_acqFinished = false;
+    sendStartAcq();
+}
+
+void MAcqManager::stopAcq()
+{
+    //ferma immediatamente l'acquisizione
+    qDebug() << "Stop acquisizione";
+    endAcquisitionSave();
+    m_startAcqManuale = false;
+    m_acqFinished = true;
 }
 
 int MAcqManager::manAutoQml()
@@ -890,7 +895,6 @@ void MAcqManager::analyzeStatus(uint8_t __currState, bool __isBT)
                 //avviso l'utente che l'acquisizione è ripartita
                 m_alarmMng.resetAlarm(ALA_NOT_ACQUIRING);
                 m_alarmMng.resetAlarm(ALA_NOT_CONNECTED);
-
                 emit systemInAcqStatus();
                 //attivo allarme di possibile perdita acquisizione
                 m_alarmMng.manageAlarm(ALA_NOT_ACQUIRING, ENABLE);
@@ -1165,29 +1169,13 @@ bool MAcqManager::handleDataFile()
                         m_mng->SetOffset(i, channel->getTextOfChild(XML_OFFSET).toFloat());
                 }
         }
-#if defined(PICOFLOW) || defined(LINUXDESKTOP)
+
         m_autoStartStop = checkAutomaticFlow();
-        if (m_autoStartStop) {
-//            QFile tempVerifica;
-//            tempVerifica.setFileName(m_fileVerifica);
-//            if (tempVerifica.exists())
-//                tempVerifica.remove();
+        if (m_autoStartStop)
             udpConn.sendSup("WDebounceStart");
-        }
-#else
-        //controllo se questo canale ha i requisiti per fare l'acq automatica
-        //mi fido del software archivio pazienti
-        if(m_mng->GetLoc(i) == "a")
-            m_autoStartStop = true;
-#endif
+
         //qDebug() << "handleDataFile(): GetGain,GetOffset:" << m_mng->GetGain(i) << m_mng->GetOffset(i);
     }
-
-    //    //qDebug()<<"stato"<<m_mng->GetState();
-    //    qDebug() << "Commit Parameters?" << m_mng->CommitParameters();
-    //    qDebug() << "Close?" << m_mng->Close();
-    //    qDebug() << "Open?" << m_mng->Open();
-    //    qDebug() << "Get Parameters?" << m_mng->GetParameters();
     return true;
 }
 

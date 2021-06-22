@@ -1,4 +1,4 @@
-import QtQuick 2.4
+﻿import QtQuick 2.4
 import QtQuick.Controls 1.4
 import QtQuick.Window 2.2
 import MComponents 1.0
@@ -23,12 +23,12 @@ Rectangle {
     Connections{
         id:con
         ignoreUnknownSignals: true
-        onColorSelected: {
+        function onColorSelected() {
             rootColorBox.color=target.choosedColor
             target.visible=false
             target = null
         }
-        onClosing:{
+        function onClosing(){
             target.destroy()
         }
     }

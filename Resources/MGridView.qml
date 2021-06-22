@@ -66,7 +66,7 @@ Rectangle{
             rep.model=eCount
             modify()
             moveAndResize()
-            //console.log("popolato con ",eCount," elements")
+           // console.log("popolato con ",eCount," elements")
         }
     }
 
@@ -98,6 +98,18 @@ Rectangle{
         }
 
         //property int itemSize:(rootGrid.width-(itemsInRow+1)*distanceBetweenItems)/itemsInRow
+    }
+
+    function enable(enable,pulsante)
+    {
+        for(var i=0;i<items.length;i++)
+        {
+            if (items[i]===pulsante) {
+                //console.log(items[i+1],items[i+4])
+                items[i+4] = enable
+            }
+        }
+        populate()
     }
 
     //@@@@@@@@@@    Events          @@@@@@@@@@

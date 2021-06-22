@@ -30,17 +30,9 @@
         <file>AlarmModel.qml</file>
     </qresource>
     <qresource prefix="/Images">
-        <file alias="Analysis">Analysis.jpg</file>
-        <file alias="Button">Button.jpg</file>
-        <file alias="Button2">Button.png</file>
-        <file alias="File">File.jpg</file>
-        <file alias="Home">Home.jpg</file>
         <file alias="medica">medica.jpg</file>
-        <file alias="Options">Options.jpg</file>
-        <file alias="Real">Real.jpg</file>
         <file alias="resetOff">resetOff.jpg</file>
         <file alias="resetOn">resetOn.jpg</file>
-        <file alias="setting">setting.png</file>
         <file alias="Supervisor">Supervisor.jpg</file>
     </qresource>
     <qresource prefix="/Config">

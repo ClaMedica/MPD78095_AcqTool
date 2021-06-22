@@ -399,16 +399,59 @@ QVariantList MAbstractManager::commandsInfoBottom()
     return list;
 }
 
+QVariantList MAbstractManager::commandsBottomAcq()
+{
+    QVariantList list;
+#ifndef PICOFLOW
+    //salva e chiudi
+    list << "$GridElement";
+    list << "descr" << tr("save&review");
+    list << "img" << "qrc:/salvaRivedi";
+    list << "key" << SAVEREW;
+    list << "visible" << true;
+    list << "enabled" << false;
+    list << "&GridElement";
+
+    //esci senza salvare
+    list << "$GridElement";
+    list << "descr" << tr("discard");
+    list << "img" << "qrc:/discard";
+    list << "key" << DISCARD;
+    list << "visible" << true;
+    list << "enabled" << true;
+    list << "&GridElement";
+#endif
+    return list;
+}
+
 QVariantList MAbstractManager::acqInfo()
 {
     QVariantList list;
+
+#ifndef PICOFLOW
+    list << "$GridElement";
+    list << "descr" << tr("start");
+    list << "img" << "qrc:/Start0";
+    list << "key" << STARTACQ;
+    list << "visible" << true;
+    list << "enabled" << true;
+    list << "&GridElement";
+
+    list << "$GridElement";
+    list << "descr" << tr("pause");
+    list << "img" << "qrc:/pausa";
+    list << "key" << PAUSA;
+    list << "visible" << true;
+    list << "enabled" << false;
+    list << "&GridElement";
+#endif
 
     QString valueLoop = "false";
 #ifdef PICOFLOW
     Ancestry *autoflow = m_configUser.getSafeChild("AutomaticFlow");
     Ancestry *childLoop = autoflow->getSafeChild("Loop");
     valueLoop = childLoop->getAttribute("value");
-#endif
+
     if (valueLoop == "true")
     {
         //esci senza salvare
@@ -431,6 +474,9 @@ QVariantList MAbstractManager::acqInfo()
         list << "enabled" << true;
         list << "&GridElement";
     }
+
+#endif
+
     return list;
 }
 

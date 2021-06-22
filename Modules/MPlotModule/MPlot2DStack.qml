@@ -66,7 +66,7 @@ Rectangle {
             if(plotProp[i]==="$Plot")
                 pn++
         plotNumber=pn
-        //console.log(plotProp)
+        console.log(plotProp)
         //adesso vado a vedere come modificare i vari plot in base alle caratteristiche
         modify(plotProp);
     }
