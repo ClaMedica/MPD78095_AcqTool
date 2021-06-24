@@ -139,13 +139,13 @@ ApplicationWindow {
         id: connMainApp
         target: bridgeMain
         ignoreUnknownSignals: true
-        function onNewAcquisition()
+        function onNewAcquisition(datafile,codSoft)
         {
             console.log(datafile);
             launch("acq", datafile, codSoft)
             vis = false
         }
-        function onNewVisualization()
+        function onNewVisualization(datafile,codSoft)
         {
             console.log(datafile);
             launch("vis", datafile, codSoft)

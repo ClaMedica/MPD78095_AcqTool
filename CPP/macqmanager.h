@@ -52,6 +52,7 @@ public slots:
     bool sendStopAcq (void);
     void startAcq();
     void stopAcq();
+    void pauseAcq();
     void resetAlarms();
     void setAlarms(QVariantList __list);
     void udpBtDecode(enum WHO __from, QByteArray __msg);

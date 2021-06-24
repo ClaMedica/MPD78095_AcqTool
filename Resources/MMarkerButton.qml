@@ -16,6 +16,7 @@ Rectangle{
     property var modello:[]
     property string key: modM.key
     signal click(var value)
+    signal exit()
     signal tooltipActive(var testo, var posY)
 
     //@@@@@@@@@@    Properties      @@@@@@@@@@
@@ -115,12 +116,14 @@ Rectangle{
             }
         }
         onReleased: {
+            if(isTouch)
                 rootMarkerButton.state="hov"
         }
         onExited:    {
             if(!isTouch){
                 rootMarkerButton.state="idl"
                 tooltipActive("",rootMarkerButton.y)
+                exit()
             }
         }
         onPressed:  {

@@ -784,6 +784,14 @@ void MAcqManager::stopAcq()
     m_acqFinished = true;
 }
 
+void MAcqManager::pauseAcq()
+{
+    //ferma l'acquisizione
+    qDebug() << "Pausa acquisizione";
+    sendStopAcq();
+}
+
+
 int MAcqManager::manAutoQml()
 {
     int retv = 0;

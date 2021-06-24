@@ -105,7 +105,7 @@ Rectangle{
         for(var i=0;i<items.length;i++)
         {
             if (items[i]===pulsante) {
-                //console.log(items[i+1],items[i+4])
+               // console.log(pulsante,items[i+1],items[i+4])
                 items[i+4] = enable
             }
         }

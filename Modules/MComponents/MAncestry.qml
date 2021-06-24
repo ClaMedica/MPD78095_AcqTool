@@ -162,7 +162,6 @@ Column {
                 if (labelAttr === "width track" )
                     continue
 
-                console.log("LABELATT",labelAttr)
                 if (CODSOFT === AcqModuleManager.FLOWSOFT && (labelAttr === "Range" || labelAttr === "Auto Range" || labelAttr === "Settings"))
                     continue
 
