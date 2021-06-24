@@ -120,9 +120,8 @@ MForm{
         itemsInRow:1
         delegate: MMarkerButton{
             onClick:{
-               // mngAcq.addMarker(value);
-                //console.log(mngAcq.acqMarkers)
-               // plot.markers=mngAcq.acqMarkers;
+                mngAcq.addMarker(value);
+                plot.markers=mngAcq.acqMarkers;
             }
             onTooltipActive: {
                 if (testo === "")
@@ -136,7 +135,7 @@ MForm{
                 }
             }
         }
-        visible: PicoFlow ? false :true
+        visible: PicoFlow ? false : true
     }
 
 
