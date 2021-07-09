@@ -46,7 +46,7 @@ printermanager::printermanager(QString __namefile, QObject *parent) : QObject(pa
 
     m_dfm = new DatafileManager();
     m_dfm->SetFileName(m_namefile);
-    m_dfm->SetFileType(7);
+    m_dfm->SetFileType(TIPOFILE);
 
     m_printMode = PORTRAIT_MODE;
     m_printModeUser = PORTRAIT_MODE;

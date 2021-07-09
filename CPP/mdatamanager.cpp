@@ -148,7 +148,8 @@ void MDataManager::loadFile(QString __fileName)
             delete m_mng;
         m_mng = new DatafileManager;
         m_mng->SetFileName(m_copyFileName);
-        m_mng->SetFileType(7);
+        m_mng->SetFileType(TIPOFILE);
+
         m_mng->SetLanguage(g_P7SettingsManager.localization());
         bool res = m_mng->Open();
         qDebug() << "File Aperto?" << res;
@@ -162,13 +163,14 @@ void MDataManager::loadFile(QString __fileName)
         }
 
         m_testNumber = m_mng->GetTestNum();
-        m_patientInfo = m_mng->GetPatient().section(";",0,1);
+        //QString patientInfo = m_mng->GetPatient();
+        m_patientInfo = m_mng->GetPatient().section(";",PAT_STR_COGNOME,PAT_STR_NOME);
         m_patientInfo.replace(";", " ");
 
         m_protocollo = m_mng->GetTestDescr();
         //m_protocollo = "Picoflow2R3"; //temporaneo finchè non si sitema il database sql con i protocolli giusti
 
-        QString dataNascita = m_mng->GetPatient().section(";",2,2);
+        QString dataNascita = m_mng->GetPatient().section(";",PAT_STR_DOB,PAT_STR_DOB);
         QDate datD = QDate::fromString(dataNascita,"dd/MM/yyyy");
         QDate dateExam = QDate(1899, 12, 30).addDays(m_mng->GetDataEsame());
         m_etaPatient = dateExam.year() - datD.year();
@@ -179,9 +181,14 @@ void MDataManager::loadFile(QString __fileName)
             QString dateofexam = dateExam.toString("dd/MM/yyyy");
             m_patientInfo = m_patientInfo + " - " + dateofexam;
         }
-
+#ifndef PICOFLOW
+        QString oper = tr("Operator") + ": " + m_mng->GetPatient().section(";", PAT_STR_ESAMINATORE, PAT_STR_ESAMINATORE);
+        QString send = tr("Sender") + ": " + m_mng->GetPatient().section(";", PAT_STR_INVIANTE, PAT_STR_INVIANTE);
+        m_patientInfo = m_patientInfo + " - " + oper + " - " + send;
+#endif
+       // QString sex = m_mng->GetPatient().section(";", PAT_STR_SEX, PAT_STR_SEX);
         m_sexPatient = false;
-        if (m_mng->GetPatient().section(";", 12, 12) == "F")
+        if (m_mng->GetPatient().section(";", PAT_STR_SEX, PAT_STR_SEX) == "F")
             m_sexPatient = true;
 
         //cerco peso e altezza paziente nel database
@@ -598,7 +605,7 @@ void MDataManager::saveChanges()
     }
     m_copy = new DatafileManager;
     m_copy->SetFileName(m_copyFileName);
-    m_copy->SetFileType(7);
+    m_copy->SetFileType(TIPOFILE);
 
     qDebug() << "Copia aperta?" << m_copy->Open();
     qDebug() << "Copia caricata?" << m_copy->GetParameters();
@@ -1035,7 +1042,7 @@ bool MDataManager::checkForVolRes()
     m_mng = new DatafileManager;
     qDebug() << m_copyFileName;
     m_mng->SetFileName(m_copyFileName);
-    m_mng->SetFileType(7);
+    m_mng->SetFileType(TIPOFILE);
 
     qDebug() << "File Aperto?" << m_mng->Open();
     qDebug() << "File Caricato?" << m_mng->GetParameters();
@@ -1112,7 +1119,7 @@ qDebug() << "INIZIO";
 
     m_mng = new DatafileManager;
     m_mng->SetFileName(m_copyFileName);
-    m_mng->SetFileType(7);
+    m_mng->SetFileType(TIPOFILE);
 
     qDebug() << "File Aperto?" << m_mng->Open();
     qDebug() << "File Caricato?" << m_mng->GetParameters();
@@ -1129,7 +1136,7 @@ qDebug() << "INIZIO";
         otherList[1] = QString::number(valResNew);
         for (int j=0; j<otherList.length()-1;j++)
             other += otherList.at(j) + ";";
-        qDebug()<<"OTHER ANALISI"<<other;
+        //qDebug()<<"OTHER ANALISI"<<other;
         m_mng->SetOther(other);
         m_mng->CommitParameters();
         setToSave("");  //necessario chiedere se salvare

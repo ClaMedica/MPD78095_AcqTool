@@ -309,7 +309,7 @@ bool MAcqManager::newAcquisition(QString __dataFile)
         m_mng = new DatafileManager;
 
         m_mng->SetFileName(__dataFile);
-        m_mng->SetFileType(7);
+        m_mng->SetFileType(TIPOFILE);
 
         qDebug() << "Opening file ... " << m_mng->Open();
         qDebug() << "Loading parameters ... " << m_mng->GetParameters();

@@ -1,4 +1,4 @@
-#ifndef printermanager_H
+﻿#ifndef printermanager_H
 #define printermanager_H
 
 #include <QObject>
@@ -6,7 +6,7 @@
 #include <QQuickItemGrabResult>
 #include "stdint.h"
 #include <QFont>
-
+#include "global.h"
 
 #define NUMOF_X_PRINT_DOTS  752 // (96 mm - 2mm dovuti agli assi) * 8 bit al mm = 94 * 8 = 752
 

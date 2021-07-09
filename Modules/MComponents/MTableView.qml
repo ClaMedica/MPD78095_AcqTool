@@ -59,6 +59,7 @@ BuzzTableView{
         var row = model.indexOfPK(patID)
         rootTable.selection.select(row)
         rootTable.currentRow = row
+        rootTable.selected()
     }
 
     function selectRowFromPK(pk)
@@ -180,7 +181,7 @@ BuzzTableView{
         height:rootTable.height-2
         border.width: 2
         border.color: layout.value("BackgroundColor")
-        color:"transparent"
+        color: "transparent"
     }
 }
 
