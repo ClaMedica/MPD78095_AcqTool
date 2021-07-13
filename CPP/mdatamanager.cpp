@@ -265,7 +265,7 @@ void MDataManager::loadFile(QString __fileName)
 //            qDebug() << numSamp[2];
 //            qDebug() << numSamp[3];
             double val = (double) numSamp[0] / m_mng->GetNAS(0);
-            qDebug() << "Marker" << key << val << descr;
+//            qDebug() << "Marker" << key << val << descr;
 
             if(m_markerMap.keys().contains(key)) {   //marker conosciuto le info ce le ho giA
                 (*mrk) = m_markerMap[key];
@@ -323,46 +323,49 @@ void MDataManager::loadFile(QString __fileName)
             Ancestry *chProp = m_configUserProp.getSafeChild(XML_CHANNELSPROP);
 #endif
             Ancestry *chName = chProp->getSafeChild(m_mng->GetChanName(h).remove("1"));
-            //max#min#step#decimals
-            QStringList rangesDef = chName->getSafeChild(ATT_RANGE)->getSafeAttribute(ATT_MODEL).split("#");
-            //autorange
-            QString autorange = chName->getSafeChild(ATT_YAUTOSCALE)->getSafeAttribute(ATT_VALUE);
-            if (autorange == "true") {
-
-                while (M > supLim)
-                {
-                    double newSupLim = supLim + rangesDef.at(2).toInt();//aggiungo lo step
-                    if (newSupLim <= rangesDef.at(0).toInt())
-                        supLim = newSupLim;
-                    else
-                        break;
-                }
-                while (m < infLim)
-                {
-                    double newInfLim = infLim - rangesDef.at(2).toInt();//aggiungo lo step
-                    if (newInfLim >= -rangesDef.at(0).toInt())
-                        infLim = newInfLim;
-                    else
-                        break;
-                }
-
-                if (sig->getName().startsWith("VV"))
-                    m_rangeChVV = -1;
-                else if (sig->getName().startsWith("Q"))
-                    m_rangeChQ = -1;
-                else if (sig->getName().startsWith("EMG"))
-                    m_rangeChEMG = -1;
-            }
-            else
+            if (chName != NULL) //canale non presente nella configurazione attuale, forse esame effettuato con pico3000
             {
-                //picoflow2r3 devo passare i range dei canali alla stampa
-                if (sig->getName().startsWith("VV"))
-                    m_rangeChVV = supLim;
-                else if (sig->getName().startsWith("Q"))
-                    m_rangeChQ = supLim;
-                else if (sig->getName().startsWith("EMG")) {
-                    if (supLim < 3500) supLim = 3500;
-                    m_rangeChEMG = supLim;
+                //max#min#step#decimals
+                QStringList rangesDef = chName->getSafeChild(ATT_RANGE)->getSafeAttribute(ATT_MODEL).split("#");
+                //autorange
+                QString autorange = chName->getSafeChild(ATT_YAUTOSCALE)->getSafeAttribute(ATT_VALUE);
+                if (autorange == "true") {
+
+                    while (M > supLim)
+                    {
+                        double newSupLim = supLim + rangesDef.at(2).toInt();//aggiungo lo step
+                        if (newSupLim <= rangesDef.at(0).toInt())
+                            supLim = newSupLim;
+                        else
+                            break;
+                    }
+                    while (m < infLim)
+                    {
+                        double newInfLim = infLim - rangesDef.at(2).toInt();//aggiungo lo step
+                        if (newInfLim >= -rangesDef.at(0).toInt())
+                            infLim = newInfLim;
+                        else
+                            break;
+                    }
+
+                    if (sig->getName().startsWith("VV"))
+                        m_rangeChVV = -1;
+                    else if (sig->getName().startsWith("Q"))
+                        m_rangeChQ = -1;
+                    else if (sig->getName().startsWith("EMG"))
+                        m_rangeChEMG = -1;
+                }
+                else
+                {
+                    //picoflow2r3 devo passare i range dei canali alla stampa
+                    if (sig->getName().startsWith("VV"))
+                        m_rangeChVV = supLim;
+                    else if (sig->getName().startsWith("Q"))
+                        m_rangeChQ = supLim;
+                    else if (sig->getName().startsWith("EMG")) {
+                        if (supLim < 3500) supLim = 3500;
+                        m_rangeChEMG = supLim;
+                    }
                 }
             }
 

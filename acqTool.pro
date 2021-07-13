@@ -28,6 +28,8 @@ TRANSLATIONS += acqtool.xlf \
     }
 
     SOURCES += \
+    ../MPD78097_Database/msqloperators.cpp \
+    ../MPD78097_Database/msqlsenders.cpp \
         main.cpp \
         CPP/alarmmanager.cpp \
         CPP/androidmanager.cpp \
@@ -79,6 +81,8 @@ TRANSLATIONS += acqtool.xlf \
         ../MPD78097_Database/msqltests.cpp
 
     HEADERS += \
+    ../MPD78097_Database/msqloperators.h \
+    ../MPD78097_Database/msqlsenders.h \
         CPP/alarmmanager.h \
         CPP/androidmanager.h \
         CPP/mabstractmanager.h \
