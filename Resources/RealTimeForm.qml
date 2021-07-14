@@ -323,7 +323,7 @@ MForm{
         alarmHeight: 50
         anchors.top:parent.top
         anchors.left:parent.left
-        anchors.right:grid.left
+        anchors.right: PicoFlow ? grid.left : panManAuto.left
         alarms: mngAcq.alarms
 
         //@@@@@@@@@@    Events          @@@@@@@@@@
