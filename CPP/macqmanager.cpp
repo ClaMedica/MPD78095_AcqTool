@@ -292,12 +292,17 @@ bool MAcqManager::newAcquisition(QString __dataFile)
         //creo il file out_file nel quale va scritto l'ok se tutto va a buon fine
         //altrimenti c'è il nome del file interrotto
         QString outF = "out_file";
+#ifdef PICOFLOW
         OutFile = new QFile(g_P7SettingsManager.progPath() + "/" + outF);
-
         //Create the out_file new
         if (QDir(g_P7SettingsManager.progPath() ).exists(outF))
             QDir(g_P7SettingsManager.progPath()).remove(outF);
-
+#else
+        OutFile = new QFile(g_P7SettingsManager.dataPath() + "/Temp/" + outF);
+        //Create the out_file new
+        if (QDir(g_P7SettingsManager.progPath() ).exists(outF))
+            QDir(g_P7SettingsManager.progPath()).remove(outF);
+#endif
         OutFile->open(QIODevice::WriteOnly | QIODevice::Text);
         OutFile->write(__dataFile.toLocal8Bit());
         OutFile->close();
