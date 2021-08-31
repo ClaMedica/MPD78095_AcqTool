@@ -1,51 +1,51 @@
 <?xml version="1.0" encoding="utf-8"?>
 <xliff version="1.2" xmlns="urn:oasis:names:tc:xliff:document:1.2" xmlns:trolltech="urn:trolltech:names:ts:document:1.0">
-  <file original="E:/Piattaforma70/MPD78095_AcqTool/Resources/AnalysisForm.qml" datatype="plaintext" source-language="en" target-language="pl-PL"><body>
+  <file original="/mnt/hgfs/SharedVM/Piattaforma70/MPD78095_AcqTool/Resources/AnalysisForm.qml" datatype="plaintext" source-language="en" target-language="pl-PL"><body>
     <group restype="x-trolltech-linguist-context" resname="AnalysisForm">
-      <trans-unit id="_msg946" approved="yes">
+      <trans-unit id="_msg858" approved="yes">
         <source xml:space="preserve">copy</source>
         <target xml:space="preserve">kopiuj</target>
         <context-group purpose="location"><context context-type="linenumber">201</context></context-group>
       </trans-unit>
-      <trans-unit id="_msg947" approved="yes">
+      <trans-unit id="_msg859" approved="yes">
         <source xml:space="preserve">&lt;p&gt;File report open.&lt;/p&gt;Close the file to continue.</source>
         <target xml:space="preserve">&lt;p&gt; Raport pliku otwarty.&lt;/p&gt;Zamknij plik, aby kontynuować.</target>
         <context-group purpose="location"><context context-type="linenumber">583</context></context-group>
       </trans-unit>
-      <trans-unit id="_msg948" approved="yes">
+      <trans-unit id="_msg860" approved="yes">
         <source xml:space="preserve">Do you really want to delete the </source>
         <target xml:space="preserve">Czy na pewno chcesz usunąć </target>
         <context-group purpose="location"><context context-type="linenumber">596</context></context-group>
       </trans-unit>
     </group>
   </body></file>
-  <file original="E:/Piattaforma70/MPD78095_AcqTool/Resources/ExitDlg.qml" datatype="plaintext" source-language="en" target-language="pl-PL"><body>
+  <file original="/mnt/hgfs/SharedVM/Piattaforma70/MPD78095_AcqTool/Resources/ExitDlg.qml" datatype="plaintext" source-language="en" target-language="pl-PL"><body>
     <group restype="x-trolltech-linguist-context" resname="ExitDlg">
-      <trans-unit id="_msg949" approved="yes">
+      <trans-unit id="_msg861" approved="yes">
         <source xml:space="preserve">Do you want save changes?</source>
         <target xml:space="preserve">Czy zapisać zmiany?</target>
         <context-group purpose="location"><context context-type="linenumber">32</context></context-group>
       </trans-unit>
-      <trans-unit id="_msg950" approved="yes">
+      <trans-unit id="_msg862" approved="yes">
         <source xml:space="preserve">Yes</source>
         <target xml:space="preserve">Tak</target>
         <context-group purpose="location"><context context-type="linenumber">42</context></context-group>
       </trans-unit>
-      <trans-unit id="_msg951" approved="yes">
+      <trans-unit id="_msg863" approved="yes">
         <source xml:space="preserve">No</source>
         <target xml:space="preserve">Nie</target>
         <context-group purpose="location"><context context-type="linenumber">59</context></context-group>
       </trans-unit>
-      <trans-unit id="_msg952" approved="yes">
+      <trans-unit id="_msg864" approved="yes">
         <source xml:space="preserve">Cancel</source>
         <target xml:space="preserve">Anuluj</target>
         <context-group purpose="location"><context context-type="linenumber">76</context></context-group>
       </trans-unit>
     </group>
   </body></file>
-  <file original="E:/Piattaforma70/MPD78095_AcqTool/Resources/RealTimeForm.qml" datatype="plaintext" source-language="en" target-language="pl-PL"><body>
+  <file original="/mnt/hgfs/SharedVM/Piattaforma70/MPD78095_AcqTool/Resources/RealTimeForm.qml" datatype="plaintext" source-language="en" target-language="pl-PL"><body>
     <group restype="x-trolltech-linguist-context" resname="RealTimeForm">
-      <trans-unit id="_msg953" approved="yes">
+      <trans-unit id="_msg865" approved="yes">
         <source xml:space="preserve">Are you sure to discard the study?</source>
         <alt-trans>
           <source xml:space="preserve">Are you sure to discard the exam?</source>
@@ -54,7 +54,7 @@
         <context-group purpose="location"><context context-type="linenumber">184</context></context-group>
         <context-group purpose="location"><context context-type="linenumber">300</context></context-group>
       </trans-unit>
-      <trans-unit id="_msg954" approved="yes">
+      <trans-unit id="_msg866" approved="yes">
         <source xml:space="preserve">Are you sure to exit from Stand-By?</source>
         <alt-trans>
           <source xml:space="preserve">Are you sure to exit from standby?</source>
@@ -62,12 +62,12 @@
         </alt-trans>
         <context-group purpose="location"><context context-type="linenumber">189</context></context-group>
       </trans-unit>
-      <trans-unit id="_msg955" approved="yes">
+      <trans-unit id="_msg867" approved="yes">
         <source xml:space="preserve">Yes</source>
         <target xml:space="preserve">Tak</target>
         <context-group purpose="location"><context context-type="linenumber">411</context></context-group>
       </trans-unit>
-      <trans-unit id="_msg956" approved="yes">
+      <trans-unit id="_msg868" approved="yes">
         <source xml:space="preserve">No</source>
         <target xml:space="preserve">Nie</target>
         <context-group purpose="location"><context context-type="linenumber">427</context></context-group>
@@ -76,304 +76,304 @@
   </body></file>
   <file original="" datatype="plaintext" source-language="en" target-language="pl-PL"><body>
     <group restype="x-trolltech-linguist-context" resname="RealTimeForm">
-      <trans-unit id="_msg957" translate="no" approved="yes">
+      <trans-unit id="_msg869" translate="no" approved="yes">
         <source xml:space="preserve">&lt;p&gt;Beaker removed&lt;/p&gt;&lt;p&gt;Acquisition blocked&lt;/p&gt;&lt;p&gt;Replace the Beaker&lt;/p&gt;&lt;p&gt;Press OK to resume&lt;/p&gt;</source>
         <target xml:space="preserve">&lt;p&gt;Zlewka usunięta&lt;/p&gt;&lt;p&gt;Przejęcie zablokowane&lt;/p&gt;&lt;p&gt;Wymień zlewkę&lt;/p&gt;&lt;p&gt;Naciśnij OK, aby wznowić&lt;/p&gt;</target>
       </trans-unit>
-      <trans-unit id="_msg958" translate="no" approved="yes">
+      <trans-unit id="_msg870" translate="no" approved="yes">
         <source xml:space="preserve">OK</source>
         <target xml:space="preserve">OK</target>
       </trans-unit>
     </group>
     <group restype="x-trolltech-linguist-context" resname="VolResDlg">
-      <trans-unit id="_msg959" translate="no" approved="yes">
+      <trans-unit id="_msg871" translate="no" approved="yes">
         <source xml:space="preserve">Ok</source>
         <target xml:space="preserve">OK</target>
       </trans-unit>
     </group>
     <group restype="x-trolltech-linguist-context" resname="SettingsContext">
-      <trans-unit id="_msg960" translate="no" approved="yes">
+      <trans-unit id="_msg872" translate="no" approved="yes">
         <source xml:space="preserve">width track</source>
         <target xml:space="preserve">grubość krzywej - online</target>
       </trans-unit>
-      <trans-unit id="_msg961" translate="no" approved="yes">
+      <trans-unit id="_msg873" translate="no" approved="yes">
         <source xml:space="preserve">Margin</source>
         <target xml:space="preserve">Margines</target>
       </trans-unit>
-      <trans-unit id="_msg962" translate="no" approved="yes">
+      <trans-unit id="_msg874" translate="no" approved="yes">
         <source xml:space="preserve">Font Family</source>
         <target xml:space="preserve">Rodzaj czcionki</target>
       </trans-unit>
-      <trans-unit id="_msg963" translate="no" approved="yes">
+      <trans-unit id="_msg875" translate="no" approved="yes">
         <source xml:space="preserve">Auto Stops</source>
         <target xml:space="preserve">Auto stop</target>
       </trans-unit>
     </group>
     <group restype="x-trolltech-linguist-context" resname="mflowdatas">
-      <trans-unit id="_msg964" translate="no" approved="yes">
+      <trans-unit id="_msg876" translate="no" approved="yes">
         <source xml:space="preserve">Liverpool (Q Max)</source>
         <target xml:space="preserve">Liverpool (Q max)</target>
       </trans-unit>
-      <trans-unit id="_msg965" translate="no" approved="yes">
+      <trans-unit id="_msg877" translate="no" approved="yes">
         <source xml:space="preserve">Liverpool (Q Ave)</source>
         <target xml:space="preserve">Liverpool (Q śr)</target>
       </trans-unit>
-      <trans-unit id="_msg966" translate="no" approved="yes">
+      <trans-unit id="_msg878" translate="no" approved="yes">
         <source xml:space="preserve">Vol. (ml)</source>
         <target xml:space="preserve">Vol. (ml)</target>
       </trans-unit>
-      <trans-unit id="_msg967" translate="no" approved="yes">
+      <trans-unit id="_msg879" translate="no" approved="yes">
         <source xml:space="preserve">Q (ml/sec)</source>
         <target xml:space="preserve">Q (ml/s)</target>
       </trans-unit>
-      <trans-unit id="_msg968" translate="no" approved="yes">
+      <trans-unit id="_msg880" translate="no" approved="yes">
         <source xml:space="preserve">Siroky (Q Max)</source>
         <target xml:space="preserve">Siroky (Q max)</target>
       </trans-unit>
-      <trans-unit id="_msg969" translate="no" approved="yes">
+      <trans-unit id="_msg881" translate="no" approved="yes">
         <source xml:space="preserve">Siroky (Q Ave)</source>
         <target xml:space="preserve">Siroky (Q śr)</target>
       </trans-unit>
     </group>
     <group restype="x-trolltech-linguist-context" resname="printermanager">
-      <trans-unit id="_msg970" translate="no" approved="yes">
+      <trans-unit id="_msg882" translate="no" approved="yes">
         <source xml:space="preserve">Investigator ...: </source>
         <target xml:space="preserve">Wykonujący .....: </target>
       </trans-unit>
     </group>
     <group restype="x-trolltech-linguist-context" resname="AlarmManager">
-      <trans-unit id="_msg971" translate="no" approved="yes">
+      <trans-unit id="_msg883" translate="no" approved="yes">
         <source xml:space="preserve">Fatal Error</source>
         <target xml:space="preserve">Błąd krytyczny</target>
       </trans-unit>
-      <trans-unit id="_msg972" translate="no" approved="yes">
+      <trans-unit id="_msg884" translate="no" approved="yes">
         <source xml:space="preserve">Call the technical service</source>
         <target xml:space="preserve">Wezwij serwis techniczny</target>
       </trans-unit>
-      <trans-unit id="_msg973" translate="no" approved="yes">
+      <trans-unit id="_msg885" translate="no" approved="yes">
         <source xml:space="preserve">Cell not connected</source>
         <target xml:space="preserve">Przetwornik nie podłączony</target>
       </trans-unit>
-      <trans-unit id="_msg974" translate="no" approved="yes">
+      <trans-unit id="_msg886" translate="no" approved="yes">
         <source xml:space="preserve">Turn the cell off and on again</source>
         <target xml:space="preserve">Wyłącz i ponownie włącz przetwornik</target>
       </trans-unit>
-      <trans-unit id="_msg975" translate="no" approved="yes">
+      <trans-unit id="_msg887" translate="no" approved="yes">
         <source xml:space="preserve">Interrupted acquisition</source>
         <target xml:space="preserve">Zkłócono pomiar</target>
       </trans-unit>
-      <trans-unit id="_msg976" translate="no" approved="yes">
+      <trans-unit id="_msg888" translate="no" approved="yes">
         <source xml:space="preserve">Beaker removed</source>
         <target xml:space="preserve">Zlewka usunięta</target>
       </trans-unit>
-      <trans-unit id="_msg977" translate="no" approved="yes">
+      <trans-unit id="_msg889" translate="no" approved="yes">
         <source xml:space="preserve">Replace the Beaker</source>
         <target xml:space="preserve">Wymień zlewkę</target>
       </trans-unit>
-      <trans-unit id="_msg978" translate="no" approved="yes">
+      <trans-unit id="_msg890" translate="no" approved="yes">
         <source xml:space="preserve">The Beaker is full</source>
         <target xml:space="preserve">zlewka jest pełna</target>
       </trans-unit>
-      <trans-unit id="_msg979" translate="no" approved="yes">
+      <trans-unit id="_msg891" translate="no" approved="yes">
         <source xml:space="preserve">Empty the Beaker</source>
         <target xml:space="preserve">opróżnij zlewkę</target>
       </trans-unit>
-      <trans-unit id="_msg980" translate="no" approved="yes">
+      <trans-unit id="_msg892" translate="no" approved="yes">
         <source xml:space="preserve">Wait for stabilization</source>
         <target xml:space="preserve">Poczekaj na stabilizację</target>
       </trans-unit>
-      <trans-unit id="_msg981" translate="no" approved="yes">
+      <trans-unit id="_msg893" translate="no" approved="yes">
         <source xml:space="preserve">Wait some seconds</source>
         <target xml:space="preserve">Poczekaj kilka sekund</target>
       </trans-unit>
-      <trans-unit id="_msg982" translate="no" approved="yes">
+      <trans-unit id="_msg894" translate="no" approved="yes">
         <source xml:space="preserve">Allarm not present</source>
         <target xml:space="preserve">Brak alarmu</target>
       </trans-unit>
     </group>
   </body></file>
-  <file original="E:/Piattaforma70/MPD78095_AcqTool/Resources/VolResDlg.qml" datatype="plaintext" source-language="en" target-language="pl-PL"><body>
+  <file original="/mnt/hgfs/SharedVM/Piattaforma70/MPD78095_AcqTool/Resources/VolResDlg.qml" datatype="plaintext" source-language="en" target-language="pl-PL"><body>
     <group restype="x-trolltech-linguist-context" resname="VolResDlg">
-      <trans-unit id="_msg983" approved="yes">
+      <trans-unit id="_msg895" approved="yes">
         <source xml:space="preserve">Insert Residual Volume</source>
         <target xml:space="preserve">Wprowadź objętość&lt;p&gt;zalegania</target>
-        <context-group purpose="location"><context context-type="linenumber">69</context></context-group>
+        <context-group purpose="location"><context context-type="linenumber">70</context></context-group>
       </trans-unit>
-      <trans-unit id="_msg984" approved="yes">
+      <trans-unit id="_msg896" approved="yes">
         <source xml:space="preserve">OK</source>
         <target xml:space="preserve">OK</target>
-        <context-group purpose="location"><context context-type="linenumber">75</context></context-group>
+        <context-group purpose="location"><context context-type="linenumber">76</context></context-group>
       </trans-unit>
     </group>
   </body></file>
-  <file original="E:/Piattaforma70/M8078027_MGlobal/ancestry.cpp" datatype="cpp" source-language="en" target-language="pl-PL"><body>
+  <file original="/mnt/hgfs/SharedVM/Piattaforma70/M8078027_MGlobal/ancestry.cpp" datatype="cpp" source-language="en" target-language="pl-PL"><body>
     <group restype="x-trolltech-linguist-context" resname="SettingsContext">
-      <trans-unit id="_msg985" approved="yes">
+      <trans-unit id="_msg897" approved="yes">
         <source xml:space="preserve">Configuration</source>
         <target xml:space="preserve">Konfiguracja</target>
         <context-group purpose="location"><context context-type="linenumber">12</context></context-group>
       </trans-unit>
-      <trans-unit id="_msg986" approved="yes">
+      <trans-unit id="_msg898" approved="yes">
         <source xml:space="preserve">Automatic Flow</source>
         <target xml:space="preserve">Automatyczny przepływ</target>
         <context-group purpose="location"><context context-type="linenumber">13</context></context-group>
       </trans-unit>
-      <trans-unit id="_msg987" approved="yes">
+      <trans-unit id="_msg899" approved="yes">
         <source xml:space="preserve">Amplitude</source>
         <target xml:space="preserve">Amplituda</target>
         <context-group purpose="location"><context context-type="linenumber">14</context></context-group>
       </trans-unit>
-      <trans-unit id="_msg988" approved="yes">
+      <trans-unit id="_msg900" approved="yes">
         <source xml:space="preserve">Duration</source>
         <target xml:space="preserve">Czas mikcji</target>
         <context-group purpose="location"><context context-type="linenumber">15</context></context-group>
       </trans-unit>
-      <trans-unit id="_msg989" approved="yes">
+      <trans-unit id="_msg901" approved="yes">
         <source xml:space="preserve">Minimum</source>
         <target xml:space="preserve">Minimum</target>
         <context-group purpose="location"><context context-type="linenumber">16</context></context-group>
       </trans-unit>
-      <trans-unit id="_msg990" approved="yes">
+      <trans-unit id="_msg902" approved="yes">
         <source xml:space="preserve">Maximum</source>
         <target xml:space="preserve">Maksimum</target>
         <context-group purpose="location"><context context-type="linenumber">17</context></context-group>
       </trans-unit>
-      <trans-unit id="_msg991" approved="yes">
+      <trans-unit id="_msg903" approved="yes">
         <source xml:space="preserve">Channel Type</source>
         <target xml:space="preserve">Typ kanału</target>
         <context-group purpose="location"><context context-type="linenumber">18</context></context-group>
       </trans-unit>
-      <trans-unit id="_msg992" approved="yes">
+      <trans-unit id="_msg904" approved="yes">
         <source xml:space="preserve">Number</source>
         <target xml:space="preserve">Numer</target>
         <context-group purpose="location"><context context-type="linenumber">19</context></context-group>
       </trans-unit>
-      <trans-unit id="_msg993" approved="yes">
+      <trans-unit id="_msg905" approved="yes">
         <source xml:space="preserve">Automatic Flow Stop Time</source>
         <target xml:space="preserve">Czas automatycznego zatrzymania przepływu</target>
         <context-group purpose="location"><context context-type="linenumber">20</context></context-group>
       </trans-unit>
-      <trans-unit id="_msg994" approved="yes">
+      <trans-unit id="_msg906" approved="yes">
         <source xml:space="preserve">Automatic Flow Start Time</source>
         <target xml:space="preserve">Czas rozpoczęcia automatycznego przepływu</target>
         <context-group purpose="location"><context context-type="linenumber">21</context></context-group>
       </trans-unit>
-      <trans-unit id="_msg995" approved="yes">
+      <trans-unit id="_msg907" approved="yes">
         <source xml:space="preserve">Channels Abilitation</source>
         <target xml:space="preserve">Aktywacja kanałów</target>
         <context-group purpose="location"><context context-type="linenumber">22</context></context-group>
       </trans-unit>
-      <trans-unit id="_msg996" approved="yes">
+      <trans-unit id="_msg908" approved="yes">
         <source xml:space="preserve">Channels Prop</source>
         <target xml:space="preserve">Właściwości kanałów</target>
         <context-group purpose="location"><context context-type="linenumber">23</context></context-group>
       </trans-unit>
-      <trans-unit id="_msg997" approved="yes">
+      <trans-unit id="_msg909" approved="yes">
         <source xml:space="preserve">thick</source>
         <target xml:space="preserve">grubość krzywej - offline</target>
         <context-group purpose="location"><context context-type="linenumber">24</context></context-group>
       </trans-unit>
-      <trans-unit id="_msg998" approved="yes">
+      <trans-unit id="_msg910" approved="yes">
         <source xml:space="preserve">color track</source>
         <target xml:space="preserve">Kolor krzywej</target>
         <context-group purpose="location"><context context-type="linenumber">25</context></context-group>
       </trans-unit>
-      <trans-unit id="_msg999" approved="yes">
+      <trans-unit id="_msg911" approved="yes">
         <source xml:space="preserve">color background</source>
         <target xml:space="preserve">kolor tła</target>
         <context-group purpose="location"><context context-type="linenumber">26</context></context-group>
       </trans-unit>
-      <trans-unit id="_msg1000" approved="yes">
+      <trans-unit id="_msg912" approved="yes">
         <source xml:space="preserve">Auto Range</source>
         <target xml:space="preserve">Automatyczne skalowanie</target>
         <context-group purpose="location"><context context-type="linenumber">27</context></context-group>
       </trans-unit>
-      <trans-unit id="_msg1001" approved="yes">
+      <trans-unit id="_msg913" approved="yes">
         <source xml:space="preserve">Range</source>
         <target xml:space="preserve">Zakres</target>
         <context-group purpose="location"><context context-type="linenumber">28</context></context-group>
       </trans-unit>
-      <trans-unit id="_msg1002" approved="yes">
+      <trans-unit id="_msg914" approved="yes">
         <source xml:space="preserve">Settings</source>
         <target xml:space="preserve">Ustawienia</target>
         <context-group purpose="location"><context context-type="linenumber">30</context></context-group>
       </trans-unit>
-      <trans-unit id="_msg1003" approved="yes">
+      <trans-unit id="_msg915" approved="yes">
         <source xml:space="preserve">Automatic Print</source>
         <target xml:space="preserve">Automatyczny wydruk</target>
         <context-group purpose="location"><context context-type="linenumber">31</context></context-group>
       </trans-unit>
-      <trans-unit id="_msg1004" approved="yes">
+      <trans-unit id="_msg916" approved="yes">
         <source xml:space="preserve">Pediatric</source>
         <target xml:space="preserve">Pediatryczny</target>
         <context-group purpose="location"><context context-type="linenumber">32</context></context-group>
       </trans-unit>
-      <trans-unit id="_msg1005" approved="yes">
+      <trans-unit id="_msg917" approved="yes">
         <source xml:space="preserve">Print Landscape Mode</source>
         <target xml:space="preserve">Wydruk w układzie poziomym</target>
         <context-group purpose="location"><context context-type="linenumber">33</context></context-group>
       </trans-unit>
-      <trans-unit id="_msg1006" approved="yes">
+      <trans-unit id="_msg918" approved="yes">
         <source xml:space="preserve">Headers</source>
         <target xml:space="preserve">Nagłówki</target>
         <context-group purpose="location"><context context-type="linenumber">34</context></context-group>
       </trans-unit>
-      <trans-unit id="_msg1007" approved="yes">
+      <trans-unit id="_msg919" approved="yes">
         <source xml:space="preserve">Insert first header</source>
         <target xml:space="preserve">Wstaw pierwszy nagłówek</target>
         <context-group purpose="location"><context context-type="linenumber">35</context></context-group>
       </trans-unit>
-      <trans-unit id="_msg1008" approved="yes">
+      <trans-unit id="_msg920" approved="yes">
         <source xml:space="preserve">Insert second header</source>
         <target xml:space="preserve">Wstaw drugi nagłówek</target>
         <context-group purpose="location"><context context-type="linenumber">36</context></context-group>
       </trans-unit>
-      <trans-unit id="_msg1009" approved="yes">
+      <trans-unit id="_msg921" approved="yes">
         <source xml:space="preserve">Edit Report</source>
         <target xml:space="preserve">Edytuj raport</target>
         <context-group purpose="location"><context context-type="linenumber">37</context></context-group>
       </trans-unit>
-      <trans-unit id="_msg1010" approved="yes">
+      <trans-unit id="_msg922" approved="yes">
         <source xml:space="preserve">Report</source>
         <target xml:space="preserve">Raport</target>
         <context-group purpose="location"><context context-type="linenumber">38</context></context-group>
       </trans-unit>
-      <trans-unit id="_msg1011" approved="yes">
+      <trans-unit id="_msg923" approved="yes">
         <source xml:space="preserve">Layout</source>
         <target xml:space="preserve">Wygląd</target>
         <context-group purpose="location"><context context-type="linenumber">40</context></context-group>
       </trans-unit>
-      <trans-unit id="_msg1012" approved="yes">
+      <trans-unit id="_msg924" approved="yes">
         <source xml:space="preserve">Windows Layout</source>
         <target xml:space="preserve">Kompozycja ekranu</target>
         <context-group purpose="location"><context context-type="linenumber">41</context></context-group>
       </trans-unit>
-      <trans-unit id="_msg1013" approved="yes">
+      <trans-unit id="_msg925" approved="yes">
         <source xml:space="preserve">Background Color</source>
         <target xml:space="preserve">Kolor tła</target>
         <context-group purpose="location"><context context-type="linenumber">42</context></context-group>
       </trans-unit>
-      <trans-unit id="_msg1014" approved="yes">
+      <trans-unit id="_msg926" approved="yes">
         <source xml:space="preserve">Tables Layout</source>
         <target xml:space="preserve">Kompozycja tabeli</target>
         <context-group purpose="location"><context context-type="linenumber">43</context></context-group>
       </trans-unit>
-      <trans-unit id="_msg1015" approved="yes">
+      <trans-unit id="_msg927" approved="yes">
         <source xml:space="preserve">Table Header Dim.</source>
         <target xml:space="preserve">Rozmiar nagłówka tabeli.</target>
         <context-group purpose="location"><context context-type="linenumber">44</context></context-group>
       </trans-unit>
-      <trans-unit id="_msg1016" approved="yes">
+      <trans-unit id="_msg928" approved="yes">
         <source xml:space="preserve">Table Element Dim.</source>
         <target xml:space="preserve">Rozmiar elementu tabeli.</target>
         <context-group purpose="location"><context context-type="linenumber">45</context></context-group>
       </trans-unit>
-      <trans-unit id="_msg1017" approved="yes">
+      <trans-unit id="_msg929" approved="yes">
         <source xml:space="preserve">Table Header Col. 1</source>
         <target xml:space="preserve">Kolor nagłówka tabeli kol. 1</target>
         <context-group purpose="location"><context context-type="linenumber">46</context></context-group>
       </trans-unit>
-      <trans-unit id="_msg1018" approved="yes">
+      <trans-unit id="_msg930" approved="yes">
         <source xml:space="preserve">Table Header Col. 2</source>
         <target xml:space="preserve">Kolor nagłówka tabeli kol. 2</target>
         <context-group purpose="location"><context context-type="linenumber">47</context></context-group>
@@ -382,120 +382,120 @@
   </body></file>
   <file original="Obsolete_PO_entries" datatype="plaintext" source-language="en" target-language="pl-PL"><body>
     <group restype="x-trolltech-linguist-context" resname="SettingsContext">
-      <trans-unit id="_msg1019" translate="no">
+      <trans-unit id="_msg931" translate="no">
         <source xml:space="preserve">Font 1</source>
         <target xml:space="preserve"></target>
       </trans-unit>
-      <trans-unit id="_msg1020" translate="no">
+      <trans-unit id="_msg932" translate="no">
         <source xml:space="preserve">Font 2</source>
         <target xml:space="preserve"></target>
       </trans-unit>
-      <trans-unit id="_msg1021" translate="no">
+      <trans-unit id="_msg933" translate="no">
         <source xml:space="preserve">Font 3</source>
         <target xml:space="preserve"></target>
       </trans-unit>
-      <trans-unit id="_msg1022" translate="no">
+      <trans-unit id="_msg934" translate="no">
         <source xml:space="preserve">Font 4</source>
         <target xml:space="preserve"></target>
       </trans-unit>
-      <trans-unit id="_msg1023" translate="no">
+      <trans-unit id="_msg935" translate="no">
         <source xml:space="preserve">Font 5</source>
         <target xml:space="preserve"></target>
       </trans-unit>
     </group>
   </body></file>
-  <file original="E:/Piattaforma70/MPD78095_AcqTool/CPP/mflowdatas.cpp" datatype="cpp" source-language="en" target-language="pl-PL"><body>
+  <file original="/mnt/hgfs/SharedVM/Piattaforma70/MPD78095_AcqTool/CPP/mflowdatas.cpp" datatype="cpp" source-language="en" target-language="pl-PL"><body>
     <group restype="x-trolltech-linguist-context" resname="mflowdatas">
-      <trans-unit id="_msg1024" approved="yes">
+      <trans-unit id="_msg936" approved="yes">
         <source xml:space="preserve"> Waiting time (sec)</source>
         <target xml:space="preserve"> Czas oczekiwania (s)</target>
         <context-group purpose="location"><context context-type="linenumber">59</context></context-group>
       </trans-unit>
-      <trans-unit id="_msg1025" approved="yes">
+      <trans-unit id="_msg937" approved="yes">
         <source xml:space="preserve"> Maximum flow rate (ml/sec)</source>
         <target xml:space="preserve"> Maksymalne tempo przepływu (ml/s)</target>
         <context-group purpose="location"><context context-type="linenumber">63</context></context-group>
       </trans-unit>
-      <trans-unit id="_msg1026" approved="yes">
+      <trans-unit id="_msg938" approved="yes">
         <source xml:space="preserve"> Average flow rate (ml/sec)</source>
         <target xml:space="preserve"> Średnie tempo przepływu (ml/s)</target>
         <context-group purpose="location"><context context-type="linenumber">66</context></context-group>
       </trans-unit>
-      <trans-unit id="_msg1027" approved="yes">
+      <trans-unit id="_msg939" approved="yes">
         <source xml:space="preserve"> Time to maximum flow (sec)</source>
         <target xml:space="preserve"> Czas do maksymalnego przepływu (s)</target>
         <context-group purpose="location"><context context-type="linenumber">69</context></context-group>
       </trans-unit>
-      <trans-unit id="_msg1028" approved="yes">
+      <trans-unit id="_msg940" approved="yes">
         <source xml:space="preserve"> Time between 5% and 95% (sec)</source>
         <target xml:space="preserve"> Czas pomiedzy 5% i 95% (s)</target>
         <context-group purpose="location"><context context-type="linenumber">72</context></context-group>
       </trans-unit>
-      <trans-unit id="_msg1029" approved="yes">
+      <trans-unit id="_msg941" approved="yes">
         <source xml:space="preserve"> Flow time (sec)</source>
         <target xml:space="preserve"> Czas przepływu (s)</target>
         <context-group purpose="location"><context context-type="linenumber">75</context></context-group>
       </trans-unit>
-      <trans-unit id="_msg1030" approved="yes">
+      <trans-unit id="_msg942" approved="yes">
         <source xml:space="preserve"> Descent time (sec)</source>
         <target xml:space="preserve"> Czas opadania (s)</target>
         <context-group purpose="location"><context context-type="linenumber">78</context></context-group>
       </trans-unit>
-      <trans-unit id="_msg1031" approved="yes">
+      <trans-unit id="_msg943" approved="yes">
         <source xml:space="preserve"> Voiding time (sec)</source>
         <target xml:space="preserve"> Czas mikcji (s)</target>
         <context-group purpose="location"><context context-type="linenumber">81</context></context-group>
       </trans-unit>
-      <trans-unit id="_msg1032" approved="yes">
+      <trans-unit id="_msg944" approved="yes">
         <source xml:space="preserve"> Volume to maximum flow (ml)</source>
         <target xml:space="preserve"> Objętość do maks. przepływu (ml)</target>
         <context-group purpose="location"><context context-type="linenumber">84</context></context-group>
       </trans-unit>
-      <trans-unit id="_msg1033" approved="yes">
+      <trans-unit id="_msg945" approved="yes">
         <source xml:space="preserve"> Voided volume (ml)</source>
         <target xml:space="preserve"> Objętość mikcji (ml)</target>
         <context-group purpose="location"><context context-type="linenumber">87</context></context-group>
       </trans-unit>
-      <trans-unit id="_msg1034" approved="yes">
+      <trans-unit id="_msg946" approved="yes">
         <source xml:space="preserve"> Corrected maximum flow (ml^(1/2)/s)</source>
         <target xml:space="preserve"> Skorygowany maks. przepływ (ml^(1/2)/s)</target>
         <context-group purpose="location"><context context-type="linenumber">90</context></context-group>
       </trans-unit>
-      <trans-unit id="_msg1035" approved="yes">
+      <trans-unit id="_msg947" approved="yes">
         <source xml:space="preserve"> Flow acceleration (ml/sec^2))</source>
         <target xml:space="preserve"> Przyrost przepływu (ml/sec^2))</target>
         <context-group purpose="location"><context context-type="linenumber">93</context></context-group>
       </trans-unit>
-      <trans-unit id="_msg1036" approved="yes">
+      <trans-unit id="_msg948" approved="yes">
         <source xml:space="preserve"> Maximum contraction speed (mm/sec)</source>
         <target xml:space="preserve"> Maksymalna prędkość skurczu (mm/s)</target>
         <context-group purpose="location"><context context-type="linenumber">96</context></context-group>
       </trans-unit>
-      <trans-unit id="_msg1037" approved="yes">
+      <trans-unit id="_msg949" approved="yes">
         <source xml:space="preserve"> Residual volume (ml)</source>
         <target xml:space="preserve"> Objętość zalegania (ml)</target>
         <context-group purpose="location"><context context-type="linenumber">99</context></context-group>
       </trans-unit>
-      <trans-unit id="_msg1038" approved="yes">
+      <trans-unit id="_msg950" approved="yes">
         <source xml:space="preserve">Pediatric (Q Max)</source>
         <target xml:space="preserve">Pediatryczny (Q Max)</target>
         <context-group purpose="location"><context context-type="linenumber">443</context></context-group>
       </trans-unit>
-      <trans-unit id="_msg1039" approved="yes">
+      <trans-unit id="_msg951" approved="yes">
         <source xml:space="preserve">Pediatric (Q Ave)</source>
         <target xml:space="preserve">Pediatryczny (Q Ave)</target>
         <context-group purpose="location"><context context-type="linenumber">461</context></context-group>
       </trans-unit>
     </group>
   </body></file>
-  <file original="E:/Piattaforma70/MPD78095_AcqTool/CPP/printermanager.cpp" datatype="cpp" source-language="en" target-language="pl-PL"><body>
+  <file original="/mnt/hgfs/SharedVM/Piattaforma70/MPD78095_AcqTool/CPP/printermanager.cpp" datatype="cpp" source-language="en" target-language="pl-PL"><body>
     <group restype="x-trolltech-linguist-context" resname="printermanager">
-      <trans-unit id="_msg1040" approved="yes">
+      <trans-unit id="_msg952" approved="yes">
         <source xml:space="preserve">UROFLOWMETER</source>
         <target xml:space="preserve">PRZEPŁYWOMIERZ</target>
         <context-group purpose="location"><context context-type="linenumber">688</context></context-group>
       </trans-unit>
-      <trans-unit id="_msg1041" approved="yes">
+      <trans-unit id="_msg953" approved="yes">
         <source xml:space="preserve">Study Number ...: </source>
         <alt-trans>
           <source xml:space="preserve">Test Number ....: </source>
@@ -503,7 +503,7 @@
         </alt-trans>
         <context-group purpose="location"><context context-type="linenumber">715</context></context-group>
       </trans-unit>
-      <trans-unit id="_msg1042" approved="yes">
+      <trans-unit id="_msg954" approved="yes">
         <source xml:space="preserve">Study Date .....: </source>
         <alt-trans>
           <source xml:space="preserve">Test Date ......: </source>
@@ -511,360 +511,360 @@
         </alt-trans>
         <context-group purpose="location"><context context-type="linenumber">716</context></context-group>
       </trans-unit>
-      <trans-unit id="_msg1043" approved="yes">
+      <trans-unit id="_msg955" approved="yes">
         <source xml:space="preserve">Surname ........: </source>
         <target xml:space="preserve">Nazwisko .......: </target>
         <context-group purpose="location"><context context-type="linenumber">717</context></context-group>
       </trans-unit>
-      <trans-unit id="_msg1044" approved="yes">
+      <trans-unit id="_msg956" approved="yes">
         <source xml:space="preserve">Name ...........: </source>
         <target xml:space="preserve">Imię ...........: </target>
         <context-group purpose="location"><context context-type="linenumber">718</context></context-group>
       </trans-unit>
-      <trans-unit id="_msg1045" approved="yes">
+      <trans-unit id="_msg957" approved="yes">
         <source xml:space="preserve">Birth Date .....: </source>
         <target xml:space="preserve">Data urodzenia .: </target>
         <context-group purpose="location"><context context-type="linenumber">719</context></context-group>
       </trans-unit>
-      <trans-unit id="_msg1046" approved="yes">
+      <trans-unit id="_msg958" approved="yes">
         <source xml:space="preserve">Gender .........: </source>
         <target xml:space="preserve">Płeć ...........: </target>
         <context-group purpose="location"><context context-type="linenumber">720</context></context-group>
       </trans-unit>
-      <trans-unit id="_msg1047" approved="yes">
+      <trans-unit id="_msg959" approved="yes">
         <source xml:space="preserve">Operator .......: </source>
         <target xml:space="preserve">Wykonujący .....: </target>
         <context-group purpose="location"><context context-type="linenumber">721</context></context-group>
       </trans-unit>
-      <trans-unit id="_msg1048" approved="yes">
+      <trans-unit id="_msg960" approved="yes">
         <source xml:space="preserve">Comments .......: </source>
         <target xml:space="preserve">Komentarz ......: </target>
         <context-group purpose="location"><context context-type="linenumber">722</context></context-group>
         <context-group purpose="location"><context context-type="linenumber">725</context></context-group>
       </trans-unit>
-      <trans-unit id="_msg1049" approved="yes">
+      <trans-unit id="_msg961" approved="yes">
         <source xml:space="preserve">MANUAL   MODALITY</source>
         <target xml:space="preserve">POMIAR   MANUALNY</target>
         <context-group purpose="location"><context context-type="linenumber">736</context></context-group>
       </trans-unit>
-      <trans-unit id="_msg1050" approved="yes">
+      <trans-unit id="_msg962" approved="yes">
         <source xml:space="preserve">AUTOMATIC  MODALITY </source>
         <target xml:space="preserve">POMIAR   AUTOMATYCZNY </target>
         <context-group purpose="location"><context context-type="linenumber">736</context></context-group>
       </trans-unit>
-      <trans-unit id="_msg1051" approved="yes">
+      <trans-unit id="_msg963" approved="yes">
         <source xml:space="preserve">  Q (ml/s)             Flowmetry              Vol (ml)</source>
         <target xml:space="preserve">  Q (ml/s)             Przepływ              Vol (ml)</target>
         <context-group purpose="location"><context context-type="linenumber">747</context></context-group>
       </trans-unit>
-      <trans-unit id="_msg1052" approved="yes">
+      <trans-unit id="_msg964" approved="yes">
         <source xml:space="preserve">EMG Diagram</source>
         <target xml:space="preserve">Diagram EMG</target>
         <context-group purpose="location"><context context-type="linenumber">765</context></context-group>
       </trans-unit>
-      <trans-unit id="_msg1053" approved="yes">
+      <trans-unit id="_msg965" approved="yes">
         <source xml:space="preserve">Flowmetry Results</source>
         <target xml:space="preserve">Wyniki przepływu cewkowego</target>
         <context-group purpose="location"><context context-type="linenumber">919</context></context-group>
       </trans-unit>
-      <trans-unit id="_msg1054" approved="yes">
+      <trans-unit id="_msg966" approved="yes">
         <source xml:space="preserve">Waiting time ................</source>
         <target xml:space="preserve">Czas oczekiwania ............</target>
         <context-group purpose="location"><context context-type="linenumber">924</context></context-group>
       </trans-unit>
-      <trans-unit id="_msg1055" approved="yes">
+      <trans-unit id="_msg967" approved="yes">
         <source xml:space="preserve">Maximum flow rate ...........</source>
         <target xml:space="preserve">Maksymalne tempo przepływu ..</target>
         <context-group purpose="location"><context context-type="linenumber">931</context></context-group>
       </trans-unit>
-      <trans-unit id="_msg1056" approved="yes">
+      <trans-unit id="_msg968" approved="yes">
         <source xml:space="preserve">Average flow rate ...........</source>
         <target xml:space="preserve">Średnie tempo przepływu .....</target>
         <context-group purpose="location"><context context-type="linenumber">932</context></context-group>
       </trans-unit>
-      <trans-unit id="_msg1057" approved="yes">
+      <trans-unit id="_msg969" approved="yes">
         <source xml:space="preserve">Time to maximum flow ........</source>
         <target xml:space="preserve">Czas do max. przepływu ......</target>
         <context-group purpose="location"><context context-type="linenumber">933</context></context-group>
       </trans-unit>
-      <trans-unit id="_msg1058" approved="yes">
+      <trans-unit id="_msg970" approved="yes">
         <source xml:space="preserve">Time between 5% and 95% .....</source>
         <target xml:space="preserve">Czas pomiędzy 5% i 95% ......</target>
         <context-group purpose="location"><context context-type="linenumber">934</context></context-group>
       </trans-unit>
-      <trans-unit id="_msg1059" approved="yes">
+      <trans-unit id="_msg971" approved="yes">
         <source xml:space="preserve">Flow time ...................</source>
         <target xml:space="preserve">Czas przepływu ..............</target>
         <context-group purpose="location"><context context-type="linenumber">935</context></context-group>
       </trans-unit>
-      <trans-unit id="_msg1060" approved="yes">
+      <trans-unit id="_msg972" approved="yes">
         <source xml:space="preserve">Descent time ................</source>
         <target xml:space="preserve">Czas opadania ...............</target>
         <context-group purpose="location"><context context-type="linenumber">936</context></context-group>
       </trans-unit>
-      <trans-unit id="_msg1061" approved="yes">
+      <trans-unit id="_msg973" approved="yes">
         <source xml:space="preserve">Voiding time ................</source>
         <target xml:space="preserve">Czas mikcji .................</target>
         <context-group purpose="location"><context context-type="linenumber">937</context></context-group>
       </trans-unit>
-      <trans-unit id="_msg1062" approved="yes">
+      <trans-unit id="_msg974" approved="yes">
         <source xml:space="preserve">Volume to maximum flow ......</source>
         <target xml:space="preserve">Objętość do maks. przepływu .</target>
         <context-group purpose="location"><context context-type="linenumber">938</context></context-group>
       </trans-unit>
-      <trans-unit id="_msg1063" approved="yes">
+      <trans-unit id="_msg975" approved="yes">
         <source xml:space="preserve">Voided Volume ...............</source>
         <target xml:space="preserve">Objętość mikcji .............</target>
         <context-group purpose="location"><context context-type="linenumber">939</context></context-group>
       </trans-unit>
-      <trans-unit id="_msg1064" approved="yes">
+      <trans-unit id="_msg976" approved="yes">
         <source xml:space="preserve">Corrected maximum flow ......</source>
         <target xml:space="preserve">Skorygowany maks. przepływ ..</target>
         <context-group purpose="location"><context context-type="linenumber">940</context></context-group>
       </trans-unit>
-      <trans-unit id="_msg1065" approved="yes">
+      <trans-unit id="_msg977" approved="yes">
         <source xml:space="preserve">Flow acceleration ...........</source>
         <target xml:space="preserve">Przyrost przepływu ..........</target>
         <context-group purpose="location"><context context-type="linenumber">941</context></context-group>
       </trans-unit>
-      <trans-unit id="_msg1066" approved="yes">
+      <trans-unit id="_msg978" approved="yes">
         <source xml:space="preserve">Maximum contraction speed ...</source>
         <target xml:space="preserve">Maksymalna prędkość skurczu .</target>
         <context-group purpose="location"><context context-type="linenumber">942</context></context-group>
       </trans-unit>
-      <trans-unit id="_msg1067" approved="yes">
+      <trans-unit id="_msg979" approved="yes">
         <source xml:space="preserve">Residual volume .............</source>
         <target xml:space="preserve">Objętość zalegania ..........</target>
         <context-group purpose="location"><context context-type="linenumber">943</context></context-group>
       </trans-unit>
-      <trans-unit id="_msg1068" approved="yes">
+      <trans-unit id="_msg980" approved="yes">
         <source xml:space="preserve">Calibration date</source>
         <target xml:space="preserve">Data kalibracji</target>
         <context-group purpose="location"><context context-type="linenumber">963</context></context-group>
       </trans-unit>
     </group>
   </body></file>
-  <file original="E:/Piattaforma70/MPD78095_AcqTool/Resources/ResultForm.qml" datatype="plaintext" source-language="en" target-language="pl-PL"><body>
+  <file original="/mnt/hgfs/SharedVM/Piattaforma70/MPD78095_AcqTool/Resources/ResultForm.qml" datatype="plaintext" source-language="en" target-language="pl-PL"><body>
     <group restype="x-trolltech-linguist-context" resname="ResultForm">
-      <trans-unit id="_msg1069" approved="yes">
+      <trans-unit id="_msg981" approved="yes">
         <source xml:space="preserve">Table</source>
         <target xml:space="preserve">Tabele</target>
         <context-group purpose="location"><context context-type="linenumber">141</context></context-group>
       </trans-unit>
-      <trans-unit id="_msg1070" approved="yes">
+      <trans-unit id="_msg982" approved="yes">
         <source xml:space="preserve">Report already exists. Do you want overwrite it?</source>
         <target xml:space="preserve">Raport już istnieje. Chcesz go nadpisać?</target>
         <context-group purpose="location"><context context-type="linenumber">485</context></context-group>
       </trans-unit>
-      <trans-unit id="_msg1071" approved="yes">
+      <trans-unit id="_msg983" approved="yes">
         <source xml:space="preserve">print</source>
         <target xml:space="preserve">wydruk</target>
         <context-group purpose="location"><context context-type="linenumber">516</context></context-group>
       </trans-unit>
-      <trans-unit id="_msg1072" approved="yes">
+      <trans-unit id="_msg984" approved="yes">
         <source xml:space="preserve">report</source>
         <target xml:space="preserve">raport</target>
         <context-group purpose="location"><context context-type="linenumber">534</context></context-group>
       </trans-unit>
-      <trans-unit id="_msg1073" approved="yes">
+      <trans-unit id="_msg985" approved="yes">
         <source xml:space="preserve">Template</source>
         <target xml:space="preserve">Szablon</target>
         <context-group purpose="location"><context context-type="linenumber">561</context></context-group>
       </trans-unit>
-      <trans-unit id="_msg1074" approved="yes">
+      <trans-unit id="_msg986" approved="yes">
         <source xml:space="preserve">back to graphs</source>
         <target xml:space="preserve">powrót do grafik</target>
         <context-group purpose="location"><context context-type="linenumber">595</context></context-group>
       </trans-unit>
-      <trans-unit id="_msg1075" approved="yes">
+      <trans-unit id="_msg987" approved="yes">
         <source xml:space="preserve">exit</source>
         <target xml:space="preserve">wyjście</target>
         <context-group purpose="location"><context context-type="linenumber">607</context></context-group>
       </trans-unit>
     </group>
   </body></file>
-  <file original="E:/Piattaforma70/MPD78095_AcqTool/Resources/main.qml" datatype="plaintext" source-language="en" target-language="pl-PL"><body>
+  <file original="/mnt/hgfs/SharedVM/Piattaforma70/MPD78095_AcqTool/Resources/main.qml" datatype="plaintext" source-language="en" target-language="pl-PL"><body>
     <group restype="x-trolltech-linguist-context" resname="main">
-      <trans-unit id="_msg1076" approved="yes">
+      <trans-unit id="_msg988" approved="yes">
         <source xml:space="preserve">Wait for ...</source>
         <target xml:space="preserve">Czekaj na ...</target>
         <context-group purpose="location"><context context-type="linenumber">44</context></context-group>
         <context-group purpose="location"><context context-type="linenumber">90</context></context-group>
       </trans-unit>
-      <trans-unit id="_msg1077" approved="yes">
+      <trans-unit id="_msg989" approved="yes">
         <source xml:space="preserve">start</source>
         <target xml:space="preserve">start</target>
-        <context-group purpose="location"><context context-type="linenumber">184</context></context-group>
+        <context-group purpose="location"><context context-type="linenumber">186</context></context-group>
       </trans-unit>
     </group>
   </body></file>
-  <file original="E:/Piattaforma70/M8078027_MGlobal/MComponents/MColorPicker.qml" datatype="plaintext" source-language="en" target-language="pl-PL"><body>
+  <file original="/mnt/hgfs/SharedVM/Piattaforma70/M8078027_MGlobal/MComponents/MColorPicker.qml" datatype="plaintext" source-language="en" target-language="pl-PL"><body>
     <group restype="x-trolltech-linguist-context" resname="MColorPicker">
-      <trans-unit id="_msg1078" approved="yes">
+      <trans-unit id="_msg990" approved="yes">
         <source xml:space="preserve">Color</source>
         <target xml:space="preserve">Kolor</target>
         <context-group purpose="location"><context context-type="linenumber">103</context></context-group>
       </trans-unit>
     </group>
   </body></file>
-  <file original="E:/Piattaforma70/M8078027_MGlobal/MComponents/MDateEdit.qml" datatype="plaintext" source-language="en" target-language="pl-PL"><body>
+  <file original="/mnt/hgfs/SharedVM/Piattaforma70/M8078027_MGlobal/MComponents/MDateEdit.qml" datatype="plaintext" source-language="en" target-language="pl-PL"><body>
     <group restype="x-trolltech-linguist-context" resname="MDateEdit">
-      <trans-unit id="_msg1079" approved="yes">
+      <trans-unit id="_msg991" approved="yes">
         <source xml:space="preserve">Day</source>
         <target xml:space="preserve">Dzień</target>
         <context-group purpose="location"><context context-type="linenumber">118</context></context-group>
       </trans-unit>
-      <trans-unit id="_msg1080" approved="yes">
+      <trans-unit id="_msg992" approved="yes">
         <source xml:space="preserve">Month</source>
         <target xml:space="preserve">Miesiąc</target>
         <context-group purpose="location"><context context-type="linenumber">142</context></context-group>
       </trans-unit>
-      <trans-unit id="_msg1081" approved="yes">
+      <trans-unit id="_msg993" approved="yes">
         <source xml:space="preserve">Year</source>
         <target xml:space="preserve">Rok</target>
         <context-group purpose="location"><context context-type="linenumber">175</context></context-group>
       </trans-unit>
-      <trans-unit id="_msg1082" approved="yes">
+      <trans-unit id="_msg994" approved="yes">
         <source xml:space="preserve">Cancel</source>
         <target xml:space="preserve">Anuluj</target>
         <context-group purpose="location"><context context-type="linenumber">241</context></context-group>
       </trans-unit>
-      <trans-unit id="_msg1083" approved="yes">
+      <trans-unit id="_msg995" approved="yes">
         <source xml:space="preserve">Save</source>
         <target xml:space="preserve">Zapisz</target>
         <context-group purpose="location"><context context-type="linenumber">255</context></context-group>
       </trans-unit>
     </group>
   </body></file>
-  <file original="E:/Piattaforma70/M8078027_MGlobal/MComponents/MDialogYesNo.qml" datatype="plaintext" source-language="en" target-language="pl-PL"><body>
+  <file original="/mnt/hgfs/SharedVM/Piattaforma70/M8078027_MGlobal/MComponents/MDialogYesNo.qml" datatype="plaintext" source-language="en" target-language="pl-PL"><body>
     <group restype="x-trolltech-linguist-context" resname="MDialogYesNo">
-      <trans-unit id="_msg1084" approved="yes">
+      <trans-unit id="_msg996" approved="yes">
         <source xml:space="preserve">Yes</source>
         <target xml:space="preserve">Tak</target>
         <context-group purpose="location"><context context-type="linenumber">49</context></context-group>
       </trans-unit>
-      <trans-unit id="_msg1085" approved="yes">
+      <trans-unit id="_msg997" approved="yes">
         <source xml:space="preserve">No</source>
         <target xml:space="preserve">Nie</target>
         <context-group purpose="location"><context context-type="linenumber">61</context></context-group>
       </trans-unit>
     </group>
   </body></file>
-  <file original="E:/Piattaforma70/M8078027_MGlobal/MComponents/MHourEdit.qml" datatype="plaintext" source-language="en" target-language="pl-PL"><body>
+  <file original="/mnt/hgfs/SharedVM/Piattaforma70/M8078027_MGlobal/MComponents/MHourEdit.qml" datatype="plaintext" source-language="en" target-language="pl-PL"><body>
     <group restype="x-trolltech-linguist-context" resname="MHourEdit">
-      <trans-unit id="_msg1086" approved="yes">
+      <trans-unit id="_msg998" approved="yes">
         <source xml:space="preserve">:</source>
         <target xml:space="preserve">:</target>
         <context-group purpose="location"><context context-type="linenumber">61</context></context-group>
       </trans-unit>
     </group>
   </body></file>
-  <file original="E:/Piattaforma70/MPD78095_AcqTool/CPP/mabstractmanager.cpp" datatype="cpp" source-language="en" target-language="pl-PL"><body>
+  <file original="/mnt/hgfs/SharedVM/Piattaforma70/MPD78095_AcqTool/CPP/mabstractmanager.cpp" datatype="cpp" source-language="en" target-language="pl-PL"><body>
     <group restype="x-trolltech-linguist-context" resname="MAbstractManager">
-      <trans-unit id="_msg1087" approved="yes">
+      <trans-unit id="_msg999" approved="yes">
         <source xml:space="preserve">Flowmetry</source>
         <target xml:space="preserve">Przepływ cewkowy</target>
         <context-group purpose="location"><context context-type="linenumber">9</context></context-group>
       </trans-unit>
-      <trans-unit id="_msg1088" approved="yes">
+      <trans-unit id="_msg1000" approved="yes">
         <source xml:space="preserve">Cough</source>
         <target xml:space="preserve">Kaszel</target>
         <context-group purpose="location"><context context-type="linenumber">10</context></context-group>
       </trans-unit>
-      <trans-unit id="_msg1089" approved="yes">
+      <trans-unit id="_msg1001" approved="yes">
         <source xml:space="preserve">Speak</source>
         <target xml:space="preserve">Mowa</target>
         <context-group purpose="location"><context context-type="linenumber">11</context></context-group>
       </trans-unit>
-      <trans-unit id="_msg1090" approved="yes">
+      <trans-unit id="_msg1002" approved="yes">
         <source xml:space="preserve">definer</source>
         <target xml:space="preserve">definicja</target>
         <context-group purpose="location"><context context-type="linenumber">12</context></context-group>
         <context-group purpose="location"><context context-type="linenumber">13</context></context-group>
       </trans-unit>
-      <trans-unit id="_msg1091" approved="yes">
+      <trans-unit id="_msg1003" approved="yes">
         <source xml:space="preserve">marker</source>
         <target xml:space="preserve">znacznik</target>
         <context-group purpose="location"><context context-type="linenumber">14</context></context-group>
         <context-group purpose="location"><context context-type="linenumber">15</context></context-group>
       </trans-unit>
-      <trans-unit id="_msg1092" approved="yes">
+      <trans-unit id="_msg1004" approved="yes">
         <source xml:space="preserve">insert f1 marker</source>
         <target xml:space="preserve">wstaw marker f1</target>
         <context-group purpose="location"><context context-type="linenumber">256</context></context-group>
       </trans-unit>
-      <trans-unit id="_msg1093" approved="yes">
+      <trans-unit id="_msg1005" approved="yes">
         <source xml:space="preserve">insert f2 marker</source>
         <target xml:space="preserve">wstaw marker f2</target>
         <context-group purpose="location"><context context-type="linenumber">264</context></context-group>
       </trans-unit>
-      <trans-unit id="_msg1094" approved="yes">
+      <trans-unit id="_msg1006" approved="yes">
         <source xml:space="preserve">insert f3 marker</source>
         <target xml:space="preserve">wstaw marker f3</target>
         <context-group purpose="location"><context context-type="linenumber">272</context></context-group>
       </trans-unit>
-      <trans-unit id="_msg1095" approved="yes">
+      <trans-unit id="_msg1007" approved="yes">
         <source xml:space="preserve">delete analytical markers</source>
         <target xml:space="preserve">skasuj znacznik analityczny</target>
         <context-group purpose="location"><context context-type="linenumber">280</context></context-group>
       </trans-unit>
-      <trans-unit id="_msg1096" approved="yes">
+      <trans-unit id="_msg1008" approved="yes">
         <source xml:space="preserve">results</source>
         <target xml:space="preserve">wyniki</target>
         <context-group purpose="location"><context context-type="linenumber">288</context></context-group>
       </trans-unit>
-      <trans-unit id="_msg1097" approved="yes">
+      <trans-unit id="_msg1009" approved="yes">
         <source xml:space="preserve">analysis</source>
         <target xml:space="preserve">analiza</target>
         <context-group purpose="location"><context context-type="linenumber">304</context></context-group>
       </trans-unit>
-      <trans-unit id="_msg1098" approved="yes">
+      <trans-unit id="_msg1010" approved="yes">
         <source xml:space="preserve">zoom in</source>
         <target xml:space="preserve">zoom(+)</target>
         <context-group purpose="location"><context context-type="linenumber">321</context></context-group>
       </trans-unit>
-      <trans-unit id="_msg1099" approved="yes">
+      <trans-unit id="_msg1011" approved="yes">
         <source xml:space="preserve">zoom out</source>
         <target xml:space="preserve">zoom (-)</target>
         <context-group purpose="location"><context context-type="linenumber">330</context></context-group>
       </trans-unit>
-      <trans-unit id="_msg1100" approved="yes">
+      <trans-unit id="_msg1012" approved="yes">
         <source xml:space="preserve">zoom none</source>
         <target xml:space="preserve">zoom (0)</target>
         <context-group purpose="location"><context context-type="linenumber">339</context></context-group>
       </trans-unit>
-      <trans-unit id="_msg1101" approved="yes">
+      <trans-unit id="_msg1013" approved="yes">
         <source xml:space="preserve">save&amp;exit</source>
         <target xml:space="preserve">zapis&amp;wyjście</target>
         <context-group purpose="location"><context context-type="linenumber">360</context></context-group>
         <context-group purpose="location"><context context-type="linenumber">392</context></context-group>
       </trans-unit>
-      <trans-unit id="_msg1102" approved="yes">
+      <trans-unit id="_msg1014" approved="yes">
         <source xml:space="preserve">export</source>
         <target xml:space="preserve">eksport</target>
         <context-group purpose="location"><context context-type="linenumber">376</context></context-group>
       </trans-unit>
-      <trans-unit id="_msg1103" approved="yes">
+      <trans-unit id="_msg1015" approved="yes">
         <source xml:space="preserve">save&amp;review</source>
         <target xml:space="preserve">zapis&amp;przejrzeć</target>
         <context-group purpose="location"><context context-type="linenumber">408</context></context-group>
       </trans-unit>
-      <trans-unit id="_msg1104" approved="yes">
+      <trans-unit id="_msg1016" approved="yes">
         <source xml:space="preserve">start</source>
         <target xml:space="preserve">start</target>
         <context-group purpose="location"><context context-type="linenumber">433</context></context-group>
       </trans-unit>
-      <trans-unit id="_msg1105" approved="yes">
+      <trans-unit id="_msg1017" approved="yes">
         <source xml:space="preserve">pause</source>
         <target xml:space="preserve">pauze</target>
         <context-group purpose="location"><context context-type="linenumber">441</context></context-group>
       </trans-unit>
-      <trans-unit id="_msg1106" approved="yes">
+      <trans-unit id="_msg1018" approved="yes">
         <source xml:space="preserve">exit</source>
         <target xml:space="preserve">wyjście</target>
         <context-group purpose="location"><context context-type="linenumber">459</context></context-group>
       </trans-unit>
-      <trans-unit id="_msg1107" approved="yes">
+      <trans-unit id="_msg1019" approved="yes">
         <source xml:space="preserve">discard</source>
         <target xml:space="preserve">porzuć</target>
         <context-group purpose="location"><context context-type="linenumber">417</context></context-group>
@@ -872,28 +872,28 @@
       </trans-unit>
     </group>
   </body></file>
-  <file original="E:/Piattaforma70/MPD78095_AcqTool/CPP/mdatamanager.cpp" datatype="cpp" source-language="en" target-language="pl-PL"><body>
+  <file original="/mnt/hgfs/SharedVM/Piattaforma70/MPD78095_AcqTool/CPP/mdatamanager.cpp" datatype="cpp" source-language="en" target-language="pl-PL"><body>
     <group restype="x-trolltech-linguist-context" resname="MDataManager">
-      <trans-unit id="_msg1108" approved="yes">
+      <trans-unit id="_msg1020" approved="yes">
         <source xml:space="preserve">Operator</source>
         <target xml:space="preserve">Wykonujący</target>
         <context-group purpose="location"><context context-type="linenumber">185</context></context-group>
       </trans-unit>
-      <trans-unit id="_msg1109" approved="yes">
+      <trans-unit id="_msg1021" approved="yes">
         <source xml:space="preserve">Sender</source>
         <target xml:space="preserve">Kierujący</target>
         <context-group purpose="location"><context context-type="linenumber">186</context></context-group>
       </trans-unit>
-      <trans-unit id="_msg1110" approved="yes">
+      <trans-unit id="_msg1022" approved="yes">
         <source xml:space="preserve">Flowmetry</source>
         <target xml:space="preserve">Przepływ cewkowy</target>
         <context-group purpose="location"><context context-type="linenumber">1090</context></context-group>
       </trans-unit>
     </group>
   </body></file>
-  <file original="E:/Piattaforma70/MPD78095_AcqTool/CPP/mdatamngdesktop.cpp" datatype="cpp" source-language="en" target-language="pl-PL"><body>
+  <file original="/mnt/hgfs/SharedVM/Piattaforma70/MPD78095_AcqTool/CPP/mdatamngdesktop.cpp" datatype="cpp" source-language="en" target-language="pl-PL"><body>
     <group restype="x-trolltech-linguist-context" resname="MDataMngDesktop">
-      <trans-unit id="_msg1111" approved="yes">
+      <trans-unit id="_msg1023" approved="yes">
         <source xml:space="preserve">problems in the report writing</source>
         <target xml:space="preserve">problemy z zapisem raportu</target>
         <context-group purpose="location"><context context-type="linenumber">284</context></context-group>
@@ -901,389 +901,389 @@
       </trans-unit>
     </group>
   </body></file>
-  <file original="E:/Piattaforma70/MPD78095_AcqTool/CPP/mflowdatas.h" datatype="c" source-language="en" target-language="pl-PL"><body>
+  <file original="/mnt/hgfs/SharedVM/Piattaforma70/MPD78095_AcqTool/CPP/mflowdatas.h" datatype="c" source-language="en" target-language="pl-PL"><body>
     <group restype="x-trolltech-linguist-context" resname="mflowdatasModel">
-      <trans-unit id="_msg1112" approved="yes">
+      <trans-unit id="_msg1024" approved="yes">
         <source xml:space="preserve">DESCRIPTION</source>
         <target xml:space="preserve">OPIS</target>
         <context-group purpose="location"><context context-type="linenumber">18</context></context-group>
       </trans-unit>
-      <trans-unit id="_msg1113" approved="yes">
+      <trans-unit id="_msg1025" approved="yes">
         <source xml:space="preserve">VALUE</source>
         <target xml:space="preserve">WARTOŚĆ</target>
         <context-group purpose="location"><context context-type="linenumber">19</context></context-group>
       </trans-unit>
     </group>
   </body></file>
-  <file original="E:/Piattaforma70/M8078027_MGlobal/appbridge.cpp" datatype="cpp" source-language="en" target-language="pl-PL"><body>
+  <file original="/mnt/hgfs/SharedVM/Piattaforma70/M8078027_MGlobal/appbridge.cpp" datatype="cpp" source-language="en" target-language="pl-PL"><body>
     <group restype="x-trolltech-linguist-context" resname="AppBridge">
-      <trans-unit id="_msg1114" approved="yes">
+      <trans-unit id="_msg1026" approved="yes">
         <source xml:space="preserve">System Error: application not started correctly</source>
         <target xml:space="preserve">Błąd systemu: aplikacja nie została poprawnie uruchomiona</target>
         <context-group purpose="location"><context context-type="linenumber">420</context></context-group>
       </trans-unit>
-      <trans-unit id="_msg1115" approved="yes">
+      <trans-unit id="_msg1027" approved="yes">
         <source xml:space="preserve">System Error: application not displayed correctly</source>
         <target xml:space="preserve">Błąd systemu: aplikacja nie wyświetla się poprawnie</target>
         <context-group purpose="location"><context context-type="linenumber">425</context></context-group>
       </trans-unit>
     </group>
     <group restype="x-trolltech-linguist-context" resname="SupeBridge">
-      <trans-unit id="_msg1116" approved="yes">
+      <trans-unit id="_msg1028" approved="yes">
         <source xml:space="preserve">Configuration: No EMG + BT Cell. Connection in progress</source>
         <target xml:space="preserve">Konfiguracja: Trwa łączenie. PW BT bez EMG</target>
         <context-group purpose="location"><context context-type="linenumber">704</context></context-group>
       </trans-unit>
-      <trans-unit id="_msg1117" approved="yes">
+      <trans-unit id="_msg1029" approved="yes">
         <source xml:space="preserve">Configuration: No EMG + Wired Cell</source>
         <target xml:space="preserve">Konfiguracja: Przew. PW bez EMG</target>
         <context-group purpose="location"><context context-type="linenumber">709</context></context-group>
       </trans-unit>
-      <trans-unit id="_msg1118" approved="yes">
+      <trans-unit id="_msg1030" approved="yes">
         <source xml:space="preserve">Configuration: EMG + BT Cell. Connection in progress</source>
         <target xml:space="preserve">Konfiguracja: Trwa łączenie. PW BT + EMG</target>
         <context-group purpose="location"><context context-type="linenumber">714</context></context-group>
       </trans-unit>
-      <trans-unit id="_msg1119" approved="yes">
+      <trans-unit id="_msg1031" approved="yes">
         <source xml:space="preserve">Configuration: EMG + Wired Cell</source>
         <target xml:space="preserve">Konfiguracja: Przew. PW + EMG</target>
         <context-group purpose="location"><context context-type="linenumber">719</context></context-group>
       </trans-unit>
-      <trans-unit id="_msg1120" approved="yes">
+      <trans-unit id="_msg1032" approved="yes">
         <source xml:space="preserve">Configuration: EMG + BT Cell Connected</source>
         <target xml:space="preserve">Konfiguracja: PW BT + EMG podłączone</target>
         <context-group purpose="location"><context context-type="linenumber">725</context></context-group>
       </trans-unit>
-      <trans-unit id="_msg1121" approved="yes">
+      <trans-unit id="_msg1033" approved="yes">
         <source xml:space="preserve">Configuration: No EMG + BT Cell Connected</source>
         <target xml:space="preserve">Konfiguracja: PW BT bez EMG podłączone</target>
         <context-group purpose="location"><context context-type="linenumber">729</context></context-group>
       </trans-unit>
     </group>
   </body></file>
-  <file original="E:/Piattaforma70/M8078027_MGlobal/layoutmanager.cpp" datatype="cpp" source-language="en" target-language="pl-PL"><body>
+  <file original="/mnt/hgfs/SharedVM/Piattaforma70/M8078027_MGlobal/layoutmanager.cpp" datatype="cpp" source-language="en" target-language="pl-PL"><body>
     <group restype="x-trolltech-linguist-context" resname="LayoutManager">
-      <trans-unit id="_msg1122" approved="yes">
+      <trans-unit id="_msg1034" approved="yes">
         <source xml:space="preserve">Richiesta sbagliata</source>
         <target xml:space="preserve">Błędne żądanie</target>
-        <context-group purpose="location"><context context-type="linenumber">65</context></context-group>
+        <context-group purpose="location"><context context-type="linenumber">71</context></context-group>
       </trans-unit>
     </group>
   </body></file>
-  <file original="E:/Piattaforma70/MPD78095_AcqTool/Resources/MNomogramma.qml" datatype="plaintext" source-language="en" target-language="pl-PL"><body>
+  <file original="/mnt/hgfs/SharedVM/Piattaforma70/MPD78095_AcqTool/Resources/MNomogramma.qml" datatype="plaintext" source-language="en" target-language="pl-PL"><body>
     <group restype="x-trolltech-linguist-context" resname="MNomogramma">
-      <trans-unit id="_msg1123" approved="yes">
+      <trans-unit id="_msg1035" approved="yes">
         <source xml:space="preserve">OUT OF RANGE</source>
         <target xml:space="preserve">POZA ZACRESEM</target>
         <context-group purpose="location"><context context-type="linenumber">461</context></context-group>
       </trans-unit>
-      <trans-unit id="_msg1124" approved="yes">
+      <trans-unit id="_msg1036" approved="yes">
         <source xml:space="preserve">copy</source>
         <target xml:space="preserve">kopiuj</target>
         <context-group purpose="location"><context context-type="linenumber">508</context></context-group>
       </trans-unit>
     </group>
   </body></file>
-  <file original="E:/Piattaforma70/MPD78095_AcqTool/Resources/WarningDlg.qml" datatype="plaintext" source-language="en" target-language="pl-PL"><body>
+  <file original="/mnt/hgfs/SharedVM/Piattaforma70/MPD78095_AcqTool/Resources/WarningDlg.qml" datatype="plaintext" source-language="en" target-language="pl-PL"><body>
     <group restype="x-trolltech-linguist-context" resname="WarningDlg">
-      <trans-unit id="_msg1125" approved="yes">
+      <trans-unit id="_msg1037" approved="yes">
         <source xml:space="preserve">OK</source>
         <target xml:space="preserve">OK</target>
-        <context-group purpose="location"><context context-type="linenumber">42</context></context-group>
+        <context-group purpose="location"><context context-type="linenumber">43</context></context-group>
       </trans-unit>
     </group>
   </body></file>
-  <file original="E:/Piattaforma70/MPD78097_Database/msqlanalysistypes.cpp" datatype="cpp" source-language="en" target-language="pl-PL"><body>
+  <file original="/mnt/hgfs/SharedVM/Piattaforma70/MPD78097_Database/msqlanalysistypes.cpp" datatype="cpp" source-language="en" target-language="pl-PL"><body>
     <group restype="x-trolltech-linguist-context" resname="MSQLAnalysisTypes">
-      <trans-unit id="_msg1126">
+      <trans-unit id="_msg1038">
         <source xml:space="preserve">Flowmetry</source>
         <target xml:space="preserve" state="needs-review-translation">Przepływ cewkowy</target>
         <context-group purpose="location"><context context-type="linenumber">19</context></context-group>
       </trans-unit>
-      <trans-unit id="_msg1127">
+      <trans-unit id="_msg1039">
         <source xml:space="preserve">Cystometry (Filling)</source>
         <target xml:space="preserve"></target>
         <context-group purpose="location"><context context-type="linenumber">20</context></context-group>
       </trans-unit>
-      <trans-unit id="_msg1128">
+      <trans-unit id="_msg1040">
         <source xml:space="preserve">PFS (Fill+Void)</source>
         <target xml:space="preserve"></target>
         <context-group purpose="location"><context context-type="linenumber">21</context></context-group>
       </trans-unit>
-      <trans-unit id="_msg1129">
+      <trans-unit id="_msg1041">
         <source xml:space="preserve">Static UPP</source>
         <target xml:space="preserve"></target>
         <context-group purpose="location"><context context-type="linenumber">23</context></context-group>
       </trans-unit>
-      <trans-unit id="_msg1130">
+      <trans-unit id="_msg1042">
         <source xml:space="preserve">Dynamic UPP</source>
         <target xml:space="preserve"></target>
         <context-group purpose="location"><context context-type="linenumber">24</context></context-group>
       </trans-unit>
-      <trans-unit id="_msg1131">
+      <trans-unit id="_msg1043">
         <source xml:space="preserve">Whitaker Test</source>
         <target xml:space="preserve"></target>
         <context-group purpose="location"><context context-type="linenumber">25</context></context-group>
       </trans-unit>
-      <trans-unit id="_msg1132">
+      <trans-unit id="_msg1044">
         <source xml:space="preserve">Leak Point</source>
         <target xml:space="preserve"></target>
         <context-group purpose="location"><context context-type="linenumber">26</context></context-group>
       </trans-unit>
-      <trans-unit id="_msg1133">
+      <trans-unit id="_msg1045">
         <source xml:space="preserve">Destrusor Overactivity</source>
         <target xml:space="preserve"></target>
         <context-group purpose="location"><context context-type="linenumber">27</context></context-group>
       </trans-unit>
-      <trans-unit id="_msg1134">
+      <trans-unit id="_msg1046">
         <source xml:space="preserve">Biofeedback</source>
         <target xml:space="preserve"></target>
         <context-group purpose="location"><context context-type="linenumber">28</context></context-group>
       </trans-unit>
     </group>
   </body></file>
-  <file original="E:/Piattaforma70/MPD78097_Database/msqlarrangements.cpp" datatype="cpp" source-language="en" target-language="pl-PL"><body>
+  <file original="/mnt/hgfs/SharedVM/Piattaforma70/MPD78097_Database/msqlarrangements.cpp" datatype="cpp" source-language="en" target-language="pl-PL"><body>
     <group restype="x-trolltech-linguist-context" resname="MSQLMSChannels">
-      <trans-unit id="_msg1135">
+      <trans-unit id="_msg1047">
         <source xml:space="preserve">Channel</source>
         <target xml:space="preserve"></target>
         <context-group purpose="location"><context context-type="linenumber">100</context></context-group>
       </trans-unit>
-      <trans-unit id="_msg1136">
+      <trans-unit id="_msg1048">
         <source xml:space="preserve">Name</source>
         <target xml:space="preserve"></target>
         <context-group purpose="location"><context context-type="linenumber">101</context></context-group>
       </trans-unit>
-      <trans-unit id="_msg1137">
+      <trans-unit id="_msg1049">
         <source xml:space="preserve">Unit</source>
         <target xml:space="preserve"></target>
         <context-group purpose="location"><context context-type="linenumber">102</context></context-group>
       </trans-unit>
-      <trans-unit id="_msg1138">
+      <trans-unit id="_msg1050">
         <source xml:space="preserve">Range</source>
         <target xml:space="preserve" state="needs-review-translation">Zakres</target>
         <context-group purpose="location"><context context-type="linenumber">103</context></context-group>
       </trans-unit>
-      <trans-unit id="_msg1139">
+      <trans-unit id="_msg1051">
         <source xml:space="preserve">Graph</source>
         <target xml:space="preserve"></target>
         <context-group purpose="location"><context context-type="linenumber">104</context></context-group>
       </trans-unit>
-      <trans-unit id="_msg1140">
+      <trans-unit id="_msg1052">
         <source xml:space="preserve">Loc</source>
         <target xml:space="preserve"></target>
         <context-group purpose="location"><context context-type="linenumber">105</context></context-group>
       </trans-unit>
-      <trans-unit id="_msg1141">
+      <trans-unit id="_msg1053">
         <source xml:space="preserve">Zero</source>
         <target xml:space="preserve"></target>
         <context-group purpose="location"><context context-type="linenumber">106</context></context-group>
       </trans-unit>
-      <trans-unit id="_msg1142">
+      <trans-unit id="_msg1054">
         <source xml:space="preserve">Measured Channel</source>
         <target xml:space="preserve"></target>
         <context-group purpose="location"><context context-type="linenumber">118</context></context-group>
       </trans-unit>
-      <trans-unit id="_msg1143">
+      <trans-unit id="_msg1055">
         <source xml:space="preserve"> added succesfully</source>
         <target xml:space="preserve"></target>
         <context-group purpose="location"><context context-type="linenumber">119</context></context-group>
       </trans-unit>
-      <trans-unit id="_msg1144">
+      <trans-unit id="_msg1056">
         <source xml:space="preserve"> modified succesfully</source>
         <target xml:space="preserve"></target>
         <context-group purpose="location"><context context-type="linenumber">120</context></context-group>
       </trans-unit>
-      <trans-unit id="_msg1145">
+      <trans-unit id="_msg1057">
         <source xml:space="preserve"> deleted succesfully</source>
         <target xml:space="preserve"></target>
         <context-group purpose="location"><context context-type="linenumber">121</context></context-group>
       </trans-unit>
-      <trans-unit id="_msg1146">
+      <trans-unit id="_msg1058">
         <source xml:space="preserve">There is already a measured channel with this name. Change it...</source>
         <target xml:space="preserve"></target>
         <context-group purpose="location"><context context-type="linenumber">122</context></context-group>
       </trans-unit>
     </group>
     <group restype="x-trolltech-linguist-context" resname="MSQLCAChannels">
-      <trans-unit id="_msg1147">
+      <trans-unit id="_msg1059">
         <source xml:space="preserve">Name</source>
         <target xml:space="preserve"></target>
         <context-group purpose="location"><context context-type="linenumber">211</context></context-group>
       </trans-unit>
-      <trans-unit id="_msg1148">
+      <trans-unit id="_msg1060">
         <source xml:space="preserve">Unit</source>
         <target xml:space="preserve"></target>
         <context-group purpose="location"><context context-type="linenumber">212</context></context-group>
       </trans-unit>
-      <trans-unit id="_msg1149">
+      <trans-unit id="_msg1061">
         <source xml:space="preserve">Range</source>
         <target xml:space="preserve" state="needs-review-translation">Zakres</target>
         <context-group purpose="location"><context context-type="linenumber">213</context></context-group>
       </trans-unit>
-      <trans-unit id="_msg1150">
+      <trans-unit id="_msg1062">
         <source xml:space="preserve">Graph</source>
         <target xml:space="preserve"></target>
         <context-group purpose="location"><context context-type="linenumber">214</context></context-group>
       </trans-unit>
-      <trans-unit id="_msg1151">
+      <trans-unit id="_msg1063">
         <source xml:space="preserve">Zero</source>
         <target xml:space="preserve"></target>
         <context-group purpose="location"><context context-type="linenumber">215</context></context-group>
       </trans-unit>
-      <trans-unit id="_msg1152">
+      <trans-unit id="_msg1064">
         <source xml:space="preserve">Calculated Channel</source>
         <target xml:space="preserve"></target>
         <context-group purpose="location"><context context-type="linenumber">218</context></context-group>
       </trans-unit>
-      <trans-unit id="_msg1153">
+      <trans-unit id="_msg1065">
         <source xml:space="preserve"> added succesfully</source>
         <target xml:space="preserve"></target>
         <context-group purpose="location"><context context-type="linenumber">219</context></context-group>
       </trans-unit>
-      <trans-unit id="_msg1154">
+      <trans-unit id="_msg1066">
         <source xml:space="preserve"> modified succesfully</source>
         <target xml:space="preserve"></target>
         <context-group purpose="location"><context context-type="linenumber">220</context></context-group>
       </trans-unit>
-      <trans-unit id="_msg1155">
+      <trans-unit id="_msg1067">
         <source xml:space="preserve"> deleted succesfully</source>
         <target xml:space="preserve"></target>
         <context-group purpose="location"><context context-type="linenumber">221</context></context-group>
       </trans-unit>
-      <trans-unit id="_msg1156">
+      <trans-unit id="_msg1068">
         <source xml:space="preserve">There is already a calculated channel with this name. Change it...</source>
         <target xml:space="preserve"></target>
         <context-group purpose="location"><context context-type="linenumber">222</context></context-group>
       </trans-unit>
     </group>
   </body></file>
-  <file original="E:/Piattaforma70/MPD78097_Database/msqlboards.cpp" datatype="cpp" source-language="en" target-language="pl-PL"><body>
+  <file original="/mnt/hgfs/SharedVM/Piattaforma70/MPD78097_Database/msqlboards.cpp" datatype="cpp" source-language="en" target-language="pl-PL"><body>
     <group restype="x-trolltech-linguist-context" resname="MSQLBoards">
-      <trans-unit id="_msg1157">
+      <trans-unit id="_msg1069">
         <source xml:space="preserve">Lite7006</source>
         <target xml:space="preserve"></target>
         <context-group purpose="location"><context context-type="linenumber">20</context></context-group>
       </trans-unit>
-      <trans-unit id="_msg1158">
+      <trans-unit id="_msg1070">
         <source xml:space="preserve">Quick	Pico Compact</source>
         <target xml:space="preserve"></target>
         <context-group purpose="location"><context context-type="linenumber">20</context></context-group>
       </trans-unit>
-      <trans-unit id="_msg1159">
+      <trans-unit id="_msg1071">
         <source xml:space="preserve">BluRunner rev3</source>
         <target xml:space="preserve"></target>
         <context-group purpose="location"><context context-type="linenumber">21</context></context-group>
       </trans-unit>
-      <trans-unit id="_msg1160">
+      <trans-unit id="_msg1072">
         <source xml:space="preserve">Blu Runner rev 3, Pico Bright used in stationary mode</source>
         <target xml:space="preserve"></target>
         <context-group purpose="location"><context context-type="linenumber">21</context></context-group>
       </trans-unit>
-      <trans-unit id="_msg1161">
+      <trans-unit id="_msg1073">
         <source xml:space="preserve">Acq3000</source>
         <target xml:space="preserve"></target>
         <context-group purpose="location"><context context-type="linenumber">22</context></context-group>
       </trans-unit>
-      <trans-unit id="_msg1162">
+      <trans-unit id="_msg1074">
         <source xml:space="preserve">PicoSmart with Acq3000 acquisition unit</source>
         <target xml:space="preserve"></target>
         <context-group purpose="location"><context context-type="linenumber">22</context></context-group>
       </trans-unit>
-      <trans-unit id="_msg1163">
+      <trans-unit id="_msg1075">
         <source xml:space="preserve">Flow-Zig</source>
         <target xml:space="preserve"></target>
         <context-group purpose="location"><context context-type="linenumber">23</context></context-group>
       </trans-unit>
-      <trans-unit id="_msg1164">
+      <trans-unit id="_msg1076">
         <source xml:space="preserve">FlowZig wireless flowmeter</source>
         <target xml:space="preserve"></target>
         <context-group purpose="location"><context context-type="linenumber">23</context></context-group>
       </trans-unit>
-      <trans-unit id="_msg1165">
+      <trans-unit id="_msg1077">
         <source xml:space="preserve">BluRunner rev4</source>
         <target xml:space="preserve"></target>
         <context-group purpose="location"><context context-type="linenumber">24</context></context-group>
       </trans-unit>
-      <trans-unit id="_msg1166">
+      <trans-unit id="_msg1078">
         <source xml:space="preserve">Blu Runner rev 4, used wireless in stationary mode</source>
         <target xml:space="preserve"></target>
         <context-group purpose="location"><context context-type="linenumber">24</context></context-group>
       </trans-unit>
-      <trans-unit id="_msg1167">
+      <trans-unit id="_msg1079">
         <source xml:space="preserve">SAU</source>
         <target xml:space="preserve"></target>
         <context-group purpose="location"><context context-type="linenumber">25</context></context-group>
       </trans-unit>
-      <trans-unit id="_msg1168">
+      <trans-unit id="_msg1080">
         <source xml:space="preserve">PicoSmart with SAU acquisition module</source>
         <target xml:space="preserve"></target>
         <context-group purpose="location"><context context-type="linenumber">25</context></context-group>
       </trans-unit>
-      <trans-unit id="_msg1169">
+      <trans-unit id="_msg1081">
         <source xml:space="preserve">Clipper</source>
         <target xml:space="preserve"></target>
         <context-group purpose="location"><context context-type="linenumber">26</context></context-group>
       </trans-unit>
-      <trans-unit id="_msg1170">
+      <trans-unit id="_msg1082">
         <source xml:space="preserve">Clipper High Resolution module</source>
         <target xml:space="preserve"></target>
         <context-group purpose="location"><context context-type="linenumber">26</context></context-group>
       </trans-unit>
-      <trans-unit id="_msg1171">
+      <trans-unit id="_msg1083">
         <source xml:space="preserve">Flow-BiT</source>
         <target xml:space="preserve"></target>
         <context-group purpose="location"><context context-type="linenumber">27</context></context-group>
       </trans-unit>
-      <trans-unit id="_msg1172">
+      <trans-unit id="_msg1084">
         <source xml:space="preserve">Wireless flow meter on blue-tooth protocol</source>
         <target xml:space="preserve"></target>
         <context-group purpose="location"><context context-type="linenumber">27</context></context-group>
       </trans-unit>
     </group>
   </body></file>
-  <file original="E:/Piattaforma70/MPD78097_Database/msqlcategories.cpp" datatype="cpp" source-language="en" target-language="pl-PL"><body>
+  <file original="/mnt/hgfs/SharedVM/Piattaforma70/MPD78097_Database/msqlcategories.cpp" datatype="cpp" source-language="en" target-language="pl-PL"><body>
     <group restype="x-trolltech-linguist-context" resname="MSQLCategories">
-      <trans-unit id="_msg1173">
+      <trans-unit id="_msg1085">
         <source xml:space="preserve">Code</source>
         <target xml:space="preserve"></target>
         <context-group purpose="location"><context context-type="linenumber">12</context></context-group>
       </trans-unit>
-      <trans-unit id="_msg1174">
+      <trans-unit id="_msg1086">
         <source xml:space="preserve">Description</source>
         <target xml:space="preserve"></target>
         <context-group purpose="location"><context context-type="linenumber">13</context></context-group>
       </trans-unit>
-      <trans-unit id="_msg1175">
+      <trans-unit id="_msg1087">
         <source xml:space="preserve">Category added succesfully</source>
         <target xml:space="preserve"></target>
         <context-group purpose="location"><context context-type="linenumber">22</context></context-group>
       </trans-unit>
-      <trans-unit id="_msg1176">
+      <trans-unit id="_msg1088">
         <source xml:space="preserve">Category modified succesfully</source>
         <target xml:space="preserve"></target>
         <context-group purpose="location"><context context-type="linenumber">23</context></context-group>
       </trans-unit>
-      <trans-unit id="_msg1177">
+      <trans-unit id="_msg1089">
         <source xml:space="preserve">Category deleted succesfully</source>
         <target xml:space="preserve"></target>
         <context-group purpose="location"><context context-type="linenumber">24</context></context-group>
       </trans-unit>
-      <trans-unit id="_msg1178">
+      <trans-unit id="_msg1090">
         <source xml:space="preserve">There is already a Category with this code. Change it...</source>
         <target xml:space="preserve"></target>
         <context-group purpose="location"><context context-type="linenumber">25</context></context-group>
       </trans-unit>
-      <trans-unit id="_msg1179">
+      <trans-unit id="_msg1091">
         <source xml:space="preserve">There are some patients related to this Category code, delete is not permitted</source>
         <target xml:space="preserve"></target>
         <context-group purpose="location"><context context-type="linenumber">26</context></context-group>
       </trans-unit>
     </group>
   </body></file>
-  <file original="E:/Piattaforma70/MPD78097_Database/msqlcomments.cpp" datatype="cpp" source-language="en" target-language="pl-PL"><body>
+  <file original="/mnt/hgfs/SharedVM/Piattaforma70/MPD78097_Database/msqlcomments.cpp" datatype="cpp" source-language="en" target-language="pl-PL"><body>
     <group restype="x-trolltech-linguist-context" resname="MSQLComments">
-      <trans-unit id="_msg1180">
+      <trans-unit id="_msg1092">
         <source xml:space="preserve">Study N.</source>
         <alt-trans>
           <source xml:space="preserve">Test N.</source>
@@ -1291,238 +1291,238 @@
         </alt-trans>
         <context-group purpose="location"><context context-type="linenumber">10</context></context-group>
       </trans-unit>
-      <trans-unit id="_msg1181">
+      <trans-unit id="_msg1093">
         <source xml:space="preserve">Protocol</source>
         <target xml:space="preserve"></target>
         <context-group purpose="location"><context context-type="linenumber">11</context></context-group>
       </trans-unit>
-      <trans-unit id="_msg1182">
+      <trans-unit id="_msg1094">
         <source xml:space="preserve">Repeatable</source>
         <target xml:space="preserve"></target>
         <context-group purpose="location"><context context-type="linenumber">12</context></context-group>
       </trans-unit>
-      <trans-unit id="_msg1183">
+      <trans-unit id="_msg1095">
         <source xml:space="preserve">Date</source>
         <target xml:space="preserve"></target>
         <context-group purpose="location"><context context-type="linenumber">13</context></context-group>
       </trans-unit>
     </group>
   </body></file>
-  <file original="E:/Piattaforma70/MPD78097_Database/msqldiagnosiscodes.cpp" datatype="cpp" source-language="en" target-language="pl-PL"><body>
+  <file original="/mnt/hgfs/SharedVM/Piattaforma70/MPD78097_Database/msqldiagnosiscodes.cpp" datatype="cpp" source-language="en" target-language="pl-PL"><body>
     <group restype="x-trolltech-linguist-context" resname="MSQLDiagnosisCodes">
-      <trans-unit id="_msg1184">
+      <trans-unit id="_msg1096">
         <source xml:space="preserve">Code</source>
         <target xml:space="preserve"></target>
         <context-group purpose="location"><context context-type="linenumber">11</context></context-group>
       </trans-unit>
-      <trans-unit id="_msg1185">
+      <trans-unit id="_msg1097">
         <source xml:space="preserve">Description</source>
         <target xml:space="preserve"></target>
         <context-group purpose="location"><context context-type="linenumber">12</context></context-group>
       </trans-unit>
-      <trans-unit id="_msg1186">
+      <trans-unit id="_msg1098">
         <source xml:space="preserve">Diagnosis Code added succesfully</source>
         <target xml:space="preserve"></target>
         <context-group purpose="location"><context context-type="linenumber">21</context></context-group>
       </trans-unit>
-      <trans-unit id="_msg1187">
+      <trans-unit id="_msg1099">
         <source xml:space="preserve">Diagnosis Code modified succesfully</source>
         <target xml:space="preserve"></target>
         <context-group purpose="location"><context context-type="linenumber">22</context></context-group>
       </trans-unit>
-      <trans-unit id="_msg1188">
+      <trans-unit id="_msg1100">
         <source xml:space="preserve">Diagnosis Code deleted succesfully</source>
         <target xml:space="preserve"></target>
         <context-group purpose="location"><context context-type="linenumber">23</context></context-group>
       </trans-unit>
-      <trans-unit id="_msg1189">
+      <trans-unit id="_msg1101">
         <source xml:space="preserve">There is already a Diagnosis Code with this code. Change it...</source>
         <target xml:space="preserve"></target>
         <context-group purpose="location"><context context-type="linenumber">24</context></context-group>
       </trans-unit>
-      <trans-unit id="_msg1190">
+      <trans-unit id="_msg1102">
         <source xml:space="preserve">There are some patients related to this diagnosis code, delete is not permitted</source>
         <target xml:space="preserve"></target>
         <context-group purpose="location"><context context-type="linenumber">25</context></context-group>
       </trans-unit>
     </group>
   </body></file>
-  <file original="E:/Piattaforma70/MPD78097_Database/msqlpatientdiagnosiscodes.cpp" datatype="cpp" source-language="en" target-language="pl-PL"><body>
+  <file original="/mnt/hgfs/SharedVM/Piattaforma70/MPD78097_Database/msqlpatientdiagnosiscodes.cpp" datatype="cpp" source-language="en" target-language="pl-PL"><body>
     <group restype="x-trolltech-linguist-context" resname="MSQLPatientDiagnosisCodes">
-      <trans-unit id="_msg1191">
+      <trans-unit id="_msg1103">
         <source xml:space="preserve">Code</source>
         <target xml:space="preserve"></target>
         <context-group purpose="location"><context context-type="linenumber">11</context></context-group>
       </trans-unit>
-      <trans-unit id="_msg1192">
+      <trans-unit id="_msg1104">
         <source xml:space="preserve">Description</source>
         <target xml:space="preserve"></target>
         <context-group purpose="location"><context context-type="linenumber">12</context></context-group>
       </trans-unit>
     </group>
   </body></file>
-  <file original="E:/Piattaforma70/MPD78097_Database/msqlpatients.cpp" datatype="cpp" source-language="en" target-language="pl-PL"><body>
+  <file original="/mnt/hgfs/SharedVM/Piattaforma70/MPD78097_Database/msqlpatients.cpp" datatype="cpp" source-language="en" target-language="pl-PL"><body>
     <group restype="x-trolltech-linguist-context" resname="MSQLPatients">
-      <trans-unit id="_msg1193">
+      <trans-unit id="_msg1105">
         <source xml:space="preserve">Birth Date</source>
         <target xml:space="preserve"></target>
         <context-group purpose="location"><context context-type="linenumber">45</context></context-group>
       </trans-unit>
-      <trans-unit id="_msg1194">
+      <trans-unit id="_msg1106">
         <source xml:space="preserve">Creation</source>
         <target xml:space="preserve"></target>
         <context-group purpose="location"><context context-type="linenumber">46</context></context-group>
       </trans-unit>
-      <trans-unit id="_msg1195">
+      <trans-unit id="_msg1107">
         <source xml:space="preserve">Name</source>
         <target xml:space="preserve"></target>
         <context-group purpose="location"><context context-type="linenumber">47</context></context-group>
         <context-group purpose="location"><context context-type="linenumber">50</context></context-group>
       </trans-unit>
-      <trans-unit id="_msg1196">
+      <trans-unit id="_msg1108">
         <source xml:space="preserve">Surname</source>
         <target xml:space="preserve"></target>
         <context-group purpose="location"><context context-type="linenumber">48</context></context-group>
         <context-group purpose="location"><context context-type="linenumber">51</context></context-group>
       </trans-unit>
-      <trans-unit id="_msg1197">
+      <trans-unit id="_msg1109">
         <source xml:space="preserve">Patient added succesfully</source>
         <target xml:space="preserve"></target>
         <context-group purpose="location"><context context-type="linenumber">70</context></context-group>
       </trans-unit>
-      <trans-unit id="_msg1198">
+      <trans-unit id="_msg1110">
         <source xml:space="preserve">Patient modified succesfully</source>
         <target xml:space="preserve"></target>
         <context-group purpose="location"><context context-type="linenumber">71</context></context-group>
       </trans-unit>
-      <trans-unit id="_msg1199">
+      <trans-unit id="_msg1111">
         <source xml:space="preserve">Patient deleted succesfully</source>
         <target xml:space="preserve"></target>
         <context-group purpose="location"><context context-type="linenumber">72</context></context-group>
       </trans-unit>
-      <trans-unit id="_msg1200">
+      <trans-unit id="_msg1112">
         <source xml:space="preserve">There is already a Patient like this. Change it...</source>
         <target xml:space="preserve"></target>
         <context-group purpose="location"><context context-type="linenumber">73</context></context-group>
       </trans-unit>
-      <trans-unit id="_msg1201">
+      <trans-unit id="_msg1113">
         <source xml:space="preserve">Anonymous</source>
         <target xml:space="preserve"></target>
         <context-group purpose="location"><context context-type="linenumber">197</context></context-group>
       </trans-unit>
-      <trans-unit id="_msg1202">
+      <trans-unit id="_msg1114">
         <source xml:space="preserve">Patient</source>
         <target xml:space="preserve"></target>
         <context-group purpose="location"><context context-type="linenumber">197</context></context-group>
       </trans-unit>
-      <trans-unit id="_msg1203">
+      <trans-unit id="_msg1115">
         <source xml:space="preserve">Anonymous Patient cannot be deleted</source>
         <target xml:space="preserve"></target>
         <context-group purpose="location"><context context-type="linenumber">199</context></context-group>
       </trans-unit>
     </group>
   </body></file>
-  <file original="E:/Piattaforma70/MPD78097_Database/msqlpatientsubcategory.cpp" datatype="cpp" source-language="en" target-language="pl-PL"><body>
+  <file original="/mnt/hgfs/SharedVM/Piattaforma70/MPD78097_Database/msqlpatientsubcategory.cpp" datatype="cpp" source-language="en" target-language="pl-PL"><body>
     <group restype="x-trolltech-linguist-context" resname="MSQLPatientSubCategory">
-      <trans-unit id="_msg1204">
+      <trans-unit id="_msg1116">
         <source xml:space="preserve">Code</source>
         <target xml:space="preserve"></target>
         <context-group purpose="location"><context context-type="linenumber">11</context></context-group>
       </trans-unit>
-      <trans-unit id="_msg1205">
+      <trans-unit id="_msg1117">
         <source xml:space="preserve">Description</source>
         <target xml:space="preserve"></target>
         <context-group purpose="location"><context context-type="linenumber">12</context></context-group>
       </trans-unit>
     </group>
   </body></file>
-  <file original="E:/Piattaforma70/MPD78097_Database/msqlroutinearrangement.cpp" datatype="cpp" source-language="en" target-language="pl-PL"><body>
+  <file original="/mnt/hgfs/SharedVM/Piattaforma70/MPD78097_Database/msqlroutinearrangement.cpp" datatype="cpp" source-language="en" target-language="pl-PL"><body>
     <group restype="x-trolltech-linguist-context" resname="MSQLRoutineArrangement">
-      <trans-unit id="_msg1206">
+      <trans-unit id="_msg1118">
         <source xml:space="preserve">Description</source>
         <target xml:space="preserve"></target>
         <context-group purpose="location"><context context-type="linenumber">17</context></context-group>
         <context-group purpose="location"><context context-type="linenumber">24</context></context-group>
       </trans-unit>
-      <trans-unit id="_msg1207">
+      <trans-unit id="_msg1119">
         <source xml:space="preserve">Board</source>
         <target xml:space="preserve"></target>
         <context-group purpose="location"><context context-type="linenumber">18</context></context-group>
       </trans-unit>
-      <trans-unit id="_msg1208">
+      <trans-unit id="_msg1120">
         <source xml:space="preserve">N° Chan</source>
         <target xml:space="preserve"></target>
         <context-group purpose="location"><context context-type="linenumber">19</context></context-group>
       </trans-unit>
-      <trans-unit id="_msg1209">
+      <trans-unit id="_msg1121">
         <source xml:space="preserve">Protocol added succesfully</source>
         <target xml:space="preserve"></target>
         <context-group purpose="location"><context context-type="linenumber">39</context></context-group>
       </trans-unit>
-      <trans-unit id="_msg1210">
+      <trans-unit id="_msg1122">
         <source xml:space="preserve">Protocol modified succesfully</source>
         <target xml:space="preserve"></target>
         <context-group purpose="location"><context context-type="linenumber">40</context></context-group>
       </trans-unit>
-      <trans-unit id="_msg1211">
+      <trans-unit id="_msg1123">
         <source xml:space="preserve">Protocol deleted succesfully</source>
         <target xml:space="preserve"></target>
         <context-group purpose="location"><context context-type="linenumber">41</context></context-group>
       </trans-unit>
-      <trans-unit id="_msg1212">
+      <trans-unit id="_msg1124">
         <source xml:space="preserve">There is already a protocol with this description. Change it...</source>
         <target xml:space="preserve"></target>
         <context-group purpose="location"><context context-type="linenumber">42</context></context-group>
       </trans-unit>
-      <trans-unit id="_msg1213">
+      <trans-unit id="_msg1125">
         <source xml:space="preserve">There are some exams related to this protocol, delete is not permitted</source>
         <target xml:space="preserve"></target>
         <context-group purpose="location"><context context-type="linenumber">43</context></context-group>
       </trans-unit>
     </group>
   </body></file>
-  <file original="E:/Piattaforma70/MPD78097_Database/msqlsubcategories.cpp" datatype="cpp" source-language="en" target-language="pl-PL"><body>
+  <file original="/mnt/hgfs/SharedVM/Piattaforma70/MPD78097_Database/msqlsubcategories.cpp" datatype="cpp" source-language="en" target-language="pl-PL"><body>
     <group restype="x-trolltech-linguist-context" resname="MSQLSubCategories">
-      <trans-unit id="_msg1214">
+      <trans-unit id="_msg1126">
         <source xml:space="preserve">Code</source>
         <target xml:space="preserve"></target>
         <context-group purpose="location"><context context-type="linenumber">12</context></context-group>
       </trans-unit>
-      <trans-unit id="_msg1215">
+      <trans-unit id="_msg1127">
         <source xml:space="preserve">Description</source>
         <target xml:space="preserve"></target>
         <context-group purpose="location"><context context-type="linenumber">13</context></context-group>
       </trans-unit>
-      <trans-unit id="_msg1216">
+      <trans-unit id="_msg1128">
         <source xml:space="preserve">SubCategory added succesfully</source>
         <target xml:space="preserve"></target>
         <context-group purpose="location"><context context-type="linenumber">21</context></context-group>
       </trans-unit>
-      <trans-unit id="_msg1217">
+      <trans-unit id="_msg1129">
         <source xml:space="preserve">SubCategory modified succesfully</source>
         <target xml:space="preserve"></target>
         <context-group purpose="location"><context context-type="linenumber">22</context></context-group>
       </trans-unit>
-      <trans-unit id="_msg1218">
+      <trans-unit id="_msg1130">
         <source xml:space="preserve">SubCategory deleted succesfully</source>
         <target xml:space="preserve"></target>
         <context-group purpose="location"><context context-type="linenumber">23</context></context-group>
       </trans-unit>
-      <trans-unit id="_msg1219">
+      <trans-unit id="_msg1131">
         <source xml:space="preserve">There is already a SubCategory with this code. Change it...</source>
         <target xml:space="preserve"></target>
         <context-group purpose="location"><context context-type="linenumber">24</context></context-group>
       </trans-unit>
-      <trans-unit id="_msg1220">
+      <trans-unit id="_msg1132">
         <source xml:space="preserve">There are some patients related to this subcategory, delete is not permitted</source>
         <target xml:space="preserve"></target>
         <context-group purpose="location"><context context-type="linenumber">25</context></context-group>
       </trans-unit>
     </group>
   </body></file>
-  <file original="E:/Piattaforma70/MPD78097_Database/msqltests.cpp" datatype="cpp" source-language="en" target-language="pl-PL"><body>
+  <file original="/mnt/hgfs/SharedVM/Piattaforma70/MPD78097_Database/msqltests.cpp" datatype="cpp" source-language="en" target-language="pl-PL"><body>
     <group restype="x-trolltech-linguist-context" resname="MSQLTests">
-      <trans-unit id="_msg1221">
+      <trans-unit id="_msg1133">
         <source xml:space="preserve">Study N.</source>
         <alt-trans>
           <source xml:space="preserve">Test N.</source>
@@ -1533,7 +1533,7 @@
         <context-group purpose="location"><context context-type="linenumber">46</context></context-group>
         <context-group purpose="location"><context context-type="linenumber">52</context></context-group>
       </trans-unit>
-      <trans-unit id="_msg1222">
+      <trans-unit id="_msg1134">
         <source xml:space="preserve">Protocol</source>
         <target xml:space="preserve"></target>
         <context-group purpose="location"><context context-type="linenumber">36</context></context-group>
@@ -1541,40 +1541,45 @@
         <context-group purpose="location"><context context-type="linenumber">47</context></context-group>
         <context-group purpose="location"><context context-type="linenumber">53</context></context-group>
       </trans-unit>
-      <trans-unit id="_msg1223">
+      <trans-unit id="_msg1135">
         <source xml:space="preserve">Date</source>
         <target xml:space="preserve"></target>
         <context-group purpose="location"><context context-type="linenumber">38</context></context-group>
         <context-group purpose="location"><context context-type="linenumber">48</context></context-group>
         <context-group purpose="location"><context context-type="linenumber">55</context></context-group>
       </trans-unit>
-      <trans-unit id="_msg1224">
+      <trans-unit id="_msg1136">
         <source xml:space="preserve">Patient</source>
         <target xml:space="preserve"></target>
         <context-group purpose="location"><context context-type="linenumber">40</context></context-group>
         <context-group purpose="location"><context context-type="linenumber">45</context></context-group>
         <context-group purpose="location"><context context-type="linenumber">51</context></context-group>
       </trans-unit>
+      <trans-unit id="_msg1137">
+        <source xml:space="preserve">column added succesfully</source>
+        <target xml:space="preserve"></target>
+        <context-group purpose="location"><context context-type="linenumber">80</context></context-group>
+      </trans-unit>
     </group>
   </body></file>
-  <file original="E:/Piattaforma70/MPD78097_Database/mdatabase.cpp" datatype="cpp" source-language="en" target-language="pl-PL"><body>
+  <file original="/mnt/hgfs/SharedVM/Piattaforma70/MPD78097_Database/mdatabase.cpp" datatype="cpp" source-language="en" target-language="pl-PL"><body>
     <group restype="x-trolltech-linguist-context" resname="ProtocolContext">
-      <trans-unit id="_msg1225" approved="yes">
+      <trans-unit id="_msg1138" approved="yes">
         <source xml:space="preserve">Manual FLW</source>
         <target xml:space="preserve">Manualny FLW</target>
         <context-group purpose="location"><context context-type="linenumber">8</context></context-group>
       </trans-unit>
-      <trans-unit id="_msg1226" approved="yes">
+      <trans-unit id="_msg1139" approved="yes">
         <source xml:space="preserve">Manual FLW + EMG</source>
         <target xml:space="preserve">Manualny FLW+EMG</target>
         <context-group purpose="location"><context context-type="linenumber">9</context></context-group>
       </trans-unit>
-      <trans-unit id="_msg1227" approved="yes">
+      <trans-unit id="_msg1140" approved="yes">
         <source xml:space="preserve">Automatic FLW</source>
         <target xml:space="preserve">Automatyczny FLW</target>
         <context-group purpose="location"><context context-type="linenumber">10</context></context-group>
       </trans-unit>
-      <trans-unit id="_msg1228" approved="yes">
+      <trans-unit id="_msg1141" approved="yes">
         <source xml:space="preserve">Automatic FLW + EMG</source>
         <target xml:space="preserve">Automatyczny FLW + EMG</target>
         <context-group purpose="location"><context context-type="linenumber">11</context></context-group>
