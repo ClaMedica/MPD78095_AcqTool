@@ -35,6 +35,7 @@ Rectangle {
         labelSize: layout.value("F4")
         verticalAlignment: Text.AlignVCenter
         wrapMode: Text.WordWrap
+        color: PicoFlow ? "white" : layout.value("textTable")
     }
 
     MButton {

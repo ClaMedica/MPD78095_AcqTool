@@ -23,12 +23,12 @@ Rectangle {
     Connections{
         id:con
         ignoreUnknownSignals: true
-        function onColorSelected() {
+        onColorSelected: {
             rootColorBox.color=target.choosedColor
             target.visible=false
             target = null
         }
-        function onClosing(){
+        onClosing:{
             target.destroy()
         }
     }

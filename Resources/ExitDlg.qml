@@ -33,7 +33,7 @@ Rectangle {
         horizontalAlignment: Text.AlignHCenter
         labelSize: layout.value("F4")
         verticalAlignment: Text.AlignVCenter
-        color : layout.value("textTable")
+        color : PicoFlow ? "white" : layout.value("textTable")
         wrapMode: Text.WordWrap
     }
 

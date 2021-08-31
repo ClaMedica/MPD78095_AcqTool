@@ -46,6 +46,7 @@
         <file>Config_Grafic_pico.xml</file>
         <file>Config_User_Prop.xml</file>
         <file>Config_Printer_Desktop.xml</file>
+        <file>Config_Layout_Pico.xml</file>
     </qresource>
     <qresource prefix="/Dialog">
         <file>VolResDlg.qml</file>

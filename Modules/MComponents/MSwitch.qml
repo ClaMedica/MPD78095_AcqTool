@@ -14,7 +14,7 @@ Rectangle {
     height: 100
     color: layout.value("BackgroundColor")
     state:"opt1"
-    border.color: layout.value("THC2")
+    border.color: PicoFlow ? "white" : layout.value("THC2")
     border.width: 3
     clip:true
 

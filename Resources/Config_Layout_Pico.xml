@@ -1,0 +1,69 @@
+<Layout label="Layout">
+        <Windows label="Windows Layout">
+            <BackgroundColor
+            label="Background Color"
+            type="ColorBox"
+            dt="string"
+            unit=""
+            value="#355667"
+            />
+            <Margin
+            label="Margin"
+            type="ComboBox"
+            dt="int"
+            unit=""
+            model="2#3#4#5#6#7#8#9#10"
+            value="2"
+            />
+        </Windows>
+        <Fonts label="Fonts">
+            <FFamily
+            label="Font Family"
+            type="ComboFont"
+            dt="string"
+            unit=""
+            model=""
+            value="Luxi Serif"
+            />
+            <F4
+            label="Font"
+            type="SpinBox"
+            dt="real"
+            unit="%"
+            model="30#1#0.1#1#"
+            value="4"
+            />
+            </Fonts>
+        <Tables label="Tables Layout">
+            <THF
+            label="Table Header Dim."
+            type="SpinBox"
+            dt="height"
+            unit="%"
+            model="30#1#0.1#1#"
+            value="10"
+            />
+            <TIF
+            label="Table Element Dim."
+            type="SpinBox"
+            dt="height"
+            unit="%"
+            model="30#1#0.1#1#"
+            value="10"
+            />
+            <THC1
+            label="Table Header Col. 1"
+            type="ColorBox"
+            dt="string"
+            unit=""
+            value="#6666FF"
+            />
+            <THC2
+            label="Table Header Col. 2"
+            type="ColorBox"
+            dt="string"
+            unit=""
+            value="#3333FF"
+            />
+        </Tables>
+</Layout>

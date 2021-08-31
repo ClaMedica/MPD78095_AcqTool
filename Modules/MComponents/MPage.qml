@@ -56,12 +56,12 @@ Rectangle{
         property var owner
         property var arg
         ignoreUnknownSignals: true
-        function onAccepted()
+        onAccepted:
         {
             questionAnswered(true, owner, arg)
             target.destroy()
         }
-        function onRejected()
+        onRejected:
         {
             questionAnswered(false, owner, arg)
             target.destroy()

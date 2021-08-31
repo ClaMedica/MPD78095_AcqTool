@@ -139,28 +139,30 @@ ApplicationWindow {
         id: connMainApp
         target: bridgeMain
         ignoreUnknownSignals: true
-        function onNewAcquisition(datafile,codSoft)
+        onNewAcquisition:
         {
             console.log(datafile);
             launch("acq", datafile, codSoft)
             vis = false
         }
-        function onNewVisualization(datafile,codSoft)
+
+        onNewVisualization:
+        //function onNewVisualization(datafile,codSoft)
         {
-            console.log(datafile);
+            console.log("vis ",datafile);
             launch("vis", datafile, codSoft)
             vis = true
         }
-        function onStampaProva()
+        onStampaProva:
         {
             console.log("Stampa di prova");
             launch("sta","")
         }
-        function onClosePico()
+        onClosePico:
         {
             mngData.exitFromReview()
         }
-        function onAnaAutomatica()
+        onAnaAutomatica:
         {
             if (vis && mngData.getAutoAna()){
                 console.log("analisi automatica");

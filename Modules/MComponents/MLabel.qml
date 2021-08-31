@@ -22,7 +22,7 @@ Text {
         else
             rootLabel.font.family = "Calibri"
     }
-    font.bold: false
+    font.bold: PicoFlow ? true : false
     font.pixelSize: screenH * 0.01 * labelSize
     fontSizeMode: Text.Fit
     verticalAlignment: Text.AlignVCenter

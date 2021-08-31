@@ -65,7 +65,7 @@ MForm{
         clip:true
         anchors.bottom: parent.bottom
         anchors.left: parent.left
-        anchors.right: grid.left
+        anchors.right: PicoFlow ? panManAuto.left : grid.left
         height: root.height - alarmBox.height
         plotProp:mngCon.plotSetting
     }
@@ -163,7 +163,7 @@ MForm{
     Rectangle
     {
         id: panManAuto
-        anchors.right: grid.left
+        anchors.right: PicoFlow ? parent.right : grid.left
         anchors.top: parent.top
         anchors.bottom: PicoFlow ? parent.bottom : rectBreakCommands.top
         width: 60
@@ -393,7 +393,7 @@ MForm{
              anchors.right:parent.right
              height:parent.height*0.8
              labelSize: layout.value("F4")
-             color: layout.value("textTable")
+             color: PicoFlow ? "white" : layout.value("textTable")
              horizontalAlignment: Text.AlignHCenter
              verticalAlignment: Text.AlignVCenter
              text: dlgDiscard.testo

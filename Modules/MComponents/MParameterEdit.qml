@@ -17,7 +17,7 @@ Rectangle {
     property string unit:""
     property bool created:false
     property bool editable:true
-    property color labelColor:layout.value("textTable")//colore della role
+    property color labelColor: PicoFlow ? "white" : layout.value("textTable")//colore della role
     property var beginInfo:undefined//è il valore che ha la info la prima volta
     property bool keyboardAlfaNum: true
     property int comboNumMaxEle:5
@@ -61,13 +61,13 @@ Rectangle {
         id:connection
         //target: viene assegnato dal rootParEdit in onComponentChanged
         ignoreUnknownSignals: true
-        function onInfoChanged(){
+        onInfoChanged:{
             if(target === undefined)
                 return
             rootParEdit.info = connection.target.info
         }
 
-        function onFocusChanged()
+        onFocusChanged:
         {
             if(target.focus)
             {
