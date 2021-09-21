@@ -45,5 +45,14 @@
         <file>cmDefFlo.png</file>
         <file>cmDefFlo_click.png</file>
         <file>cmDefFlo_off.png</file>
+        <file>Start0.png</file>
+        <file>Start0_click.png</file>
+        <file>Start0_off.png</file>
+        <file>salvaRivedi.png</file>
+        <file>salvaRivedi_click.png</file>
+        <file>salvaRivedi_off.png</file>
+        <file>pausa.png</file>
+        <file>pausa_click.png</file>
+        <file>pausa_off.png</file>
     </qresource>
 </RCC>

@@ -21,7 +21,7 @@ Rectangle {
     readonly property bool modelOk: (model.length != 0) && (model[0] !== undefined)
     clip: true
     Behavior on height { NumberAnimation { duration:300; easing.type: Easing.OutExpo}}
-    border.width: screenH*0.005
+    border.width: screenH*0.003
 //    onModelChanged:        if(modelOk) currentIndex = 0
     onCurrentIndexChanged: {
         if (modelOk && model[currentIndex] !== undefined)

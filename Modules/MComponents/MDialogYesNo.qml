@@ -9,7 +9,7 @@ Rectangle {
     anchors.centerIn: parent
     visible: false
     color : layout.value("BackgroundColor")
-    border.color: layout.value("THC2")
+    border.color: PicoFlow ? "white" : layout.value("textTable")
     border.width: 5
     property string message: "Message"
     property string yesText:"Yes"
@@ -35,7 +35,7 @@ Rectangle {
         horizontalAlignment: Text.AlignHCenter
         labelSize: layout.value("F4")
         verticalAlignment: Text.AlignVCenter
-        color : layout.value("textTable")
+        color : PicoFlow ? "white" : layout.value("textTable")
         wrapMode: Text.WordWrap
     }
 
@@ -44,8 +44,8 @@ Rectangle {
         anchors.top:lblMessage.bottom
         anchors.left:parent.left
         anchors.bottom: parent.bottom
-        width: parent.width/2.1
-        anchors.margins: parent.height*0.02
+        width: parent.width/3
+        anchors.margins: parent.height*0.05
         text: qsTr("Yes")
         labelSize: layout.value("F4")
         onClicked:accepted()
@@ -56,8 +56,8 @@ Rectangle {
         anchors.top:lblMessage.bottom
         anchors.right:parent.right
         anchors.bottom: parent.bottom
-        width: parent.width/2.1
-        anchors.margins: parent.height*0.02
+        width: parent.width/3
+        anchors.margins: parent.height*0.05
         text: qsTr("No")
         labelSize: layout.value("F4")
         onClicked:rejected()

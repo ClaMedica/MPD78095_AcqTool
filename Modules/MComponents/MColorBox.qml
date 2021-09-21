@@ -1,4 +1,4 @@
-import QtQuick 2.4
+﻿import QtQuick 2.4
 import QtQuick.Controls 1.4
 import QtQuick.Window 2.2
 import MComponents 1.0

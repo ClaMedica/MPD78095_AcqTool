@@ -36,9 +36,9 @@ Rectangle{
         anchors.right:img.left
         anchors.margins: layout.value("Margin")
 
-        color: layout.value("textTable")
+        color: PicoFlow ? "white" : layout.value("textTable")
         text: itemData.value
-        labelSize: layout.value("F4")-1
+        labelSize: PicoFlow ? layout.value("F4") : layout.value("F4")-1
         horizontalAlignment: Text.AlignLeft
     }
 

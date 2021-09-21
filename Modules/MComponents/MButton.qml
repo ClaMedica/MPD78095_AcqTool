@@ -14,7 +14,6 @@ Rectangle {
     property bool switchEnabled:false
     property bool checked:control.checked
     property bool orange: false
-    property bool greytext: false
 
     signal clicked(var id)
     signal pressed(var id)
@@ -71,7 +70,6 @@ Rectangle {
         anchors.fill: rootBtn
         labelSize: rootBtn.labelSize
         color: control.pressed?"white": layout.value("textTable")
-        //color: control.pressed?"white": greytext ? "darkslateblue" : "black"
         horizontalAlignment: Text.AlignHCenter
         verticalAlignment: Text.AlignVCenter
         Behavior on color {

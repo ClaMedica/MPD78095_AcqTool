@@ -46,7 +46,9 @@ ApplicationWindow {
              forReal.configurationFile = mngAcq.plotConfigFileName()
              forReal.displayMessage(qsTr("Wait for ..."), -1,2)
              forHome.whoIsVisible = forReal.name
-             forReal.setAcqInfo(mngData.acqInfo())
+             forReal.setAcqInfo(mngAcq.acqInfo())
+             forReal.setCommandsBottom(mngAcq.commandsBottomAcq())
+
          }
          else if(mode === "vis")
          {
@@ -92,6 +94,7 @@ ApplicationWindow {
             forReal.displayMessage(qsTr("Wait for ..."), -1,1)
             forHome.whoIsVisible = forReal.name
             forReal.setAcqInfo(mngAcq.acqInfo())
+            forReal.setCommandsBottom(mngAcq.commandsBottomAcq())
         }
         else if(mode === "vis")
         {
@@ -146,9 +149,11 @@ ApplicationWindow {
             launch("acq", datafile, codSoft)
             vis = false
         }
+
         onNewVisualization:
+        //function onNewVisualization(datafile,codSoft)
         {
-            console.log(datafile);
+            console.log("vis ",datafile);
             launch("vis", datafile, codSoft)
             vis = true
         }
@@ -176,7 +181,9 @@ ApplicationWindow {
         id:mngAcq
 
         //@@@@@@@@@@    Events          @@@@@@@@@@
-        Component.onCompleted: console.log("MAcqManager Ready!")
+        Component.onCompleted: {
+            console.log("MAcqManager Ready!")
+        }
         onSystemInAcqStatus:
         {
             console.log("Go Go Go");

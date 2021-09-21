@@ -31,9 +31,17 @@
             type="SpinBox"
             dt="real"
             unit="ml"
-            model="2000#1000#500#200#0#"
-            value="200"
+            model="2000#200#100#0#"
+            value="500"
         />
+        <Zero
+            label="Zero"
+            type="TextField"
+            unit=""
+            value="0"
+            alfanum="false"
+            visible = "false"
+         />
 
     </VV>
     <Q>
@@ -67,9 +75,17 @@
             type="SpinBox"
             dt="real"
             unit="ml/sec"
-            model="100#25#1#0#"
+            model="100#10#10#0#"
             value="50"
         />
+        <Zero
+            label="Zero"
+            type="TextField"
+            unit=""
+            value="0"
+            alfanum="false"
+            visible = "false"
+         />
 
     </Q>
     <EMG>
@@ -103,9 +119,17 @@
             type="SpinBox"
             dt="real"
             unit="uV"
-            model="5000#500#500#0#"
-            value="1000"
+            model="3500#500#500#0#"
+            value="3500"
         />
+        <Zero
+            label="Zero"
+            type="TextField"
+            unit=""
+            value="0"
+            alfanum="false"
+            visible = "false"
+         />
     </EMG>
 </ChannelsProp>
 </Configuration>

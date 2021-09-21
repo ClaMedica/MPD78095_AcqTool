@@ -1,4 +1,4 @@
-import QtQuick 2.5
+﻿import QtQuick 2.5
 import QtQuick.Dialogs 1.2
 import QtQuick.Controls 1.4
 import QtQuick.Layouts 1.2
@@ -15,10 +15,11 @@ Rectangle{
     property var image: undefined
     property var keyboard: appKey
     property var keyboardNum: appKeyNum
+    property var mexBox
     signal changePage(var page)
     signal backClicked
     signal nextClicked
-    signal questionAnswered(bool accepted,var owner,var arg)
+    signal questionAnswered(var accepted,var owner,var arg)
     color: "transparent"
 
     function previous() {
@@ -37,7 +38,7 @@ Rectangle{
 
     function askQuestion(owner, arg, question, answ1, answ2)
     {
-        var mexBox = Qt.createQmlObject("import MComponents 1.0; MDialogYesNo{}", rootPage);
+        mexBox = Qt.createQmlObject("import MComponents 1.0; MDialogYesNo{}", rootPage);
         mexBox.anchors.centerIn = rootPage
         mexBox.message = question
         mexBox.yesText = answ1

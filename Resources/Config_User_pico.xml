@@ -1,4 +1,4 @@
-<Configuration label="Configuration">
+﻿<Configuration label="Configuration">
     <Versione
         label="2"
         visible="false"
@@ -200,8 +200,8 @@
                     type="SpinBox"
                     dt="real"
                     unit="uV"
-                    model="5000#500#500#0#"
-                    value="1000"
+                    model="3500#500#500#0#"
+                    value="3500"
                 />
 
             </EMG>

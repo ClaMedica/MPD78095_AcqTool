@@ -159,10 +159,13 @@ Column {
                 //console.log(pchild,i,childrenCount,ancestry)
 
                 var labelAttr = pchild.getAttribute("label")
-                if (labelAttr === "width track" || labelAttr === "Margin" || labelAttr === "Fonts")
+                if (labelAttr === "width track" )
                     continue
 
                 if (CODSOFT === AcqModuleManager.FLOWSOFT && (labelAttr === "Range" || labelAttr === "Auto Range" || labelAttr === "Settings"))
+                    continue
+
+                if (CODSOFT === AcqModuleManager.FLWHS && (labelAttr === "Channels Abilitation" || labelAttr === "EMG"))
                     continue
 
                 if(pchild.isYoungest()) {//creo un parametro modificabile
@@ -171,7 +174,7 @@ Column {
                     if (vis === "false")
                         continue
 
-                    console.log("creo un parametro modificabile")
+                    //console.log("creo un parametro modificabile",pchild.getAttribute("label"))
                     c = Qt.createQmlObject('import MComponents 1.0 ;MParameterEdit{}', recChildren)
                     var attributesNames = ancestry.getAttributesNames()
                     var attributesValues = ancestry.getAttributesValues()

@@ -18,9 +18,7 @@ Rectangle{
     color:itemData.column%2?
     itemData.row%2?layout.value("ir2"):layout.value("ir0"):
     itemData.row%2?layout.value("ir3"):layout.value("ir1")
-//    color:itemData.column%2?
-//    itemData.row%2?DataEngine.ir2:DataEngine.ir0:
-//    itemData.row%2?DataEngine.ir3:DataEngine.ir1
+
     Behavior on color {
         ColorAnimation {
             duration: 200
@@ -31,17 +29,11 @@ Rectangle{
     Rectangle{
         id:recSel
         anchors.fill:parent
-        opacity: layout.value("opacita")//0.5
+        opacity: PicoFlow ? 0.7: layout.value("opacita")//0.5
         visible: itemData.selected
-        color: layout.value("sr")
+        color: PicoFlow ? "darkblue" : layout.value("sr")
     }
-//    Rectangle{
-//        id:recSel
-//        anchors.fill:parent
-//        opacity: PicoFlow ? 0.7 : 0.6
-//        visible: itemData.selected
-//        color: PicoFlow ? "darkblue" : "#001681"
-//    }
+
     MLabel{
         anchors.fill:parent
         anchors.margins: 2
@@ -50,6 +42,8 @@ Rectangle{
         text: {
             if (itemData.selected)
                 color = "white"
+            else if (PicoFlow)
+                color = "black"
             else
                 color = layout.value("textTable")
             if (itemData.value!==undefined && (colonna[itemData.column] === "BirthDate" || colonna[itemData.column] === "TestDate" || colonna[itemData.column] === "Date")){
@@ -62,7 +56,7 @@ Rectangle{
                 itemData.value===undefined?"none":itemData.value
         }
         labelSize:{
-            if (itemData.selected)
+            if (itemData.selected || PicoFlow)
                 layout.value("F4")
             else
                 layout.value("F4")-1

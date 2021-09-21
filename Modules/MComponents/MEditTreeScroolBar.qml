@@ -53,10 +53,10 @@ Rectangle {
         }
 
         ScrollBar.vertical: ScrollBar {
-            parent: flickable.parent
-            anchors.top: flickable.top
-            anchors.left: flickable.right
-            anchors.bottom: flickable.bottom
+            parent: flick.parent
+            anchors.top: flick.top
+            anchors.left: flick.right
+            anchors.bottom: flick.bottom
             width: flick.width*0.02
         }
     }

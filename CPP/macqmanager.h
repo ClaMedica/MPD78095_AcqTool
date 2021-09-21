@@ -6,7 +6,6 @@
 #include "mabstractmanager.h"
 #include "udpmsgs.h"
 
-
 const double COEFDigFilter[6] = {
     0.06667948314423,   0.1945929082815,   0.2888590053723,   0.2888590053723,
      0.1945929082815,  0.06667948314423};//somma = 1,1002627935295
@@ -44,13 +43,16 @@ public slots:
 
     bool newAcquisition(QString __dataFile = "");
     void connectToServers();
-    void endAcquisition(bool discard = false);
-    void endAcquisitionSave();
+    void endAcquisition(bool __discard = false);
+    void endAcquisitionSave(bool __rivedi = true);
     void endAcquisitionDiscard();
     void addMarker(QVariant __key);
     void addDefiner(bool __startEnd, QVariantList __info);
     bool sendStartAcq(void);
     bool sendStopAcq (void);
+    void startAcq();
+    void stopAcq();
+    void pauseAcq();
     void resetAlarms();
     void setAlarms(QVariantList __list);
     void udpBtDecode(enum WHO __from, QByteArray __msg);

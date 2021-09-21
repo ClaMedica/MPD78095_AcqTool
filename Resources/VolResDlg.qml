@@ -9,8 +9,7 @@ MForm {
     width:screenW*grafic.valueOf("Dialog","width")
     anchors.centerIn: parent
     visible: false
-  //  color : layout.value("BackgroundColor")
-    border.color: layout.value("THC2")
+    border.color: PicoFlow ? layout.value("THC2") : layout.value("textTable")
     border.width: 5
 
     property string titleDlg: ""
@@ -43,6 +42,8 @@ MForm {
         width: parent.width
         height: parent.height/5
         anchors.top: parent.top
+        border.color: volResDlg.border.color //layout.value("textTable")
+        border.width: volResDlg.border.width
         MLabel {
             id: lblMessage
             anchors.horizontalCenter: parent.horizontalCenter
@@ -51,7 +52,7 @@ MForm {
             horizontalAlignment: Text.AlignHCenter
             labelSize: layout.value("F4")
             verticalAlignment: Text.AlignVCenter
-            color : layout.value("textTable")
+            color: PicoFlow ? "white" : layout.value("textTable")
         }
     }
 
@@ -63,7 +64,7 @@ MForm {
         anchors.horizontalCenter: parent.horizontalCenter
         anchors.margins: layout.value("Margin")
         type:typTextField
-        labelColor: layout.value("textTable")
+        labelColor: PicoFlow ? "white" : layout.value("textTable")
         labelSize: layout.value("F4")
         viewPerc:0.75
         role:qsTr("Insert Residual Volume")
@@ -82,8 +83,6 @@ MForm {
         labelSize: layout.value("F4")
         onClicked: okbutton()
     }
-
-
 }
 
 
