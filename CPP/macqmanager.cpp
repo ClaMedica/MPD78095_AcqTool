@@ -1,4 +1,4 @@
-﻿#include "macqmanager.h"
+#include "macqmanager.h"
 
 extern bool DebugAcqTool;
 
@@ -632,7 +632,7 @@ void MAcqManager::handleTCP(SimpleTCPClient *__client, QByteArray __blocco)
     alarms_t alarms;
     if(m_tcpClients.values().contains(__client)) {
         QString who = m_tcpClients.key(__client);
-       // qDebug() <<"handleTCP"<< who << __block;
+       // qDebug() <<"handleTCP"<< who << __blocco;
 
         if(who == "STA") {      //allora e' uno stato
             static QByteArray staticblock;
@@ -740,31 +740,8 @@ void MAcqManager::handleTCP(SimpleTCPClient *__client, QByteArray __blocco)
             }
         }
         else if(who == "CMD") {
-<<<<<<< HEAD
-            qDebug() << "CMD __block[4]" << __blocco[4];
+            qDebug() << "CMD __blocco[4]" << __blocco[4];
             if(__blocco[4] == '5' && m_acqFileOpened) {
-                if(!m_saving) {
-                    //parte immediatamente l'acquisizione
-                    //azzero
-                    qDebug() << "CMD __block[4] == '5': Start acquiring sendStartAcq()";
-                    acqStarted = true;
-
-                    m_startAcqManuale = true;
-                    int secToSave = 0.0;
-                    //in caso di flussimetria manuale non devo tenermi buffer di dati:
-                    //i dati salvati partono dal momento dello start acquisizione da parte dell'utente
-                    if (m_autoStartStop)  { //in caso di flussimetria automatica
-                        //effetto buffer tengo solo gli ultimi 5 secondi
-                        secToSave = 5.0;
-                        //devo resettare il buffer del controllo dei min secondi per lo stop automatico
-                        m_stopBuffer.clear();
-                    }
-                    foreach(QString type, m_channelMap.keys())
-                        foreach(MSignal *sig, m_channelMap[type])
-                            sig->saveLastSec(secToSave);
-=======
-            qDebug() << "CMD __block[4]" << __block[4];
-            if(__block[4] == '5' && m_acqFileOpened) {
                 if (!m_saving)
                     startAcq();
                 else
@@ -773,7 +750,6 @@ void MAcqManager::handleTCP(SimpleTCPClient *__client, QByteArray __blocco)
         }
     }
 }
->>>>>>> c1f237414b466da1afa02cefe82f57750b142ee8
 
 void MAcqManager::startAcq()
 {
