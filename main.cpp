@@ -78,11 +78,11 @@ int main(int argc, char *argv[])
 #endif
 
 #if defined(MAC) || defined(WIN32)
-     QString logFile = "acqTool_log_" + QDateTime::currentDateTime().toString("yyyyMMdd_hhmmss")+".htm";
+     QString logFile = "acqTool_log.htm";// + QDateTime::currentDateTime().toString("yyyyMMdd_hhmmss")+".htm";
      gPath_log = QApplication::applicationDirPath() + "/"+ logFile;
      qDebug() << "Start. log:" << gPath_log;
      //dirotto il debug log
-     //MyMessageOutput::init(gPath_log);
+     MyMessageOutput::init(gPath_log);
 #endif
 
 
