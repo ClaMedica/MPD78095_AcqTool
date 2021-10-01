@@ -1,4 +1,4 @@
-#include "mdatamngdesktop.h"
+﻿#include "mdatamngdesktop.h"
 #include "medicalreport.h"
 #include <QErrorMessage>
 #include <QDesktopServices>
@@ -609,7 +609,7 @@ void MDataMngDesktop::openExportTool()
     //necessario salvare prima di fare l'esportazione per avere i dati risultati su pic
     saveChanges();
     QString pth;
-#ifdef win32
+#ifdef WIN32
     pth = g_P7SettingsManager.progPath()+"/exportTool.exe";
 #elif MAC
     pth = g_P7SettingsManager.progPath()+"/ExportTool";

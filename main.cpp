@@ -79,10 +79,11 @@ int main(int argc, char *argv[])
 
 #if defined(MAC) || defined(WIN32)
      QString logFile = "acqTool_log.htm";// + QDateTime::currentDateTime().toString("yyyyMMdd_hhmmss")+".htm";
-     gPath_log = QApplication::applicationDirPath() + "/"+ logFile;
+    // gPath_log = QApplication::applicationDirPath() + "/"+ logFile;
+     gPath_log = "C:/"+ logFile;
      qDebug() << "Start. log:" << gPath_log;
      //dirotto il debug log
-     MyMessageOutput::init(gPath_log);
+    // MyMessageOutput::init(gPath_log);
 #endif
 
 
@@ -176,6 +177,8 @@ int main(int argc, char *argv[])
     engine.rootContext()->setContextProperty("PicoFlow", bool_false);
 #ifdef MAC
     engine.rootContext()->setContextProperty("Mac", true);
+#else
+    engine.rootContext()->setContextProperty("Mac", false);
 #endif
 #ifndef STATICO
     if(DebugAcqTool)
