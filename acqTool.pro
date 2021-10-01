@@ -1,5 +1,5 @@
 TEMPLATE = app
-VERSION = 2.1.0
+VERSION = 2.1.1
 
 QT += qml quick widgets sql network multimedia xml core serialport gui
 
