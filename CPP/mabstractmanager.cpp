@@ -483,9 +483,6 @@ QVariantList MAbstractManager::acqInfo()
 bool MAbstractManager::load()
 {
     //in questa funzione inizializzo tutto caricando i file di configurazione fissi
-    m_configLocale.erase();
-    if(!m_configLocale.loadFromXML(":/Config/Config_Locale.xml"))
-        qCritical() << "Error on locale configuration file";
 
     QString configUser;
 #ifdef PICOFLOW

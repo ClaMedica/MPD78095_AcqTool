@@ -90,8 +90,8 @@ protected:
     QMap<QString, QStringList>   m_chanInPlots;  //associa nome plot ad una mappa con cui ripescare il buffer
     QMap<QString, int32_t> m_dataChanNameMap;    //associa il nome del canale al suo indice
     QMap<QString, SimpleTCPChannel *> m_tcpChannels;    //canali di comunicazione verso l'esterno
-    Ancestry m_configLocale,    //e' la prima ad essere caricata e contiene la lingua
-    m_configMarkers,            //contiene le info per i marker
+
+    Ancestry m_configMarkers,            //contiene le info per i marker
     m_configUser,               //contiene le info modificate dall'utente per acquisizione
     m_configUserProp,               //contiene le info modificate dall'utente per grafica canali
     m_configPrinter,            //contiene le info relative alla stampa
