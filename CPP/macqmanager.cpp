@@ -1,4 +1,4 @@
-#include "macqmanager.h"
+﻿#include "macqmanager.h"
 
 extern bool DebugAcqTool;
 
@@ -13,6 +13,8 @@ MAcqManager::MAcqManager(QObject *parent)
     m_autoStartStop = false;
     m_saving = false;           //non sto salvando i dati
     m_supeConnected = false;
+    m_startReceiveUdpSupe = false;
+
     m_oldState = 0;
     m_itsok = "              &";
     OutFile = NULL;
@@ -116,8 +118,10 @@ void MAcqManager::sendBeakerOkToSupe()
 
 void MAcqManager::udpBtDecode(enum WHO __from, QByteArray __msg)
 {
-//    qDebug() << __from << __msg;
-
+#ifndef PICOFLOW
+    if (!m_startReceiveUdpSupe) //il supe manda il lordo del beacker giusto solo dopo lo start
+        return;
+#endif
     switch(__from) {
     case E_SUP:
                 if((__msg.at(0) == 'S') && (__msg == "Suspended")) emit udpBtStopped();
@@ -171,7 +175,7 @@ void MAcqManager::udpBtDecode(enum WHO __from, QByteArray __msg)
                     }
                     else if (m_noBeaker && m_startReset)
                     {
-                        //qDebug()<<"DA SUP lordo ACQ%.1f Si Beaker"<<m_timeGo;
+                        qDebug()<<"DA SUP lordo ACQ%.1f Si Beaker"<<m_timeGo;
                         m_alarmMng.resetAlarm(ALA_NO_BEAKER);
                         bool val = m_alarmMng.addAlarm(ALA_STABILIZE);
                         if (val)
@@ -678,7 +682,7 @@ void MAcqManager::handleTCP(SimpleTCPClient *__client, QByteArray __blocco)
                     bool tmpInAcq = (m_acqFileOpened && !m_acqFinished);
                     if(tmpInAcq && !inAcq) {    // inizio acq: transizione stato
                         acqStarted = true;
-                     //   qDebug() << "(tmpInAcq && !inAcq): sendStartAcq()";
+                      //  qDebug() << "(tmpInAcq && !inAcq): sendStartAcq()";
                         sendStartAcq();
                     }
                     inAcq = tmpInAcq;
@@ -740,7 +744,7 @@ void MAcqManager::handleTCP(SimpleTCPClient *__client, QByteArray __blocco)
             }
         }
         else if(who == "CMD") {
-            qDebug() << "CMD __blocco[4]" << __blocco[4];
+        //    qDebug() << "CMD __blocco[4]" << __blocco[4];
             if(__blocco[4] == '5' && m_acqFileOpened) {
                 if (!m_saving)
                     startAcq();
@@ -912,7 +916,10 @@ void MAcqManager::analyzeStatus(uint8_t __currState, bool __isBT)
                 //attivo allarme di possibile perdita acquisizione
                 m_alarmMng.manageAlarm(ALA_NOT_ACQUIRING, ENABLE);
             }
-
+#ifndef PICOFLOW
+            if(m_oldState == ESTATE_ACQUIRING)
+                m_startReceiveUdpSupe = true;
+#endif
             break;
 
         default:break;

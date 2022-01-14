@@ -76,6 +76,7 @@ private:
     m_acqFinished,  //mi dice se ho finito di acquisire
     m_autoStartStop;//mi dice se il controllo e' abilitato o meno
     bool m_startAcqManuale; //tasto start
+    bool m_startReceiveUdpSupe;
 
     QByteArray m_sendingPack;
 

@@ -49,6 +49,8 @@ int main(int argc, char *argv[])
     bool bool_false = false; (void) bool_false;
     bool bool_true  = true;  (void) bool_true;
 
+  //  qputenv("QML_IMPORT_TRACE", "1");
+
     Q_INIT_RESOURCE(qml);
 #ifdef STATICO
     Q_IMPORT_PLUGIN(QmlPlotterPlugin)
@@ -80,10 +82,10 @@ int main(int argc, char *argv[])
 #if defined(MAC) || defined(WIN32)
      QString logFile = "acqTool_log.htm";// + QDateTime::currentDateTime().toString("yyyyMMdd_hhmmss")+".htm";
     // gPath_log = QApplication::applicationDirPath() + "/"+ logFile;
-     gPath_log = "C:/"+ logFile;
+     gPath_log = "E:/"+ logFile;
      qDebug() << "Start. log:" << gPath_log;
      //dirotto il debug log
-    // MyMessageOutput::init(gPath_log);
+     MyMessageOutput::init(gPath_log);
 #endif
 
 
@@ -180,10 +182,7 @@ int main(int argc, char *argv[])
 #else
     engine.rootContext()->setContextProperty("Mac", false);
 #endif
-#ifndef STATICO
-    if(DebugAcqTool)
-        engine.addImportPath(QApplication::applicationDirPath() + "/Modules");
-#endif
+
 #endif
 
     engine.rootContext()->setContextProperty("layout", &mngLayout);
