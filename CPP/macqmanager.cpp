@@ -1,7 +1,5 @@
 ﻿#include "macqmanager.h"
 
-extern bool DebugAcqTool;
-
 MAcqManager::MAcqManager(QObject *parent)
 {
     (void) parent;
@@ -360,9 +358,13 @@ bool MAcqManager::newAcquisition(QString __dataFile)
 
         m_newStateQ.clear();
 
+//Da vedere, quando si mettono mani sul pico, se è possibile spostare il salvataggio
+//sotto medica/acqmodulemanager alla fine della funzione CreateFile
+//dove avviene il salvataggio in caso di desktop (senza bridge)
+#ifdef PICOFLOW
         //dico a medica di salvare il file nel db
-        if (!DebugAcqTool) g_mainAppBridge->sendSave();
-
+        g_mainAppBridge->sendSave();
+#endif
         //inizializzo i server di comunicazione con i plotter
         initializeServers();
 
@@ -372,7 +374,7 @@ bool MAcqManager::newAcquisition(QString __dataFile)
         m_alarmMng.resetAlarm(ALA_FULL_BEAKER);
 
         //connessioni
-        if (!DebugAcqTool) connectToServers();
+        connectToServers();
 
         m_disableWeightFilt = QFile::exists(m_fileVerifica);    // "/tmp/disableDebounce"
     }
@@ -405,7 +407,7 @@ void MAcqManager::connectToServers()
         qDebug() << "TCP connected m_supeConnected:" << m_supeConnected;
 }
 
-void MAcqManager::endAcquisitionSave(bool __rivedi)
+void MAcqManager::endAcquisitionSave()
 {
     qDebug() << "endAcquisitionSave()";
 #ifdef PICOFLOW
@@ -416,9 +418,8 @@ void MAcqManager::endAcquisitionSave(bool __rivedi)
         g_mainAppBridge->sendOpen();
     }
 #else
+    //chiudi e rivedi
     endAcquisition();
-    //chiudi
-    if (__rivedi) g_mainAppBridge->sendOpen();
 #endif
 
 }
@@ -427,7 +428,9 @@ void MAcqManager::endAcquisitionDiscard()
 {
     qDebug() << "endAcquisitionDiscard()";
     endAcquisition(true);
+#ifdef PICOFLOW
     g_mainAppBridge->sendDiscard();
+#endif
 }
 
 void MAcqManager::endAcquisition(bool __discard)
@@ -438,6 +441,8 @@ void MAcqManager::endAcquisition(bool __discard)
     if (tempVerifica.exists())
         tempVerifica.remove();
 #endif
+
+    emit acquisitionEnded(); //dico ai plot di chiudere
 
     //disabilito gli allarmi
     m_alarmMng.disableAll();
@@ -502,9 +507,19 @@ void MAcqManager::endAcquisition(bool __discard)
 #ifdef PICOFLOW
         system("sync");
 #endif
+
+#ifndef PICOFLOW
+        exit(E_DISCARD);
+#endif
+    }
+    else
+    {
+#ifndef PICOFLOW
+        exit(E_CLOSEREVIEW);
+#endif
     }
 
-    emit acquisitionEnded();
+
 }
 
 void MAcqManager::addMarker(QVariant __key)
@@ -636,7 +651,7 @@ void MAcqManager::handleTCP(SimpleTCPClient *__client, QByteArray __blocco)
     alarms_t alarms;
     if(m_tcpClients.values().contains(__client)) {
         QString who = m_tcpClients.key(__client);
-       // qDebug() <<"handleTCP"<< who << __blocco;
+        //qDebug() <<"handleTCP"<< who << __blocco;
 
         if(who == "STA") {      //allora e' uno stato
             static QByteArray staticblock;
@@ -689,7 +704,7 @@ void MAcqManager::handleTCP(SimpleTCPClient *__client, QByteArray __blocco)
 
                     if(acqStarted && (newState == ESTATE_ACQUIRING)) {
                         acqStarted = false;
-                    //   qDebug() << "transizione: emit systemInAcqStatus()";
+                        //qDebug() << "transizione: emit systemInAcqStatus()";
                         emit systemInAcqStatus();
                     }
 

@@ -1,8 +1,6 @@
 ﻿#include "mdatamanager.h"
 #include "systemmanager.h"
 
-extern bool DebugAcqTool;
-
 MDataManager::MDataManager(QObject *parent)
 {
     (void) parent;

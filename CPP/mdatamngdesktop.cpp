@@ -9,8 +9,6 @@
 #include <QTextDocument>
 #include <QProcess>
 
-extern bool DebugAcqTool;
-
 class MyException : public QException
 {
 public:
@@ -528,13 +526,7 @@ void MDataMngDesktop::exitFromReview()
         if (QFile::exists(filenameAna))
             qDebug()<<"cancello file temp analisi"<<QFile::remove(filenameAna);
 
-        if(DebugAcqTool == false) {
-            g_mainAppBridge->sendExitReview();
-            g_mainAppBridge->sendSwitch();  //send(MEX_SHOW);
-        }
-        else
-            exit(0);
-
+        exit(0);
         return;
     }
 
@@ -563,7 +555,7 @@ void MDataMngDesktop::exitFromReview()
             }
 
             if (m_analyzed) //è un test analizzato, devo scrivere sul database 1 nel campo Saved dei tests
-                g_mainAppBridge->testsAnalyzed();
+                exit(E_SAVE);//ANALYZED
         }
         else //"no"
         {
@@ -574,12 +566,7 @@ void MDataMngDesktop::exitFromReview()
                 qDebug()<<"cancello file temp analisi"<<QFile::remove(filenameAna);
 
         }
-        if(DebugAcqTool == false) {
-            g_mainAppBridge->sendExitReview();
-            g_mainAppBridge->sendSwitch(); //poi dovra tornare al modulo database
-        }
-        else
-            exit(0);
+        exit(0);
     }
 }
 

@@ -33,49 +33,15 @@ ApplicationWindow {
 
     color:"steelblue"
 
-    function launchDEBUG(mode,dataFile,codSoft)
-     {
-         console.log("launchDEBUG(mode,dataFile)", mode, dataFile,codSoft)
-
-         if(mode === "acq")
-         {
-             console.log("Start new acq")
-             mngAcq.load()
-             mngAcq.newAcquisition(dataFile)
-             forReal.setMarkersInfo(mngAcq.markersInfo("type", [1, 6]))
-             forReal.configurationFile = mngAcq.plotConfigFileName()
-             forReal.displayMessage(qsTr("Wait for ..."), -1,2)
-             forHome.whoIsVisible = forReal.name
-             forReal.setAcqInfo(mngAcq.acqInfo())
-             forReal.setCommandsBottom(mngAcq.commandsBottomAcq())
-
-         }
-         else if(mode === "vis")
-         {
-             console.log("Start new vis")
-             forAna.initialize()
-             mngData.load()
-             if(platform !== "android")
-                 mngData.loadFile(dataFile);
-             else
-                 mngData.loadFile("/mnt/sdcard/Medica/pv000461A.pic")
-             forAna.setMarkersInfo(mngData.markersInfo("type", [1, 6]))
-             forAna.setDefinersInfo(mngData.definersInfo())
-             forAna.setActionsInfo(mngData.actionsInfo())
-             forAna.setCommandsInfo(mngData.commandsInfo())
-             forAna.setCommandsInfoBottom(mngData.commandsInfoBottom())
-         }
-         console.log("Application Ready!")
-     }
-
     //@@@@@@@@@@    Events          @@@@@@@@@@
      Component.onCompleted: {
          acqLoaded.createFileLoaded()
-         console.log("debug??? ", Qt.application.arguments[4])
-
-         if (Qt.application.arguments[4] === "debug") {
+         console.log("desktop ", Qt.application.arguments[1])
+         //se l'argomento 1 è vis o acq stiamo parlando di desktop
+         //altrimenti è picoflow2r3 che fa partire acqtool con i parametri per il bridge
+         if (Qt.application.arguments[1] === "vis" || Qt.application.arguments[1] === "acq") {
              root.visible = true
-             launchDEBUG(Qt.application.arguments[1],Qt.application.arguments[2], Qt.application.arguments[3])
+             launch(Qt.application.arguments[1],Qt.application.arguments[2], Qt.application.arguments[3])
          }
      }
 
@@ -139,6 +105,7 @@ ApplicationWindow {
 //            timStopBT.start()
     }
 
+    //questa connections con bridgeMain (acqtool) è attiva solo in caso di PicoFlow2r3
     Connections {
         id: connMainApp
         target: bridgeMain

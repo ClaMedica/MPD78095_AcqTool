@@ -38,7 +38,6 @@
 
 char strvers[] = "AcqTool del " __DATE__ " alle " __TIME__;
 
-bool DebugAcqTool = false;
 
 AcqBridge *g_mainAppBridge;
 #ifdef PICOFLOW
@@ -88,8 +87,6 @@ int main(int argc, char *argv[])
      MyMessageOutput::init(gPath_log);
 #endif
 
-
-
     //carico i settaggi
     g_P7SettingsManager.loadSettings(true);
     //localizzazione
@@ -114,11 +111,10 @@ int main(int argc, char *argv[])
         arguments << QString(argv[i]);
     qDebug() << "Argomenti" << arguments;
 
-    if((argc > 1) && (strcmp(argv[argc - 1], (const char *)"debug") == 0))
-        DebugAcqTool = true;
-    if(DebugAcqTool == false)
+#ifdef PICOFLOW
         g_mainAppBridge = new AcqBridge(QStringList() << argv[1] << argv[2]);   //definisco un bridge tra app di tipo server
-
+#endif
+        
     qmlRegisterType<ParameterManager>("Managers", 1, 0, "ParameterManager");
     qmlRegisterType<ModelManager>("Managers", 1, 0, "ModelManager");
     qmlRegisterType<MAcqManager>("Managers", 1, 0, "MAcqManager");
@@ -178,9 +174,9 @@ int main(int argc, char *argv[])
     engine.rootContext()->setContextProperty("screenW", size.width());
     engine.rootContext()->setContextProperty("PicoFlow", bool_false);
 #ifdef MAC
-    engine.rootContext()->setContextProperty("Mac", true);
+    engine.rootContext()->setContextProperty("Mac", bool_true);
 #else
-    engine.rootContext()->setContextProperty("Mac", false);
+    engine.rootContext()->setContextProperty("Mac", bool_false);
 #endif
 
 #endif
@@ -195,10 +191,10 @@ int main(int argc, char *argv[])
     engine.load(QUrl(QStringLiteral("qrc:/main.qml")));
     qDebug() << "engine caricato";
 
-
-    if(DebugAcqTool == false)
+#ifdef PICOFLOW
         g_mainAppBridge->setRootObjects(engine.rootObjects());
-
+#endif
+    
     int ret = app.exec();
 
     qDebug() << "Uscito" << ret;

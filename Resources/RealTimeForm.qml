@@ -173,6 +173,7 @@ MForm{
             //@@@@@@@@@@    Properties      @@@@@@@@@@
             id:gridAcq
             property bool pauseToDisable: false
+            property bool startToDisable: false
             anchors.fill: panManAuto
             owner:"Acq"
             itemsInRow:1
@@ -190,12 +191,13 @@ MForm{
                         dlgDiscard.visible = true
                     }
                     // Pulsanti FLWHS
+                    var vero = true
                     //start con zero
                     if (value === MDataManager.STARTACQ.toString()) {
-                        //necessario partita l'acquisizione abilitare i pulsanti pausa e salvaRivedi
-                        var vero = true
-                        gridAcq.enable(true,MDataManager.PAUSA)
-                        gridComandBottom.enable(true,MDataManager.SAVEREW)
+                        //necessario partita l'acquisizione abilitare i pulsanti pausa e salvaRivedi                        
+                        gridAcq.startToDisable = true
+                        gridAcq.enable(vero,MDataManager.PAUSA)
+                        gridComandBottom.enable(vero,MDataManager.SAVEREW)
                         //start aquisizione
                         mngAcq.startAcq()
                     }
@@ -204,6 +206,7 @@ MForm{
                         //necessario disabilitare il pulsante pausa
                         //necessario dare tempo al click di tornare alla forma normale,
                         //dopodichè riesce a prendere l'immagine nuova not enabled.
+                        gridAcq.enable(vero,MDataManager.STARTACQ)
                         gridAcq.pauseToDisable = true
                         mngAcq.pauseAcq()
                     }
@@ -214,6 +217,12 @@ MForm{
                         //dopo averlo cliccato
                         gridAcq.pauseToDisable = false
                         timeDisablePause.start()
+                    }
+                    if (gridAcq.startToDisable){
+                        //è qui che lanciamo il timer per disabilitare il pulsante pause
+                        //dopo averlo cliccato
+                        gridAcq.startToDisable = false
+                        timeDisableStart.start()
                     }
                 }
 
@@ -238,6 +247,15 @@ MForm{
             onTriggered: {
                 var falso = false
                 gridAcq.enable(falso,MDataManager.PAUSA)
+            }
+        }
+
+        Timer {
+            id: timeDisableStart
+            interval: 500
+            onTriggered: {
+                var falso = false
+                gridAcq.enable(falso,MDataManager.STARTACQ)
             }
         }
 
@@ -292,7 +310,7 @@ MForm{
                 // Pulsanti FLWHS
                 //salva e rivedi
                 if (value === MDataManager.SAVEREW.toString()) {
-                   mngAcq.stopAcq()
+                    mngAcq.stopAcq()
                 }
                 // abbandona
                 if (value === MDataManager.DISCARD.toString()) {
@@ -411,7 +429,6 @@ MForm{
             text: qsTr("Yes")
             onClicked: {
                 dlgDiscard.visible = false
-                plot.stopAll()
                 mngAcq.endAcquisitionDiscard()
             }
         }

@@ -30,7 +30,6 @@ public:
 signals:
     void alarmsChanged();
     void acqMarkersChanged();
-//    void acquisitionStarted();
     void systemInAcqStatus();
     void acquisitionEnded();
 
@@ -44,7 +43,7 @@ public slots:
     bool newAcquisition(QString __dataFile = "");
     void connectToServers();
     void endAcquisition(bool __discard = false);
-    void endAcquisitionSave(bool __rivedi = true);
+    void endAcquisitionSave();
     void endAcquisitionDiscard();
     void addMarker(QVariant __key);
     void addDefiner(bool __startEnd, QVariantList __info);
