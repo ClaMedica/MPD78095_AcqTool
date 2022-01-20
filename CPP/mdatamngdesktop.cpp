@@ -258,12 +258,7 @@ void MDataMngDesktop::deleteAnMArkers()
 
 bool MDataMngDesktop::checkReport()
 {
-    QString nomePDF = "rf" + QString("%1").arg(m_testNumber,5,10,QLatin1Char('0')) + "1a" + ".pdf";
-#if MAC
-    m_nomeRefertoPdf = g_P7SettingsManager.dataPath() + "/ref/" + nomePDF;
-#else
-    m_nomeRefertoPdf = g_P7SettingsManager.dataPath() + "\\ref\\" + nomePDF;
-#endif
+    createNamePDf();
     QFile filePdf(m_nomeRefertoPdf);
     if (filePdf.exists())
         return true;
@@ -313,6 +308,7 @@ void MDataMngDesktop::openReport(QString __nomeReport)
 #else
     m_nomeReferto = g_P7SettingsManager.dataPath() + "\\ref\\" +  "rf" + QString("%1").arg(m_testNumber,5,10,QLatin1Char('0')) + "1a" + ".htm";
 #endif
+
     m_reportEdit = m_configPrinter.getSafeChild("Report");
     QString toEdit = m_reportEdit->getSafeChild("HTM")->getSafeAttribute(ATT_VALUE);
 
@@ -491,9 +487,21 @@ void MDataMngDesktop::startPrint()
 
     //stampo: apro il file in word
     if (m_autoPrint) {
+        createNamePDf();
         openReport("Standard");
         m_autoPrint = false; //non deve ristampare se l'utente riapre subito l'esame
     }
+}
+
+void MDataMngDesktop::createNamePDf()
+{
+    //creo il nome per il PDF
+    QString nomePDF = "rf" + QString("%1").arg(m_testNumber,5,10,QLatin1Char('0')) + "1a" + ".pdf";
+#if MAC
+    m_nomeRefertoPdf = g_P7SettingsManager.dataPath() + "/ref/" + nomePDF;
+#else
+    m_nomeRefertoPdf = g_P7SettingsManager.dataPath() + "\\ref\\" + nomePDF;
+#endif
 }
 
 void MDataMngDesktop::exitFromReview()

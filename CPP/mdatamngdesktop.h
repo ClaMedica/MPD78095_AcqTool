@@ -40,6 +40,7 @@ private:
     Ancestry * m_reportEdit;
 
     void createPdf();
+    void createNamePDf();
 
 };
 

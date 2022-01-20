@@ -77,6 +77,9 @@ ApplicationWindow {
             forAna.setActionsInfo(mngData.actionsInfo())
             forAna.setCommandsInfo(mngData.commandsInfo())
             forAna.setCommandsInfoBottom(mngData.commandsInfoBottom())
+
+            timeAutoAna.start() //do il tempo di caricare tutto
+
         }
 //        else if (mode === "sta")
 //        {
@@ -86,11 +89,20 @@ ApplicationWindow {
 //        }
 
         console.log("Application Ready!")
-        if (mode !== "sta")
+        if (mode !== "sta" && platform !== "window")
             bridgeMain.sendSwitch()
     }
 
-
+    Timer {
+        id: timeAutoAna
+        interval: 2000
+        onTriggered: {
+            if (mngData.getAutoAna()){
+                console.log("analisi automatica desktop");
+                mngData.analysis()
+            }
+        }
+    }
 
     //@@@@@@@@@@    Objects         @@@@@@@@@@
     FileIO {
