@@ -78,7 +78,8 @@ ApplicationWindow {
             forAna.setCommandsInfo(mngData.commandsInfo())
             forAna.setCommandsInfoBottom(mngData.commandsInfoBottom())
 
-            timeAutoAna.start() //do il tempo di caricare tutto
+            if (platform === "window") //nel caso picoflow2r3 ci pensa il bridge
+                timeAutoAna.start() //do il tempo di caricare tutto
 
         }
 //        else if (mode === "sta")
