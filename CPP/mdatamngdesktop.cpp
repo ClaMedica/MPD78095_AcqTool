@@ -312,7 +312,7 @@ void MDataMngDesktop::openReport(QString __nomeReport)
     m_reportEdit = m_configPrinter.getSafeChild("Report");
     QString toEdit = m_reportEdit->getSafeChild("HTM")->getSafeAttribute(ATT_VALUE);
 
-    if (toEdit == "false") {
+    if (toEdit == "false" || m_autoPrint) {
         //necessario trasformare il file referto htm in htm tradotto per leggere tutti i caratteri
         QFile f(m_nomeReferto);
         f.open(QIODevice::ReadOnly);
@@ -420,7 +420,7 @@ void MDataMngDesktop::createPdf()
     textDoc.print(&printer);
 
     QString toEdit = m_reportEdit->getSafeChild("HTM")->getSafeAttribute(ATT_VALUE);
-    if (toEdit == "false") {
+    if (toEdit == "false" || m_autoPrint) {
         QUrl urlFile = QUrl::fromLocalFile(m_nomeRefertoPdf);
         QProcess *viewer = new QProcess();
         QString namep = "/PDFviewer";
@@ -429,7 +429,7 @@ void MDataMngDesktop::createPdf()
 #endif
         viewer->setProgram(g_P7SettingsManager.progPath()+namep);
         viewer->setArguments(QStringList() << urlFile.toString() << g_P7SettingsManager.localization());
-        bool ret = viewer->startDetached();
+        viewer->startDetached();
     }
     FI.close();
     FI.remove();
