@@ -72,8 +72,9 @@ private:
     m_serverReady,
     m_sendingToPlot,
     m_saving,
-    m_acqFinished,  //mi dice se ho finito di acquisire
-    m_autoStartStop;//mi dice se il controllo e' abilitato o meno
+    m_acqFinished,      //mi dice se ho finito di acquisire
+    m_autoStartStop,    //mi dice se il controllo e' abilitato o meno
+    m_pause;            //true se l'utente ha messo in pausa l'acquisizione
     bool m_startAcqManuale; //tasto start
     bool m_startReceiveUdpSupe;
 

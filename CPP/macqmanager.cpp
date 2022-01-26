@@ -12,6 +12,7 @@ MAcqManager::MAcqManager(QObject *parent)
     m_saving = false;           //non sto salvando i dati
     m_supeConnected = false;
     m_startReceiveUdpSupe = false;
+    m_pause = false;
 
     m_oldState = 0;
     m_itsok = "              &";
@@ -130,6 +131,11 @@ void MAcqManager::udpBtDecode(enum WHO __from, QByteArray __msg)
                     m_calibCella = __msg.mid(6) + ";";
                     //qDebug() << "calibration data:" << m_calibCella;
                 }
+                if((__msg.at(0) == 'C') && (__msg == "ConnectedOK")) {
+                    //la cella si è riconnessa dopo essersi scollegata, devo rifar partire l'acquisizione
+                    if (m_acqFileOpened) sendStartAcq();
+                    qDebug() << "ConnectedOK" << m_acqFileOpened;
+                }
                 if (__msg.at(0) == 'W') {
 
                     if (QFile::exists(m_fileVerifica))
@@ -173,13 +179,14 @@ void MAcqManager::udpBtDecode(enum WHO __from, QByteArray __msg)
                     }
                     else if (m_noBeaker && m_startReset)
                     {
-                        qDebug()<<"DA SUP lordo ACQ%.1f Si Beaker"<<m_timeGo;
+                        qDebug()<<"DA SUP lordo ACQ% Si Beaker"<< lordo <<m_timeGo;
                         m_alarmMng.resetAlarm(ALA_NO_BEAKER);
                         bool val = m_alarmMng.addAlarm(ALA_STABILIZE);
                         if (val)
                         {
                             QTimer::singleShot(10000,this,SLOT(sendBeakerOkToSupe()));
                             m_startReset = false;
+                            m_saving = true;
                             m_timeGo++;
                         }
                     }
@@ -697,14 +704,14 @@ void MAcqManager::handleTCP(SimpleTCPClient *__client, QByteArray __blocco)
                     bool tmpInAcq = (m_acqFileOpened && !m_acqFinished);
                     if(tmpInAcq && !inAcq) {    // inizio acq: transizione stato
                         acqStarted = true;
-                      //  qDebug() << "(tmpInAcq && !inAcq): sendStartAcq()";
+                        //qDebug() << "(tmpInAcq && !inAcq): sendStartAcq()";
                         sendStartAcq();
                     }
                     inAcq = tmpInAcq;
 
                     if(acqStarted && (newState == ESTATE_ACQUIRING)) {
                         acqStarted = false;
-                        //qDebug() << "transizione: emit systemInAcqStatus()";
+                       // qDebug() << "transizione: emit systemInAcqStatus()";
                         emit systemInAcqStatus();
                     }
 
@@ -812,6 +819,7 @@ void MAcqManager::pauseAcq()
 {
     //ferma l'acquisizione
     qDebug() << "Pausa acquisizione";
+    m_pause = true;
     sendStopAcq();
 }
 
@@ -917,8 +925,14 @@ void MAcqManager::analyzeStatus(uint8_t __currState, bool __isBT)
                 //se c'è stata un'interruzione di connessione (vera o dovuta a apri/chiudi review)
                 if (interruption){
                     interruption = false;
-                    //e un 'esame aperto (interruzione vera)
-                    if (m_acqFileOpened){
+                    if (m_pause) {
+                        // restart dopo una pausa
+                        m_pause = false;
+                        //devo inserire il marker di sistema per acquisizione interrotta
+                        qDebug()<<"inserisco marker per pausa";
+                        addMarker(MRK_W);
+                    }
+                    else if (m_acqFileOpened){ //e' un 'esame aperto (interruzione vera)
                         //devo inserire il marker di sistema per acquisizione interrotta
                         qDebug()<<"inserisco marker per interruzione";
                         addMarker(MRK_E3);
