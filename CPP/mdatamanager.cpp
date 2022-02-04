@@ -435,7 +435,7 @@ void MDataManager::loadFile(QString __fileName)
                 QVariantList valuesY;
                 foreach(MSignal *sig, m_signalVector)
                     if(sig->getName() == m_mng->GetChanName(numCh)) {
-                        qDebug("%s: %d", sig->getName().toLatin1().constData(), sig->size());
+                        //qDebug("%s: %d", sig->getName().toLatin1().constData(), sig->size());
                         for (int i = 0; i < sig->size(); i++)
                             valuesY.append(sig->at(i));
                     }
