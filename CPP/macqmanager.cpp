@@ -79,7 +79,7 @@ MAcqManager::~MAcqManager()
     }
 
     if(m_tcpClients.values().size() > 0) {
-        foreach (SimpleTCPClient * cur, m_tcpClients.values()) {
+        foreach (SimpleTCPClientAcq * cur, m_tcpClients.values()) {
             delete cur;
         }
     }
@@ -226,7 +226,7 @@ void MAcqManager::udpBtDecode(enum WHO __from, QByteArray __msg)
     }
 }
 
-void MAcqManager::dataOnTCP(QObject *__pParent, SimpleTCPClient *__pTCP, QByteArray __blocco)
+void MAcqManager::dataOnTCP(QObject *__pParent, SimpleTCPClientAcq *__pTCP, QByteArray __blocco)
 {
     //arriviamo qua dentro ogni volta che arriva qualcosa da uno dei server a cui siamo collegati
 
@@ -401,7 +401,7 @@ void MAcqManager::connectToServers()
 
     //mi connetto ai server
     qDebug() << "Connecting to servers ..." << m_tcpClients.keys();
-    foreach (SimpleTCPClient *client, m_tcpClients) {
+    foreach (SimpleTCPClientAcq *client, m_tcpClients) {
         if (client->getSocketState() != QAbstractSocket::ConnectedState) {
             client->registerDataReadyCallBack(&(this->dataOnTCP));
             client->connectToHost();
@@ -458,7 +458,7 @@ void MAcqManager::endAcquisition(bool __discard)
     qDebug() << "endAcquisition discard:" << __discard;
     sendStopAcq();
 
-//    foreach (SimpleTCPClient *client, m_tcpClients) {
+//    foreach (SimpleTCPClientAcq *client, m_tcpClients) {
 //        //mi disconnetto dal supe
 //        if(client->disconnectToHost())
 //            qDebug() << "disconnect "
@@ -651,7 +651,7 @@ void MAcqManager::updateAcqData()
 
 static bool acqStarted = false;
 
-void MAcqManager::handleTCP(SimpleTCPClient *__client, QByteArray __blocco)
+void MAcqManager::handleTCP(SimpleTCPClientAcq *__client, QByteArray __blocco)
 {
     flowBT_status_t stBT;
     picoFlow_status_t stPico;
@@ -867,7 +867,7 @@ bool MAcqManager::loadConnectivityInfo(Ancestry *__info)
 
         if(child->getSafeAttribute(ATT_TYPE) == "client") {
             if( ! m_tcpClients.keys().contains(name))
-                m_tcpClients[name] = new SimpleTCPClient(QHostAddress(address), port, this);
+                m_tcpClients[name] = new SimpleTCPClientAcq(QHostAddress(address), port, this);
         }
         else if(child->getSafeAttribute(ATT_TYPE) == "server") {
             if( ! m_tcpChannels.keys().contains(name))

@@ -23,7 +23,7 @@ public:
     QVariantList alarms(){return m_alarmList;}
     QVariantList acqMarkers(){return m_acqMarkerList;}
 
-    static void dataOnTCP(QObject *__pParent=NULL, SimpleTCPClient *__pTCP=NULL, QByteArray __blocco=QByteArray());
+    static void dataOnTCP(QObject *__pParent=NULL, SimpleTCPClientAcq *__pTCP=NULL, QByteArray __blocco=QByteArray());
     Q_INVOKABLE void send_Command(int __command);    
     Q_INVOKABLE int manAutoQml();
 
@@ -82,7 +82,7 @@ private:
 
     QVariantList m_alarmList,m_acqMarkerList;//#BUG aggiungere la definer list se servirA 
 
-    QMap<QString,SimpleTCPClient *> m_tcpClients;//elenco dei client attivi
+    QMap<QString,SimpleTCPClientAcq *> m_tcpClients;//elenco dei client attivi
     QMap<QString,int>   m_sampleFreqMap, //mi dice per ogni canale fisico la frequenza di campionamento
                         m_frameMap,//mi dice quanti campioni cavare via da ogni buffer ad ogni ciclo di controllo
                         m_bufSizeMap;//mi dice per ogni buffer la dimensione da tenere per essere pronti
@@ -115,7 +115,7 @@ private:
     MSignal m_stopBuffer;
 
     void updateAcqData();
-    void handleTCP(SimpleTCPClient *__client, QByteArray __blocco);
+    void handleTCP(SimpleTCPClientAcq *__client, QByteArray __blocco);
     void initializeServers();
     bool loadConnectivityInfo(Ancestry *__info);
     void analyzeStatus(uint8_t __currState, bool __isBT);

@@ -1,6 +1,6 @@
-#include "SimpleTCPClient.h"
+﻿#include "SimpleTCPClientAcq.h"
 
-SimpleTCPClient::SimpleTCPClient(QHostAddress __address, int __port, QObject *__pParent) :
+SimpleTCPClientAcq::SimpleTCPClientAcq(QHostAddress __address, int __port, QObject *__pParent) :
     QObject(__pParent)
 {
     m_hostAddress = __address;
@@ -16,7 +16,7 @@ SimpleTCPClient::SimpleTCPClient(QHostAddress __address, int __port, QObject *__
     connect(m_channelTcpSocket, SIGNAL(error(QAbstractSocket::SocketError)), this, SLOT(onTcpError(QAbstractSocket::SocketError)));
 }
 
-SimpleTCPClient::~SimpleTCPClient()
+SimpleTCPClientAcq::~SimpleTCPClientAcq()
 {
     if(m_channelInUse)
         m_channelTcpSocket->close();
@@ -24,7 +24,7 @@ SimpleTCPClient::~SimpleTCPClient()
     delete m_channelTcpSocket;
 }
 
-void SimpleTCPClient::sendData(char* msg, quint32 len){
+void SimpleTCPClientAcq::sendData(char* msg, quint32 len){
     QByteArray block;
     QDataStream out(&block, QIODevice::WriteOnly);
 
@@ -49,7 +49,7 @@ void SimpleTCPClient::sendData(char* msg, quint32 len){
 }
 
 
-bool SimpleTCPClient::setHostAddress(QHostAddress __address)
+bool SimpleTCPClientAcq::setHostAddress(QHostAddress __address)
 {
     if(m_channelInUse)
         return false;
@@ -57,7 +57,7 @@ bool SimpleTCPClient::setHostAddress(QHostAddress __address)
     return true;
 }
 
-bool SimpleTCPClient::setHostPort(int __port)
+bool SimpleTCPClientAcq::setHostPort(int __port)
 {
     if(m_channelInUse)
         return false;
@@ -65,7 +65,7 @@ bool SimpleTCPClient::setHostPort(int __port)
     return true;
 }
 
-bool SimpleTCPClient::connectToHost()
+bool SimpleTCPClientAcq::connectToHost()
 {
     bool ret = false;
     if( ! m_channelInUse) {
@@ -77,7 +77,7 @@ bool SimpleTCPClient::connectToHost()
     return ret;
 }
 
-bool SimpleTCPClient::connectToHost(QHostAddress __address, int __port)
+bool SimpleTCPClientAcq::connectToHost(QHostAddress __address, int __port)
 {
     if(m_channelInUse)
         return false;
@@ -88,7 +88,7 @@ bool SimpleTCPClient::connectToHost(QHostAddress __address, int __port)
     return true;
 }
 
-bool SimpleTCPClient::disconnectToHost()
+bool SimpleTCPClientAcq::disconnectToHost()
 {
     if(!m_channelInUse)
         return false;
@@ -96,7 +96,7 @@ bool SimpleTCPClient::disconnectToHost()
     return true;
 }
 
-void SimpleTCPClient::onTcpError(QAbstractSocket::SocketError __error)
+void SimpleTCPClientAcq::onTcpError(QAbstractSocket::SocketError __error)
 {
     qDebug() <<"Address: "<<m_hostAddress.toString()<<" Port: "<<m_hostPort<<" Error: "<<m_channelTcpSocket->errorString()<<__error;
     switch (__error)
@@ -131,19 +131,19 @@ void SimpleTCPClient::onTcpError(QAbstractSocket::SocketError __error)
     emit tcpError(__error);
 }
 
-void SimpleTCPClient::onConnectedToHost()
+void SimpleTCPClientAcq::onConnectedToHost()
 {
     emit connectedToHost();
 }
 
-void SimpleTCPClient::onDisconnectedFromHost()
+void SimpleTCPClientAcq::onDisconnectedFromHost()
 {
     m_channelInUse = false;
     emit disconnectFromHost();
 }
 
 
-void SimpleTCPClient::onDataReady()
+void SimpleTCPClientAcq::onDataReady()
 {
     if(m_pFDataReadyCallBack != NULL)
     {

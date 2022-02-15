@@ -30,6 +30,7 @@ TRANSLATIONS += acqtool.xlf \
     SOURCES += \
     ../MPD78097_Database/msqloperators.cpp \
     ../MPD78097_Database/msqlsenders.cpp \
+    CPP/TCP/SimpleTCPClientAcq.cpp \
         main.cpp \
         CPP/alarmmanager.cpp \
         CPP/androidmanager.cpp \
@@ -45,7 +46,6 @@ TRANSLATIONS += acqtool.xlf \
         CPP/parametermanager.cpp \
         CPP/printermanager.cpp \
         CPP/TCP/SimpleTCPChannel.cpp \
-        CPP/TCP/SimpleTCPClient.cpp \
         CPP/TCP/TcpServers.cpp \
         CPP/TCP/TcpSettingFile.cpp \
         CPP/graficmanager.cpp \
@@ -83,6 +83,7 @@ TRANSLATIONS += acqtool.xlf \
     HEADERS += \
     ../MPD78097_Database/msqloperators.h \
     ../MPD78097_Database/msqlsenders.h \
+    CPP/TCP/SimpleTCPClientAcq.h \
         CPP/alarmmanager.h \
         CPP/androidmanager.h \
         CPP/mabstractmanager.h \
@@ -96,7 +97,6 @@ TRANSLATIONS += acqtool.xlf \
         CPP/parametermanager.h \
         CPP/printermanager.h \
         CPP/TCP/SimpleTCPChannel.h \
-        CPP/TCP/SimpleTCPClient.h \
         CPP/TCP/TcpServers.h \
         CPP/TCP/TcpSettingFile.h \
         CPP/bitmapsv.h \

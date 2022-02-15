@@ -4,7 +4,7 @@
 #include <QObject>
 #include <datafilemanager.h>
 #include <analysis.h>
-#include "SimpleTCPClient.h"
+#include "SimpleTCPClientAcq.h"
 #include "TcpServers.h"
 #include "ancestry.h"
 #include "msignal.h"
