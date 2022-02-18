@@ -11,11 +11,7 @@ class SimpleTCPClientAcq : public QObject
 
 public:
     explicit SimpleTCPClientAcq(QHostAddress __address = QHostAddress::LocalHost, int __currentPort = 2000, QObject *__pParent = 0);
-#ifdef STATICO
-    inline ~SimpleTCPClientAcq();
-#else
     ~SimpleTCPClientAcq();
-#endif
 
     QHostAddress hostAddress(){return m_hostAddress;}
     int hostPort(){return m_hostPort;}
