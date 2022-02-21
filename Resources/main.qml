@@ -94,6 +94,11 @@ ApplicationWindow {
             bridgeMain.sendSwitch()
     }
 
+
+    onClosing: {
+        close.accepted = false
+    }
+
     Timer {
         id: timeAutoAna
         interval: 2000

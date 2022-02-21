@@ -80,15 +80,19 @@ int main(int argc, char *argv[])
 
 #if defined(MAC) || defined(WIN32)
      QString logFile = "acqTool_log.htm";// + QDateTime::currentDateTime().toString("yyyyMMdd_hhmmss")+".htm";
-    // gPath_log = QApplication::applicationDirPath() + "/"+ logFile;
+#ifdef MAC
+     gPath_log = QApplication::applicationDirPath() + "/"+ logFile;
+#else
      gPath_log = "E:/"+ logFile;
+#endif
      qDebug() << "Start. log:" << gPath_log;
      //dirotto il debug log
      MyMessageOutput::init(gPath_log);
 #endif
 
     //carico i settaggi
-    g_P7SettingsManager.loadSettings(true);
+     QString codSoft = QString(argv[3]);
+    g_P7SettingsManager.loadSettings(true,codSoft.toInt());
     //localizzazione
     QString local = g_P7SettingsManager.localization();
     QString pathTranslations = g_P7SettingsManager.appPath();
