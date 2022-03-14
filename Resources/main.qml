@@ -173,6 +173,7 @@ ApplicationWindow {
         {
             console.log("Go Go Go");
             forReal.displayMessage(qsTr("start"),3000,6)
+            forReal.connected()
         }
         onAcquisitionEnded:
         {

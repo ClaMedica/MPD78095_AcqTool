@@ -54,6 +54,16 @@ MForm{
                 gridComandBottom.count++
     }
 
+    function connected(){
+        for (var i=0; i<gridAcq.items.length; i++)
+        {
+            if (gridAcq.items[i].toString() === MDataManager.STARTACQ.toString()) {
+                timeStart.enable = true
+                timeStart.start()
+            }
+        }
+    }
+
     function endAcq()
     {
         plot.stopAll()
@@ -222,7 +232,8 @@ MForm{
                         //è qui che lanciamo il timer per disabilitare il pulsante pause
                         //dopo averlo cliccato
                         gridAcq.startToDisable = false
-                        timeDisableStart.start()
+                        timeStart.enable = false
+                        timeStart.start()
                     }
                 }
 
@@ -251,11 +262,11 @@ MForm{
         }
 
         Timer {
-            id: timeDisableStart
+            id: timeStart
+            property bool enable: false
             interval: 500
             onTriggered: {
-                var falso = false
-                gridAcq.enable(falso,MDataManager.STARTACQ)
+                gridAcq.enable(enable,MDataManager.STARTACQ)
             }
         }
 

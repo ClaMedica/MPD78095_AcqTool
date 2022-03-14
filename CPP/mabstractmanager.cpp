@@ -434,7 +434,7 @@ QVariantList MAbstractManager::acqInfo()
     list << "img" << "qrc:/Start0";
     list << "key" << STARTACQ;
     list << "visible" << true;
-    list << "enabled" << true;
+    list << "enabled" << false;
     list << "&GridElement";
 
     list << "$GridElement";
