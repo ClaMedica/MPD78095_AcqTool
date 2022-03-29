@@ -89,6 +89,34 @@ MForm{
         mngCon.read()
     }
 
+    function activeAnalisysButton()
+    {
+        if (!PicoFlow)
+        {
+            mngData.saveImg(sourceImg,"GR000")
+            //rendo abilitato il pulsante per passare ai risultati senza dover rifare l'analisi
+            //abilito anche il pulsante export
+            for (var i=0; i<gridActions.items.length; i++)
+            {
+                if (gridActions.items[i]===MDataManager.RISULTATI)
+                {
+                    gridActions.items[i+4] = "true"
+                    break;
+                }
+            }
+            gridActions.populate()
+            for (i=0; i<gridComand.items.length; i++)
+            {
+                if (gridComand.items[i]===MDataManager.EXPORT)
+                {
+                    gridComand.items[i+4] = "true"
+                    break;
+                }
+            }
+            gridComand.populate()
+        }
+    }
+
     function disablebuttons(__disable){
         for (var i=0; i<gridComand.items.length; i++)
         {
@@ -411,32 +439,8 @@ MForm{
 
         delegate: MMarkerButton{
             onClick: {
-                if (value === MDataManager.ANALISI.toString()) {
-                    if (!PicoFlow)
-                    {
-                        mngData.saveImg(sourceImg,"GR000")
-                        //rendo abilitato il pulsante per passare ai risultati senza dover rifare l'analisi
-                        //abilito anche il pulsante export
-                        for (var i=0; i<gridActions.items.length; i++)
-                        {
-                            if (gridActions.items[i]===MDataManager.RISULTATI)
-                            {
-                                gridActions.items[i+4] = "true"
-                                break;
-                            }
-                        }
-                        gridActions.populate()
-                        for (i=0; i<gridComand.items.length; i++)
-                        {
-                            if (gridComand.items[i]===MDataManager.EXPORT)
-                            {
-                                gridComand.items[i+4] = "true"
-                                break;
-                            }
-                        }
-                        gridComand.populate()
-                    }
-                    mngData.analysis();
+                if (value === MDataManager.ANALISI.toString()) {                    
+                    mngData.analysis();                    
                 }
 
                 if (value === MDataManager.CHIUDIREV.toString()) {

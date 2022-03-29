@@ -1295,12 +1295,11 @@ qDebug() << "INIZIO";
             }
 
             if (found) {
-                //                                        'Salva l'immagine dei tracciati all'interno del definitore
-                //                                        myGraphPlot.RedrawGraphForPrint("GR200", MarkerUtils.getOpMarkerAn(mkOpAnIn - 1).myNumStart(myGraphPlot.GetTruePosChannel(myGraphPlot.MaxNASCh)), MarkerUtils.getOpMarkerAn(mkOpAnIn - 1).myNumEnd(myGraphPlot.GetTruePosChannel(myGraphPlot.MaxNASCh)))
-                m_analyzed = true;
                 //                                            UpdateTestOther()
                 //Lancia analisi e Inizializza nomogrammi
-                InitPageGraphs(FLW_AVD_STUDY);
+                bool ret = InitPageGraphs(FLW_AVD_STUDY);
+                if (ret)
+                    m_analyzed = true;
                 //                                            'ridimensiono il definitore sulla base del marker F2 del flusso
                 //                                            'For k = 1 To theGraphs.NMarkerAn
                 //                                            '    If MarkerAn(k).NumOpMark = mkOpAnIn And MarkerAn(k).key = 3 Then
@@ -1329,8 +1328,9 @@ qDebug() << "INIZIO";
     qDebug() << "File chiuso" << m_mng->Close();
 
     //qml
-    qDebug() << "FINE";
-    emit sg_loadResult();
+    qDebug() << "FINE" << m_analyzed;
+    if (m_analyzed)
+        emit sg_loadResult();
 }
 
 void MDataManager::setToSave(QString __val)
@@ -1358,7 +1358,7 @@ int MDataManager::getValVolRes()
     return m_VolRes.toInt();
 }
 
-void MDataManager::InitPageGraphs(int __anaType)
+bool MDataManager::InitPageGraphs(int __anaType)
 {
     if (__anaType == FLW_AVD_STUDY) {
         //determina tratti da analizzare.
@@ -1425,8 +1425,13 @@ void MDataManager::InitPageGraphs(int __anaType)
         int def = evMarkOpIn->value("num").toInt();
         (void) def;
         bool ret = InitArraysFLW(evStart, evEnd, enCh, evMarkOpIn->value("num").toInt(), evAuto);
-        (void) ret;
 #ifndef PICOFLOW
+        //necessario gestire valore di ritorno
+        //se false messaggio di errore
+        if (!ret) {
+            emit sg_warning(tr("No flow detected"));
+            return false;
+         }
         //se gli anMarker li trovo per la prima volta li inserisco in grafica
         if (evAuto != 0) {
             VarMapVec *mrkAnVec = new VarMapVec;
@@ -1483,6 +1488,7 @@ void MDataManager::InitPageGraphs(int __anaType)
         }
 #endif
     }
+    return true;
 }
 
 bool MDataManager::InitArraysFLW(int __start,

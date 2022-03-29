@@ -127,7 +127,7 @@ private:
     void updateAvailableData();
     bool buildInfoList();
 
-    void InitPageGraphs(int __anaType);
+    bool InitPageGraphs(int __anaType);
     bool InitArraysFLW(int __start, int __end, QVector<unsigned char> __chEn, int __curDef, unsigned char __auto);
     int ReadResult(int & __numEv);
     bool checkForVolRes();

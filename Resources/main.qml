@@ -214,9 +214,9 @@ ApplicationWindow {
 
         onSg_loadResult:{
             forAna.visible = false
+            forAna.activeAnalisysButton()
             forRes.loadPageAnalysis()
             forRes.visible = true
-
         }
 
         onSg_openReport: {
