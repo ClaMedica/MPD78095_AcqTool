@@ -711,7 +711,7 @@ void MAcqManager::handleTCP(SimpleTCPClientAcq *__client, QByteArray __blocco)
 
                     if(acqStarted && (newState == ESTATE_ACQUIRING)) {
                         acqStarted = false;
-                       // qDebug() << "transizione: emit systemInAcqStatus()";
+                        //qDebug() << "transizione: emit systemInAcqStatus()";
                         emit systemInAcqStatus();
                     }
 
@@ -782,7 +782,6 @@ void MAcqManager::startAcq()
     //parte immediatamente l'acquisizione
     //azzero
     qDebug() << "Start acquisizione sendStartAcq()";
-    acqStarted = true;
 
     m_startAcqManuale = true;
     int secToSave = 0.0;

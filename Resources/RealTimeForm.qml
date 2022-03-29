@@ -15,6 +15,7 @@ MForm{
     property int saveMe:plot.savedData
     property int manAuto: 0 // 1:man_waiting_start 2:auto_waiting_start 3:recording
     property bool manAutoBlink: false
+    property bool acquiring: false
     signal back
 
     //@@@@@@@@@@    Properties      @@@@@@@@@@
@@ -55,11 +56,14 @@ MForm{
     }
 
     function connected(){
-        for (var i=0; i<gridAcq.items.length; i++)
+        if (!acquiring)
         {
-            if (gridAcq.items[i].toString() === MDataManager.STARTACQ.toString()) {
-                timeStart.enable = true
-                timeStart.start()
+            for (var i=0; i<gridAcq.items.length; i++)
+            {
+                if (gridAcq.items[i].toString() === MDataManager.STARTACQ.toString()) {
+                    timeStart.enable = true
+                    timeStart.start()
+                }
             }
         }
     }
@@ -209,6 +213,7 @@ MForm{
                         gridAcq.enable(vero,MDataManager.PAUSA)
                         gridComandBottom.enable(vero,MDataManager.SAVEREW)
                         //start aquisizione
+                        acquiring = true
                         mngAcq.startAcq()
                     }
                     //pausa
