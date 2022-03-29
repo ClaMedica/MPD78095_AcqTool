@@ -75,7 +75,7 @@ MForm{
         clip:true
         anchors.bottom: parent.bottom
         anchors.left: parent.left
-        anchors.right: PicoFlow ? panManAuto.left : grid.left
+        anchors.right: panManAuto.left
         height: root.height - alarmBox.height
         plotProp:mngCon.plotSetting
     }
