@@ -237,7 +237,9 @@ MForm{
                   delTim.stop()
                   plot.activeMouse = false
                   clicright.visible = false
+                  plot.setToCopy = true
                   mngData.copyImg(sourceImg)
+                  endCopy.start()
               }
             }
         }
@@ -260,6 +262,12 @@ MForm{
                 plot.activeMouse = false
                 clicright.visible = false
             }
+        }
+        Timer{
+            id:endCopy
+            interval: 5
+            onTriggered:
+                plot.setToCopy = false
         }
     }
 
@@ -425,7 +433,6 @@ MForm{
         width: plot.width
         height: plot.height
         sourceItem: plot
-        recursive: true
     }
 
     MGridView{

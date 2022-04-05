@@ -32,8 +32,8 @@
           <source xml:space="preserve">Are you sure to discard the exam?</source>
           <target xml:space="preserve" state="needs-review-translation">Vil slette undersøkelsen?</target>
         </alt-trans>
-        <context-group purpose="location"><context context-type="linenumber">195</context></context-group>
-        <context-group purpose="location"><context context-type="linenumber">329</context></context-group>
+        <context-group purpose="location"><context context-type="linenumber">199</context></context-group>
+        <context-group purpose="location"><context context-type="linenumber">334</context></context-group>
       </trans-unit>
       <trans-unit id="_msg577" approved="yes">
         <source xml:space="preserve">Are you sure to exit from Stand-By?</source>
@@ -41,17 +41,17 @@
           <source xml:space="preserve">Are you sure to exit from standby?</source>
           <target xml:space="preserve">Er du sikker på å forlate Stand-By?</target>
         </alt-trans>
-        <context-group purpose="location"><context context-type="linenumber">200</context></context-group>
+        <context-group purpose="location"><context context-type="linenumber">204</context></context-group>
       </trans-unit>
       <trans-unit id="_msg578" approved="yes">
         <source xml:space="preserve">Yes</source>
         <target xml:space="preserve">Ja</target>
-        <context-group purpose="location"><context context-type="linenumber">440</context></context-group>
+        <context-group purpose="location"><context context-type="linenumber">445</context></context-group>
       </trans-unit>
       <trans-unit id="_msg579" approved="yes">
         <source xml:space="preserve">No</source>
         <target xml:space="preserve">No</target>
-        <context-group purpose="location"><context context-type="linenumber">455</context></context-group>
+        <context-group purpose="location"><context context-type="linenumber">460</context></context-group>
       </trans-unit>
     </group>
   </body></file>
@@ -962,12 +962,12 @@
       <trans-unit id="_msg747" approved="yes">
         <source xml:space="preserve">&lt;p&gt;File report open.&lt;/p&gt;Close the file to continue.</source>
         <target xml:space="preserve">&lt;p&gt; Filrapporten er åpen.&lt;/p&gt;Lukk filen for å fortsette.</target>
-        <context-group purpose="location"><context context-type="linenumber">612</context></context-group>
+        <context-group purpose="location"><context context-type="linenumber">587</context></context-group>
       </trans-unit>
       <trans-unit id="_msg748" approved="yes">
         <source xml:space="preserve">Do you really want to delete the </source>
         <target xml:space="preserve">Vil du virkelig slette</target>
-        <context-group purpose="location"><context context-type="linenumber">625</context></context-group>
+        <context-group purpose="location"><context context-type="linenumber">600</context></context-group>
       </trans-unit>
     </group>
   </body></file>
