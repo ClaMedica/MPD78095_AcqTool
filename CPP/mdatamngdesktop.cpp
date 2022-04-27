@@ -249,7 +249,9 @@ void MDataMngDesktop::deleteAnMArkers()
         {
             QVariantList mrk;
             mrk.append((qulonglong)curMap);
+            emit noChangeTodo();
             changeObject(mrk);
+
         }
     }
     qDebug() << "Fine cancello tutti gli anmarker";

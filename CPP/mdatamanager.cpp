@@ -1484,8 +1484,9 @@ bool MDataManager::InitPageGraphs(int __anaType)
 
             // saveChanges();//(?)
             updateInfoList();
-            emit reloadingCompleted();
+
         }
+        emit reloadingCompleted();
 #endif
     }
     return true;

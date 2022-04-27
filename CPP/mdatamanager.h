@@ -77,6 +77,7 @@ signals:
     void infoListChanged();
     void loadingCompleted();
     void reloadingCompleted();
+    void noChangeTodo();
 
     void sg_openVolResDlg(QString __tipoAn);
     void sg_loadResult();

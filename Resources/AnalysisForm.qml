@@ -25,16 +25,21 @@ MForm{
     //@@@@@@@@@@    Functions       @@@@@@@@@@
     function populate()
     {
-        plot.tracks=mngData.getData("Track")
-        plot.markers=mngData.getData("Marker")
-        plot.frames=mngData.getData("Definer")
-        if (!change)
+        if (!change) {
             plot.limits=mngData.getPlotLimits();
+        }
         else
             change = false
-       lbNamePat.testo = mngData.protocollo + " - " +mngData.patientInfo;
+
+        plot.tracks=mngData.getData("Track")
+        plot.frames=mngData.getData("Definer")
+        plot.markers=mngData.getData("Marker")
+        lbNamePat.testo = mngData.protocollo + " - " +mngData.patientInfo;
     }
 
+    function setChange() {
+        change = true;
+    }
 
     function initialize()
     {
@@ -401,6 +406,7 @@ MForm{
             onClick: {
                 if (value === MDataManager.DELETEALL.toString())
                     mngData.deleteAnMArkers()
+
                 if (value === "f1" || value === "f2" || value === "f3")
                 {
                     plot.anMarkerKey = value

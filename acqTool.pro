@@ -1,5 +1,5 @@
 TEMPLATE = app
-VERSION = 2.2.0
+VERSION = 2.2.1
 
 QT += qml quick widgets sql network multimedia xml core serialport gui
 
@@ -20,7 +20,6 @@ TRANSLATIONS += acqtool.xlf \
                 acqtool_no.xlf \
                 acqtool_pl.xlf \
                 acqtool_fr.xlf
-
 
     lupdate_only{
         SOURCES += Resources/*.qml \
