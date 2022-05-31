@@ -601,7 +601,7 @@ QList<QString> MDataMngDesktop::getListReports()
 
 }
 
-void MDataMngDesktop::openExportTool()
+void MDataMngDesktop::openExportTool(QString __codSoft)
 {    
     //necessario salvare prima di fare l'esportazione per avere i dati risultati su pic
     saveChanges();
@@ -615,7 +615,7 @@ void MDataMngDesktop::openExportTool()
     proc->setProgram(pth);
 
     QStringList arg;
-    arg << "s" << QString::number(m_testNumber);
+    arg << "s" << __codSoft << QString::number(m_testNumber);
     proc->setArguments(arg);
 
     connect(proc,  QOverload<int, QProcess::ExitStatus>::of(&QProcess::finished),

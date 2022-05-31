@@ -474,7 +474,7 @@ MForm{
 
                 if (value === MDataManager.EXPORT.toString())
                     //export
-                    mngData.openExportTool()
+                    mngData.openExportTool(codSoft)
             }
             onTooltipActive: {
                 if (testo === "")
