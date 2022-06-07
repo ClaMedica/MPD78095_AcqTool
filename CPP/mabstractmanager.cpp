@@ -554,9 +554,9 @@ bool MAbstractManager::load()
     else
         language = "Windows-1252";   // CODEC Francese/Italiano/Tedesco/Spagnolo/etc..
 
-    QTextCodec *codec = QTextCodec::codecForName(language);
     m_language = language;
 
+//    QTextCodec *codec = QTextCodec::codecForName(language);
     bool firstLine = true;
     while (!fileMess.atEnd()) {
         QByteArray line = fileMess.readLine();
@@ -566,20 +566,22 @@ bool MAbstractManager::load()
         }
         QList<QByteArray> row = line.split(',');
         QString code = row.at(0);
-
-        QByteArray BTesto = QByteArray(row.at(3));
-        QTextStream testo(&BTesto);
-        testo.setAutoDetectUnicode(false);
-        testo.setCodec(codec);
-        QString testoStr = testo.readAll();
-        QByteArray BHelp = QByteArray(row.at(4));
-        QTextStream help(&BHelp);
-        help.setAutoDetectUnicode(false);
-        help.setCodec(codec);
-        QString helpStr = help.readAll();
+//        Utilizzando QString::fromUtf8 NON sembra necessario l'utilizzo del codec
+//        Testato con Polacco
+//        QByteArray BTesto = QByteArray(row.at(3));
+//        QTextStream testo(&BTesto);
+//        testo.setAutoDetectUnicode(false);
+//        testo.setCodec(codec);
+//        QString testoStr = testo.readAll();
+//        QByteArray BHelp = QByteArray(row.at(4));
+//        QTextStream help(&BHelp);
+//        help.setAutoDetectUnicode(false);
+//        help.setCodec(codec);
+//        QString helpStr = help.readAll();
 
         QStringList testi;
-        testi << testoStr << helpStr;
+        testi << QString::fromUtf8(row.at(3)) << QString::fromUtf8(row.at(4));
+        //testi << testoStr << helpStr;
         m_messaggiUtente[code.toInt()] = testi;
     }
 

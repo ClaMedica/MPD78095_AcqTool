@@ -365,9 +365,6 @@ bool MAcqManager::newAcquisition(QString __dataFile)
 
         m_newStateQ.clear();
 
-//Da vedere, quando si mettono mani sul pico, se è possibile spostare il salvataggio
-//sotto medica/acqmodulemanager alla fine della funzione CreateFile
-//dove avviene il salvataggio in caso di desktop (senza bridge)
 #ifdef PICOFLOW
         //dico a medica di salvare il file nel db
         g_mainAppBridge->sendSave();
