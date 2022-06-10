@@ -186,7 +186,11 @@ void MAcqManager::udpBtDecode(enum WHO __from, QByteArray __msg)
                         {
                             QTimer::singleShot(10000,this,SLOT(sendBeakerOkToSupe()));
                             m_startReset = false;
+#ifdef PICOFLOW
                             if (m_startAcqManuale) m_saving = true;
+#else
+                            m_saving = true;
+#endif
                             m_timeGo++;
                         }
                     }
