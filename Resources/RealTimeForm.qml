@@ -56,7 +56,7 @@ MForm{
     }
 
     function connected(){
-        if (!acquiring)
+        if (!acquiring && !mngAcq.acqAuto)
         {
             for (var i=0; i<gridAcq.items.length; i++)
             {
@@ -66,11 +66,22 @@ MForm{
                 }
             }
         }
+        if (mngAcq.acqAuto)
+        {
+            var vero = true
+            gridAcq.enable(vero,MDataManager.PAUSA)
+            gridComandBottom.enable(vero,MDataManager.SAVEREW)
+        }
     }
 
     function endAcq()
     {
         plot.stopAll()
+    }
+
+    function updateOpMarker()
+    {
+        plot.markers=mngAcq.acqMarkers;
     }
 
     MPlot2DRealStack {
@@ -135,7 +146,6 @@ MForm{
         delegate: MMarkerButton{
             onClick:{
                 mngAcq.addMarker(value);
-                plot.markers=mngAcq.acqMarkers;
             }
             onTooltipActive: {
                 if (testo === "")
@@ -234,7 +244,7 @@ MForm{
                         timeDisablePause.start()
                     }
                     if (gridAcq.startToDisable){
-                        //è qui che lanciamo il timer per disabilitare il pulsante pause
+                        //è qui che lanciamo il timer per disabilitare il pulsante start
                         //dopo averlo cliccato
                         gridAcq.startToDisable = false
                         timeStart.enable = false

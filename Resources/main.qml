@@ -190,6 +190,9 @@ ApplicationWindow {
             console.log("udp BtRestarted")
 //            btStatusUdp = 4
         }
+        onAcqMarkersChanged: {
+            forReal.updateOpMarker()
+        }
     }
 
     MDataManager{
@@ -286,6 +289,11 @@ ApplicationWindow {
         //@@@@@@@@@@    Properties      @@@@@@@@@@
         id: exit
         visible: false
+
+        onSendClose: {
+            //necessario pulire la scheramata risultati
+            forRes.resetResult()
+        }
     }
 
     WarningDlg {

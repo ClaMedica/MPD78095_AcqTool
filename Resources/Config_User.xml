@@ -1,125 +1,111 @@
 ﻿<Configuration label="Configuration">
-        <pesoBeaker value="70"/>
-        <AutomaticFlow label="Automatic Flow">
-        <Auto
-            label="Automatic flow"
+<Versione
+    label="1"
+    visible="false"
+/>
+<pesoBeaker label="pesoBeaker" value="70" visible = "false"/>
+<AutomaticFlow label="Automatic Flow">
+    <Auto
+        label="Automatic flow"
+        type="CheckBox"
+        unit=""
+        value="false"
+        visible="false"
+    />
+    <AutoStarts label="Automatic Flow Start Time">
+            <Amplitude label="Amplitude">
+                <min
+                    label="Minimum"
+                    type="SpinBox"
+                    unit="ml"
+                    dt="real"
+                    value="1"
+                    model="2#1#1#0#"
+                 />
+                 <max
+                    label="Maximum"
+                    type="TextField"
+                    unit="ml/sec"
+                    value="150"
+                    alfanum="false"
+                    visible="false"
+                 />
+            </Amplitude>
+            <Duration label="Duration">
+                <min
+                    label="Minimum"
+                    type="SpinBox"
+                    dt="real"
+                    unit="sec"
+                    value="2"
+                    model="5#1#1#0#"
+                />
+            </Duration>
+            <chanType
+                type="TextField"
+                unit=""
+                label="Channel Type"
+                value="VV"
+                visible = "false"
+             />
+             <num
+                label="Number"
+                type="TextField"
+                unit=""
+                value="1"
+                visible = "false"
+             />
+    </AutoStarts>
+    <AutoStops label="Automatic Flow Stop Time">
+            <Value label="Value" visible = "false">
+                <min
+                    label="Minimum"
+                    type="TextField"
+                    unit="ml/sec"
+                    value="-2"
+                    alfanum="false"
+                />
+                <max
+                    label="Maximum"
+                    type="TextField"
+                    unit="ml/sec"
+                    value="2"
+                    alfanum="false"
+                />
+            </Value>
+            <Duration label="Duration">
+                <min
+                    label="Minimum"
+                    type="SpinBox"
+                    dt="real"
+                    unit="sec"
+                    value="20"
+                    model="95#5#1#0#"
+                />
+           </Duration>
+           <chanType
+                 label="Channel Type"
+                 type="TextField"
+                 unit=""
+                 value="Q"
+                 visible = "false"
+             />
+             <num
+                 label="Number"
+                 type="TextField"
+                 unit=""
+                 value="1"
+                 visible = "false"
+             />
+    </AutoStops>
+</AutomaticFlow>
+<ChannelsAbilitation label="Channels Abilitation">
+        <Emg
+            label="EMG"
             type="CheckBox"
             unit=""
-            value="false"
-            visible="false"
+            value="true"
+            visible = "true"
         />
-        <AutoStarts label="Auto Starts">>
-               <Amplitude label="Amplitude">
-                      <min
-                                label="Minimum"
-                                type="TextField"
-                                unit="g"
-                                value="2"
-                                />
-                                <max
-                                label="Maximum"
-                                type="TextField"
-                                unit="g"
-                                value="15"
-                                />
-                        </Amplitude>
-                        <Duration label="Duration">
-                                <min
-                                label="Minimum"
-                                type="TextField"
-                                unit="sec"
-                                value="10"
-                                />
-                        </Duration>
-                        <chanType
-                            type="TextField"
-                            unit=""
-                            label="Channel Type"
-                            value="VBT"
-                            visible = "false"
-                         />
-                         <num
-                            label="Number"
-                            type="TextField"
-                            unit=""
-                            value="1"
-                            visible = "false"
-                         />
-        </AutoStarts>
-        <AutoStops label="Auto Stops">
-                    <Value label="Value">
-                                <min
-                                label="Minimum"
-                                type="TextField"
-                                unit="ml/sec"
-                                value="-1"
-                                />
-                                <max
-                                label="Maximum"
-                                type="TextField"
-                                unit="ml/sec"
-                                value="1"
-                                />
-                        </Value>
-                        <Duration label="Duration">
-                                <min
-                                label="Minimum"
-                                type="TextField"
-                                unit="sec"
-                                value="300"
-                                />
-                                <max
-                                label="Maximum"
-                                type="TextField"
-                                unit="sec"
-                                value="300"
-                                />
-                        </Duration>
-                        <chanType
-                              label="Channel Type"
-                              type="TextField"
-                              unit=""
-                              value="QBT"
-                              visible = "false"
-                          />
-                          <num
-                              label="Number"
-                              type="TextField"
-                              unit=""
-                              value="1"
-                              visible = "false"
-                          />
-        </AutoStops>
-        </AutomaticFlow>
-        <Supervisor label="Supervisor">
-                <Visible
-                label="Visible"
-                type="CheckBox"
-                unit=""
-                value="0"
-                />
-
-        </Supervisor>
-        <ChannelsAbilitation label="Channels Abilitation">
-            <Emg
-                label="EMG"
-                type="CheckBox"
-                unit=""
-                value="0"
-            />
-            <Type>
-                <FlowC
-                    label="flow via cavo"
-                    type="CheckBox"
-                    unit=""
-                    value="1"
-                />
-                <FlowBT
-                    label="flow BT"
-                    type="CheckBox"
-                    unit=""
-                    value="0"
-                />
-             </Type>
-         </ChannelsAbilitation>
+</ChannelsAbilitation>
 </Configuration>
