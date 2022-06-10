@@ -186,7 +186,7 @@ void MAcqManager::udpBtDecode(enum WHO __from, QByteArray __msg)
                         {
                             QTimer::singleShot(10000,this,SLOT(sendBeakerOkToSupe()));
                             m_startReset = false;
-                            m_saving = true;
+                            if (m_startAcqManuale) m_saving = true;
                             m_timeGo++;
                         }
                     }
