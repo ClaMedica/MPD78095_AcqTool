@@ -187,7 +187,7 @@ MForm {
                 buttonLQM.buttonId = pagesLocal.length
                 buttonLQM.anchors.bottom = rectdata.bottom
                 buttonLQM.anchors.left = rectdata.left
-                buttonLQM.anchors.bottomMargin = rectf.height/9
+                buttonLQM.anchors.bottomMargin = rectf.height/8
                 buttonLQM.anchors.leftMargin = btnLeftMargin
                 buttonLQM.width = screenW*grafic.valueOf("Button","width")
                 buttonLQM.height = screenH*grafic.valueOf("Button","height")
@@ -234,7 +234,7 @@ MForm {
                 buttonLQA.buttonId = pagesLocal.length
                 buttonLQA.anchors.bottom = rectdata.bottom
                 buttonLQA.anchors.left = rectdata.left
-                buttonLQA.anchors.bottomMargin = rectf.height/9
+                buttonLQA.anchors.bottomMargin = rectf.height/8
                 buttonLQA.anchors.leftMargin = btnLeftMargin
                 buttonLQA.height = screenH*grafic.valueOf("Button","height")
                 buttonLQA.width = screenW*grafic.valueOf("Button","width")
@@ -289,7 +289,7 @@ MForm {
                     buttonSQM.buttonId = pagesLocal.length
                     buttonSQM.anchors.bottom = rectdata.bottom
                     buttonSQM.anchors.left = rectdata.left
-                    buttonSQM.anchors.bottomMargin = rectf.height/9
+                    buttonSQM.anchors.bottomMargin = rectf.height/8
                     buttonSQM.anchors.leftMargin = btnLeftMargin
                     buttonSQM.width = screenW*grafic.valueOf("Button","width")
                     buttonSQM.height = screenH*grafic.valueOf("Button","height")
@@ -342,7 +342,7 @@ MForm {
                     buttonSQA.buttonId = pagesLocal.length
                     buttonSQA.anchors.bottom = rectdata.bottom
                     buttonSQA.anchors.left = rectdata.left
-                    buttonSQA.anchors.bottomMargin = rectdata.height/9
+                    buttonSQA.anchors.bottomMargin = rectdata.height/8
                     buttonSQA.anchors.leftMargin = btnLeftMargin
                     buttonSQA.width = screenW*grafic.valueOf("Button","width")
                     buttonSQA.height = screenH*grafic.valueOf("Button","height")
@@ -394,7 +394,7 @@ MForm {
                     buttonMQM.buttonId = pagesLocal.length
                     buttonMQM.anchors.bottom = rectdata.bottom
                     buttonMQM.anchors.left = rectdata.left
-                    buttonMQM.anchors.bottomMargin = rectf.height/9
+                    buttonMQM.anchors.bottomMargin = rectf.height/8
                     buttonMQM.anchors.leftMargin = btnLeftMargin
                     buttonMQM.width = screenW*grafic.valueOf("Button","width")
                     buttonMQM.height = screenH*grafic.valueOf("Button","height")
@@ -446,7 +446,7 @@ MForm {
                     buttonMQA.buttonId = pagesLocal.length
                     buttonMQA.anchors.bottom = rectdata.bottom
                     buttonMQA.anchors.left = rectdata.left
-                    buttonMQA.anchors.bottomMargin = rectf.height/9
+                    buttonMQA.anchors.bottomMargin = rectf.height/8
                     buttonMQA.anchors.leftMargin = btnLeftMargin
                     buttonMQA.width = screenW*grafic.valueOf("Button","width")
                     buttonMQA.height = screenH*grafic.valueOf("Button","height")
@@ -538,7 +538,7 @@ MForm {
         text: qsTr("report")
         anchors.left: parent.left
         anchors.bottom: PicoFlow ? parent.bottom : lbNamePat.top
-        anchors.bottomMargin: 10
+        anchors.bottomMargin: PicoFlow ? 10 : 5
         anchors.leftMargin: 10
         width: screenW*grafic.valueOf("Button","width")
         height: screenH*grafic.valueOf("Button","height")
@@ -569,7 +569,7 @@ MForm {
         id:coverCombo
         anchors.left: btnReport.right
         anchors.bottom: PicoFlow ? parent.bottom : lbNamePat.top
-        anchors.bottomMargin: 10
+        anchors.bottomMargin: PicoFlow ? 10 : 5
         anchors.leftMargin: 10
         width: screenW*grafic.valueOf("Button","width")/2
         height: screenH*grafic.valueOf("Button","height")/2
@@ -582,7 +582,7 @@ MForm {
         property var listReports:[]
         anchors.left: btnReport.right
         anchors.bottom: PicoFlow ? parent.bottom : lbNamePat.top
-        anchors.bottomMargin: 10
+        anchors.bottomMargin: PicoFlow ? 10 : 5
         anchors.leftMargin: 10
         width: screenW*grafic.valueOf("Button","width")/2
         height: screenH*grafic.valueOf("Button","height")/2
@@ -598,7 +598,7 @@ MForm {
         property real wbt: grafic.valueOf("Button","width")
         text: qsTr("back to graphs")
         anchors.bottom: PicoFlow ? parent.bottom : lbNamePat.top
-        anchors.bottomMargin: 10
+        anchors.bottomMargin: PicoFlow ? 10 : 5
         anchors.horizontalCenter: parent.horizontalCenter
         width:  screenW*(0.01+btnBack.wbt)
         height: screenH*grafic.valueOf("Button","height")
