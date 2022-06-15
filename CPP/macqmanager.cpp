@@ -186,7 +186,11 @@ void MAcqManager::udpBtDecode(enum WHO __from, QByteArray __msg)
                         {
                             QTimer::singleShot(10000,this,SLOT(sendBeakerOkToSupe()));
                             m_startReset = false;
+#ifdef PICOFLOW
+                            if (m_startAcqManuale) m_saving = true;
+#else
                             m_saving = true;
+#endif
                             m_timeGo++;
                         }
                     }
@@ -365,9 +369,6 @@ bool MAcqManager::newAcquisition(QString __dataFile)
 
         m_newStateQ.clear();
 
-//Da vedere, quando si mettono mani sul pico, se è possibile spostare il salvataggio
-//sotto medica/acqmodulemanager alla fine della funzione CreateFile
-//dove avviene il salvataggio in caso di desktop (senza bridge)
 #ifdef PICOFLOW
         //dico a medica di salvare il file nel db
         g_mainAppBridge->sendSave();

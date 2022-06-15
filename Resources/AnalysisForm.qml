@@ -290,22 +290,16 @@ MForm{
         height: parent.height/25
         color: "lightgray"
         property string testo: "datiPaziente"
+
+
         MLabel{
-            height:  parent.height
+            id: lblPat
+            height: parent.height
+            width: parent.width
             labelSize: 2
-            anchors.verticalCenter: parent.verticalCenter
-            anchors.horizontalCenter: parent.horizontalCenter
+            horizontalAlignment: Text.AlignHCenter
             text: parent.testo
         }
-
-//        MouseArea {
-//            id: plotMouse
-//            anchors.fill: parent
-//            enabled: !PicoFlow
-//            acceptedButtons: Qt.NoButton
-//            propagateComposedEvents: true
-//            hoverEnabled: plot.activeMouse
-//        }
     }
 
     //Models
@@ -414,7 +408,6 @@ MForm{
                 }
                 if (value === MDataManager.RISULTATI.toString()) {
                     forAna.visible = false
-                    forRes.loadPageAnalysis()
                     forRes.visible = true
                 }
             }

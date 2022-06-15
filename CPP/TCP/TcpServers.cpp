@@ -84,9 +84,9 @@ void TcpServers::createServers(int __num)
         m_pTCPServer = new SimpleTCPChannel*[m_numTCPservers];
        for (i  = 0; i < m_numTCPservers; i++)
        {
-            m_pTCPServer[i] = new SimpleTCPChannel(QHostAddress::LocalHost, 2000+i, this);
+            m_pTCPServer[i] = new SimpleTCPChannel(QHostAddress::LocalHost, 7600+i, this);
             m_serverAddress.append(QHostAddress(QHostAddress::LocalHost).toString());
-            m_serverPort.append(QString().sprintf("%d", 2000+i));
+            m_serverPort.append(QString().sprintf("%d", 7600+i));
             m_serverStatus.append(QString(""));
             m_serverError.append(QString(""));
        }
