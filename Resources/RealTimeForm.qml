@@ -65,13 +65,14 @@ MForm{
                     timeStart.start()
                 }
             }
-        }
-        if (mngAcq.acqAuto)
-        {
+        }        
+    }
+
+    function autoStarted()
+    {
             var vero = true
             gridAcq.enable(vero,MDataManager.PAUSA)
             gridComandBottom.enable(vero,MDataManager.SAVEREW)
-        }
     }
 
     function endAcq()

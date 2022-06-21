@@ -175,6 +175,10 @@ ApplicationWindow {
             forReal.displayMessage(qsTr("start"),3000,6)
             forReal.connected()
         }
+        onAcqAutoStarted:
+        {
+            forReal.autoStarted()
+        }
         onAcquisitionEnded:
         {
             console.log("ENDED")

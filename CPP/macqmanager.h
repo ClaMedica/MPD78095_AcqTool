@@ -34,6 +34,7 @@ signals:
     void acqMarkersChanged();
     void systemInAcqStatus();
     void acquisitionEnded();
+    void acqAutoStarted();
 
     void udpBtStopped();
     void udpBtRestarted();

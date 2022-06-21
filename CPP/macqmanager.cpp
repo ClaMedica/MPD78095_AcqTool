@@ -1045,6 +1045,7 @@ void MAcqManager::checkAutomaticStartStop(QString __which)
                     //il seguente assegnamento deve essere fatto qui prima del return
                     //per evitare che si eseguano altri controlli prima di finire le operazioni precedenti
                     m_saving = true;    //posso iniziare a salvare i dati
+                    emit acqAutoStarted();
                     return;
                 }
                 else {
