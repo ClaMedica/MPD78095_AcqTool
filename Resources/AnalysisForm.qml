@@ -445,7 +445,8 @@ MForm{
 
         delegate: MMarkerButton{
             onClick: {
-                if (value === MDataManager.ANALISI.toString()) {                    
+                if (value === MDataManager.ANALISI.toString()) {
+                    change = true
                     mngData.analysis();                    
                 }
 
