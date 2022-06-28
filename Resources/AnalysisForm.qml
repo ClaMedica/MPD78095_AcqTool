@@ -27,18 +27,13 @@ MForm{
     {
         if (!change) {
             plot.limits=mngData.getPlotLimits();
+            change = true
         }
-        else
-            change = false
 
         plot.tracks=mngData.getData("Track")
         plot.frames=mngData.getData("Definer")
         plot.markers=mngData.getData("Marker")
         lbNamePat.testo = mngData.protocollo + " - " +mngData.patientInfo;
-    }
-
-    function setChange() {
-        change = true;
     }
 
     function initialize()
@@ -160,7 +155,6 @@ MForm{
 
         onCurObjChanged: {
             if(completed){
-                change = true;
                 if (!PicoFlow && curObj.length === 1) {//sto cancellando un markers
                     dialogDelete.obj = curObj
                     dialogDelete.owner=this
@@ -171,17 +165,14 @@ MForm{
         }
 
         onOpMarkerPosChanged:{
-            change = true; //cambiamenti nel plot
             mngData.addOpMarker(opMarkerKey,opMarkerPos)
         }
 
         onDefinerPosChanged:{
-            change = true; //cambiamenti nel plot
             mngData.addDefiner(definerKey,definerPos)
         }
 
         onAnMarkerPosChanged: {
-            change = true; //cambiamenti nel plot
             mngData.addAnMarker(anMarkerKey,anMarkerPos,anMarkChNames)
         }
 
@@ -445,10 +436,8 @@ MForm{
 
         delegate: MMarkerButton{
             onClick: {
-                if (value === MDataManager.ANALISI.toString()) {
-                    change = true
-                    mngData.analysis();                    
-                }
+                if (value === MDataManager.ANALISI.toString())
+                    mngData.analysis();
 
                 if (value === MDataManager.CHIUDIREV.toString()) {
                     mngData.exitFromReview()

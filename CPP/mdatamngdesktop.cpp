@@ -249,7 +249,6 @@ void MDataMngDesktop::deleteAnMArkers()
         {
             QVariantList mrk;
             mrk.append((qulonglong)curMap);
-            emit noChangeTodo();
             changeObject(mrk);
 
         }

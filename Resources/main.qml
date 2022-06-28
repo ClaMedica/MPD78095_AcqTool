@@ -212,7 +212,6 @@ ApplicationWindow {
         }
 
         onReloadingCompleted: forAna.populate()
-        onNoChangeTodo: forAna.setChange()
 
         onSg_openVolResDlg:{
             volRes.focus = true
