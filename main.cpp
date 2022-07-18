@@ -174,6 +174,7 @@ int main(int argc, char *argv[])
     engine.rootContext()->setContextProperty("screenH", size.height());
     engine.rootContext()->setContextProperty("screenW", size.width());
     engine.rootContext()->setContextProperty("PicoFlow", bool_false);
+    engine.rootContext()->setContextProperty("codSoft", codSoft);
 #ifdef MAC
     engine.rootContext()->setContextProperty("Mac", bool_true);
 #else

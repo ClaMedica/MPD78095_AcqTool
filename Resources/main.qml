@@ -175,6 +175,10 @@ ApplicationWindow {
             forReal.displayMessage(qsTr("start"),3000,6)
             forReal.connected()
         }
+        onAcqAutoStarted:
+        {
+            forReal.autoStarted()
+        }
         onAcquisitionEnded:
         {
             console.log("ENDED")
@@ -189,6 +193,9 @@ ApplicationWindow {
         {
             console.log("udp BtRestarted")
 //            btStatusUdp = 4
+        }
+        onAcqMarkersChanged: {
+            forReal.updateOpMarker()
         }
     }
 
@@ -205,7 +212,6 @@ ApplicationWindow {
         }
 
         onReloadingCompleted: forAna.populate()
-        onNoChangeTodo: forAna.setChange()
 
         onSg_openVolResDlg:{
             volRes.focus = true
@@ -286,6 +292,11 @@ ApplicationWindow {
         //@@@@@@@@@@    Properties      @@@@@@@@@@
         id: exit
         visible: false
+
+        onSendClose: {
+            //necessario pulire la scheramata risultati
+            forRes.resetResult()
+        }
     }
 
     WarningDlg {

@@ -13,6 +13,8 @@ Rectangle {
     border.color: layout.value("textTable")
     border.width: 5
 
+    signal sendClose
+
     function open()
     {
         DataEngine.putItemOnTop(this)
@@ -47,10 +49,10 @@ Rectangle {
         anchors.margins: parent.height*0.02
         labelSize: layout.value("F4")
         onClicked: {
-//            if (PicoFlow) restartBt()
+            sendClose()
             exitDlg.visible = false
             mngData.toSave = "yes"
-            mngData.exitFromReview()
+            mngData.exitFromReview()           
         }
     }
 
@@ -64,10 +66,10 @@ Rectangle {
         anchors.margins: parent.height*0.02
         labelSize: layout.value("F4")
         onClicked: {
-//            if (PicoFlow) restartBt()
+            sendClose()
             exitDlg.visible = false
             mngData.toSave = "no"
-            mngData.exitFromReview()
+            mngData.exitFromReview()            
         }
     }
 

@@ -186,7 +186,11 @@ void MAcqManager::udpBtDecode(enum WHO __from, QByteArray __msg)
                         {
                             QTimer::singleShot(10000,this,SLOT(sendBeakerOkToSupe()));
                             m_startReset = false;
+#ifdef PICOFLOW
                             if (m_startAcqManuale) m_saving = true;
+#else
+                            m_saving = true;
+#endif
                             m_timeGo++;
                         }
                     }
@@ -1063,6 +1067,7 @@ void MAcqManager::checkAutomaticStartStop(QString __which)
                     //il seguente assegnamento deve essere fatto qui prima del return
                     //per evitare che si eseguano altri controlli prima di finire le operazioni precedenti
                     m_saving = true;    //posso iniziare a salvare i dati
+                    emit acqAutoStarted();
                     return;
                 }
                 else {

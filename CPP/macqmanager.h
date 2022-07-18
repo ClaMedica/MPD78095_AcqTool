@@ -19,9 +19,11 @@ public:
 
     Q_PROPERTY(QVariantList alarms READ alarms WRITE setAlarms NOTIFY alarmsChanged)
     Q_PROPERTY(QVariantList acqMarkers READ acqMarkers NOTIFY acqMarkersChanged)
+    Q_PROPERTY(bool acqAuto READ acqAuto)
 
     QVariantList alarms(){return m_alarmList;}
     QVariantList acqMarkers(){return m_acqMarkerList;}
+    bool acqAuto() {return m_autoStartStop;}
 
     static void dataOnTCP(QObject *__pParent=NULL, SimpleTCPClientAcq *__pTCP=NULL, QByteArray __blocco=QByteArray());
     Q_INVOKABLE void send_Command(int __command);    
@@ -32,6 +34,7 @@ signals:
     void acqMarkersChanged();
     void systemInAcqStatus();
     void acquisitionEnded();
+    void acqAutoStarted();
 
     void udpBtStopped();
     void udpBtRestarted();

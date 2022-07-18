@@ -76,7 +76,7 @@ BuzzTableView{
         }
     }
     function populate(){//al caricamento della tabella popolo con le colonne
-        if(model===undefined)
+        if(model===null)
             return
         var info = model.modelInfo(type)
         var sizeUsed=0

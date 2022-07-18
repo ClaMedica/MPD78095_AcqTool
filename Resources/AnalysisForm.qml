@@ -27,18 +27,13 @@ MForm{
     {
         if (!change) {
             plot.limits=mngData.getPlotLimits();
+            change = true
         }
-        else
-            change = false
 
         plot.tracks=mngData.getData("Track")
         plot.frames=mngData.getData("Definer")
         plot.markers=mngData.getData("Marker")
         lbNamePat.testo = mngData.protocollo + " - " +mngData.patientInfo;
-    }
-
-    function setChange() {
-        change = true;
     }
 
     function initialize()
@@ -160,7 +155,6 @@ MForm{
 
         onCurObjChanged: {
             if(completed){
-                change = true;
                 if (!PicoFlow && curObj.length === 1) {//sto cancellando un markers
                     dialogDelete.obj = curObj
                     dialogDelete.owner=this
@@ -171,17 +165,14 @@ MForm{
         }
 
         onOpMarkerPosChanged:{
-            change = true; //cambiamenti nel plot
             mngData.addOpMarker(opMarkerKey,opMarkerPos)
         }
 
         onDefinerPosChanged:{
-            change = true; //cambiamenti nel plot
             mngData.addDefiner(definerKey,definerPos)
         }
 
         onAnMarkerPosChanged: {
-            change = true; //cambiamenti nel plot
             mngData.addAnMarker(anMarkerKey,anMarkerPos,anMarkChNames)
         }
 
@@ -290,22 +281,16 @@ MForm{
         height: parent.height/25
         color: "lightgray"
         property string testo: "datiPaziente"
+
+
         MLabel{
-            height:  parent.height
+            id: lblPat
+            height: parent.height
+            width: parent.width
             labelSize: 2
-            anchors.verticalCenter: parent.verticalCenter
-            anchors.horizontalCenter: parent.horizontalCenter
+            horizontalAlignment: Text.AlignHCenter
             text: parent.testo
         }
-
-//        MouseArea {
-//            id: plotMouse
-//            anchors.fill: parent
-//            enabled: !PicoFlow
-//            acceptedButtons: Qt.NoButton
-//            propagateComposedEvents: true
-//            hoverEnabled: plot.activeMouse
-//        }
     }
 
     //Models
@@ -414,7 +399,6 @@ MForm{
                 }
                 if (value === MDataManager.RISULTATI.toString()) {
                     forAna.visible = false
-                    forRes.loadPageAnalysis()
                     forRes.visible = true
                 }
             }
@@ -452,9 +436,8 @@ MForm{
 
         delegate: MMarkerButton{
             onClick: {
-                if (value === MDataManager.ANALISI.toString()) {                    
-                    mngData.analysis();                    
-                }
+                if (value === MDataManager.ANALISI.toString())
+                    mngData.analysis();
 
                 if (value === MDataManager.CHIUDIREV.toString()) {
                     mngData.exitFromReview()
@@ -474,7 +457,7 @@ MForm{
 
                 if (value === MDataManager.EXPORT.toString())
                     //export
-                    mngData.openExportTool()
+                    mngData.openExportTool(codSoft)
             }
             onTooltipActive: {
                 if (testo === "")
