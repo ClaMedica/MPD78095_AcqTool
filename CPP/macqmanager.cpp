@@ -247,6 +247,13 @@ bool MAcqManager::newAcquisition(QString __dataFile)
     }
     else
     {
+
+        //controllo memoria
+        static void *p0 = nullptr;
+        void *p = sbrk(0);
+        if(p0 == nullptr) p0 = p;
+        qDebug("sbrk: %p %d", p, (int)p - (int)p0);
+
         qDebug() << "carico la configurazione per l'acquisizione";
         qDebug() << g_P7SettingsManager.progPath();
         if(!m_configAcq.loadFromXML(g_P7SettingsManager.configChannels()))
@@ -258,7 +265,22 @@ bool MAcqManager::newAcquisition(QString __dataFile)
         //carico info di connettivitA
         loadConnectivityInfo(m_configAcq.getSafeChild(XML_CONNECTIONS));
 
+
         //resetto le QMap se non sono pulite
+        foreach(QString type, m_channelMap.keys())
+            foreach(MSignal *sig, m_channelMap[type]) {
+                sig->clear();
+                delete sig;
+                sig = NULL;
+            }
+
+        m_channelMap.clear();
+
+        foreach(QString c, m_totalHWChan) {
+            m_bufferMap[c]->clear();
+            delete m_bufferMap[c];
+            m_bufferMap[c] = NULL;
+        }
         m_bufferMap.clear();
         m_operationMap.clear();
         m_HWChansMap.clear();
