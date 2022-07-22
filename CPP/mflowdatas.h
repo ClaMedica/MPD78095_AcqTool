@@ -28,6 +28,7 @@ class mflowdatas : public QObject
 public:
     explicit mflowdatas(QObject *parent = 0);
     ~mflowdatas();
+    void delAll();
 
 
     Q_INVOKABLE mflowdatasModel * datasInfo()   {return m_datasInfo;}

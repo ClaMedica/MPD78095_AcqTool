@@ -543,6 +543,7 @@ void MDataMngDesktop::exitFromReview()
         emit sg_exitFromReview();
     else
     {
+        emit sg_clearResultForm();
         if (getToSave() == "yes")
         {
             //copio il file copy nell'originale

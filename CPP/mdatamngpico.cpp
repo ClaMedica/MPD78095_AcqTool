@@ -171,6 +171,8 @@ void MDataMngPico::exitFromReview()
         }
     }
 
+    resetAll();
+    emit sg_clearResultForm();
    // qDebug()<<"AUTOLOOP"<<m_autoLoop;
     send_Command(5);   // STARTBT
     if (m_autoLoop)

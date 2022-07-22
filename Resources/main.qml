@@ -235,6 +235,11 @@ ApplicationWindow {
              exit.open()
         }
 
+        onSg_clearResultForm: {
+            //necessario pulire la scheramata risultati
+            forRes.resetResult()
+        }
+
         onSg_warning: {
             warning.testoWarning = __msg
             warning.open()

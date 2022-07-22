@@ -95,10 +95,6 @@ MAcqManager::~MAcqManager()
             delete sig;
         }
     }
-
-    //    for(int i=0;i<m_signalVector.size();i++)
-    //        if(m_signalVector[i]!=NULL)
-    //            delete m_signalVector[i];
 }
 
 void MAcqManager::sendBeakerOkToSupe()
@@ -270,20 +266,24 @@ bool MAcqManager::newAcquisition(QString __dataFile)
         loadConnectivityInfo(m_configAcq.getSafeChild(XML_CONNECTIONS));
 
 
-        //resetto le QMap se non sono pulite
+//        //resetto le QMap se non sono pulite
         foreach(QString type, m_channelMap.keys())
             foreach(MSignal *sig, m_channelMap[type]) {
                 sig->clear();
-                delete sig;
-                sig = NULL;
+                if (sig != NULL) {
+                    delete sig;
+                    sig = NULL;
+                }
             }
 
         m_channelMap.clear();
 
         foreach(QString c, m_totalHWChan) {
             m_bufferMap[c]->clear();
-            delete m_bufferMap[c];
-            m_bufferMap[c] = NULL;
+            if (m_bufferMap[c] != NULL) {
+                delete m_bufferMap[c];
+                m_bufferMap[c] = NULL;
+            }
         }
         m_bufferMap.clear();
         m_operationMap.clear();

@@ -8,6 +8,9 @@
 #include "dbStatements.h"
 #include <mdatabase.h>
 
+#define NOMO_LIV_NUMSIGN 7
+#define NOMO_SIR_NUMSIGN 4
+
 typedef struct {
     float waiting_time;			// waiting time
     float q_max;					// maximum flow
@@ -85,6 +88,8 @@ signals:
     void infoToSave();
     void sg_warning(QString __msg);
 
+    void sg_clearResultForm();
+
 public slots:
     void analysis(void);
 
@@ -106,10 +111,6 @@ private:
     QStringList m_availableData,
     m_possibleCategories;
 
-    QString m_currentSignalName;
-
-    MSignal *m_pCurrentSignal;
-
     AnalysisType m_anaType;
 
     //fine esame
@@ -123,6 +124,18 @@ private:
     QString m_toSave;
 
     int m_numAna; //numero di analisi --> non sappiamo se serve
+
+    //nomogramma LiverpoolQMax
+    QVector<MSignal *> m_nomoLivMaxSign;
+    //nomogramma LiverpoolQAve
+    QVector<MSignal *> m_nomoLivAveSign;
+    //nomogramma Siroky Max & Ave
+    QVector<MSignal *> m_nomoSirAveSign;
+    QVector<MSignal *> m_nomoSirMaxSign;
+    //nomogramma Miskolc Max & Ave
+    QVector<MSignal*> m_nomoMisMaxSign;
+    QVector<MSignal*> m_nomoMisAveSign;
+
 
     void updateAvailableData();
     bool buildInfoList();

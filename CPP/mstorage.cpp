@@ -6,21 +6,52 @@ MStorage::MStorage(QObject *parent) :
 {
 
 }
+MStorage::~MStorage()
+{
+    foreach (QString s,m_allMap.keys())
+    {
+        VarMapVec *curVec = m_allMap[s];
+        for (int i=0; i<curVec->size(); i++) {
+            if (curVec->at(i) != NULL) {
+                delete curVec->at(i);
+            }
+        }
+        curVec->clear();
+        if (curVec != NULL) {
+            delete curVec;
+            curVec = NULL;
+        }
+
+    }
+    m_allMap.clear();
+
+    foreach (QString s,m_storage.keys())
+    {
+        foreach (QString s1, m_storage[s].keys())
+        {
+            VarMapVec *curVec = m_storage[s][s1];
+            for (int i=0; i<curVec->size(); i++) {
+                if (curVec->at(i) != NULL) {
+                    delete curVec->at(i);
+                }
+            }
+            curVec->clear();
+            if (curVec != NULL) {
+                delete curVec;
+                curVec = NULL;
+            }
+            m_storage[s].clear();
+        }
+    }
+
+    m_storage.clear();
+
+}
 
 void MStorage::clearAll()
 {
-    //QMap< QString,QVector< QMap<QString,QVariant> *> *> m_allMap;
-//    foreach (QString s,m_allMap.keys())
-//    {
-//        VarMapVec *curVec = m_allMap[s];
-//        for (int i=0; i<curVec->size(); i++)
-//            delete curVec->at(i);
 
-//        curVec->clear();
-//        delete curVec;
-//    }
-//    m_allMap.clear();
-
+    //QMap<QString,QMap<QString,VarMapVec *> > m_storage
     //QMap<QString,QMap<QString,QVector< QMap<QString,QVariant> *> *> > m_storage;
     //non cancello le family ma solo gli elementi
     foreach (QString s,m_storage.keys())
@@ -29,7 +60,8 @@ void MStorage::clearAll()
         {
             VarMapVec *curVec = m_storage[s][s1];
             for (int i=0; i<curVec->size(); i++)
-                delete curVec->at(i);
+                if (curVec->at(i) != NULL)
+                    delete curVec->at(i);
 
             curVec->clear();
         }

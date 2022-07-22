@@ -46,9 +46,39 @@ mflowdatas::mflowdatas(QObject *parent) : QObject(parent)
 
 mflowdatas::~mflowdatas()
 {
-    //delete m_datasInfo;
-    //delete m_liverpoolMax;
-    //delete m_liverpoolAve;
+    delAll();
+}
+
+void mflowdatas::delAll()
+{
+    if (m_datasInfo != NULL) {
+        delete m_datasInfo;
+        m_datasInfo = NULL;
+    }
+    if (m_liverpoolMax != NULL) {
+        delete m_liverpoolMax;
+        m_liverpoolMax = NULL;
+    }
+    if (m_liverpoolAve != NULL) {
+        delete m_liverpoolAve;
+        m_liverpoolAve = NULL;
+    }
+    if (m_sirokyMax != NULL) {
+        delete m_sirokyMax;
+        m_sirokyMax = NULL;
+    }
+    if (m_sirokyAve != NULL) {
+        delete m_sirokyAve;
+        m_sirokyAve = NULL;
+    }
+    if (m_miskolcMax != NULL) {
+        delete m_miskolcMax;
+        m_miskolcMax = NULL;
+    }
+    if (m_miskolcAve != NULL) {
+        delete m_miskolcAve;
+        m_miskolcAve = NULL;
+    }
 }
 
 void mflowdatas::buildTable()

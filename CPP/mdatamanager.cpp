@@ -8,8 +8,6 @@ MDataManager::MDataManager(QObject *parent)
     m_mng = NULL;
     m_ana = NULL;
     m_copy = NULL;
-    m_currentSignalName = "custom_signal";
-    m_pCurrentSignal = NULL;
     m_numChannels = 0;
 
     m_end = 3600;   //fine esame di default a 1 ora
@@ -43,11 +41,27 @@ MDataManager::MDataManager(QObject *parent)
 
     m_protocollo = "Picoflow2R3";
 
+    m_nomoLivMaxSign.resize(NOMO_LIV_NUMSIGN);
+    m_nomoLivAveSign.resize(NOMO_LIV_NUMSIGN);
+    for (int i=0; i<NOMO_LIV_NUMSIGN;i++) {
+        m_nomoLivMaxSign[i] = NULL;
+        m_nomoLivAveSign[i] = NULL;
+    }
+
+    m_nomoSirAveSign.resize(NOMO_SIR_NUMSIGN+1);
+    m_nomoSirMaxSign.resize(NOMO_SIR_NUMSIGN);
+    for (int i=0; i<NOMO_SIR_NUMSIGN+1;i++) {
+        if (i<NOMO_SIR_NUMSIGN)m_nomoSirMaxSign[i] = NULL;
+        m_nomoSirAveSign[i] = NULL;
+    }
+
+
     setValVolRes(-999);
 }
 
 MDataManager::~MDataManager()
 {
+    resetAll();
     if(m_mng != NULL) {
         m_mng->Close();
         delete m_mng;
@@ -57,6 +71,17 @@ MDataManager::~MDataManager()
         delete m_ana;
         m_ana = NULL;
     }
+    if(m_copy != NULL) {
+        delete m_copy;
+        m_copy = NULL;
+    }
+
+    m_nomoLivMaxSign.clear();
+    m_nomoLivAveSign.clear();
+    m_nomoSirAveSign.clear();
+    m_nomoSirMaxSign.clear();
+    m_nomoMisAveSign.clear();
+    m_nomoMisMaxSign.clear();
 }
 
 void MDataManager::setInfoList(QVariantList __list)
@@ -592,10 +617,39 @@ void MDataManager::resetAll()
 {
     m_data.clear();
     m_availableData.clear();
-    for(int i = 0; i < m_signalVector.size(); i++)
-        delete m_signalVector[i];
+    for(int i = 0; i < m_signalVector.size(); i++) {
+        if (m_signalVector[i] != NULL) {
+            delete m_signalVector[i];
+            m_signalVector[i] = NULL;
+        }
+    }
     m_signalVector.clear();
     m_storage.clearAll();
+
+    for (int i=0; i<NOMO_LIV_NUMSIGN;i++) {
+        if (m_nomoLivMaxSign.at(i) != NULL) {
+            delete m_nomoLivMaxSign.at(i);
+            m_nomoLivMaxSign[i] = NULL;
+        }
+        if (m_nomoLivAveSign.at(i) != NULL) {
+            delete m_nomoLivAveSign.at(i);
+            m_nomoLivAveSign[i] = NULL;
+        }
+    }
+    for (int i=0; i<m_nomoMisMaxSign.size(); i++)
+        if (m_nomoMisMaxSign.at(i) != NULL) {
+            delete m_nomoMisMaxSign.at(i);
+            m_nomoMisMaxSign[i] = NULL;
+        }
+    for (int i=0; i<m_nomoMisAveSign.size(); i++)
+        if (m_nomoMisAveSign.at(i) != NULL) {
+            delete m_nomoMisAveSign.at(i);
+            m_nomoMisAveSign[i] = NULL;
+        }
+
+    for (int i=0; i<m_aflwdatas.size(); i++)
+        m_aflwdatas.at(i)->delAll();
+     m_aflwdatas.clear();
 }
 
 void MDataManager::saveChanges()
@@ -1538,39 +1592,39 @@ bool MDataManager::InitArraysFLW(int __start,
 
     qDebug() << "costruisco i segnali da disegnare nel plot per i nomogrammi";
     for (int i = 0; i < numEv; i++) {
-        qDebug() << "nomogramma LiverpoolQMax";
-        MSignal *sig0 = new MSignal;
-        MSignal *sig1 = new MSignal;
-        MSignal *sig2 = new MSignal;
-        MSignal *sig3 = new MSignal;
-        MSignal *sig4 = new MSignal;
-        MSignal *sig5 = new MSignal;
-        MSignal *sig6 = new MSignal;
+        //nomogramma LiverpoolQMax
+        for (int i=0; i<m_nomoLivMaxSign.size();i++) {
+            if (m_nomoLivMaxSign.at(i) != NULL) {
+                delete m_nomoLivMaxSign.at(i);
+                m_nomoLivMaxSign[i] = NULL;
+            }
+            m_nomoLivMaxSign[i] = new MSignal;
+        }
 
         int lunx = m_aflwdatas.at(i+1)->getLiverpoolMax()->getXmax();
-        sig0->setData(m_aflwdatas.at(i+1)->getLiverpoolMax()->getLineY(0).data(), lunx);
-        sig0->setName("linea1");
-        sig1->setData(m_aflwdatas.at(i+1)->getLiverpoolMax()->getLineY(1).data(), lunx);
-        sig1->setName("linea2");
-        sig2->setData(m_aflwdatas.at(i+1)->getLiverpoolMax()->getLineY(2).data(), lunx);
-        sig2->setName("linea3");
-        sig3->setData(m_aflwdatas.at(i+1)->getLiverpoolMax()->getLineY(3).data(), lunx);
-        sig3->setName("linea4");
-        sig4->setData(m_aflwdatas.at(i+1)->getLiverpoolMax()->getLineY(4).data(), lunx);
-        sig4->setName("linea5");
-        sig5->setData(m_aflwdatas.at(i+1)->getLiverpoolMax()->getLineY(5).data(), lunx);
-        sig5->setName("linea6");
-        sig6->setData(m_aflwdatas.at(i+1)->getLiverpoolMax()->getLineY(6).data(), lunx);
-        sig6->setName("linea7");
+        m_nomoLivMaxSign.at(0)->setData(m_aflwdatas.at(i+1)->getLiverpoolMax()->getLineY(0).data(), lunx);
+        m_nomoLivMaxSign.at(0)->setName("linea1");
+        m_nomoLivMaxSign.at(1)->setData(m_aflwdatas.at(i+1)->getLiverpoolMax()->getLineY(0).data(), lunx);
+        m_nomoLivMaxSign.at(1)->setName("linea2");
+        m_nomoLivMaxSign.at(2)->setData(m_aflwdatas.at(i+1)->getLiverpoolMax()->getLineY(2).data(), lunx);
+        m_nomoLivMaxSign.at(2)->setName("linea3");
+        m_nomoLivMaxSign.at(3)->setData(m_aflwdatas.at(i+1)->getLiverpoolMax()->getLineY(3).data(), lunx);
+        m_nomoLivMaxSign.at(3)->setName("linea4");
+        m_nomoLivMaxSign.at(4)->setData(m_aflwdatas.at(i+1)->getLiverpoolMax()->getLineY(4).data(), lunx);
+        m_nomoLivMaxSign.at(4)->setName("linea5");
+        m_nomoLivMaxSign.at(5)->setData(m_aflwdatas.at(i+1)->getLiverpoolMax()->getLineY(5).data(), lunx);
+        m_nomoLivMaxSign.at(5)->setName("linea6");
+        m_nomoLivMaxSign.at(6)->setData(m_aflwdatas.at(i+1)->getLiverpoolMax()->getLineY(6).data(), lunx);
+        m_nomoLivMaxSign.at(6)->setName("linea7");
 
         QVariantList tracce;
-        tracce << "$Track" << "family" << sig0->getName() << "name" << "Signal" << "Category" << CAT_TRACK << "descr" << "line1" << "pointer" << (qulonglong)sig0 << "&Track";
-        tracce << "$Track" << "family" << sig1->getName() << "name" << "Signal" << "Category" << CAT_TRACK << "descr" << "line2" << "pointer" << (qulonglong)sig1 << "&Track";
-        tracce << "$Track" << "family" << sig2->getName() << "name" << "Signal" << "Category" << CAT_TRACK << "descr" << "line3" << "pointer" << (qulonglong)sig2 << "&Track";
-        tracce << "$Track" << "family" << sig3->getName() << "name" << "Signal" << "Category" << CAT_TRACK << "descr" << "line4" << "pointer" << (qulonglong)sig3 << "&Track";
-        tracce << "$Track" << "family" << sig4->getName() << "name" << "Signal" << "Category" << CAT_TRACK << "descr" << "line5" << "pointer" << (qulonglong)sig4 << "&Track";
-        tracce << "$Track" << "family" << sig5->getName() << "name" << "Signal" << "Category" << CAT_TRACK << "descr" << "line6" << "pointer" << (qulonglong)sig5 << "&Track";
-        tracce << "$Track" << "family" << sig6->getName() << "name" << "Signal" << "Category" << CAT_TRACK << "descr" << "line7" << "pointer" << (qulonglong)sig6 << "&Track";
+        tracce << "$Track" << "family" << m_nomoLivMaxSign.at(0)->getName() << "name" << "Signal" << "Category" << CAT_TRACK << "descr" << "line1" << "pointer" << (qulonglong)m_nomoLivMaxSign.at(0) << "&Track";
+        tracce << "$Track" << "family" << m_nomoLivMaxSign.at(1)->getName() << "name" << "Signal" << "Category" << CAT_TRACK << "descr" << "line2" << "pointer" << (qulonglong)m_nomoLivMaxSign.at(1) << "&Track";
+        tracce << "$Track" << "family" << m_nomoLivMaxSign.at(2)->getName() << "name" << "Signal" << "Category" << CAT_TRACK << "descr" << "line3" << "pointer" << (qulonglong)m_nomoLivMaxSign.at(2) << "&Track";
+        tracce << "$Track" << "family" << m_nomoLivMaxSign.at(3)->getName() << "name" << "Signal" << "Category" << CAT_TRACK << "descr" << "line4" << "pointer" << (qulonglong)m_nomoLivMaxSign.at(3) << "&Track";
+        tracce << "$Track" << "family" << m_nomoLivMaxSign.at(4)->getName() << "name" << "Signal" << "Category" << CAT_TRACK << "descr" << "line5" << "pointer" << (qulonglong)m_nomoLivMaxSign.at(4) << "&Track";
+        tracce << "$Track" << "family" << m_nomoLivMaxSign.at(5)->getName() << "name" << "Signal" << "Category" << CAT_TRACK << "descr" << "line6" << "pointer" << (qulonglong)m_nomoLivMaxSign.at(5) << "&Track";
+        tracce << "$Track" << "family" << m_nomoLivMaxSign.at(6)->getName() << "name" << "Signal" << "Category" << CAT_TRACK << "descr" << "line7" << "pointer" << (qulonglong)m_nomoLivMaxSign.at(6) << "&Track";
 
         QVariantList colori;
         colori << "green" << "red" << "black" << "black" << "black" << "black" << "green";
@@ -1578,68 +1632,71 @@ bool MDataManager::InitArraysFLW(int __start,
         m_aflwdatas.at(i+1)->getLiverpoolMax()->setColors(colori);
         m_aflwdatas.at(i+1)->getLiverpoolMax()->setTracce(tracce);
 
-
         qDebug() << "nomogramma LiverpoolQAve";
-        MSignal *sig0Ave = new MSignal;
-        MSignal *sig1Ave = new MSignal;
-        MSignal *sig2Ave = new MSignal;
-        MSignal *sig3Ave = new MSignal;
-        MSignal *sig4Ave = new MSignal;
-        MSignal *sig5Ave = new MSignal;
-        MSignal *sig6Ave = new MSignal;
+        for (int i=0; i<m_nomoLivAveSign.size();i++) {
+            if (m_nomoLivAveSign.at(i) != NULL) {
+                delete m_nomoLivAveSign.at(i);
+                m_nomoLivAveSign[i] = NULL;
+            }
+            m_nomoLivAveSign[i] = new MSignal;
+        }
 
         lunx = m_aflwdatas.at(i+1)->getLiverpoolAve()->getXmax();
-        sig0Ave->setData(m_aflwdatas.at(i+1)->getLiverpoolAve()->getLineY(0).data(),lunx);
-        sig0Ave->setName("linea1");
-        sig1Ave->setData(m_aflwdatas.at(i+1)->getLiverpoolAve()->getLineY(1).data(),lunx);
-        sig1Ave->setName("linea2");
-        sig2Ave->setData(m_aflwdatas.at(i+1)->getLiverpoolAve()->getLineY(2).data(),lunx);
-        sig2Ave->setName("linea3");
-        sig3Ave->setData(m_aflwdatas.at(i+1)->getLiverpoolAve()->getLineY(3).data(),lunx);
-        sig3Ave->setName("linea4");
-        sig4Ave->setData(m_aflwdatas.at(i+1)->getLiverpoolAve()->getLineY(4).data(),lunx);
-        sig4Ave->setName("linea5");
-        sig5Ave->setData(m_aflwdatas.at(i+1)->getLiverpoolAve()->getLineY(5).data(),lunx);
-        sig5Ave->setName("linea6");
-        sig6Ave->setData(m_aflwdatas.at(i+1)->getLiverpoolAve()->getLineY(6).data(),lunx);
-        sig6Ave->setName("linea7");
+        m_nomoLivAveSign.at(0)->setData(m_aflwdatas.at(i+1)->getLiverpoolAve()->getLineY(0).data(),lunx);
+        m_nomoLivAveSign.at(0)->setName("linea1");
+        m_nomoLivAveSign.at(1)->setData(m_aflwdatas.at(i+1)->getLiverpoolAve()->getLineY(1).data(),lunx);
+        m_nomoLivAveSign.at(1)->setName("linea2");
+        m_nomoLivAveSign.at(2)->setData(m_aflwdatas.at(i+1)->getLiverpoolAve()->getLineY(2).data(),lunx);
+        m_nomoLivAveSign.at(2)->setName("linea3");
+        m_nomoLivAveSign.at(3)->setData(m_aflwdatas.at(i+1)->getLiverpoolAve()->getLineY(3).data(),lunx);
+        m_nomoLivAveSign.at(3)->setName("linea4");
+        m_nomoLivAveSign.at(4)->setData(m_aflwdatas.at(i+1)->getLiverpoolAve()->getLineY(4).data(),lunx);
+        m_nomoLivAveSign.at(4)->setName("linea5");
+        m_nomoLivAveSign.at(5)->setData(m_aflwdatas.at(i+1)->getLiverpoolAve()->getLineY(5).data(),lunx);
+        m_nomoLivAveSign.at(5)->setName("linea6");
+        m_nomoLivAveSign.at(6)->setData(m_aflwdatas.at(i+1)->getLiverpoolAve()->getLineY(6).data(),lunx);
+        m_nomoLivAveSign.at(6)->setName("linea7");
 
         tracce.clear();
-        tracce << "$Track" << "family" << sig0Ave->getName() << "name" << "Signal" << "Category" << CAT_TRACK << "descr" << "line1" << "pointer" << (qulonglong)sig0Ave << "&Track";
-        tracce << "$Track" << "family" << sig1Ave->getName() << "name" << "Signal" << "Category" << CAT_TRACK << "descr" << "line2" << "pointer" << (qulonglong)sig1Ave << "&Track";
-        tracce << "$Track" << "family" << sig2Ave->getName() << "name" << "Signal" << "Category" << CAT_TRACK << "descr" << "line3" << "pointer" << (qulonglong)sig2Ave << "&Track";
-        tracce << "$Track" << "family" << sig3Ave->getName() << "name" << "Signal" << "Category" << CAT_TRACK << "descr" << "line4" << "pointer" << (qulonglong)sig3Ave << "&Track";
-        tracce << "$Track" << "family" << sig4Ave->getName() << "name" << "Signal" << "Category" << CAT_TRACK << "descr" << "line5" << "pointer" << (qulonglong)sig4Ave << "&Track";
-        tracce << "$Track" << "family" << sig5Ave->getName() << "name" << "Signal" << "Category" << CAT_TRACK << "descr" << "line6" << "pointer" << (qulonglong)sig5Ave << "&Track";
-        tracce << "$Track" << "family" << sig6Ave->getName() << "name" << "Signal" << "Category" << CAT_TRACK << "descr" << "line7" << "pointer" << (qulonglong)sig6Ave << "&Track";
+        tracce << "$Track" << "family" << m_nomoLivAveSign.at(0)->getName() << "name" << "Signal" << "Category" << CAT_TRACK << "descr" << "line1" << "pointer" << (qulonglong) m_nomoLivAveSign.at(0) << "&Track";
+        tracce << "$Track" << "family" << m_nomoLivAveSign.at(1)->getName() << "name" << "Signal" << "Category" << CAT_TRACK << "descr" << "line2" << "pointer" << (qulonglong) m_nomoLivAveSign.at(1) << "&Track";
+        tracce << "$Track" << "family" << m_nomoLivAveSign.at(2)->getName() << "name" << "Signal" << "Category" << CAT_TRACK << "descr" << "line3" << "pointer" << (qulonglong) m_nomoLivAveSign.at(2) << "&Track";
+        tracce << "$Track" << "family" << m_nomoLivAveSign.at(3)->getName() << "name" << "Signal" << "Category" << CAT_TRACK << "descr" << "line4" << "pointer" << (qulonglong) m_nomoLivAveSign.at(3) << "&Track";
+        tracce << "$Track" << "family" << m_nomoLivAveSign.at(4)->getName() << "name" << "Signal" << "Category" << CAT_TRACK << "descr" << "line5" << "pointer" << (qulonglong) m_nomoLivAveSign.at(4) << "&Track";
+        tracce << "$Track" << "family" << m_nomoLivAveSign.at(5)->getName() << "name" << "Signal" << "Category" << CAT_TRACK << "descr" << "line6" << "pointer" << (qulonglong) m_nomoLivAveSign.at(5) << "&Track";
+        tracce << "$Track" << "family" << m_nomoLivAveSign.at(6)->getName() << "name" << "Signal" << "Category" << CAT_TRACK << "descr" << "line7" << "pointer" << (qulonglong) m_nomoLivAveSign.at(6) << "&Track";
 
         colori.clear();
         colori << "green" << "red" << "black" << "black" << "black" << "black" << "green";
         m_aflwdatas.at(i+1)->getLiverpoolAve()->setColors(colori);
         m_aflwdatas.at(i+1)->getLiverpoolAve()->setTracce(tracce);
 
-        qDebug() << "nomogramma Siroky Max & Ave";
+        //nomogramma Siroky Max & Ave
         if (!m_sexPatient) {
-            MSignal *sig0SirMax = new MSignal;
-            MSignal *sig1SirMax = new MSignal;
-            MSignal *sig2SirMax = new MSignal;
-            MSignal *sig3SirMax = new MSignal;
+            for (int i=0; i<m_nomoSirMaxSign.size();i++) {
+                if (m_nomoSirMaxSign.at(i) != NULL) {
+                    delete m_nomoSirMaxSign.at(i);
+                    m_nomoSirMaxSign[i] = NULL;
+                }
+                m_nomoSirMaxSign[i] = new MSignal;
+            }
+
             lunx = m_aflwdatas.at(i+1)->getSirokyMax()->getXmax();
 
-            sig0SirMax->setData(m_aflwdatas.at(i+1)->getSirokyMax()->getLineY(0).data(),lunx);
-            sig0SirMax->setName("linea1");
-            sig1SirMax->setData(m_aflwdatas.at(i+1)->getSirokyMax()->getLineY(1).data(),lunx);
-            sig1SirMax->setName("linea2");
-            sig2SirMax->setData(m_aflwdatas.at(i+1)->getSirokyMax()->getLineY(2).data(),lunx);
-            sig2SirMax->setName("linea3");
-            sig3SirMax->setData(m_aflwdatas.at(i+1)->getSirokyMax()->getLineY(3).data(),lunx);
-            sig3SirMax->setName("linea4");
+            m_nomoSirMaxSign.at(0)->setData(m_aflwdatas.at(i+1)->getSirokyMax()->getLineY(0).data(),lunx);
+            m_nomoSirMaxSign.at(0)->setName("linea1");
+            m_nomoSirMaxSign.at(1)->setData(m_aflwdatas.at(i+1)->getSirokyMax()->getLineY(1).data(),lunx);
+            m_nomoSirMaxSign.at(1)->setName("linea2");
+            m_nomoSirMaxSign.at(2)->setData(m_aflwdatas.at(i+1)->getSirokyMax()->getLineY(2).data(),lunx);
+            m_nomoSirMaxSign.at(2)->setName("linea3");
+            m_nomoSirMaxSign.at(3)->setData(m_aflwdatas.at(i+1)->getSirokyMax()->getLineY(3).data(),lunx);
+            m_nomoSirMaxSign.at(3)->setName("linea4");
 
             tracce.clear();
-            tracce << "$Track"<<"family"<<sig0SirMax->getName()<<"name"<<"Signal"<<"Category"<<CAT_TRACK<<"descr"<<"line1"<<"pointer"<<(qulonglong)sig0SirMax<<"&Track";
-            tracce << "$Track"<<"family"<<sig1SirMax->getName()<<"name"<<"Signal"<<"Category"<<CAT_TRACK<<"descr"<<"line2"<<"pointer"<<(qulonglong)sig1SirMax<<"&Track";
-            tracce << "$Track"<<"family"<<sig2SirMax->getName()<<"name"<<"Signal"<<"Category"<<CAT_TRACK<<"descr"<<"line3"<<"pointer"<<(qulonglong)sig2SirMax<<"&Track";
-            tracce << "$Track"<<"family"<<sig3SirMax->getName()<<"name"<<"Signal"<<"Category"<<CAT_TRACK<<"descr"<<"line4"<<"pointer"<<(qulonglong)sig3SirMax<<"&Track";
+            tracce << "$Track"<<"family"<<m_nomoSirMaxSign.at(0)->getName()<<"name"<<"Signal"<<"Category"<<CAT_TRACK<<"descr"<<"line1"<<"pointer"<<(qulonglong)m_nomoSirMaxSign.at(0)<<"&Track";
+            tracce << "$Track"<<"family"<<m_nomoSirMaxSign.at(1)->getName()<<"name"<<"Signal"<<"Category"<<CAT_TRACK<<"descr"<<"line2"<<"pointer"<<(qulonglong)m_nomoSirMaxSign.at(1)<<"&Track";
+            tracce << "$Track"<<"family"<<m_nomoSirMaxSign.at(2)->getName()<<"name"<<"Signal"<<"Category"<<CAT_TRACK<<"descr"<<"line3"<<"pointer"<<(qulonglong)m_nomoSirMaxSign.at(2)<<"&Track";
+            tracce << "$Track"<<"family"<<m_nomoSirMaxSign.at(3)->getName()<<"name"<<"Signal"<<"Category"<<CAT_TRACK<<"descr"<<"line4"<<"pointer"<<(qulonglong)m_nomoSirMaxSign.at(3)<<"&Track";
 
             colori.clear();
             colori << "black" << "red" << "black" << "black";
@@ -1653,30 +1710,32 @@ bool MDataManager::InitArraysFLW(int __start,
             m_aflwdatas.at(i+1)->getSirokyMax()->setLinea(linee);
 
             //nomogramma Siroky Ave
-            MSignal *sig0SirAve = new MSignal;
-            MSignal *sig1SirAve = new MSignal;
-            MSignal *sig2SirAve = new MSignal;
-            MSignal *sig3SirAve = new MSignal;
-            MSignal *sig4SirAve = new MSignal;
+            for (int i=0; i<m_nomoSirAveSign.size();i++) {
+                if (m_nomoSirAveSign.at(i) != NULL) {
+                    delete m_nomoSirAveSign.at(i);
+                    m_nomoSirAveSign[i] = NULL;
+                }
+                m_nomoSirAveSign[i] = new MSignal;
+            }
 
             lunx = m_aflwdatas.at(i+1)->getSirokyAve()->getXmax();
-            sig0SirAve->setData(m_aflwdatas.at(i+1)->getSirokyAve()->getLineY(0).data(),lunx);
-            sig0SirAve->setName("linea1");
-            sig1SirAve->setData(m_aflwdatas.at(i+1)->getSirokyAve()->getLineY(1).data(),lunx);
-            sig1SirAve->setName("linea2");
-            sig2SirAve->setData(m_aflwdatas.at(i+1)->getSirokyAve()->getLineY(2).data(),lunx);
-            sig2SirAve->setName("linea3");
-            sig3SirAve->setData(m_aflwdatas.at(i+1)->getSirokyAve()->getLineY(3).data(),lunx);
-            sig3SirAve->setName("linea4");
-            sig4SirAve->setData(m_aflwdatas.at(i+1)->getSirokyAve()->getLineY(4).data(),lunx);
-            sig4SirAve->setName("linea4");
+            m_nomoSirAveSign.at(0)->setData(m_aflwdatas.at(i+1)->getSirokyAve()->getLineY(0).data(),lunx);
+            m_nomoSirAveSign.at(0)->setName("linea1");
+            m_nomoSirAveSign.at(1)->setData(m_aflwdatas.at(i+1)->getSirokyAve()->getLineY(1).data(),lunx);
+            m_nomoSirAveSign.at(1)->setName("linea2");
+            m_nomoSirAveSign.at(2)->setData(m_aflwdatas.at(i+1)->getSirokyAve()->getLineY(2).data(),lunx);
+            m_nomoSirAveSign.at(2)->setName("linea3");
+            m_nomoSirAveSign.at(3)->setData(m_aflwdatas.at(i+1)->getSirokyAve()->getLineY(3).data(),lunx);
+            m_nomoSirAveSign.at(3)->setName("linea4");
+            m_nomoSirAveSign.at(4)->setData(m_aflwdatas.at(i+1)->getSirokyAve()->getLineY(4).data(),lunx);
+            m_nomoSirAveSign.at(4)->setName("linea4");
 
             tracce.clear();
-            tracce<< "$Track"<<"family"<<sig0SirAve->getName()<<"name"<<"Signal"<<"Category"<<CAT_TRACK<<"descr"<<"line1"<<"pointer"<<(qulonglong)sig0SirAve<<"&Track";
-            tracce<< "$Track"<<"family"<<sig1SirAve->getName()<<"name"<<"Signal"<<"Category"<<CAT_TRACK<<"descr"<<"line2"<<"pointer"<<(qulonglong)sig1SirAve<<"&Track";
-            tracce<< "$Track"<<"family"<<sig2SirAve->getName()<<"name"<<"Signal"<<"Category"<<CAT_TRACK<<"descr"<<"line3"<<"pointer"<<(qulonglong)sig2SirAve<<"&Track";
-            tracce<< "$Track"<<"family"<<sig3SirAve->getName()<<"name"<<"Signal"<<"Category"<<CAT_TRACK<<"descr"<<"line4"<<"pointer"<<(qulonglong)sig3SirAve<<"&Track";
-            tracce<< "$Track"<<"family"<<sig4SirAve->getName()<<"name"<<"Signal"<<"Category"<<CAT_TRACK<<"descr"<<"line5"<<"pointer"<<(qulonglong)sig4SirAve<<"&Track";
+            tracce<< "$Track"<<"family"<<m_nomoSirAveSign.at(0)->getName()<<"name"<<"Signal"<<"Category"<<CAT_TRACK<<"descr"<<"line1"<<"pointer"<<(qulonglong)m_nomoSirAveSign.at(0)<<"&Track";
+            tracce<< "$Track"<<"family"<<m_nomoSirAveSign.at(1)->getName()<<"name"<<"Signal"<<"Category"<<CAT_TRACK<<"descr"<<"line2"<<"pointer"<<(qulonglong)m_nomoSirAveSign.at(1)<<"&Track";
+            tracce<< "$Track"<<"family"<<m_nomoSirAveSign.at(2)->getName()<<"name"<<"Signal"<<"Category"<<CAT_TRACK<<"descr"<<"line3"<<"pointer"<<(qulonglong)m_nomoSirAveSign.at(2)<<"&Track";
+            tracce<< "$Track"<<"family"<<m_nomoSirAveSign.at(3)->getName()<<"name"<<"Signal"<<"Category"<<CAT_TRACK<<"descr"<<"line4"<<"pointer"<<(qulonglong)m_nomoSirAveSign.at(3)<<"&Track";
+            tracce<< "$Track"<<"family"<<m_nomoSirAveSign.at(4)->getName()<<"name"<<"Signal"<<"Category"<<CAT_TRACK<<"descr"<<"line5"<<"pointer"<<(qulonglong)m_nomoSirAveSign.at(4)<<"&Track";
 
             colori.clear();
             colori << "black" << "red" << "black" << "black" << "black";
@@ -1690,22 +1749,21 @@ bool MDataManager::InitArraysFLW(int __start,
             m_aflwdatas.at(i+1)->getSirokyAve()->setLinea(linee);
         }
 
-        qDebug() << "nomogramma Miskolc Max & Ave";
+        //nomogramma Miskolc Max & Ave
         if (m_aflwdatas.at(i+1)->getMiskolcMax()->getTitle() != "")
         {
             int linee = m_aflwdatas.at(i+1)->getLineMiskolcMax();
             lunx = m_aflwdatas.at(i+1)->getMiskolcMax()->getXmax();
-            QVector<MSignal*> signs;
-            signs.resize(linee);
+            if (m_nomoMisMaxSign.size() == 0) m_nomoMisMaxSign.resize(linee);
             tracce.clear();
             colori.clear();
             for (int j=0; j<linee; j++)
             {
-                signs[j] = new MSignal;
-                signs[j]->setData(m_aflwdatas.at(i+1)->getMiskolcMax()->getLineY(j).data(),lunx);
-                signs[j]->setName(QString("linea %1").arg(j));
+                m_nomoMisMaxSign[j] = new MSignal;
+                m_nomoMisMaxSign[j]->setData(m_aflwdatas.at(i+1)->getMiskolcMax()->getLineY(j).data(),lunx);
+                m_nomoMisMaxSign[j]->setName(QString("linea %1").arg(j));
 
-                tracce<< "$Track"<<"family"<<signs[j]->getName()<<"name"<<"Signal"<<"Category"<<CAT_TRACK<<"descr"<<QString("linea%1").arg(j)<<"pointer"<<(qulonglong)signs[j]<<"&Track";
+                tracce<< "$Track"<<"family"<<m_nomoMisMaxSign[j]->getName()<<"name"<<"Signal"<<"Category"<<CAT_TRACK<<"descr"<<QString("linea%1").arg(j)<<"pointer"<<(qulonglong)m_nomoMisMaxSign[j]<<"&Track";
                 colori << "black";
             }
 
@@ -1717,17 +1775,16 @@ bool MDataManager::InitArraysFLW(int __start,
         {
             int linee = m_aflwdatas.at(i+1)->getLineMiskolcAve();
             lunx = m_aflwdatas.at(i+1)->getMiskolcAve()->getXmax();
-            QVector<MSignal*> signs;
-            signs.resize(linee);
+            if (m_nomoMisAveSign.size() == 0) m_nomoMisAveSign.resize(linee);
             tracce.clear();
             colori.clear();
             for (int j=0; j<linee; j++)
             {
-                signs[j] = new MSignal;
-                signs[j]->setData(m_aflwdatas.at(i+1)->getMiskolcAve()->getLineY(j).data(),lunx);
-                signs[j]->setName(QString("linea %1").arg(j));
+                m_nomoMisAveSign[j] = new MSignal;
+                m_nomoMisAveSign[j]->setData(m_aflwdatas.at(i+1)->getMiskolcAve()->getLineY(j).data(),lunx);
+                m_nomoMisAveSign[j]->setName(QString("linea %1").arg(j));
 
-                tracce<< "$Track"<<"family"<<signs[j]->getName()<<"name"<<"Signal"<<"Category"<<CAT_TRACK<<"descr"<<QString("linea%1").arg(j)<<"pointer"<<(qulonglong)signs[j]<<"&Track";
+                tracce<< "$Track"<<"family"<<m_nomoMisAveSign[j]->getName()<<"name"<<"Signal"<<"Category"<<CAT_TRACK<<"descr"<<QString("linea%1").arg(j)<<"pointer"<<(qulonglong)m_nomoMisAveSign[j]<<"&Track";
                 colori << "green";
             }
 
@@ -1749,6 +1806,8 @@ int MDataManager::ReadResult(int & __numEv)
 
    __numEv = m_mng->readNumEv();
 
+   for (int i=0; i<m_aflwdatas.size(); i++)
+       m_aflwdatas.at(i)->delAll();
     m_aflwdatas.clear();
 
     switch (StructType)

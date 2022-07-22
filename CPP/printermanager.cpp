@@ -100,6 +100,11 @@ printermanager::printermanager(QString __namefile, QObject *parent) : QObject(pa
 
 printermanager::~printermanager()
 {
+    if (m_dfm != NULL)
+    {
+        delete m_dfm;
+        m_dfm = NULL;
+    }
     qDebug("uscita printermanager");
 }
 
@@ -393,13 +398,13 @@ void printermanager::print(QString __datiCalib)
     //paziente
     QString dataPaz = m_dfm->GetPatient();
    // qDebug()<<"DATI PAZIENTE"<<dataPaz;
-    m_surname = dataPaz.section(";", 0, 0);
-    m_name = dataPaz.section(";", 1, 1);
-    m_dateofbirth = dataPaz.section(";", 2, 2);
-    m_sex = dataPaz.section(";", 12, 12);
-    m_ID = dataPaz.section(";", 3, 3);
-    m_operatore = dataPaz.section(";",7,7);
-    m_commenti = dataPaz.section(";",11,11);
+    m_surname = dataPaz.section(";", PAT_STR_COGNOME, PAT_STR_COGNOME);
+    m_name = dataPaz.section(";", PAT_STR_NOME, PAT_STR_NOME);
+    m_dateofbirth = dataPaz.section(";", PAT_STR_DOB, PAT_STR_DOB);
+    m_sex = dataPaz.section(";", PAT_STR_SEX, PAT_STR_SEX);
+    m_ID = dataPaz.section(";", PAT_STR_ID, PAT_STR_ID);
+    m_operatore = dataPaz.section(";",PAT_STR_ESAMINATORE,PAT_STR_ESAMINATORE);
+    m_commenti = dataPaz.section(";",PAT_STR_NOTE,PAT_STR_NOTE);
     //esame
     m_numchan = m_dfm->GetChanNum();
     m_numTest = m_dfm->GetTestNum();
