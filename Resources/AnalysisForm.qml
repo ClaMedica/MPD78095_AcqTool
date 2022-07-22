@@ -27,7 +27,7 @@ MForm{
     {
         if (!change) {
             plot.limits=mngData.getPlotLimits();
-            change = true
+            if (!PicoFlow) change = true
         }
 
         plot.tracks=mngData.getData("Track")

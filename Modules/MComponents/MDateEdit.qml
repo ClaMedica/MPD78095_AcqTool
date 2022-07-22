@@ -1,4 +1,4 @@
-import QtQuick 2.5
+﻿import QtQuick 2.5
 import QtQuick.Window 2.2
 import QtQuick.Window 2.2
 import QtQuick.Layouts 1.1
@@ -105,6 +105,8 @@ Rectangle {
             height: parent.height
             width:parent.width*0.3
             labelSize: rootDateEdit.labelSize
+            maximumLength:2
+            onlyNumber: true
             onTextChanged: uppa(cbMonth.text)
             onFocusChanged:
             {
@@ -128,6 +130,8 @@ Rectangle {
             anchors.verticalCenter: parent.verticalCenter
             height: parent.height
             width:parent.width*0.3
+            maximumLength:2
+            onlyNumber: true
             labelSize: rootDateEdit.labelSize
             onTextChanged: uppa(cbMonth.text)
             onFocusChanged:
@@ -153,6 +157,7 @@ Rectangle {
             height: parent.height
             width:parent.width*0.38
             maximumLength:4
+            onlyNumber: true
             text:""
             verticalAlignment: Text.AlignVCenter
             horizontalAlignment: Text.AlignHCenter
