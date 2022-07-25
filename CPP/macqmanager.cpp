@@ -247,13 +247,6 @@ bool MAcqManager::newAcquisition(QString __dataFile)
     }
     else
     {
-
-        //controllo memoria
-        static void *p0 = nullptr;
-        void *p = sbrk(0);
-        if(p0 == nullptr) p0 = p;
-        qDebug("sbrk: %p %d", p, (int)p - (int)p0);
-
         qDebug() << "carico la configurazione per l'acquisizione";
         qDebug() << g_P7SettingsManager.progPath();
         if(!m_configAcq.loadFromXML(g_P7SettingsManager.configChannels()))
