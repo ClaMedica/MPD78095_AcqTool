@@ -202,6 +202,7 @@ ApplicationWindow {
     MDataManager{
         //@@@@@@@@@@    Properties      @@@@@@@@@@
         id:mngData
+        property bool volResOpened: false
 
         //@@@@@@@@@@    Events          @@@@@@@@@@
 
@@ -214,17 +215,26 @@ ApplicationWindow {
         onReloadingCompleted: forAna.populate()
 
         onSg_openVolResDlg:{
-            // Prima di aprire la dialog per l'inserimento del vol. residuo si devono disattavire
-            // i pulsanti Analisi e Chiudi per evitare che vengano premuti mentre la dialog è aperta
             volRes.titleDlg = __tipoAn
-            openVorRel.start()
+            if (!PicoFlow) {
+                // Prima di aprire la dialog per l'inserimento del vol. residuo si devono disattavire
+                // i pulsanti Analisi e Chiudi per evitare che vengano premuti mentre la dialog è aperta
+                volResOpened = true
+                openVorRel.start()
+            }
+             else {
+                 volRes.focus = true
+                 volRes.open()
+             }
         }
 
         onSg_loadResult:{
             forAna.visible = false
-            forAna.activeAnalisysButton()
-            forAna.disablebuttons(false)
-            forRes.loadPageAnalysis()
+            if (volResOpened) {
+                volResOpened = false
+                forAna.disablebuttons(false)
+            }
+            forRes.loadPageAnalysis()                
             forRes.visible = true
         }
 
@@ -252,7 +262,7 @@ ApplicationWindow {
 
     Timer{
         id:openVorRel
-        interval: 300
+        interval: 600
         onTriggered: {
             forAna.disablebuttons(true)
             volRes.focus = true

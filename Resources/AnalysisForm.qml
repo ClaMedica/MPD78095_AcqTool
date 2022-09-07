@@ -89,40 +89,7 @@ MForm{
         mngCon.read()
     }
 
-    function activeAnalisysButton()
-    {
-        if (!PicoFlow)
-        {
-            mngData.saveImg(sourceImg,"GR000")
-            //rendo abilitato il pulsante per passare ai risultati senza dover rifare l'analisi
-            //abilito anche il pulsante export
-            for (var i=0; i<gridActions.items.length; i++)
-            {
-                if (gridActions.items[i]===MDataManager.RISULTATI)
-                {
-                    gridActions.items[i+4] = "true"
-                    break;
-                }
-            }
-            gridActions.populate()
-            for (i=0; i<gridComand.items.length; i++)
-            {
-                if (gridComand.items[i]===MDataManager.EXPORT)
-                {
-                    gridComand.items[i+4] = "true"
-                    break;
-                }
-            }
-            gridComand.populate()
-        }
-    }
-
     function disablebtsReport(__disable){
-        disablebuttons(__disable)
-        notClose.visible = __disable
-    }
-
-    function disablebuttons(__disable){
         for (var i=0; i<gridComand.items.length; i++)
         {
             if (gridComand.items[i]===MDataManager.ANALISI)
@@ -141,6 +108,40 @@ MForm{
         }
         gridComand.populate()
         gridComandBottom.populate()
+        notClose.visible = __disable
+    }
+
+    function disablebuttons(__disable){
+        for (var i=0; i<gridComand.items.length-1; i++)
+        {
+            if (gridComand.items[i]==="enabled")
+                gridComand.items[i+1] = !__disable
+        }
+        for (i=0; i<gridComandBottom.items.length-1; i++)
+        {
+            if (gridComandBottom.items[i]==="enabled")
+                gridComandBottom.items[i+1] = !__disable
+        }
+        for (i=0; i<gridMarker.items.length-1; i++)
+        {
+            if (gridMarker.items[i]==="enabled")
+                gridMarker.items[i+1] = !__disable
+        }
+        for (i=0; i<gridDefiners.items.length-1; i++)
+        {
+            if (gridDefiners.items[i]==="enabled")
+                gridDefiners.items[i+1] = !__disable
+        }
+        for (i=0; i<gridActions.items.length-1; i++)
+        {
+            if (gridActions.items[i]==="enabled")
+                gridActions.items[i+1] = !__disable
+        }
+        gridComand.populate()
+        gridComandBottom.populate()
+        gridMarker.populate()
+        gridDefiners.populate()
+        gridActions.populate()
     }
 
     //@@@@@@@@@@    Objects     @@@@@@@@@@

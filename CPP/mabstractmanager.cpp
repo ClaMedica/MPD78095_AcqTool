@@ -49,6 +49,7 @@ QVariantList MAbstractManager::markersInfo(QString __filterType,
                     list << key;
                     list << marker.value(key);
                 }
+                list << "enabled" << true;
                 list << "&GridElement";
             }
             break;
@@ -60,6 +61,7 @@ QVariantList MAbstractManager::markersInfo(QString __filterType,
                     list << key;
                     list << marker.value(key);
                 }
+                list << "enabled" << true;
                 list << "&GridElement";
             }
             break;
@@ -71,6 +73,7 @@ QVariantList MAbstractManager::markersInfo(QString __filterType,
                     list << key;
                     list << marker.value(key);
                 }
+                list << "enabled" << true;
                 list << "&GridElement";
             }
             break;
@@ -82,6 +85,7 @@ QVariantList MAbstractManager::markersInfo(QString __filterType,
                     list << key;
                     list << marker.value(key);
                 }
+                list << "enabled" << true;
                 list << "&GridElement";
             }
             break;
@@ -93,6 +97,7 @@ QVariantList MAbstractManager::markersInfo(QString __filterType,
                     list << key;
                     list << marker.value(key);
                 }
+                list << "enabled" << true;
                 list << "&GridElement";
             }
             break;
@@ -104,6 +109,7 @@ QVariantList MAbstractManager::markersInfo(QString __filterType,
                     list << key;
                     list << marker.value(key);
                 }
+                list << "enabled" << true;
                 list << "&GridElement";
             }
             break;
@@ -115,6 +121,7 @@ QVariantList MAbstractManager::markersInfo(QString __filterType,
                     list << key;
                     list << marker.value(key);
                 }
+                list << "enabled" << true;
                 list<<"&GridElement";
             }
             break;
@@ -126,6 +133,7 @@ QVariantList MAbstractManager::markersInfo(QString __filterType,
                     list << key;
                     list << marker.value(key);
                 }
+                list << "enabled" << true;
                 list << "&GridElement";
             }
             break;
@@ -137,6 +145,7 @@ QVariantList MAbstractManager::markersInfo(QString __filterType,
                     list << key;
                     list << marker.value(key);
                 }
+                list << "enabled" << true;
                 list << "&GridElement";
             }
             break;
@@ -148,6 +157,7 @@ QVariantList MAbstractManager::markersInfo(QString __filterType,
                     list << key;
                     list << marker.value(key);
                 }
+                list << "enabled" << true;
                 list << "&GridElement";
             }
             break;
@@ -159,6 +169,7 @@ QVariantList MAbstractManager::markersInfo(QString __filterType,
                     list << key;
                     list << marker.value(key);
                 }
+                list << "enabled" << true;
                 list << "&GridElement";
             }
             break;
@@ -184,6 +195,7 @@ QVariantList MAbstractManager::markersInfo(QString __filterType,
                     list << key;
                     list << marker.value(key);
                 }
+                list << "enabled" << true;
                 list << "&GridElement";
             }
             break;
@@ -195,6 +207,7 @@ QVariantList MAbstractManager::markersInfo(QString __filterType,
                     list << key;
                     list << marker.value(key);
                 }
+                list << "enabled" << true;
                 list << "&GridElement";
             }
             break;
@@ -213,6 +226,7 @@ QVariantList MAbstractManager::markersInfo(QString __filterType,
                 else
                     list << marker.value(key);
             }
+            list << "enabled" << true;
             list << "&GridElement";
         }
     }
@@ -239,6 +253,7 @@ QVariantList MAbstractManager::definersInfo()
                     else
                         list << marker.value(key);
                 }
+                list << "enabled" << true;
                 list << "&GridElement";
             }
     }
