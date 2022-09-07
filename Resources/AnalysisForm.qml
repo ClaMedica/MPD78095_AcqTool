@@ -117,24 +117,30 @@ MForm{
         }
     }
 
+    function disablebtsReport(__disable){
+        disablebuttons(__disable)
+        notClose.visible = __disable
+    }
+
     function disablebuttons(__disable){
         for (var i=0; i<gridComand.items.length; i++)
         {
             if (gridComand.items[i]===MDataManager.ANALISI)
             {
                 gridComand.items[i+4] = !__disable
-                break;
+                break
             }
         }
         for (i=0; i<gridComandBottom.items.length; i++)
         {
             if (gridComandBottom.items[i]===MDataManager.CHIUDIREV)
+            {
                 gridComandBottom.items[i+4] = !__disable
+                break
+            }
         }
         gridComand.populate()
         gridComandBottom.populate()
-
-        notClose.visible = __disable
     }
 
     //@@@@@@@@@@    Objects     @@@@@@@@@@
@@ -383,7 +389,6 @@ MForm{
         anchors.top: rectBreak.bottom
         anchors.bottom: parent.bottom
         width:PicoFlow ? 0 : 60
-
         owner:"Actions"
         itemsInRow:1
         delegate: MMarkerButton {

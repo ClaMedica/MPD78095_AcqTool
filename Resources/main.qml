@@ -214,21 +214,23 @@ ApplicationWindow {
         onReloadingCompleted: forAna.populate()
 
         onSg_openVolResDlg:{
-            volRes.focus = true
+            // Prima di aprire la dialog per l'inserimento del vol. residuo si devono disattavire
+            // i pulsanti Analisi e Chiudi per evitare che vengano premuti mentre la dialog è aperta
             volRes.titleDlg = __tipoAn
-            volRes.open()
+            openVorRel.start()
         }
 
         onSg_loadResult:{
             forAna.visible = false
             forAna.activeAnalisysButton()
+            forAna.disablebuttons(false)
             forRes.loadPageAnalysis()
             forRes.visible = true
         }
 
         onSg_openReport: {
-            forRes.disablebuttons(__disable)
-            forAna.disablebuttons(__disable)
+            forRes.disablebtsReport(__disable)
+            forAna.disablebtsReport(__disable)
         }
 
         onSg_exitFromReview:{
@@ -246,6 +248,16 @@ ApplicationWindow {
         }
 
         Component.onCompleted: console.log("MDataManager Ready!")
+    }
+
+    Timer{
+        id:openVorRel
+        interval: 300
+        onTriggered: {
+            forAna.disablebuttons(true)
+            volRes.focus = true
+            volRes.open()
+        }
     }
 
     MForm {
