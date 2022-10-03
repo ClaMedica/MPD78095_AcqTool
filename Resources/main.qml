@@ -217,7 +217,7 @@ ApplicationWindow {
         onSg_openVolResDlg:{
             volRes.titleDlg = __tipoAn
             if (!PicoFlow) {
-                // Prima di aprire la dialog per l'inserimento del vol. residuo si devono disattavire
+                // Prima di aprire la dialog per l'inserimento del vol. residuo si devono disattivare
                 // i pulsanti Analisi e Chiudi per evitare che vengano premuti mentre la dialog è aperta
                 volResOpened = true
                 openVorRel.start()
@@ -230,6 +230,7 @@ ApplicationWindow {
 
         onSg_loadResult:{
             forAna.visible = false
+            forAna.saveMainImg()
             if (volResOpened) {
                 volResOpened = false
                 forAna.disablebuttons(false)

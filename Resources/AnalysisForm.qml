@@ -89,6 +89,11 @@ MForm{
         mngCon.read()
     }
 
+    function saveMainImg()
+    {
+        mngData.saveImg(sourceImg,"GR000")
+    }
+
     function disablebtsReport(__disable){
         for (var i=0; i<gridComand.items.length; i++)
         {
