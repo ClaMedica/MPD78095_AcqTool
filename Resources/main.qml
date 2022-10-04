@@ -254,6 +254,10 @@ ApplicationWindow {
         }
 
         onSg_warning: {
+            if (volResOpened) {
+                volResOpened = false
+                forAna.disablebuttons(false)
+            }
             warning.testoWarning = __msg
             warning.open()
         }
