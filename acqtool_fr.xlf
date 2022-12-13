@@ -5,17 +5,17 @@
       <trans-unit id="_msg1141" approved="yes">
         <source xml:space="preserve">copy</source>
         <target xml:space="preserve">Copie</target>
-        <context-group purpose="location"><context context-type="linenumber">229</context></context-group>
+        <context-group purpose="location"><context context-type="linenumber">237</context></context-group>
       </trans-unit>
       <trans-unit id="_msg1142" approved="yes">
         <source xml:space="preserve">&lt;p&gt;File report open.&lt;/p&gt;Close the file to continue.</source>
         <target xml:space="preserve">Fichier rapport ouvert.&lt;/p&gt; Fermez le fichier pour continuer.</target>
-        <context-group purpose="location"><context context-type="linenumber">587</context></context-group>
+        <context-group purpose="location"><context context-type="linenumber">594</context></context-group>
       </trans-unit>
       <trans-unit id="_msg1143" approved="yes">
         <source xml:space="preserve">Do you really want to delete the </source>
         <target xml:space="preserve">Voulez vous vraiment supprimer le </target>
-        <context-group purpose="location"><context context-type="linenumber">600</context></context-group>
+        <context-group purpose="location"><context context-type="linenumber">607</context></context-group>
       </trans-unit>
     </group>
   </body></file>
@@ -24,22 +24,22 @@
       <trans-unit id="_msg1144" approved="yes">
         <source xml:space="preserve">Do you want save changes?</source>
         <target xml:space="preserve">Voulez-vous enregistrer les changements?</target>
-        <context-group purpose="location"><context context-type="linenumber">32</context></context-group>
+        <context-group purpose="location"><context context-type="linenumber">34</context></context-group>
       </trans-unit>
       <trans-unit id="_msg1145" approved="yes">
         <source xml:space="preserve">Yes</source>
         <target xml:space="preserve">Oui</target>
-        <context-group purpose="location"><context context-type="linenumber">42</context></context-group>
+        <context-group purpose="location"><context context-type="linenumber">44</context></context-group>
       </trans-unit>
       <trans-unit id="_msg1146" approved="yes">
         <source xml:space="preserve">No</source>
         <target xml:space="preserve">Non</target>
-        <context-group purpose="location"><context context-type="linenumber">59</context></context-group>
+        <context-group purpose="location"><context context-type="linenumber">61</context></context-group>
       </trans-unit>
       <trans-unit id="_msg1147" approved="yes">
         <source xml:space="preserve">Cancel</source>
         <target xml:space="preserve">Annuler</target>
-        <context-group purpose="location"><context context-type="linenumber">76</context></context-group>
+        <context-group purpose="location"><context context-type="linenumber">78</context></context-group>
       </trans-unit>
     </group>
   </body></file>
@@ -65,23 +65,23 @@
           <source xml:space="preserve">Are you sure to discard the exam?</source>
           <target xml:space="preserve" state="needs-review-translation">Etes-vous sûr de jeter l’examen?</target>
         </alt-trans>
-        <context-group purpose="location"><context context-type="linenumber">199</context></context-group>
-        <context-group purpose="location"><context context-type="linenumber">334</context></context-group>
+        <context-group purpose="location"><context context-type="linenumber">210</context></context-group>
+        <context-group purpose="location"><context context-type="linenumber">345</context></context-group>
       </trans-unit>
       <trans-unit id="_msg1151" approved="yes">
         <source xml:space="preserve">Are you sure to exit from Stand-By?</source>
         <target xml:space="preserve">Etes-vous sûr de sortir du Stand-By?</target>
-        <context-group purpose="location"><context context-type="linenumber">204</context></context-group>
+        <context-group purpose="location"><context context-type="linenumber">215</context></context-group>
       </trans-unit>
       <trans-unit id="_msg1152" approved="yes">
         <source xml:space="preserve">Yes</source>
         <target xml:space="preserve">Oui</target>
-        <context-group purpose="location"><context context-type="linenumber">445</context></context-group>
+        <context-group purpose="location"><context context-type="linenumber">456</context></context-group>
       </trans-unit>
       <trans-unit id="_msg1153" approved="yes">
         <source xml:space="preserve">No</source>
         <target xml:space="preserve">Non</target>
-        <context-group purpose="location"><context context-type="linenumber">460</context></context-group>
+        <context-group purpose="location"><context context-type="linenumber">471</context></context-group>
       </trans-unit>
     </group>
   </body></file>
@@ -90,37 +90,37 @@
       <trans-unit id="_msg1154" approved="yes">
         <source xml:space="preserve">Table</source>
         <target xml:space="preserve">Table</target>
-        <context-group purpose="location"><context context-type="linenumber">141</context></context-group>
+        <context-group purpose="location"><context context-type="linenumber">145</context></context-group>
       </trans-unit>
       <trans-unit id="_msg1155">
         <source xml:space="preserve">Report already exists. Do you want overwrite it?</source>
         <target xml:space="preserve"></target>
-        <context-group purpose="location"><context context-type="linenumber">485</context></context-group>
+        <context-group purpose="location"><context context-type="linenumber">489</context></context-group>
       </trans-unit>
       <trans-unit id="_msg1156" approved="yes">
         <source xml:space="preserve">print</source>
         <target xml:space="preserve">Imprimer</target>
-        <context-group purpose="location"><context context-type="linenumber">516</context></context-group>
+        <context-group purpose="location"><context context-type="linenumber">520</context></context-group>
       </trans-unit>
       <trans-unit id="_msg1157" approved="yes">
         <source xml:space="preserve">report</source>
         <target xml:space="preserve">rapport</target>
-        <context-group purpose="location"><context context-type="linenumber">534</context></context-group>
+        <context-group purpose="location"><context context-type="linenumber">538</context></context-group>
       </trans-unit>
       <trans-unit id="_msg1158">
         <source xml:space="preserve">Template</source>
         <target xml:space="preserve"></target>
-        <context-group purpose="location"><context context-type="linenumber">561</context></context-group>
+        <context-group purpose="location"><context context-type="linenumber">565</context></context-group>
       </trans-unit>
       <trans-unit id="_msg1159" approved="yes">
         <source xml:space="preserve">back to graphs</source>
         <target xml:space="preserve">retour aux graphiques</target>
-        <context-group purpose="location"><context context-type="linenumber">595</context></context-group>
+        <context-group purpose="location"><context context-type="linenumber">599</context></context-group>
       </trans-unit>
       <trans-unit id="_msg1160" approved="yes">
         <source xml:space="preserve">exit</source>
         <target xml:space="preserve">sortie</target>
-        <context-group purpose="location"><context context-type="linenumber">607</context></context-group>
+        <context-group purpose="location"><context context-type="linenumber">615</context></context-group>
       </trans-unit>
     </group>
   </body></file>
@@ -175,27 +175,27 @@
       <trans-unit id="_msg1167">
         <source xml:space="preserve">Day</source>
         <target xml:space="preserve"></target>
-        <context-group purpose="location"><context context-type="linenumber">118</context></context-group>
+        <context-group purpose="location"><context context-type="linenumber">119</context></context-group>
       </trans-unit>
       <trans-unit id="_msg1168">
         <source xml:space="preserve">Month</source>
         <target xml:space="preserve"></target>
-        <context-group purpose="location"><context context-type="linenumber">142</context></context-group>
+        <context-group purpose="location"><context context-type="linenumber">145</context></context-group>
       </trans-unit>
       <trans-unit id="_msg1169">
         <source xml:space="preserve">Year</source>
         <target xml:space="preserve"></target>
-        <context-group purpose="location"><context context-type="linenumber">175</context></context-group>
+        <context-group purpose="location"><context context-type="linenumber">179</context></context-group>
       </trans-unit>
       <trans-unit id="_msg1170" approved="yes">
         <source xml:space="preserve">Cancel</source>
         <target xml:space="preserve">Annuler</target>
-        <context-group purpose="location"><context context-type="linenumber">241</context></context-group>
+        <context-group purpose="location"><context context-type="linenumber">245</context></context-group>
       </trans-unit>
       <trans-unit id="_msg1171" approved="yes">
         <source xml:space="preserve">Save</source>
         <target xml:space="preserve">Sauvegarder</target>
-        <context-group purpose="location"><context context-type="linenumber">255</context></context-group>
+        <context-group purpose="location"><context context-type="linenumber">259</context></context-group>
       </trans-unit>
     </group>
   </body></file>
@@ -254,84 +254,84 @@
       <trans-unit id="_msg1180" approved="yes">
         <source xml:space="preserve">insert f1 marker</source>
         <target xml:space="preserve">insérer le marqueur f1</target>
-        <context-group purpose="location"><context context-type="linenumber">256</context></context-group>
+        <context-group purpose="location"><context context-type="linenumber">271</context></context-group>
       </trans-unit>
       <trans-unit id="_msg1181" approved="yes">
         <source xml:space="preserve">insert f2 marker</source>
         <target xml:space="preserve">insérer le marqueur f2</target>
-        <context-group purpose="location"><context context-type="linenumber">264</context></context-group>
+        <context-group purpose="location"><context context-type="linenumber">279</context></context-group>
       </trans-unit>
       <trans-unit id="_msg1182" approved="yes">
         <source xml:space="preserve">insert f3 marker</source>
         <target xml:space="preserve">insérer le marqueur f3</target>
-        <context-group purpose="location"><context context-type="linenumber">272</context></context-group>
+        <context-group purpose="location"><context context-type="linenumber">287</context></context-group>
       </trans-unit>
       <trans-unit id="_msg1183" approved="yes">
         <source xml:space="preserve">delete analytical markers</source>
         <target xml:space="preserve">supprimer les marqueurs analytiques</target>
-        <context-group purpose="location"><context context-type="linenumber">280</context></context-group>
+        <context-group purpose="location"><context context-type="linenumber">295</context></context-group>
       </trans-unit>
       <trans-unit id="_msg1184" approved="yes">
         <source xml:space="preserve">results</source>
         <target xml:space="preserve">résultats</target>
-        <context-group purpose="location"><context context-type="linenumber">288</context></context-group>
+        <context-group purpose="location"><context context-type="linenumber">303</context></context-group>
       </trans-unit>
       <trans-unit id="_msg1185" approved="yes">
         <source xml:space="preserve">analysis</source>
         <target xml:space="preserve">analyse</target>
-        <context-group purpose="location"><context context-type="linenumber">304</context></context-group>
+        <context-group purpose="location"><context context-type="linenumber">319</context></context-group>
       </trans-unit>
       <trans-unit id="_msg1186" approved="yes">
         <source xml:space="preserve">zoom in</source>
         <target xml:space="preserve">zoomer</target>
-        <context-group purpose="location"><context context-type="linenumber">321</context></context-group>
+        <context-group purpose="location"><context context-type="linenumber">336</context></context-group>
       </trans-unit>
       <trans-unit id="_msg1187" approved="yes">
         <source xml:space="preserve">zoom out</source>
         <target xml:space="preserve">dé zoomer</target>
-        <context-group purpose="location"><context context-type="linenumber">330</context></context-group>
+        <context-group purpose="location"><context context-type="linenumber">345</context></context-group>
       </trans-unit>
       <trans-unit id="_msg1188" approved="yes">
         <source xml:space="preserve">zoom none</source>
         <target xml:space="preserve">aucun zoom</target>
-        <context-group purpose="location"><context context-type="linenumber">339</context></context-group>
+        <context-group purpose="location"><context context-type="linenumber">354</context></context-group>
       </trans-unit>
       <trans-unit id="_msg1189" approved="yes">
         <source xml:space="preserve">save&amp;exit</source>
         <target xml:space="preserve">Sauvegarde&amp;sortie</target>
-        <context-group purpose="location"><context context-type="linenumber">360</context></context-group>
-        <context-group purpose="location"><context context-type="linenumber">392</context></context-group>
+        <context-group purpose="location"><context context-type="linenumber">375</context></context-group>
+        <context-group purpose="location"><context context-type="linenumber">407</context></context-group>
       </trans-unit>
       <trans-unit id="_msg1190">
         <source xml:space="preserve">export</source>
         <target xml:space="preserve"></target>
-        <context-group purpose="location"><context context-type="linenumber">376</context></context-group>
+        <context-group purpose="location"><context context-type="linenumber">391</context></context-group>
       </trans-unit>
       <trans-unit id="_msg1191">
         <source xml:space="preserve">save&amp;review</source>
         <target xml:space="preserve"></target>
-        <context-group purpose="location"><context context-type="linenumber">408</context></context-group>
+        <context-group purpose="location"><context context-type="linenumber">423</context></context-group>
       </trans-unit>
       <trans-unit id="_msg1192">
         <source xml:space="preserve">start</source>
         <target xml:space="preserve" state="needs-review-translation">départ</target>
-        <context-group purpose="location"><context context-type="linenumber">433</context></context-group>
+        <context-group purpose="location"><context context-type="linenumber">448</context></context-group>
       </trans-unit>
       <trans-unit id="_msg1193">
         <source xml:space="preserve">pause</source>
         <target xml:space="preserve"></target>
-        <context-group purpose="location"><context context-type="linenumber">441</context></context-group>
+        <context-group purpose="location"><context context-type="linenumber">456</context></context-group>
       </trans-unit>
       <trans-unit id="_msg1194" approved="yes">
         <source xml:space="preserve">exit</source>
         <target xml:space="preserve">sortie</target>
-        <context-group purpose="location"><context context-type="linenumber">459</context></context-group>
+        <context-group purpose="location"><context context-type="linenumber">474</context></context-group>
       </trans-unit>
       <trans-unit id="_msg1195" approved="yes">
         <source xml:space="preserve">discard</source>
         <target xml:space="preserve">Jeter</target>
-        <context-group purpose="location"><context context-type="linenumber">417</context></context-group>
-        <context-group purpose="location"><context context-type="linenumber">470</context></context-group>
+        <context-group purpose="location"><context context-type="linenumber">432</context></context-group>
+        <context-group purpose="location"><context context-type="linenumber">485</context></context-group>
       </trans-unit>
     </group>
   </body></file>
@@ -340,22 +340,22 @@
       <trans-unit id="_msg1196">
         <source xml:space="preserve">Operator</source>
         <target xml:space="preserve"></target>
-        <context-group purpose="location"><context context-type="linenumber">183</context></context-group>
+        <context-group purpose="location"><context context-type="linenumber">208</context></context-group>
       </trans-unit>
       <trans-unit id="_msg1197">
         <source xml:space="preserve">Sender</source>
         <target xml:space="preserve"></target>
-        <context-group purpose="location"><context context-type="linenumber">184</context></context-group>
+        <context-group purpose="location"><context context-type="linenumber">209</context></context-group>
       </trans-unit>
       <trans-unit id="_msg1198" approved="yes">
         <source xml:space="preserve">Flowmetry</source>
         <target xml:space="preserve">Flowmetry</target>
-        <context-group purpose="location"><context context-type="linenumber">1088</context></context-group>
+        <context-group purpose="location"><context context-type="linenumber">1142</context></context-group>
       </trans-unit>
       <trans-unit id="_msg1199" approved="yes">
         <source xml:space="preserve">No flow detected</source>
         <target xml:space="preserve">Aucun débit détecté</target>
-        <context-group purpose="location"><context context-type="linenumber">1432</context></context-group>
+        <context-group purpose="location"><context context-type="linenumber">1486</context></context-group>
       </trans-unit>
     </group>
   </body></file>
@@ -364,8 +364,8 @@
       <trans-unit id="_msg1200" approved="yes">
         <source xml:space="preserve">problems in the report writing</source>
         <target xml:space="preserve">problèmes dans la rédaction du rapport</target>
-        <context-group purpose="location"><context context-type="linenumber">281</context></context-group>
-        <context-group purpose="location"><context context-type="linenumber">300</context></context-group>
+        <context-group purpose="location"><context context-type="linenumber">282</context></context-group>
+        <context-group purpose="location"><context context-type="linenumber">301</context></context-group>
       </trans-unit>
     </group>
   </body></file>
@@ -374,82 +374,82 @@
       <trans-unit id="_msg1201" approved="yes">
         <source xml:space="preserve"> Waiting time (sec)</source>
         <target xml:space="preserve">Temps d’attente (sec)</target>
-        <context-group purpose="location"><context context-type="linenumber">59</context></context-group>
+        <context-group purpose="location"><context context-type="linenumber">89</context></context-group>
       </trans-unit>
       <trans-unit id="_msg1202" approved="yes">
         <source xml:space="preserve"> Maximum flow rate (ml/sec)</source>
         <target xml:space="preserve">Débit maximal (ml/sec)</target>
-        <context-group purpose="location"><context context-type="linenumber">63</context></context-group>
+        <context-group purpose="location"><context context-type="linenumber">93</context></context-group>
       </trans-unit>
       <trans-unit id="_msg1203" approved="yes">
         <source xml:space="preserve"> Average flow rate (ml/sec)</source>
         <target xml:space="preserve">Débit moyen (ml/sec)</target>
-        <context-group purpose="location"><context context-type="linenumber">66</context></context-group>
+        <context-group purpose="location"><context context-type="linenumber">96</context></context-group>
       </trans-unit>
       <trans-unit id="_msg1204" approved="yes">
         <source xml:space="preserve"> Time to maximum flow (sec)</source>
         <target xml:space="preserve">Temps à débit maximum (sec)</target>
-        <context-group purpose="location"><context context-type="linenumber">69</context></context-group>
+        <context-group purpose="location"><context context-type="linenumber">99</context></context-group>
       </trans-unit>
       <trans-unit id="_msg1205" approved="yes">
         <source xml:space="preserve"> Time between 5% and 95% (sec)</source>
         <target xml:space="preserve">Temps entre 5% et 95% (sec)</target>
-        <context-group purpose="location"><context context-type="linenumber">72</context></context-group>
+        <context-group purpose="location"><context context-type="linenumber">102</context></context-group>
       </trans-unit>
       <trans-unit id="_msg1206" approved="yes">
         <source xml:space="preserve"> Flow time (sec)</source>
         <target xml:space="preserve">Durée de débit (sec)</target>
-        <context-group purpose="location"><context context-type="linenumber">75</context></context-group>
+        <context-group purpose="location"><context context-type="linenumber">105</context></context-group>
       </trans-unit>
       <trans-unit id="_msg1207" approved="yes">
         <source xml:space="preserve"> Descent time (sec)</source>
         <target xml:space="preserve">Temps de descente (sec)</target>
-        <context-group purpose="location"><context context-type="linenumber">78</context></context-group>
+        <context-group purpose="location"><context context-type="linenumber">108</context></context-group>
       </trans-unit>
       <trans-unit id="_msg1208" approved="yes">
         <source xml:space="preserve"> Voiding time (sec)</source>
         <target xml:space="preserve">Durée de miction</target>
-        <context-group purpose="location"><context context-type="linenumber">81</context></context-group>
+        <context-group purpose="location"><context context-type="linenumber">111</context></context-group>
       </trans-unit>
       <trans-unit id="_msg1209" approved="yes">
         <source xml:space="preserve"> Volume to maximum flow (ml)</source>
         <target xml:space="preserve">Volume au débit maximum (ml)</target>
-        <context-group purpose="location"><context context-type="linenumber">84</context></context-group>
+        <context-group purpose="location"><context context-type="linenumber">114</context></context-group>
       </trans-unit>
       <trans-unit id="_msg1210" approved="yes">
         <source xml:space="preserve"> Voided volume (ml)</source>
         <target xml:space="preserve">Volume uriné (ml)</target>
-        <context-group purpose="location"><context context-type="linenumber">87</context></context-group>
+        <context-group purpose="location"><context context-type="linenumber">117</context></context-group>
       </trans-unit>
       <trans-unit id="_msg1211" approved="yes">
         <source xml:space="preserve"> Corrected maximum flow (ml^(1/2)/s)</source>
         <target xml:space="preserve">Débit maximum corrigé (ml^ (1/2)/s)</target>
-        <context-group purpose="location"><context context-type="linenumber">90</context></context-group>
+        <context-group purpose="location"><context context-type="linenumber">120</context></context-group>
       </trans-unit>
       <trans-unit id="_msg1212" approved="yes">
         <source xml:space="preserve"> Flow acceleration (ml/sec^2))</source>
         <target xml:space="preserve">Accélération du débit (ml/sec 2))</target>
-        <context-group purpose="location"><context context-type="linenumber">93</context></context-group>
+        <context-group purpose="location"><context context-type="linenumber">123</context></context-group>
       </trans-unit>
       <trans-unit id="_msg1213" approved="yes">
         <source xml:space="preserve"> Maximum contraction speed (mm/sec)</source>
         <target xml:space="preserve">Vitesse maximale de contraction (mm/sec)</target>
-        <context-group purpose="location"><context context-type="linenumber">96</context></context-group>
+        <context-group purpose="location"><context context-type="linenumber">126</context></context-group>
       </trans-unit>
       <trans-unit id="_msg1214" approved="yes">
         <source xml:space="preserve"> Residual volume (ml)</source>
         <target xml:space="preserve">Volume résiduel (ml)</target>
-        <context-group purpose="location"><context context-type="linenumber">99</context></context-group>
+        <context-group purpose="location"><context context-type="linenumber">129</context></context-group>
       </trans-unit>
       <trans-unit id="_msg1215" approved="yes">
         <source xml:space="preserve">Pediatric (Q Max)</source>
         <target xml:space="preserve">Pédiatrique (Q Max)</target>
-        <context-group purpose="location"><context context-type="linenumber">443</context></context-group>
+        <context-group purpose="location"><context context-type="linenumber">473</context></context-group>
       </trans-unit>
       <trans-unit id="_msg1216" approved="yes">
         <source xml:space="preserve">Pediatric (Q Ave)</source>
         <target xml:space="preserve">Pédiatrique (Q Ave)</target>
-        <context-group purpose="location"><context context-type="linenumber">461</context></context-group>
+        <context-group purpose="location"><context context-type="linenumber">491</context></context-group>
       </trans-unit>
     </group>
   </body></file>
@@ -472,7 +472,7 @@
       <trans-unit id="_msg1219" approved="yes">
         <source xml:space="preserve">UROFLOWMETER</source>
         <target xml:space="preserve">DEBITMETRE</target>
-        <context-group purpose="location"><context context-type="linenumber">688</context></context-group>
+        <context-group purpose="location"><context context-type="linenumber">693</context></context-group>
       </trans-unit>
       <trans-unit id="_msg1220">
         <source xml:space="preserve">Study Number ...: </source>
@@ -480,7 +480,7 @@
           <source xml:space="preserve">Test Number ....: </source>
           <target xml:space="preserve" state="needs-review-translation">Numéro de test ........: </target>
         </alt-trans>
-        <context-group purpose="location"><context context-type="linenumber">715</context></context-group>
+        <context-group purpose="location"><context context-type="linenumber">720</context></context-group>
       </trans-unit>
       <trans-unit id="_msg1221">
         <source xml:space="preserve">Study Date .....: </source>
@@ -488,138 +488,138 @@
           <source xml:space="preserve">Test Date ......: </source>
           <target xml:space="preserve" state="needs-review-translation">Date du test ..........: </target>
         </alt-trans>
-        <context-group purpose="location"><context context-type="linenumber">716</context></context-group>
+        <context-group purpose="location"><context context-type="linenumber">721</context></context-group>
       </trans-unit>
       <trans-unit id="_msg1222" approved="yes">
         <source xml:space="preserve">Surname ........: </source>
         <target xml:space="preserve">Nom ...................: </target>
-        <context-group purpose="location"><context context-type="linenumber">717</context></context-group>
+        <context-group purpose="location"><context context-type="linenumber">722</context></context-group>
       </trans-unit>
       <trans-unit id="_msg1223" approved="yes">
         <source xml:space="preserve">Name ...........: </source>
         <target xml:space="preserve">Prénom ................: </target>
-        <context-group purpose="location"><context context-type="linenumber">718</context></context-group>
+        <context-group purpose="location"><context context-type="linenumber">723</context></context-group>
       </trans-unit>
       <trans-unit id="_msg1224" approved="yes">
         <source xml:space="preserve">Birth Date .....: </source>
         <target xml:space="preserve">Date de naissance .....: </target>
-        <context-group purpose="location"><context context-type="linenumber">719</context></context-group>
+        <context-group purpose="location"><context context-type="linenumber">724</context></context-group>
       </trans-unit>
       <trans-unit id="_msg1225" approved="yes">
         <source xml:space="preserve">Gender .........: </source>
         <target xml:space="preserve">Sexe ..................: </target>
-        <context-group purpose="location"><context context-type="linenumber">720</context></context-group>
+        <context-group purpose="location"><context context-type="linenumber">725</context></context-group>
       </trans-unit>
       <trans-unit id="_msg1226" approved="yes">
         <source xml:space="preserve">Operator .......: </source>
         <target xml:space="preserve">Opérateur .............: </target>
-        <context-group purpose="location"><context context-type="linenumber">721</context></context-group>
+        <context-group purpose="location"><context context-type="linenumber">726</context></context-group>
       </trans-unit>
       <trans-unit id="_msg1227" approved="yes">
         <source xml:space="preserve">Comments .......: </source>
         <target xml:space="preserve">Commentaires ..........: </target>
-        <context-group purpose="location"><context context-type="linenumber">722</context></context-group>
-        <context-group purpose="location"><context context-type="linenumber">725</context></context-group>
+        <context-group purpose="location"><context context-type="linenumber">727</context></context-group>
+        <context-group purpose="location"><context context-type="linenumber">730</context></context-group>
       </trans-unit>
       <trans-unit id="_msg1228" approved="yes">
         <source xml:space="preserve">MANUAL   MODALITY</source>
         <target xml:space="preserve">MODALITÉ MANUELLE</target>
-        <context-group purpose="location"><context context-type="linenumber">736</context></context-group>
+        <context-group purpose="location"><context context-type="linenumber">741</context></context-group>
       </trans-unit>
       <trans-unit id="_msg1229" approved="yes">
         <source xml:space="preserve">AUTOMATIC  MODALITY </source>
         <target xml:space="preserve">MODALITÉ AUTOMATIQUE </target>
-        <context-group purpose="location"><context context-type="linenumber">736</context></context-group>
+        <context-group purpose="location"><context context-type="linenumber">741</context></context-group>
       </trans-unit>
       <trans-unit id="_msg1230" approved="yes">
         <source xml:space="preserve">  Q (ml/s)             Flowmetry              Vol (ml)</source>
         <target xml:space="preserve">Q (ml/s) Débitmétrie Vol (ml)</target>
-        <context-group purpose="location"><context context-type="linenumber">747</context></context-group>
+        <context-group purpose="location"><context context-type="linenumber">752</context></context-group>
       </trans-unit>
       <trans-unit id="_msg1231" approved="yes">
         <source xml:space="preserve">EMG Diagram</source>
         <target xml:space="preserve">Diagramme EMG</target>
-        <context-group purpose="location"><context context-type="linenumber">765</context></context-group>
+        <context-group purpose="location"><context context-type="linenumber">770</context></context-group>
       </trans-unit>
       <trans-unit id="_msg1232" approved="yes">
         <source xml:space="preserve">Flowmetry Results</source>
         <target xml:space="preserve">Résultats de  Débitmétrie</target>
-        <context-group purpose="location"><context context-type="linenumber">919</context></context-group>
+        <context-group purpose="location"><context context-type="linenumber">924</context></context-group>
       </trans-unit>
       <trans-unit id="_msg1233" approved="yes">
         <source xml:space="preserve">Waiting time ................</source>
         <target xml:space="preserve">Temps d&apos;attente .............</target>
-        <context-group purpose="location"><context context-type="linenumber">924</context></context-group>
+        <context-group purpose="location"><context context-type="linenumber">929</context></context-group>
       </trans-unit>
       <trans-unit id="_msg1234" approved="yes">
         <source xml:space="preserve">Maximum flow rate ...........</source>
         <target xml:space="preserve">Débit maximum ...............</target>
-        <context-group purpose="location"><context context-type="linenumber">931</context></context-group>
+        <context-group purpose="location"><context context-type="linenumber">936</context></context-group>
       </trans-unit>
       <trans-unit id="_msg1235" approved="yes">
         <source xml:space="preserve">Average flow rate ...........</source>
         <target xml:space="preserve">Débit moyen .................</target>
-        <context-group purpose="location"><context context-type="linenumber">932</context></context-group>
+        <context-group purpose="location"><context context-type="linenumber">937</context></context-group>
       </trans-unit>
       <trans-unit id="_msg1236" approved="yes">
         <source xml:space="preserve">Time to maximum flow ........</source>
         <target xml:space="preserve">Temps au débit maximum ......</target>
-        <context-group purpose="location"><context context-type="linenumber">933</context></context-group>
+        <context-group purpose="location"><context context-type="linenumber">938</context></context-group>
       </trans-unit>
       <trans-unit id="_msg1237" approved="yes">
         <source xml:space="preserve">Time between 5% and 95% .....</source>
         <target xml:space="preserve">Temps entre 5% et 95% .......</target>
-        <context-group purpose="location"><context context-type="linenumber">934</context></context-group>
+        <context-group purpose="location"><context context-type="linenumber">939</context></context-group>
       </trans-unit>
       <trans-unit id="_msg1238" approved="yes">
         <source xml:space="preserve">Flow time ...................</source>
         <target xml:space="preserve">Temps du débit ..............</target>
-        <context-group purpose="location"><context context-type="linenumber">935</context></context-group>
+        <context-group purpose="location"><context context-type="linenumber">940</context></context-group>
       </trans-unit>
       <trans-unit id="_msg1239" approved="yes">
         <source xml:space="preserve">Descent time ................</source>
         <target xml:space="preserve">Temps de Descente ...........</target>
-        <context-group purpose="location"><context context-type="linenumber">936</context></context-group>
+        <context-group purpose="location"><context context-type="linenumber">941</context></context-group>
       </trans-unit>
       <trans-unit id="_msg1240" approved="yes">
         <source xml:space="preserve">Voiding time ................</source>
         <target xml:space="preserve">Durée de la miction .........</target>
-        <context-group purpose="location"><context context-type="linenumber">937</context></context-group>
+        <context-group purpose="location"><context context-type="linenumber">942</context></context-group>
       </trans-unit>
       <trans-unit id="_msg1241" approved="yes">
         <source xml:space="preserve">Volume to maximum flow ......</source>
         <target xml:space="preserve">Volume au débit maximum .....</target>
-        <context-group purpose="location"><context context-type="linenumber">938</context></context-group>
+        <context-group purpose="location"><context context-type="linenumber">943</context></context-group>
       </trans-unit>
       <trans-unit id="_msg1242" approved="yes">
         <source xml:space="preserve">Voided Volume ...............</source>
         <target xml:space="preserve">Volume uriné ................</target>
-        <context-group purpose="location"><context context-type="linenumber">939</context></context-group>
+        <context-group purpose="location"><context context-type="linenumber">944</context></context-group>
       </trans-unit>
       <trans-unit id="_msg1243" approved="yes">
         <source xml:space="preserve">Corrected maximum flow ......</source>
         <target xml:space="preserve">Flux maximum corrigé ........</target>
-        <context-group purpose="location"><context context-type="linenumber">940</context></context-group>
+        <context-group purpose="location"><context context-type="linenumber">945</context></context-group>
       </trans-unit>
       <trans-unit id="_msg1244" approved="yes">
         <source xml:space="preserve">Flow acceleration ...........</source>
         <target xml:space="preserve">Accélération du Debit .......</target>
-        <context-group purpose="location"><context context-type="linenumber">941</context></context-group>
+        <context-group purpose="location"><context context-type="linenumber">946</context></context-group>
       </trans-unit>
       <trans-unit id="_msg1245" approved="yes">
         <source xml:space="preserve">Maximum contraction speed ...</source>
         <target xml:space="preserve">Vitesse de contraction max ..</target>
-        <context-group purpose="location"><context context-type="linenumber">942</context></context-group>
+        <context-group purpose="location"><context context-type="linenumber">947</context></context-group>
       </trans-unit>
       <trans-unit id="_msg1246" approved="yes">
         <source xml:space="preserve">Residual volume .............</source>
         <target xml:space="preserve">Résidu post-mictionnel ......</target>
-        <context-group purpose="location"><context context-type="linenumber">943</context></context-group>
+        <context-group purpose="location"><context context-type="linenumber">948</context></context-group>
       </trans-unit>
       <trans-unit id="_msg1247" approved="yes">
         <source xml:space="preserve">Calibration date</source>
         <target xml:space="preserve">Date de calibration</target>
-        <context-group purpose="location"><context context-type="linenumber">963</context></context-group>
+        <context-group purpose="location"><context context-type="linenumber">968</context></context-group>
       </trans-unit>
     </group>
   </body></file>
@@ -1275,17 +1275,17 @@
       <trans-unit id="_msg1367">
         <source xml:space="preserve">Anonymous</source>
         <target xml:space="preserve"></target>
-        <context-group purpose="location"><context context-type="linenumber">198</context></context-group>
+        <context-group purpose="location"><context context-type="linenumber">200</context></context-group>
       </trans-unit>
       <trans-unit id="_msg1368">
         <source xml:space="preserve">Patient</source>
         <target xml:space="preserve"></target>
-        <context-group purpose="location"><context context-type="linenumber">198</context></context-group>
+        <context-group purpose="location"><context context-type="linenumber">200</context></context-group>
       </trans-unit>
       <trans-unit id="_msg1369">
         <source xml:space="preserve">Anonymous Patient cannot be deleted</source>
         <target xml:space="preserve"></target>
-        <context-group purpose="location"><context context-type="linenumber">200</context></context-group>
+        <context-group purpose="location"><context context-type="linenumber">202</context></context-group>
       </trans-unit>
     </group>
   </body></file>

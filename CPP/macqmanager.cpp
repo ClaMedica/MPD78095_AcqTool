@@ -1011,9 +1011,9 @@ void MAcqManager::checkAutomaticStartStop(QString __which)
             double minSecd = childDur->getSafeChild(ATT_MIN)->getSafeAttribute(ATT_VALUE).toDouble();
             int minSec = round(minSecd);
 
-            //le ampiezze sono ml/s
-            double ampMind = childAmp->getSafeChild(ATT_MIN)->getSafeAttribute(ATT_VALUE).toDouble();
-            double ampMaxd = childAmp->getSafeChild(ATT_MAX)->getSafeAttribute(ATT_VALUE).toDouble();
+            //le ampiezze
+            double ampMind = childAmp->getSafeChild(ATT_MIN)->getSafeAttribute(ATT_VALUE).toDouble();//ml
+            double ampMaxd = childAmp->getSafeChild(ATT_MAX)->getSafeAttribute(ATT_VALUE).toDouble();// ml/s
             int ampMin = round(ampMind);
             int ampMax = round(ampMaxd);
             ampMax = ampMax*minSec;
