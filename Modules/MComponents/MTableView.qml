@@ -59,6 +59,8 @@ BuzzTableView{
         var row = model.indexOfPK(patID)
         rootTable.selection.select(row)
         rootTable.currentRow = row
+        rowSel = row
+        posItemTimer.start()
         rootTable.selected()
     }
 
@@ -125,22 +127,28 @@ BuzzTableView{
             mngSys.startSound()
     }
 
-    function getColumnValues()
+    function getTesto(val, colIndex)
     {
-        var col = []
+        var col = ""
         if (model !== null)
         {
             var info = model.modelInfo(type)
-            for (var i=0; i<info.length; i++)
-                col[i] = info[i][0]
+            col = info[colIndex][0]
+            if (val!==undefined && val !== "" && (col === "BirthDate" || col === "TestDate" || col === "Date"))
+                return Qt.formatDate(new Date(val), "dd/MM/yyyy")
+            else if (val!==undefined ) {
+                if (col === "Arrangement" || col === "ArrangDesc" )
+                    return qsTranslate("ProtocolContext",val)
+                else return val
+            }
+            else
+                return "none"
         }
-
-        return col
     }
 
     rowDelegate:TRowDelegate{itemData:styleData}
     itemDelegate:TItemDelegate{
-        colonna:getColumnValues()
+        testoFormattato: getTesto(styleData.value,styleData.column)
         itemData:styleData
     }
     headerDelegate:THeaderDelegate{itemData:styleData}
@@ -184,6 +192,7 @@ BuzzTableView{
         color: "transparent"
     }
 }
+
 
 
 

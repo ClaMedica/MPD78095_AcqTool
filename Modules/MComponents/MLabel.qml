@@ -12,11 +12,23 @@ Text {
     text: ""
     font.family:
     {
-        if (PicoFlow)
+        if (PicoFlow) {
             if (layout !== undefined)
                 rootLabel.font.family = layout.value("FFamily")
             else
                 rootLabel.font.family ="Luxi Serif"
+        }
+        else if (Mac) {
+            if (layout !== undefined) {
+                var family = layout.value("FFamilyW")
+                if (family !== "Calibri" && family !== "Luxi Serif")
+                    rootLabel.font.family = family
+                else
+                    rootLabel.font.family ="Arial"
+            }
+            else
+                rootLabel.font.family ="Arial"
+        }
         else if (layout !== undefined)
             rootLabel.font.family = layout.value("FFamilyW")
         else

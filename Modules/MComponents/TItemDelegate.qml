@@ -10,7 +10,8 @@ Rectangle{
         property int elideMode:0
         property string value:""
     }
-    property var colonna: []
+
+    property string testoFormattato: ""
     opacity:0
     Component.onCompleted: opacity=1
     Component.onDestruction: opacity=0
@@ -46,14 +47,8 @@ Rectangle{
                 color = "black"
             else
                 color = layout.value("textTable")
-            if (itemData.value!==undefined && (colonna[itemData.column] === "BirthDate" || colonna[itemData.column] === "TestDate" || colonna[itemData.column] === "Date")){
-                Qt.formatDate(new Date(itemData.value), "dd/MM/yyyy")
-            }
-            else if (colonna[itemData.column] === "Arrangement"/* || colonna[itemData.column] === "ArrangDesc"*/) {
-                itemData.value===undefined?"none":qsTranslate("ProtocolContext",itemData.value)
-            }
-            else
-                itemData.value===undefined?"none":itemData.value
+
+            testoFormattato
         }
         labelSize:{
             if (itemData.selected || PicoFlow)
@@ -61,8 +56,9 @@ Rectangle{
             else
                 layout.value("F4")-1
         }
-        horizontalAlignment: Text.AlignHCenter        
+        horizontalAlignment: Text.AlignHCenter
     }
 
 }
+
 

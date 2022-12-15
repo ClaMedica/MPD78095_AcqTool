@@ -172,7 +172,7 @@ ApplicationWindow {
         onSystemInAcqStatus:
         {
             console.log("Go Go Go");
-            forReal.displayMessage(qsTr("start"),3000,6)
+            forReal.displayMessage(qsTr("start"),3000,9)
             forReal.connected()
         }
         onAcqAutoStarted:
@@ -230,7 +230,7 @@ ApplicationWindow {
 
         onSg_loadResult:{
             forAna.visible = false
-            forAna.saveMainImg()
+            if (!PicoFlow) forAna.saveMainImg()
             if (volResOpened) {
                 volResOpened = false
                 forAna.disablebuttons(false)
