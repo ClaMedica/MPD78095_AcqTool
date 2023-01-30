@@ -48,7 +48,8 @@ int main(int argc, char *argv[])
     bool bool_false = false; (void) bool_false;
     bool bool_true  = true;  (void) bool_true;
 
-  //  qputenv("QML_IMPORT_TRACE", "1");
+    //per vedere nel log debug tutte le librerie qml caricate e il loro path
+    //qputenv("QML_IMPORT_TRACE", "1");
 
     Q_INIT_RESOURCE(qml);
 #ifdef STATICO
@@ -149,6 +150,7 @@ int main(int argc, char *argv[])
     engine.rootContext()->setContextProperty("screenW", 640);
     engine.rootContext()->setContextProperty("isTouch", bool_true);
     engine.rootContext()->setContextProperty("PicoFlow", bool_true);
+    engine.rootContext()->setContextProperty("Mac", bool_false);
 #endif
 
 #ifdef ANDROID

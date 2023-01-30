@@ -384,10 +384,6 @@ bool MAcqManager::newAcquisition(QString __dataFile)
 
         m_newStateQ.clear();
 
-#ifdef PICOFLOW
-        //dico a medica di salvare il file nel db
-        g_mainAppBridge->sendSave();
-#endif
         //inizializzo i server di comunicazione con i plotter
         initializeServers();
 
@@ -401,8 +397,7 @@ bool MAcqManager::newAcquisition(QString __dataFile)
 
         m_disableWeightFilt = QFile::exists(m_fileVerifica);    // "/tmp/disableDebounce"
     }
-    //faccio partire il timer per l'allarme di stato
-    //m_alarmMng.startTimeoutAlarm();
+
 
     return true;
 }
