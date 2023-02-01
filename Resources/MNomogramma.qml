@@ -449,17 +449,14 @@ Rectangle {
             }
         }
 
-        Item {
+        MLabel {
+            id: lblOutOfRange
             visible: !isVis
-            anchors.centerIn: parent
-            MLabel {
-                id: lblOutOfRange
-                anchors.centerIn: parent
-                fontSizeMode: Text.FixedSize
-                labelSize: layout.value("F4")
-                color: "black"
-                text: qsTr("OUT OF RANGE")
-            }
+            anchors.centerIn: PicoFlow ? rootPlot : parent
+            fontSizeMode: Text.FixedSize
+            labelSize: PicoFlow ? layout.value("F4")-1 : layout.value("F4")
+            color: "black"
+            text: qsTr("OUT OF RANGE")
         }
     }
 
