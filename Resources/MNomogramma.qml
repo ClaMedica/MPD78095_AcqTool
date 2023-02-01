@@ -454,7 +454,7 @@ Rectangle {
             visible: !isVis
             anchors.centerIn: PicoFlow ? rootPlot : parent
             fontSizeMode: Text.FixedSize
-            labelSize: PicoFlow ? layout.value("F4")-1 : layout.value("F4")
+            labelSize: (PicoFlow || Mac) ? layout.value("F4")-1 : layout.value("F4")
             color: "black"
             text: qsTr("OUT OF RANGE")
         }
