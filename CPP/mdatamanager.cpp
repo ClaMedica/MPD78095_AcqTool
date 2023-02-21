@@ -1,6 +1,8 @@
 ﻿#include "mdatamanager.h"
 #include "systemmanager.h"
 
+extern bool DebugAcqTool;
+
 MDataManager::MDataManager(QObject *parent)
 {
     (void) parent;
@@ -132,8 +134,9 @@ void MDataManager::loadFile(QString __fileName)
 
     m_analyzed = false;
     m_fileName = __fileName;
-    m_pathData = m_fileName.left(m_fileName.lastIndexOf("/")+1);
 
+    m_pathData = QDir::toNativeSeparators(g_P7SettingsManager.datafilePath() + "/");
+    m_pathRef = g_P7SettingsManager.datarefPath();
 
     //la prima volta che salvo mi faccio la copia del file originale
     m_copyFileName = m_fileName;
@@ -218,7 +221,7 @@ void MDataManager::loadFile(QString __fileName)
         MSQLPatients                *tesPatient;
         MSQLTests                   *tesTest;
         MDatabase db;
-        db.connectDatabase(g_P7SettingsManager.dataPath() + "/db.sqlite3");
+        db.connectDatabase(QDir::toNativeSeparators(g_P7SettingsManager.dataPath() + "/db.sqlite3"));
         tesPatient = (MSQLPatients*) db.modelPointer(TAB_Patients);
         tesTest = (MSQLTests*) db.modelPointer(TAB_Tests);
 

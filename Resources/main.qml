@@ -240,7 +240,7 @@ ApplicationWindow {
         }
 
         onSg_openReport: {
-            forRes.disablebtsReport(__disable)
+            forRes.disablebuttons(__disable)
             forAna.disablebtsReport(__disable)
         }
 
@@ -258,6 +258,11 @@ ApplicationWindow {
                 volResOpened = false
                 forAna.disablebuttons(false)
             }
+            warning.testoWarning = __msg
+            warning.open()
+        }
+
+        onSg_warnReport: {
             warning.testoWarning = __msg
             warning.open()
         }

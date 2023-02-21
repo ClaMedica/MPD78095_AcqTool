@@ -1,5 +1,5 @@
 TEMPLATE = app
-VERSION = 2.2.7
+VERSION = 2.3.0
 
 QT += qml quick widgets sql network multimedia xml core serialport gui
 
@@ -170,6 +170,8 @@ contains(ANDROID_TARGET_ARCH,armeabi-v7a) {
 win32 {
     DEFINES += WIN32
     TARGET = acqTool
+
+    QT+=axcontainer
 
     SOURCES += CPP/mdatamngdesktop.cpp \
 

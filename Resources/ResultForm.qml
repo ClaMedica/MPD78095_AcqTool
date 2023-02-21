@@ -469,50 +469,13 @@ MForm {
         id:timPrint
         interval:500
         onTriggered: {
-            mngData.startPrint()
+            if (PicoFlow)
+                mngData.startPrint()
+            else
+                mngData.startPrint(codSoft)
             btnPrint.dataSent = true
         }
     }
-
-    //@@@@@@@@@@    Graphics      @@@@@@@@@@
-    MDialogYesNo
-    {
-        id: dialogMain
-        property var owner: dialogMain
-        height:screenH*0.3
-        width:screenW*0.3
-
-        onOwnerChanged: {
-            switch(owner) {
-            case dialogMain: break;
-            case btnReport:
-                message = qsTr("Report already exists. Do you want overwrite it?")
-                break
-            default:console.error("Owner sconosciuto", owner)
-            }
-            if(owner != dialogMain)
-                dialogMain.open()
-        }
-        onAccepted: {
-            switch(owner) {
-            case dialogMain: break
-            case btnReport:
-                mngData.openReport(comboReport.currentText)
-                break
-            default:
-                console.error("Owner sconosciuto",owner)
-            }
-        }
-        onRejected: {
-            switch(owner) {
-            case dialogMain: break;
-            case btnReport:
-                break;
-            default: console.error("Owner sconosciuto",owner)
-            }
-        }
-    }
-
 
     MButton{
         id: btnPrint
@@ -545,10 +508,7 @@ MForm {
         labelSize: layout.value("F4")
         visible: PicoFlow ? false : true
         onClicked: {
-            if( mngData.checkReport())
-                dialogMain.owner = btnReport
-            else
-                mngData.openReport(comboReport.currentText)
+            mngData.openReport(comboReport.currentText,codSoft)
         }
     }
 

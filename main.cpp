@@ -30,6 +30,8 @@
 #include <fileio.h>
 #include <systemmanager.h>
 
+bool DebugAcqTool = false;
+
 #ifdef ANDROID
 #include <QAndroidJniObject>
 #include <QtAndroid>
@@ -112,6 +114,9 @@ int main(int argc, char *argv[])
     for(int i = 0; i < argc; i++)
         arguments << QString(argv[i]);
     qDebug() << "Argomenti" << arguments;
+
+    if((argc > 1) && (strcmp(argv[argc - 1], (const char *)"debug") == 0))
+          DebugAcqTool = true;
 
 #ifdef PICOFLOW
         g_mainAppBridge = new AcqBridge(QStringList() << argv[1] << argv[2]);   //definisco un bridge tra app di tipo server

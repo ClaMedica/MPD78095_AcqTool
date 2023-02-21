@@ -18,7 +18,22 @@
        label="Insert second header"
        type="TextField"
        unit=""
-       value="Pico Flow 2"
+       value="Flow"
     />
 </Headers>
+<Report label="Report">
+    <EDIT
+        label="Edit Report"
+        type="CheckBox"
+        unit=""
+        value="false"
+    />
+    <WITH
+        label="Edit Report with"
+        model="Proprietary editor#System editor"
+        type="CheckBoxMultiple"
+        unit=""
+        value="true#false"
+    />
+</Report>
 </Configuration>

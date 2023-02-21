@@ -154,6 +154,7 @@ protected:
     bool    m_autoPrint;
     bool    m_autoAna;
     QString m_pathData;
+    QString m_pathRef;
     QString m_fileName;
     QString m_copyFileName;
     int m_testNumber;
