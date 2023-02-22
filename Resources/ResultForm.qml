@@ -27,9 +27,13 @@ MForm {
         if (visible && !PicoFlow) {
             lbNamePat.testo = mngData.protocollo + " - " +mngData.patientInfo;
             comboReport.listReports = []
+            var valueTemplate = mngData.getTemplate()
             var referti = mngData.getListReports()
-            for (var i=0; i<referti.length;i++)
+            for (var i=0; i<referti.length;i++) {
                 comboReport.listReports.push(referti[i])
+                if (referti[i] === valueTemplate)
+                    comboReport.updateComboIndex(i)
+            }
         }
 
     }
@@ -508,7 +512,7 @@ MForm {
         labelSize: layout.value("F4")
         visible: PicoFlow ? false : true
         onClicked: {
-            mngData.openReport(comboReport.currentText,codSoft)
+            mngData.openReport(codSoft)
         }
     }
 
@@ -551,6 +555,7 @@ MForm {
         model: listReports
         currentIndex:1
         numElementiMax:5
+        onCurrentTextChanged: mngData.setReportTemplate(comboReport.currentText);
     }
 
     MButton {

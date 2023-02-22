@@ -5,9 +5,6 @@
 #include <QQuickItemGrabResult>
 #include "mdatamanager.h"
 
-#define REFHTM  0
-#define REFRTF  1
-
 class MDataMngDesktop : public MDataManager
 {
     Q_OBJECT
@@ -23,7 +20,7 @@ signals:
 
 public slots:
     void deleteAnMArkers();
-    void openReport(QString __nomeReport, QString __codSoft);
+    void openReport(QString __codSoft);
     void addOpMarker(QVariant __key, QVariant __posX);
     void addDefiner(QVariant __key, QVector<double> __pos);
     void addAnMarker(QVariant __key, QVariant __posX, QVariantList __chName);
@@ -31,8 +28,10 @@ public slots:
     void startPrint(QString __codSoft);
     void exitFromReview();
     void openExportTool(QString __codSoft);
+    void setReportTemplate(QString __template);
     //gestione referti
     QList<QString> getListReports();
+    QString getTemplate();
     void slot_checkReportOpened();
     void slot_startReport();
 
@@ -40,6 +39,7 @@ private:
     //referto
     QString m_nomeReferto;
     QString m_nomeRefertoPdf;
+    QString m_template;
     Ancestry * m_reportEdit;
     int m_tipoReferto;
     QTimer *m_reportOpenedTimer;

@@ -33,6 +33,13 @@ Rectangle {
 
     signal clicked
 
+    function updateComboIndex(index)
+    {
+        currentIndex = index
+        currentText = model[currentIndex]
+        curEle.text = currentText
+    }
+
     function find(newpage)
     {
         var indx = 0;

@@ -22,7 +22,7 @@
     />
 </Headers>
 <Report label="Report">
-    <EDIT
+    <HTM
         label="Edit Report"
         type="CheckBox"
         unit=""
@@ -36,4 +36,13 @@
         value="true#false"
     />
 </Report>
+<Template label="Report template" >
+    <Select
+        label="Select default template for reports"
+        model="NewTemplate#Standard"
+        type="ComboBox"
+        unit=""
+        value="NewTemplate"
+        />
+</Template>
 </Configuration>

@@ -29,6 +29,7 @@ MDataMngDesktop::MDataMngDesktop(QObject *parent)
     m_nomeReferto = "";
     m_nomeRefertoPdf = "";
     m_tipoReferto = REFHTM;
+    m_template = "Standard";
 
     m_reportOpenedTimer = new QTimer(this);
     m_reportTimer = new QTimer(this);
@@ -280,29 +281,30 @@ void MDataMngDesktop::deleteAnMArkers()
 
 }
 
-void MDataMngDesktop::openReport(QString __nomeReport, QString __codSoft)
+void MDataMngDesktop::setReportTemplate(QString __template)
 {
-//    m_reportEdit = m_configPrinter.getSafeChild("Report");
-//    QStringList editWith = m_reportEdit->getSafeChild("WITH")->getSafeAttribute(ATT_VALUE).split("#");
-//    for (int i=0;i<editWith.length();i++) {
-//        if (editWith[i] == "true")
-//            m_tipoReferto = i;
-//    }
+    m_template = __template;
+}
 
+void MDataMngDesktop::openReport(QString __codSoft)
+{
     createNamePDf();
 
     QString tipoFile = ".htm";
     if (m_tipoReferto == REFRTF)
         tipoFile = ".rtf";
 
-    if (__nomeReport == "")
-        __nomeReport = "Standard"+tipoFile;
+    QString fileReferto = m_template;
+    if (fileReferto == "")
+        fileReferto = "Standard"+tipoFile;
+    else
+        fileReferto += tipoFile;
 
     if (!QDir().exists(QDir::toNativeSeparators(m_pathRef + "/tmp")))
         QDir(m_pathRef).mkdir("tmp");
 
 #ifdef STATICO
-    QString nomeR = __nomeReport;
+    QString nomeR = fileReferto;
     MedicalReport m;
     int res = m.CreaMedicalReport(g_P7SettingsManager.dataPath().toLatin1(),g_P7SettingsManager.appPath().toLatin1(),m_copyFileName.toLatin1(), __codSoft.toInt(), nomeR.toLatin1(),g_P7SettingsManager.localization());
     if (res != 0)
@@ -315,7 +317,7 @@ void MDataMngDesktop::openReport(QString __nomeReport, QString __codSoft)
     if (reportLib.load())
     {
         bool refDone = false;
-        QString nomeR = __nomeReport;
+        QString nomeR = fileReferto;
         Init(g_P7SettingsManager.dataPath().toLatin1(),g_P7SettingsManager.appPath().toLatin1(),m_copyFileName.toLatin1(), __codSoft.toInt(), nomeR.toLatin1(),g_P7SettingsManager.localization());
         if (fillRef1())
             if (fillRef2())
@@ -335,7 +337,7 @@ void MDataMngDesktop::openReport(QString __nomeReport, QString __codSoft)
     m_nomeReferto = QDir::toNativeSeparators(m_pathRef  + "/tmp/" +  "rf" + QString("%1").arg(m_testNumber,5,10,QLatin1Char('0')) + "1a" + tipoFile);
 #endif
 
-    QString toEdit = m_reportEdit->getSafeChild("EDIT")->getSafeAttribute(ATT_VALUE);
+    QString toEdit = m_reportEdit->getSafeChild("HTM")->getSafeAttribute(ATT_VALUE);
 
     if (toEdit == "false" || m_autoPrint) {
         if (m_tipoReferto == REFHTM)
@@ -667,7 +669,7 @@ void MDataMngDesktop::createPdf()
 #endif
     }
 
-    QString toEdit = m_reportEdit->getSafeChild("EDIT")->getSafeAttribute(ATT_VALUE);
+    QString toEdit = m_reportEdit->getSafeChild("HTM")->getSafeAttribute(ATT_VALUE);
     if (toEdit == "false" || m_autoPrint) {
         QUrl urlFile = QUrl::fromLocalFile(m_nomeRefertoPdf);
         QProcess *viewer = new QProcess();
@@ -740,8 +742,7 @@ void MDataMngDesktop::startPrint(QString __codSoft)
 
     //stampo: apro il file
     if (m_autoPrint) {
-        createNamePDf();
-        openReport("Standard",__codSoft);
+        openReport(__codSoft);
         m_autoPrint = false; //non deve ristampare se l'utente riapre subito l'esame
     }
 }
@@ -818,7 +819,7 @@ void MDataMngDesktop::exitFromReview()
             }
 
             //creazione PDF all'uscita nel caso di Edit del referto
-            QString toEdit = m_reportEdit->getSafeChild("EDIT")->getSafeAttribute(ATT_VALUE);
+            QString toEdit = m_reportEdit->getSafeChild("HTM")->getSafeAttribute(ATT_VALUE);
             if (m_tipoReferto == REFRTF && toEdit == "true" && !m_autoPrint)//da vedere bene sta cosa dell'autoprint qui
                 createPdf();
 
@@ -863,6 +864,10 @@ QList<QString> MDataMngDesktop::getListReports()
 {
     QList<QString> list;
 
+    QString tipoFile = ".htm";
+    if (m_tipoReferto == REFRTF)
+        tipoFile = ".rtf";
+
     QString pathTemplate = QDir::toNativeSeparators(g_P7SettingsManager.dataPath() + "/grpbase/MRTemplate_" + g_P7SettingsManager.localization());
     QDir pathDir = QDir(pathTemplate);
     QFileInfoList entriesPath = pathDir.entryInfoList(QDir::Files);
@@ -872,12 +877,22 @@ QList<QString> MDataMngDesktop::getListReports()
         QString name = finfo.baseName();
         if (name == "StandardSource") //questo è il template che teniamo come copia
             continue;
+        QString suffix = "."+finfo.suffix();
+        if (suffix != tipoFile)
+            continue;
 
         list.push_back(name);
     }
 
     return list;
 
+}
+
+QString MDataMngDesktop::getTemplate()
+{
+    Ancestry* reportTemplate = m_configPrinter.getSafeChild("Template");
+    QString value = reportTemplate->getSafeChild("Select")->getAttribute("value");
+    return value;
 }
 
 void MDataMngDesktop::openExportTool(QString __codSoft)
