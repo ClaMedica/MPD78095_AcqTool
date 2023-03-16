@@ -9,6 +9,9 @@ Rectangle {
     property alias fileURL:path.text
     id:rootPathEdit
     color:"transparent"
+
+    signal clicked
+
     MTextField{
         id:path
         anchors.top:parent.top
@@ -34,12 +37,13 @@ Rectangle {
         id:dialog
         folder:rootPathEdit.folder
         nameFilters: rootPathEdit.nameFilters
-        onSelectionAccepted:
+        onSelectionAccepted: {
+            rootPathEdit.clicked()
             if(selectFolder)
                 path.text=folder
             else
                 path.text=fileUrl
-
+        }
         selectMultiple: false
         selectFolder: rootPathEdit.selectFolder
         onFolderChanged: console.log(folder)

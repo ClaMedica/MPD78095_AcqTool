@@ -73,9 +73,7 @@ Rectangle {
         curEle.visible = false
         opened = true
         if (!notPutOn)
-            DataEngine.putItemOnTop(rootComboBox)
-
-        rootComboBox.clicked()
+            DataEngine.putItemOnTop(rootComboBox)      
     }
 
     function closeBox(index,text)
@@ -85,6 +83,8 @@ Rectangle {
             return
         opened = false
 //        console.log(index, text)
+        if (currentIndex !== index)
+                rootComboBox.clicked()
         currentIndex = index
         currentText = text
         curEle.text = text

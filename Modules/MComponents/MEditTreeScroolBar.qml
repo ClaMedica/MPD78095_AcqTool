@@ -2,11 +2,10 @@
 import QtQuick.Controls 1.2
 import QtQuick.Controls 2.15
 import QtQuick.Dialogs 1.2
-import "qrc:/GeneralData.js" as DataEngine
 import Settings 1.0
-import "qrc:/"
-import "qrc:/Forms"
+
 import MComponents 1.0
+
 
 //Uguale a MEditTree ma con la scroolbar
 Rectangle {
@@ -15,6 +14,8 @@ Rectangle {
     property int divH: 10
     color: "transparent"
     clip: true
+
+    signal elementModified
 
     function loadFile(f) {
         console.log("editSettings", f)
@@ -50,6 +51,9 @@ Rectangle {
             width:rootTree.width
             labelSize: rootTree.labelSize
             itemHeight: rootTree.height/divH
+            onClicked: {
+                elementModified()
+            }
         }
 
         ScrollBar.vertical: ScrollBar {
@@ -60,6 +64,4 @@ Rectangle {
             width: flick.width*0.02
         }
     }
-
-
 }

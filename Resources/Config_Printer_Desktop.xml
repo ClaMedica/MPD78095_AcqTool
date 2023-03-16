@@ -39,10 +39,10 @@
 <Template label="Report template" >
     <Select
         label="Select default template for reports"
-        model="NewTemplate#Standard"
+        model="Standard"
         type="ComboBox"
         unit=""
-        value="NewTemplate"
+        value="Standard"
         />
 </Template>
 </Configuration>

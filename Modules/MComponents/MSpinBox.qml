@@ -1,4 +1,4 @@
-import QtQuick 2.5
+﻿import QtQuick 2.5
 import QtQuick.Dialogs 1.2
 import QtQuick.Controls 1.4
 import QtQuick.Layouts 1.2
@@ -16,6 +16,8 @@ Rectangle{
     property string suffix: "a.u."
     property real labelSize: 3
 
+    signal clicked
+
     function changeValue(newValue)
     {
         if(newValue > maximumValue)
@@ -24,6 +26,7 @@ Rectangle{
             newValue = minimumValue
 
         value = newValue
+        rootSpinBox.clicked()
     }
 
     MButton {

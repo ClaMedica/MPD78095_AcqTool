@@ -5,6 +5,7 @@ import MComponents 1.0
 import Settings 1.0
 import AcqModuleManager 1.0
 
+
 Column {
     id:rootAncestry
     property var ancestry//si suppone che sia una classe ancestry altrimenti non funziona
@@ -13,7 +14,9 @@ Column {
     property real labelSize: PicoFlow ? 4 : 3
     property var father
 
-    spacing: 21
+    signal clicked
+
+    spacing: 25
 
     //onHeightChanged: console.log(height)
     onAncestryChanged: {
@@ -27,6 +30,10 @@ Column {
             recChildren.load()
             updateDimensions()
         }
+    }
+
+    function elementClicked() {
+       rootAncestry.clicked()
     }
 
     function updateDimensions() {
@@ -55,8 +62,20 @@ Column {
     function save() {
         //salvo i miei attributi
         for(var i = 0; i < recChildren.parameters.length; i++)
-            recChildren.parChildren[i].setAttribute("value", recChildren.parameters[i].info)
-
+        {
+            if (recChildren.parameters[i].type === "CheckBoxMultiple") {
+                var info = recChildren.parameters[i].info
+                var infoValue = ""
+                for (var j=0;j<info.length;j++) {
+                    infoValue += info[j]
+                    if (j < info.length-1)
+                        infoValue += "#"
+                }
+                recChildren.parChildren[i].setAttribute("value", infoValue)
+            }
+            else
+                recChildren.parChildren[i].setAttribute("value", recChildren.parameters[i].info)
+        }
         //e dico a tutti i figli di fare lo stesso
         for(i = 0; i < recChildren.children.length; i++)
             recChildren.children[i].save()
@@ -180,29 +199,39 @@ Column {
                     var attributesValues = ancestry.getAttributesValues()
                     var attributesCount = ancestry.attributesCount()
 
+                    var model=pchild.getAttribute("model").split("#")
+                    if(model !== "" && model !== undefined)
+                        c.model = model
+
+                    c.type = pchild.getAttribute("type")
+                    if (c.type === "CheckBoxMultiple")
+                        c.height = itemHeight*c.model.length
+                    else
+                        c.height = itemHeight
+
                     c.anchors.left = recChildren.left
                     c.anchors.right = recChildren.right
                     c.anchors.leftMargin = itemHeight
-                    c.height = itemHeight
-                    c.type = pchild.getAttribute("type")
-                    c.unit = pchild.getAttribute("unit")
-                    var model=pchild.getAttribute("model").split("#")
 
-                    //console.log(model)
-                    if(model !== "" && model !== undefined)
-                        c.model = model
-                    var info = pchild.getAttribute("value")
-                    //console.log(info,c.component)
-                    c.setInfo(info)
+                    c.unit = pchild.getAttribute("unit")
+
+                    if (c.type === "CheckBoxMultiple")
+                        c.beginInfo = pchild.getAttribute("value").split("#")
+                    else {
+                        var info = pchild.getAttribute("value")
+                        //console.log(info,c.component)
+                        c.setInfo(info)
+                    }
                     c.role = qsTranslate("SettingsContext",pchild.getAttribute("label"))
                     c.labelSize = rootAncestry.labelSize
 
                     if (pchild.getAttribute("alfanum") === "false")
                         c.keyboardAlfaNum = false
 
+                    c.clicked.connect(rootAncestry.elementClicked)
+
                     parChildren.push(pchild)
                     parameters[parameters.length] = c
-
                 }
                 else
                 {
@@ -220,8 +249,12 @@ Column {
                     c.ancestry = pchild
                     c.labelSize = rootAncestry.labelSize
                     c.itemHeight = rootAncestry.itemHeight
+
+                    c.clicked.connect(c.father.elementClicked)
+
                     children[children.length] = c
                 }
+
 
                 curEle[curEle.length] = c
                 last = c

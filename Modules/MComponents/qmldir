@@ -2,6 +2,7 @@
 MButton 1.0             MButton.qml
 MAncestry 1.0		MAncestry.qml
 MCheckBox 1.0   	MCheckBox.qml
+MCheckBoxMultiple 1.0  	MCheckBoxMultiple.qml
 MColorBox 1.0 		MColorBox.qml
 MColorPicker 1.0 	MColorPicker.qml
 MDateEdit 1.0		MDateEdit.qml

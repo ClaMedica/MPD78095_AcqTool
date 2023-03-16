@@ -49,7 +49,10 @@ private:
     void loadFile(QString __fileName);
     void createPdf();
     QString createNamePDf();
+#ifdef WIN32
     bool checkReportFileOpen();
+#endif
+
 
 };
 

@@ -12,7 +12,7 @@ Rectangle{
     readonly property var model:layout.fontFamilies()
     property int oriH: height
     property int labelSize:2
-    readonly property bool modelOk: model.length !=0 && model[0]!=undefined
+    readonly property bool modelOk: model.length !==0 && model[0]!==undefined
     clip:true
     height:100
     width:300
@@ -20,6 +20,8 @@ Rectangle{
     border.width: screenH*0.005
     onModelChanged: if(modelOk)curEle.text=model[0]
     onCurrentIndexChanged: if(modelOk)curEle.text=model[currentIndex]
+
+    signal clicked
 
     function find(text){
         if(model === undefined || model === null)
@@ -43,11 +45,14 @@ Rectangle{
         view.visible=true
         curEle.visible=false
         DataEngine.putItemOnTop(rootComboBox)
+
     }
 
     function closeBox(index,text)
     {
         //console.log("close box")
+        if (currentIndex !== index)
+                rootComboBox.clicked()
         currentIndex=index
         currentText=text
         curEle.text=text

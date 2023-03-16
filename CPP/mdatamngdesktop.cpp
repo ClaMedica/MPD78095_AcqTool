@@ -309,11 +309,17 @@ void MDataMngDesktop::openReport(QString __codSoft)
     int res = m.CreaMedicalReport(g_P7SettingsManager.dataPath().toLatin1(),g_P7SettingsManager.appPath().toLatin1(),m_copyFileName.toLatin1(), __codSoft.toInt(), nomeR.toLatin1(),g_P7SettingsManager.localization());
     if (res != 0)
     {
+        qDebug() << "ERROR Medical report"<< res;
         emit sg_warnReport(tr("Problems in the report writing"));
         return;
     }
 #else
+#ifdef WIN32
     QLibrary reportLib("MedicalReport.dll");
+#endif
+#ifdef MAC
+    QLibrary reportLib("MedicalReport");
+#endif
     if (reportLib.load())
     {
         bool refDone = false;
@@ -331,12 +337,7 @@ void MDataMngDesktop::openReport(QString __codSoft)
     }
 #endif
 
-#ifdef MAC
-    m_nomeReferto = m_pathRef + "/tmp/" +  "rf" + QString("%1").arg(m_testNumber,5,10,QLatin1Char('0')) + "1a" + tipoFile;
-#else
     m_nomeReferto = QDir::toNativeSeparators(m_pathRef  + "/tmp/" +  "rf" + QString("%1").arg(m_testNumber,5,10,QLatin1Char('0')) + "1a" + tipoFile);
-#endif
-
     QString toEdit = m_reportEdit->getSafeChild("HTM")->getSafeAttribute(ATT_VALUE);
 
     if (toEdit == "false" || m_autoPrint) {
@@ -351,11 +352,8 @@ void MDataMngDesktop::openReport(QString __codSoft)
             QTextDocument textDoc;
             textDoc.setHtml(stringa);
             f.close();
-#ifdef MAC
-            QFile f1(g_P7SettingsManager.dataPath() + "/ref/" + "prova" + tipoFile);
-#else
+
             QFile f1(QDir::toNativeSeparators(m_pathRef + "/tmp/prova" + tipoFile));
-#endif
             f1.open(QIODevice::WriteOnly);
             f1.write(textDoc.toHtml("utf-8").toUtf8());
             f.remove();
@@ -422,7 +420,7 @@ void MDataMngDesktop::openReport(QString __codSoft)
         }
         else //REFRTF
         {
-            //APERUTRA FILE CON WORD
+            //APERUTRA FILE CON WORD (WIN) LIBREOFFICE (MAC)
             QUrl urlFile = QUrl::fromLocalFile(m_nomeReferto);
             bool returnValue = QDesktopServices::openUrl(urlFile);
 
@@ -436,14 +434,47 @@ void MDataMngDesktop::openReport(QString __codSoft)
         }
     }
 }
-
+#ifdef WIN32
 HANDLE hProc;
+#endif
+
 void MDataMngDesktop::slot_checkReportOpened()
 {
-    QStringList output;
-    bool wordFound = false;
-    QString namef = "rf" + QString("%1").arg(m_testNumber,5,10,QLatin1Char('0')) + "1a";
+#ifdef MAC
+    QProcess lsof;
+    bool found = false;
+    QString output;
+    const int MAX_WAIT_TO_OPEN_TIME = 15000;
+    QElapsedTimer tOut; tOut.start();
+    while (!found && tOut.elapsed() < MAX_WAIT_TO_OPEN_TIME) {
+        lsof.start("lsof", QStringList() << m_nomeReferto);
+        lsof.waitForFinished();
+        output = QString(lsof.readAllStandardOutput());
+        QStringList outputList = output.split("\n");
+        qDebug() << "Processi con file referto " << outputList;
+        if (outputList.length() > 1) {
+            for (int i=1;i<outputList.length();i++){
+                if (!outputList.at(i).contains("mdworker_") && !outputList.at(i).contains("finder") && outputList.at(i).length() > 5) {
+                    found = true;
+                    break;
+                }
+            }
+        }
+    }
 
+    if (!found) {
+        //riabilitazine eventuali pulsanti disabilitati
+        qDebug()<<"Referto non aperto";
+        emit sg_openReport(false);
+        return;
+    }
+
+    m_reportOpenedTimer->stop();
+#endif
+#ifdef WIN32
+    QString namef = "rf" + QString("%1").arg(m_testNumber,5,10,QLatin1Char('0')) + "1a";
+    bool wordFound = false;
+    QStringList output;
     int PIDpos = 1;
     const int MAX_WAIT_TO_OPEN_TIME = 15000;
     QElapsedTimer tOut; tOut.start();
@@ -499,14 +530,39 @@ void MDataMngDesktop::slot_checkReportOpened()
     QString pidString = pidOutput.remove("\"");
     int pid = pidString.toInt();
     hProc = OpenProcess(PROCESS_QUERY_INFORMATION ,FALSE,pid);
-
+#endif
     m_reportTimer->setInterval(1000);
-    m_reportTimer->start(); 
+    m_reportTimer->start();
 }
 
 void MDataMngDesktop::slot_startReport()
 {
-    //Sleep(1000);
+#ifdef MAC
+    QProcess lsof;
+    bool found = false;
+
+    lsof.start("lsof", QStringList() << m_nomeReferto);
+    lsof.waitForFinished();
+    QString output = QString(lsof.readAllStandardOutput());
+    QStringList outputList = output.split("\n");
+    qDebug() << "Processi con file referto alla chiusura " << outputList;
+    for (int i=1;i<outputList.length();i++){
+        if (!outputList.at(i).contains("finder") && outputList.at(i).length() > 5) {
+            found = true;
+            break;
+        }
+    }
+
+    qDebug() << found;
+    if (!found) {
+        qDebug()<<"Referto chiuso";
+        m_reportTimer->stop();
+        //riabilitazine eventuali pulsanti disabilitati
+        emit sg_openReport(false);
+    }
+
+#endif
+#ifdef WIN32
     static int counter = 0;
     if (m_winword)
     {
@@ -537,8 +593,10 @@ void MDataMngDesktop::slot_startReport()
             emit sg_openReport(false);
         }
     }
+#endif
 }
 
+#ifdef WIN32
 // Verifica se report File e' aperto o chiuso
 bool MDataMngDesktop::checkReportFileOpen()
 {
@@ -567,6 +625,8 @@ bool MDataMngDesktop::checkReportFileOpen()
 
     return false;
 }
+#endif
+
 
 void MDataMngDesktop::createPdf()
 {
@@ -667,6 +727,13 @@ void MDataMngDesktop::createPdf()
         else  //cancello rtf
             QFile::remove(m_nomeReferto);
 #endif
+#ifdef MAC
+
+        QString command = "/Applications/LibreOffice.app/Contents/MacOS/soffice -norestore -headless --convert-to pdf --outdir "+ m_pathRef + "/tmp " + QDir::toNativeSeparators(m_nomeReferto);
+        QByteArray ba = command.toLocal8Bit();
+        system(ba.data());
+        QFile::remove(m_nomeReferto); //cancello rtf
+#endif
     }
 
     QString toEdit = m_reportEdit->getSafeChild("HTM")->getSafeAttribute(ATT_VALUE);
@@ -751,11 +818,8 @@ QString MDataMngDesktop::createNamePDf()
 {
     //creo il nome per il PDF
     QString nomePDF = "rf" + QString("%1").arg(m_testNumber,5,10,QLatin1Char('0')) + "1a" + ".pdf";
-#if MAC
-    m_nomeRefertoPdf = g_P7SettingsManager.dataPath() + "/ref/" + nomePDF;
-#else
     m_nomeRefertoPdf = QDir::toNativeSeparators(m_pathRef + "/tmp/" + nomePDF);
-#endif
+
     return nomePDF;
 }
 
@@ -848,10 +912,10 @@ void MDataMngDesktop::exitFromReview()
                 qDebug()<<"cancello file temp analisi"<<QFile::remove(filenameAna);
 
             //cancello gli eventuali referti /Ref/tmp
-            QString tmp = QDir::toNativeSeparators(m_pathRef + "/tmp");
+            QString tmp = QDir::toNativeSeparators(m_pathRef + "/tmp/");
             QStringList listref = QDir(tmp).entryList(QDir::Files);
             foreach (QString f, listref) {
-                QFile::remove(tmp + "\\" + f);
+                qDebug() << "cancello referto" << QFile::remove(tmp + f);
             }
             QDir(m_pathRef).rmdir(tmp);
 

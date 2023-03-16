@@ -8,9 +8,13 @@ TextField {
     id: rootLabel
     property real labelSize: 8
     property bool onlyNumber: false
+    property string oldText: ""
 
     IntValidator { id: intval  }
     RegExpValidator { id: regexp; regExp: /""/ }
+
+    signal clicked
+
     onOnlyNumberChanged:
     {
         if (onlyNumber)
@@ -18,6 +22,13 @@ TextField {
         else
             rootLabel.validator = regexp
     }
+    onTextChanged: {
+        if (oldText !== "" && oldText !== text)
+            rootLabel.clicked()
+
+        oldText = text
+    }
+
 
     text: ""
     font.family:

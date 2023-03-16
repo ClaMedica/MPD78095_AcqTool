@@ -1,4 +1,4 @@
-import QtQuick.Controls 1.4
+﻿import QtQuick.Controls 1.4
 import QtQuick.Controls.Styles 1.4
 import QtQuick 2.5
 import QtQuick.Window 2.0
@@ -16,6 +16,9 @@ Rectangle {
     height: Screen.height*0.02
     width:  Screen.width*0.05
     onTextChanged: if(!editable)initText(text)
+
+    signal clicked
+
     onCheckedChanged: {
         if (checked !== undefined)
             realChecked = checked
@@ -48,7 +51,8 @@ Rectangle {
             anchors.fill: parent
             onClicked: {
                 realChecked=!realChecked;
-                checked = realChecked
+                checked = realChecked                
+                rootCheck.clicked()
             }
         }
 

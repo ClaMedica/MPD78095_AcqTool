@@ -9,7 +9,7 @@ Rectangle {
     property string type:typTextField
     property string style:"default"
     property var component:undefined
-    property string info: ""
+    property var info: ""
     property var model //contiene un modello per il componente
     property real viewPerc:0.6 //indica quanto spazio occupa la label
     property bool labelFirst:true
@@ -28,6 +28,7 @@ Rectangle {
     readonly property string typTextField:"TextField"
     readonly property string typComboBox: "ComboBox"
     readonly property string typCheckBox: "CheckBox"
+    readonly property string typCheckBoxMultiple: "CheckBoxMultiple"
     readonly property string typPathEdit: "PathEdit"
     readonly property string typDateEdit: "DateEdit"
     readonly property string typColorBox: "ColorBox"
@@ -40,12 +41,8 @@ Rectangle {
     height:100
     width:300
 
-    //Since the Parmeter are created on the fly,
-    //we need to identify them on which the user
-    // has clicked. The id must be unique
-    property int parameterId: 0
-    signal clicked()
-    signal lostFocusTarget()
+    signal clicked
+    signal lostFocusTarget
 
     onComponentChanged: if(component !== undefined) connection.target = component
 
@@ -116,11 +113,12 @@ Rectangle {
             if(created) {
                 info = __info
                 switch(type) {
-                case typTextField:component.text        =__info.toString();break;
-                case typComboBox :component.currentIndex=component.find(__info.toString());break;
-                case typCheckBox :component.checked     = ((__info === "false") ||
-                                                           (__info === "0") ||
-                                                           (__info === "")) ? false : true;
+                case typTextField       :component.text        =__info.toString();break;
+                case typComboBox        :component.currentIndex=component.find(__info.toString());break;
+                case typCheckBoxMultiple:component.checkedM = __info;break;
+                case typCheckBox        :component.checked     = ((__info === "false") ||
+                                                                   (__info === "0") ||
+                                                                   (__info === "")) ? false : true;
                     break;
                 case typPathEdit :component.fileURL     =__info;break;
                 case typDateEdit :component.setDate(__info);break;
@@ -173,6 +171,9 @@ Rectangle {
             setInfo(model[0])
             break;
         case typCheckBox:
+            break;
+        case typCheckBoxMultiple:
+            component.model = model
             break;
         case typPathEdit:
             component.folder=model[0]
@@ -250,6 +251,10 @@ Rectangle {
                 c.text=""
                 viewPerc=0.8;
                 break;
+            case typCheckBoxMultiple: c=Qt.createQmlObject('import MComponents 1.0;
+                                                    MCheckBoxMultiple {property var info:checkedM}',container);
+                viewPerc=0.8;
+                break;
             case typPathEdit: c=Qt.createQmlObject('import MComponents 1.0;
                                                     MPathEdit{property var info:fileURL}',container);break;
             case typDateEdit: c=Qt.createQmlObject('import MComponents 1.0;
@@ -278,8 +283,7 @@ Rectangle {
             if(c.labelSize !== undefined)
                 c.labelSize=rootParEdit.labelSize
 
-            if (type === typDateEdit || type === typComboBox)
-                c.clicked.connect(cliccato)
+            c.clicked.connect(cliccato)
 
             if(type === typTextField)
                 c.maximumLength = maxText

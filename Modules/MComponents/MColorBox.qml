@@ -9,6 +9,9 @@ Rectangle {
     height: 62
     border.width: 2
     border.color: "black"
+
+    signal clicked
+
     MouseArea{
         anchors.fill:parent
         onClicked: {
@@ -24,6 +27,7 @@ Rectangle {
         id:con
         ignoreUnknownSignals: true
         onColorSelected: {
+            rootColorBox.clicked()
             rootColorBox.color=target.choosedColor
             target.visible=false
             target = null
