@@ -204,8 +204,11 @@ Column {
                         c.model = model
 
                     c.type = pchild.getAttribute("type")
-                    if (c.type === "CheckBoxMultiple")
+                    if (c.type === "CheckBoxMultiple") {
                         c.height = itemHeight*c.model.length
+                        for (var j=0;j<c.model.length;j++)
+                            c.model[j] = qsTranslate("SettingsContext",c.model[j])
+                    }
                     else
                         c.height = itemHeight
 

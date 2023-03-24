@@ -22,6 +22,8 @@ signals:
 //    void udpMdmPrnStatus(enum WHO, int);
 
     void sg_exitFromReview();
+    //non serve nel PicoFlow2, messa per gestire in qml segnalo utile per Desktop per gestione referti.
+    void sg_warnReport(QString __msg);
 
 public slots:
     void sendToPrint();
