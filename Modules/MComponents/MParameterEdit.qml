@@ -22,8 +22,8 @@ Rectangle {
     property bool keyboardAlfaNum: true
     property int comboNumMaxEle:5
     property string containerBorderColor: "transparent"
-    property bool virtualKeyOpen: false
     property int maxText: 255
+    property bool password: false
     readonly property int currentIndex:type===typComboBox && component!=undefined?component.currentIndex:-1
     readonly property string typTextField:"TextField"
     readonly property string typComboBox: "ComboBox"
@@ -45,6 +45,14 @@ Rectangle {
     signal lostFocusTarget
 
     onComponentChanged: if(component !== undefined) connection.target = component
+
+
+   onEnabledChanged: {
+       if(type === typTextField && !enabled)
+           component.textColor = "gray"
+       else
+           component.textColor = "black"
+   }
 
     function reload()
     {
@@ -68,6 +76,7 @@ Rectangle {
         {
             if(target.focus)
             {
+                //console.log("KEYBOARD")
                 if (isTouch)
                 {
                     mngSys.startSound()
@@ -84,12 +93,16 @@ Rectangle {
                         DataEngine.putItemOnTop(c)
                         if (rootParEdit.type === typTextField)
                             c.testo = connection.target.text
+                        if (password) c.password = true
                         c.show()
-                        rootParEdit.virtualKeyOpen = true;
+                        if (!keyboardAlfaNum) {
+                            if (maxText < 255) {
+                                c.maxChars = maxText
+                                c.labelTarget += " " + maxText.toString() + " DIGITS"
+                            }
+                        }
                     }
                     rootParEdit.clicked()
-                    if (rootParEdit.virtualKeyOpen)
-                        rootParEdit.virtualKeyOpen = false
                 }
                 else
                 {
@@ -164,11 +177,9 @@ Rectangle {
             break;
         case typComboBox:
             component.model=model
-            component.currentIndex=1
             component.labelSize=labelSize
             component.numElementiMax=comboNumMaxEle
-            rootParEdit.info=component.currentText
-            setInfo(model[0])
+            if (beginInfo === undefined) setInfo(model[0])
             break;
         case typCheckBox:
             break;
@@ -285,8 +296,11 @@ Rectangle {
 
             c.clicked.connect(cliccato)
 
-            if(type === typTextField)
+            if(type === typTextField) {
                 c.maximumLength = maxText
+                if (password)
+                    c.echoMode = TextInput.Password
+            }
 
             component=c
             created=true

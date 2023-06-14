@@ -240,6 +240,11 @@ void MAcqManager::dataOnTCP(QObject *__pParent, SimpleTCPClientAcq *__pTCP, QByt
     qDebug() << "dataOnTCP() dati ignorati" << s << QByteArray(__blocco.constData(),sm);
 }
 
+void MAcqManager::setUserLogged(QString __user)
+{
+    gUser_logged = __user;
+}
+
 bool MAcqManager::newAcquisition(QString __dataFile)
 {
     if(m_acqFileOpened) {
@@ -347,8 +352,22 @@ bool MAcqManager::newAcquisition(QString __dataFile)
         qDebug() << "Opening file ... " << m_mng->Open();
         qDebug() << "Loading parameters ... " << m_mng->GetParameters();
 
-        m_acqFileOpened = true;     //mi segno che ho aperto il file
+        QString dataNascita = m_mng->GetPatient().section(";",PAT_STR_DOB,PAT_STR_DOB);
+        QString m_patientInfo = m_mng->GetPatient().section(";",PAT_STR_COGNOME,PAT_STR_NOME);
+        QStringList patInfo = m_patientInfo.split(";");
 
+        QString standby = "";
+#ifdef PICOFLOW
+        Ancestry *autoflow = m_configUser.getSafeChild("AutomaticFlow");
+        Ancestry *childLoop = autoflow->getSafeChild("Loop");
+        QString val = childLoop->getSafeAttribute("value");
+        if (val == "true")standby = "Stand-By mode";
+#endif
+        qDebug() << "GDPR: Execution new study n." << m_mng->GetTestNum()
+                 << "Protocol:" << m_mng->GetTestDescr() << "Patient:" << patInfo[0] + " " + patInfo[1]
+                 << "D.o.B:" << dataNascita << standby;
+
+        m_acqFileOpened = true;     //mi segno che ho aperto il file
         m_acqFinished = false;
 
         //necessari assegnamenti per risentire gli allarmi su gestione beaker
@@ -516,7 +535,7 @@ void MAcqManager::endAcquisition(bool __discard)
         Ancestry *child = autoflow->getSafeChild("Auto");
         child->setAttribute("value","false");
 #ifdef PICOFLOW
-        //devo resettare il parametro di loop a false per non far partire una nuova acquisiszione alla successiva acquisizione
+        //devo resettare il parametro di loop a false per non far partire una nuova acquisizione alla successiva acquisizione
         Ancestry *childLoop = autoflow->getSafeChild("Loop");
         childLoop->setAttribute("value","false");
 #endif

@@ -16,6 +16,8 @@ Rectangle {
     property string testo: ""
     property string labelTarget: ""
     property string oldTesto: ""
+    property bool password: false
+    property int maxChars: 255
 
     anchors.fill: parent
 
@@ -23,7 +25,10 @@ Rectangle {
     {
         visible=true
         oldTesto = testo
-        txtField.text = testo
+        if (password)
+            txtField.text = ""
+        else
+            txtField.text = testo
     }
 
     MouseArea{
@@ -55,6 +60,8 @@ Rectangle {
             anchors.verticalCenter: parent.verticalCenter
             onTextChanged: if(target!=undefined) target.text=txtField.text
             validator: target!=undefined?target.validator:null
+            echoMode: password ? TextInput.Password : TextInput.Normal
+            maximumLength: maxChars
         }
     }
 

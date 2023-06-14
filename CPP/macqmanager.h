@@ -59,6 +59,7 @@ public slots:
     void setAlarms(QVariantList __list);
     void udpBtDecode(enum WHO __from, QByteArray __msg);
     void sendBeakerOkToSupe();
+    void setUserLogged(QString __user);
 
 //private slots:
     bool sendCommand(tcp_flow_bt_cmd_t __command);

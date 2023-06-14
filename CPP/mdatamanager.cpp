@@ -1182,6 +1182,13 @@ qDebug() << "INIZIO";
     qDebug() << "File Aperto?" << m_mng->Open();
     qDebug() << "File Caricato?" << m_mng->GetParameters();
 
+    QDate dateExam = QDate(1899, 12, 30).addDays(m_mng->GetDataEsame());
+    QString dataEsame = dateExam.toString("dd/MM/yyyy");
+    QString m_patientInfo = m_mng->GetPatient().section(";",PAT_STR_COGNOME,PAT_STR_NOME);
+    QStringList patInfo = m_patientInfo.split(";");
+    qDebug() << "GDPR: Stationary Analysis (Patient:" << patInfo[0] + " " + patInfo[1]
+             << "- study n." << m_mng->GetTestNum() << "- Date study:" << dataEsame << ")";
+
     //mi salvo nel campo other il valore del volume residuo nel caso l'utente lo avesse nonecambiato
     QString other = m_mng->GetOther();
     QStringList otherList = other.split(";");
