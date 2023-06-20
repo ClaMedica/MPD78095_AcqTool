@@ -47,6 +47,8 @@ AcqBridge *g_mainAppBridge;
 
 int main(int argc, char *argv[])
 {
+    //vis "C:\\Users\\Public\\Documents\\FlowBtData/UDSData/pv000031A.pic" 16 debug
+
     bool bool_false = false; (void) bool_false;
     bool bool_true  = true;  (void) bool_true;
 
