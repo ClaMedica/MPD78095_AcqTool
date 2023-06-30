@@ -395,9 +395,16 @@ bool MAcqManager::newAcquisition(QString __dataFile)
         //connessioni
         connectToServers();
 
+#ifdef PICOFLOW
+        //In caso di discard esame precedente con disconnessione/riconnesione
+        //è necessario resettare il valore salvato del volume usato
+        //per gestire le disconnessioni durante un'acquisizione
+        //Ad ogni inizio acquisizione diciamo al Supe di azzerarlo
+        udpConn.sendSup("RESETWEIGHT");
+#endif
+
         m_disableWeightFilt = QFile::exists(m_fileVerifica);    // "/tmp/disableDebounce"
     }
-
 
     return true;
 }
@@ -913,6 +920,15 @@ void MAcqManager::analyzeStatus(uint8_t __currState, bool __isBT)
             if(m_oldState == ESTATE_ACQUIRING) {
                 m_alarmMng.addAlarm(ALA_NOT_CONNECTED);
                 interruption = true;
+
+#ifdef PICOFLOW
+                //se non sto ancora salvando significa che il pulsante di start
+                //non e' stato ancora premuto
+                //l'interruzione mi genera una partenza senza zero
+                if (!m_saving)
+                    udpConn.sendSup("RESETWEIGHT");
+#endif
+
             }
             break;
 
@@ -948,6 +964,7 @@ void MAcqManager::analyzeStatus(uint8_t __currState, bool __isBT)
                         addMarker(MRK_E3);
                     }
                 }
+
                 //avviso l'utente che l'acquisizione è ripartita
                 m_alarmMng.resetAlarm(ALA_NOT_ACQUIRING);
                 m_alarmMng.resetAlarm(ALA_NOT_CONNECTED);
