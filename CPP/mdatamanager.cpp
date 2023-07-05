@@ -1186,6 +1186,9 @@ qDebug() << "INIZIO";
     QString dataEsame = dateExam.toString("dd/MM/yyyy");
     QString m_patientInfo = m_mng->GetPatient().section(";",PAT_STR_COGNOME,PAT_STR_NOME);
     QStringList patInfo = m_patientInfo.split(";");
+    if (!g_File_LogGDPR.isOpen())
+        g_File_LogGDPR.open(QIODevice::Append);
+    //qDebug()<< "userlogged datamanager" << gUser_logged;
     qDebug() << "GDPR: Stationary Analysis (Patient:" << patInfo[0] + " " + patInfo[1]
              << "- study n." << m_mng->GetTestNum() << "- Date study:" << dataEsame << ")";
 
