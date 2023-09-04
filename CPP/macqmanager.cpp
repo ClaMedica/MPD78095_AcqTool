@@ -362,13 +362,14 @@ bool MAcqManager::newAcquisition(QString __dataFile)
         Ancestry *childLoop = autoflow->getSafeChild("Loop");
         QString val = childLoop->getSafeAttribute("value");
         if (val == "true")standby = "Stand-By mode";
-#endif
+
         if (!g_File_LogGDPR.isOpen())
             g_File_LogGDPR.open(QIODevice::Append);
 
         qDebug() << "GDPR: Execution new study n." << m_mng->GetTestNum()
                  << "Protocol:" << m_mng->GetTestDescr() << "Patient:" << patInfo[0] + " " + patInfo[1]
                  << "D.o.B:" << dataNascita << standby;
+#endif
 
         m_acqFileOpened = true;     //mi segno che ho aperto il file
         m_acqFinished = false;
