@@ -24,6 +24,7 @@ Rectangle {
     property string containerBorderColor: "transparent"
     property int maxText: 255
     property bool password: false
+    property bool emptyVal: false
     readonly property int currentIndex:type===typComboBox && component!=undefined?component.currentIndex:-1
     readonly property string typTextField:"TextField"
     readonly property string typComboBox: "ComboBox"
@@ -91,8 +92,12 @@ Rectangle {
                         c.target = connection.target
                         c.labelTarget = label.text
                         DataEngine.putItemOnTop(c)
-                        if (rootParEdit.type === typTextField)
-                            c.testo = connection.target.text
+                        if (rootParEdit.type === typTextField) {
+                            if (emptyVal)
+                                c.testo = ""
+                            else
+                                c.testo = connection.target.text
+                        }
                         if (password) c.password = true
                         c.show()
                         if (!keyboardAlfaNum) {
