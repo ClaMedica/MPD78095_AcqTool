@@ -219,6 +219,25 @@ DINAMICO {
     else:macx:CONFIG(debug, debug|release): LIBS += -L$$PWD/../Build/Debug/DatafileManager/ -lDatafileManager
     macx:CONFIG(release, debug|release): LIBS += -L$$PWD/../Build/Release/MedicalReport/ -lMedicalReport
     else:macx:CONFIG(debug, debug|release): LIBS += -L$$PWD/../Build/Debug/MedicalReport/ -lMedicalReport
+
+macx  {
+#ogni volta che si ricompilano le librerie è necessario eseguire le seguente operazioni
+#se cambia il numero di versione va aggiornato il nome della dylib
+#otool -l libMedicalReport.1.8.0.dylib
+#install_name_tool -id @rpath/lMedicalReport.1.8.0.dylib libMedicalReport.1.8.0.dylib
+#otool -l libDatafileManager.dylib
+#install_name_tool -id @rpath/libDatafileManager.2.2.0.dylib libDatafileManager.2.2.0.dylib
+
+        INCLUDEPATH += $$PWD/../Build/Release/DatafileManager
+        DEPENDPATH += $$PWD/../Build/Release/DatafileManager
+        MediaFiles.files += $$PWD/../Build/Release/DatafileManager/libDatafileManager.2.2.0.dylib
+        INCLUDEPATH += $$PWD/../Build/Release/MedicalReport
+        DEPENDPATH += $$PWD/../Build/Release/MedicalReport
+        MediaFiles.files += $$PWD/../Build/Release/MedicalReport/libMedicalReport.1.8.0.dylib
+
+        MediaFiles.path = Contents/Frameworks
+        QMAKE_BUNDLE_DATA += MediaFiles
+    }
 }
 
 STATICO {
