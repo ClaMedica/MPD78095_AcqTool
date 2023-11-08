@@ -24,7 +24,7 @@ Rectangle {
     function show()
     {
         visible=true
-        oldTesto = testo
+        if (testo !== "") oldTesto = testo
         if (password)
             txtField.text = ""
         else

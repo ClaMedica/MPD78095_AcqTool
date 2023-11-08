@@ -103,7 +103,7 @@ Rectangle {
                         if (!keyboardAlfaNum) {
                             if (maxText < 255) {
                                 c.maxChars = maxText
-                                c.labelTarget += " " + maxText.toString() + " DIGITS"
+                                c.labelTarget += " " + maxText.toString() + qsTr(" DIGITS")
                             }
                         }
                     }
