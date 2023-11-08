@@ -318,7 +318,7 @@ void MDataMngDesktop::openReport(QString __codSoft)
     QLibrary reportLib("MedicalReport.dll");
 #endif
 #ifdef MAC
-    QLibrary reportLib("MedicalReport");
+    QLibrary reportLib("libMedicalReport.1.8.0");
 #endif
     if (reportLib.load())
     {
@@ -973,7 +973,11 @@ void MDataMngDesktop::openExportTool(QString __codSoft)
     proc->setProgram(pth);
 
     QStringList arg;
-    arg << "s" << __codSoft << QString::number(m_testNumber);
+    QString typeImg = "h";
+    if (m_tipoReferto == REFRTF)
+        typeImg = "r";
+
+    arg << "s" << __codSoft << QString::number(m_testNumber) << typeImg;
     proc->setArguments(arg);
 
     connect(proc,  QOverload<int, QProcess::ExitStatus>::of(&QProcess::finished),
