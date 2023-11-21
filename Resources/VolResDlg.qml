@@ -69,6 +69,7 @@ MForm {
         viewPerc:0.75
         role:qsTr("Insert Residual Volume")
         keyboardAlfaNum: false
+        emptyVal: true
     }
 
     MButton {

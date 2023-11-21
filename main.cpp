@@ -64,8 +64,7 @@ int main(int argc, char *argv[])
     QGuiApplication app(argc, argv);
 
     //carico i settaggi
-     QString codSoft = QString(argv[3]);
-     g_P7SettingsManager.loadSettings(true,codSoft.toInt());
+     g_P7SettingsManager.loadSettings(true);
 
 #ifdef ANDROID
     QtAndroid::androidActivity().callMethod<void>("registerBroadcastReceiver", "()V");
@@ -183,6 +182,7 @@ int main(int argc, char *argv[])
     engine.rootContext()->setContextProperty("screenH", size.height());
     engine.rootContext()->setContextProperty("screenW", size.width());
     engine.rootContext()->setContextProperty("PicoFlow", bool_false);
+    QString codSoft = QString(argv[3]);
     engine.rootContext()->setContextProperty("codSoft", codSoft);
 #ifdef MAC
     engine.rootContext()->setContextProperty("Mac", bool_true);
@@ -203,7 +203,7 @@ int main(int argc, char *argv[])
     qDebug() << "engine caricato";
 
 #ifdef PICOFLOW
-        g_mainAppBridge->setRootObjects(engine.rootObjects());
+    g_mainAppBridge->setRootObjects(engine.rootObjects());
 #endif
     
     int ret = app.exec();

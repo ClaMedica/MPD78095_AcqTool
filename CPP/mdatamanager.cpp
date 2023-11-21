@@ -1182,6 +1182,17 @@ qDebug() << "INIZIO";
     qDebug() << "File Aperto?" << m_mng->Open();
     qDebug() << "File Caricato?" << m_mng->GetParameters();
 
+    QDate dateExam = QDate(1899, 12, 30).addDays(m_mng->GetDataEsame());
+    QString dataEsame = dateExam.toString("dd/MM/yyyy");
+    QString m_patientInfo = m_mng->GetPatient().section(";",PAT_STR_COGNOME,PAT_STR_NOME);
+    QStringList patInfo = m_patientInfo.split(";");
+#ifdef PICOFLOW
+    if (!g_File_LogGDPR.isOpen())
+        g_File_LogGDPR.open(QIODevice::Append);
+    //qDebug()<< "userlogged datamanager" << gUser_logged;
+    qDebug() << "GDPR: Stationary Analysis (Patient:" << patInfo[0] + " " + patInfo[1]
+             << "- study n." << m_mng->GetTestNum() << "- Date study:" << dataEsame << ")";
+#endif
     //mi salvo nel campo other il valore del volume residuo nel caso l'utente lo avesse nonecambiato
     QString other = m_mng->GetOther();
     QStringList otherList = other.split(";");

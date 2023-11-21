@@ -121,8 +121,10 @@ BuzzTableView{
     function order(c,order,sound){
         if(!sortEnabled)
             return
+        rootTable.selection.clear()
         upDowns[c]=order
         model.orderByInfo(type,roles[c],order)
+        rootTable.currentRow = -1 //altrimenti tiene il valore precedente
         if (sound && rootTable.visible && rootTable.completed && isTouch) //altrimenti il click su header non suona
             mngSys.startSound()
     }

@@ -8,7 +8,7 @@ import "Images"
 
 Rectangle {
     id: rootComboBox
-    property string currentText: if (currentIndex != -1) model[currentIndex]
+    property string currentText: ""
     property int currentIndex: -1
     property var model: []
     property int oriH: height

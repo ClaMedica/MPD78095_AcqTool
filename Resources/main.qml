@@ -158,6 +158,10 @@ ApplicationWindow {
                 mngData.analysis()
             }
         }
+        onSetUserLogged:
+        {
+           mngAcq.setUserLogged(user)
+        }
     }
 
 

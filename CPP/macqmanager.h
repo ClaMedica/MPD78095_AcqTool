@@ -59,6 +59,7 @@ public slots:
     void setAlarms(QVariantList __list);
     void udpBtDecode(enum WHO __from, QByteArray __msg);
     void sendBeakerOkToSupe();
+    void setUserLogged(QString __user);
 
 //private slots:
     bool sendCommand(tcp_flow_bt_cmd_t __command);
@@ -71,7 +72,7 @@ private:
                 m_superList;    //lista dei supervisori che dovrA? avviare
 
     bool    m_acqFileOpened,
-    m_supeConnected,    //mi indica quando il supervisore A? connesso
+    m_supeConnected,    //mi indica quando il supervisore e' connesso
     m_serverReady,
     m_sendingToPlot,
     m_saving,
