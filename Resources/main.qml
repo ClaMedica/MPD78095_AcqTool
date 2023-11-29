@@ -41,11 +41,11 @@ ApplicationWindow {
          //altrimenti è picoflow2r3 che fa partire acqtool con i parametri per il bridge
          if (Qt.application.arguments[1] === "vis" || Qt.application.arguments[1] === "acq") {
              root.visible = true
-             launch(Qt.application.arguments[1],Qt.application.arguments[2], Qt.application.arguments[3])
+             launch(Qt.application.arguments[1],Qt.application.arguments[2], Qt.application.arguments[3],Qt.application.arguments[4])
          }
      }
 
-    function launch(mode,dataFile,codSoft)
+    function launch(mode,dataFile,codSoft,enabledUser)
     {
         console.log("launch(mode,dataFile)", mode, dataFile)
         if(mode === "acq")
@@ -65,7 +65,7 @@ ApplicationWindow {
         else if(mode === "vis")
         {
             if (PicoFlow) suspendBt()
-            console.log("Start new vis", codSoft)
+            console.log("Start new vis", codSoft, enabledUser)
             forAna.initialize()
             mngData.load()
             if(platform !== "android")
@@ -75,7 +75,7 @@ ApplicationWindow {
             forAna.setMarkersInfo(mngData.markersInfo("type", [1, 6]))
             forAna.setDefinersInfo(mngData.definersInfo())
             forAna.setActionsInfo(mngData.actionsInfo())
-            forAna.setCommandsInfo(mngData.commandsInfo())
+            forAna.setCommandsInfo(mngData.commandsInfo(), enabledUser)
             forAna.setCommandsInfoBottom(mngData.commandsInfoBottom())
 
             if (platform === "window") //nel caso picoflow2r3 ci pensa il bridge
@@ -139,7 +139,7 @@ ApplicationWindow {
         //function onNewVisualization(datafile,codSoft)
         {
             console.log("vis ",datafile);
-            launch("vis", datafile, codSoft)
+            launch("vis", datafile, codSoft, "true")
             vis = true
         }
         onStampaProva:

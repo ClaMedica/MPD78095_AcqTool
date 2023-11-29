@@ -2,6 +2,7 @@
 import MPlotModule 1.0
 import QtQuick.Controls 1.4
 import QtQuick.Window 2.2
+import QtQuick.Controls.Styles 1.4
 import "Tools"
 import "Models"
 
@@ -55,19 +56,28 @@ Rectangle {
 
     //copy Plot
     property var toCopyPlot: []
+    property bool setToCopy: false
 
     //Colormap
     property var colorMap:[]
 
     property bool firstPlot: false
+    property int numPlot: 1
+
+    property int stepMovePlot: -1
 
     id: rootPlot
     focus: false
 
-    function setAXmin(x) { zoomer.xAbsoluteMin = x; zoomer.checkLimits(); zoomer.restore(); curTime.value = x }
-    function setAXmax(x) { zoomer.xAbsoluteMax = x; zoomer.checkLimits(); zoomer.restore(); }
-    function setAYmin(y) { zoomer.yAbsoluteMin = y; zoomer.checkLimits(); zoomer.restore(); }
-    function setAYmax(y) { zoomer.yAbsoluteMax = y; zoomer.checkLimits(); zoomer.restore(); }
+    Component.onCompleted: {
+//        stepMovePlot = (plotter.yAbsoluteMax - plotter.yAbsoluteMin)/10
+//        console.log(" STEP PLOT PLOTTER ", stepMovePlot)
+    }
+
+    function setAXmin(x) { zoomer.xAbsoluteMin = x; zoomer.restore(); curTime.value = x }
+    function setAXmax(x) { zoomer.xAbsoluteMax = x; zoomer.restore(); }
+    function setAYmin(y) { zoomer.yAbsoluteMin = y; zoomer.restore(); }
+    function setAYmax(y) { zoomer.yAbsoluteMax = y; zoomer.restore(); }
 
 
     //button:
@@ -92,13 +102,11 @@ Rectangle {
     function setXmin(x)
     {
         zoomer.xMin=x;
-        //zoomer.txMin=x;
     }
 
     function setXmax(x)
     {
          zoomer.xMax = x;
-        //zoomer.txMax=x;
     }
 
     function addMarkerOp()
@@ -156,6 +164,7 @@ Rectangle {
         //console.log(newLimits)
         if(newLimits.length === 4)
         {//devono esserci esattamente 4 elementi
+            rRightMarginBottom.posScale = 0;
             setAXmin(newLimits[0])
             setAXmax(newLimits[1])
             setAYmin(newLimits[2])
@@ -222,8 +231,8 @@ Rectangle {
         color: "transparent"
         width: modP.rightMargin
         anchors.top: rootPlot.top
-        anchors.bottom: rootPlot.bottom
         anchors.right: rootPlot.right
+        height: rootPlot.height/2
 
         MLegend {
             id:legend
@@ -238,6 +247,116 @@ Rectangle {
             propagateComposedEvents: true
             onClicked: {
                 toCopyPlot = [parent.width]
+            }
+        }
+    }
+
+    Rectangle {
+        id: rRightMarginBottom
+        color: "transparent"
+        width: modP.rightMargin
+        anchors.bottom: rootPlot.bottom
+        anchors.right: rootPlot.right
+        height: rootPlot.height/3
+        visible: !PicoFlow && !setToCopy
+        property var btnSize: rootPlot.height*numPlot*0.015
+        property var posScale: 0
+
+//        Button {
+//            id: btnUp
+//            anchors.top: parent.top
+//            anchors.horizontalCenter: parent.horizontalCenter
+//            width: rRightMarginBottom.btnSize
+//            height: rRightMarginBottom.btnSize
+//            style: ButtonStyle {
+//                background: Image {
+//                    source: "qrc:/Image/frecciasu.jpg"
+//                    fillMode: Image.Stretch
+//                }
+//            }
+//            onClicked: {
+//                if (rRightMarginBottom.posScale < 10) {
+//                    rRightMarginBottom.posScale++
+//                    var valPlot = (plotter.yAbsoluteMax - plotter.yAbsoluteMin)/10
+//                    if (stepMovePlot === -1)
+//                        stepMovePlot = valPlot
+//                    zoomer.yAbsoluteMax = yMax - stepMovePlot//valPlot
+//                    zoomer.yAbsoluteMin = yMin - stepMovePlot//valPlot
+//                    zoomer.setZoomX(zoomer.xMin,zoomer.xMax)
+//                }
+//            }
+//        }
+//        Button {
+//            id: btnDown
+//            anchors.top: btnUp.bottom
+//            anchors.horizontalCenter: parent.horizontalCenter
+//            anchors.topMargin: rRightMarginBottom.btnSize/4
+//            width: rRightMarginBottom.btnSize
+//            height: rRightMarginBottom.btnSize
+//            style: ButtonStyle {
+//                background: Image {
+//                    source: "qrc:/Image/frecciagiu.jpg"
+//                    fillMode: Image.Stretch
+//                }
+//            }
+//            onClicked: {
+//                if (rRightMarginBottom.posScale > 0) {
+//                    rRightMarginBottom.posScale--
+//                    var valPlot = (plotter.yAbsoluteMax - plotter.yAbsoluteMin)/10
+//                    if (stepMovePlot === -1)
+//                        stepMovePlot = valPlot
+//                    zoomer.yAbsoluteMax = yMax + stepMovePlot//valPlot
+//                    zoomer.yAbsoluteMin = yMin + stepMovePlot//valPlot
+//                    zoomer.setZoomX(zoomer.xMin,zoomer.xMax)
+//                }
+//            }
+//        }
+        Button {
+            id: btnMore
+            anchors.top: parent.top
+            anchors.horizontalCenter: parent.horizontalCenter
+            anchors.topMargin: rRightMarginBottom.btnSize/2
+            width: rRightMarginBottom.btnSize
+            height: rRightMarginBottom.btnSize
+            style: ButtonStyle {
+                background: Image {
+                    source: "qrc:/Image/scale-up.png"
+                    fillMode: Image.Stretch
+                }
+            }
+            onClicked: {
+               if (stepMovePlot === -1)
+                    stepMovePlot = plotter.yAbsoluteMax/10
+                var newScaleYmax= (plotter.yAbsoluteMax/2 - stepMovePlot)*2
+                var newScaleYmin = (yMin * newScaleYmax)/yMax
+                if (newScaleYmax > 0) {
+                    zoomer.yAbsoluteMax = newScaleYmax
+                    zoomer.yAbsoluteMin = newScaleYmin
+                    zoomer.setZoomX(zoomer.xMin,zoomer.xMax)
+                }
+            }
+        }
+        Button {
+            id: btnLess
+            anchors.top: btnMore.bottom
+            anchors.horizontalCenter: parent.horizontalCenter
+            anchors.topMargin: rRightMarginBottom.btnSize/4
+            width: rRightMarginBottom.btnSize
+            height: rRightMarginBottom.btnSize
+            style: ButtonStyle {
+                background: Image {
+                    source: "qrc:/Image/scale-down.png"
+                    fillMode: Image.Stretch
+                }
+            }
+            onClicked: {
+                if (stepMovePlot === -1)
+                    stepMovePlot = plotter.yAbsoluteMax/10
+                var newScaleYmax= (plotter.yAbsoluteMax/2 + stepMovePlot)*2
+                var newScaleYmin = (yMin * newScaleYmax)/yMax
+                zoomer.yAbsoluteMax = newScaleYmax
+                zoomer.yAbsoluteMin = newScaleYmin
+                zoomer.setZoomX(zoomer.xMin,zoomer.xMax)
             }
         }
     }
@@ -617,6 +736,8 @@ Rectangle {
             vMin:plotter.xMin
             yMax:plotter.yMax
             yMin:plotter.yMin
+
+            countUpDown: rRightMarginBottom.posScale
 
             onNewMarkerChanged:if(completed)currentObject=newMarker
         }

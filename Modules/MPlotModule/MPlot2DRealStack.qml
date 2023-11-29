@@ -9,7 +9,7 @@ Rectangle {
     id:rootPlotRealStack
 
     property var plotProp:[]
-    property int plotNumber
+    property int plotNumber:0
     property var markers:[]
     property int savedData
     property bool completed:false
@@ -60,9 +60,17 @@ Rectangle {
     onMarkersChanged:   if(completed)separateMarkers(markers)
     color:"transparent"
 
-    Component.onCompleted:goTim.start(10)
+    Component.onCompleted:goTim.start()
 
-    Timer{id:goTim;onTriggered: completed=true}
+    Timer {
+        id:goTim
+        repeat: false
+        interval: 10
+        onTriggered: {
+            //console.log("MPLOT completed")
+            completed=true
+        }
+    }
 
     function modify(p)
     {
@@ -80,7 +88,7 @@ Rectangle {
                 }
                 if(p[i]==="&Plot")
                 {
-                    //console.log("CHANGE MODEL")
+                    //console.log("CHANGE MODEL",lista.itemAt(plotIndex),plotIndex,l)
                     lista.itemAt(plotIndex).modello=l
                     plotIndex++
                     continue
@@ -96,14 +104,13 @@ Rectangle {
 
     function stopAll()
     {
+        timCheckTcp.stop()
         for(var i=0;i<lista.count;i++)
-        {
             lista.itemAt(i).stop()
-            plotNumber=0
-            timCheckTcp.stop()
-        }
 
+        plotNumber=0
     }
+
     Timer{
         id: timCheckTcp
         interval: 2000
@@ -125,7 +132,7 @@ Rectangle {
 
     function popola()
     {
-       // console.log("lughezza prop",plotProp.length)
+        //console.log("lughezza prop",plotProp.length)
         var n = 0
         for(var i=0;i<plotProp.length;i++){
             if(plotProp[i]==="$Plot"){
@@ -133,7 +140,7 @@ Rectangle {
             }
         }
         plotNumber = n
-     //   console.log("disegno finito num plot", plotNumber)
+        //console.log("disegno finito num plot", plotNumber)
         modify(plotProp);
     }
 
@@ -141,6 +148,7 @@ Rectangle {
         id:lista
         anchors.fill:rootPlotRealStack
         model:plotNumber
+
         delegate:MPlot2DRealTime{
             id: plot
             clip:true
