@@ -827,6 +827,9 @@ void MDataMngDesktop::exitFromReview()
 {
     qDebug() << "Exit" << getToSave();
 
+    if (g_File_LogGDPR.isOpen())
+        g_File_LogGDPR.close();
+
     //devo resettare il parametro di flusso automatico a false per non far partire sempre l'analisi in automatico all'apertura in review di un file
     Ancestry *autoflow = m_configUser.getSafeChild("AutomaticFlow");
     Ancestry *child = autoflow->getSafeChild("Auto");
