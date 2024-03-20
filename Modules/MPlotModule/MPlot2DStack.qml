@@ -32,6 +32,7 @@ Rectangle {
 
     //copy Plot
     property var toCopyPlot: []
+    property bool setToCopy: false
 
     color:"transparent"
 
@@ -66,7 +67,7 @@ Rectangle {
             if(plotProp[i]==="$Plot")
                 pn++
         plotNumber=pn
-        console.log(plotProp)
+        //console.log(plotProp)
         //adesso vado a vedere come modificare i vari plot in base alle caratteristiche
         modify(plotProp);
     }
@@ -263,6 +264,11 @@ Rectangle {
         }
     }
 
+    onSetToCopyChanged: {
+        for(var i = 0; i < plotNumber; i++)
+            lista.itemAt(i).setToCopy = setToCopy
+    }
+
     function timConnect(ind)
     {
         for(var i = 0; i < plotNumber; i++) {
@@ -284,6 +290,7 @@ Rectangle {
             height:rootPlotStack.height/plotNumber
             width:rootPlotStack.width
             firstPlot: index === 0
+            numPlot: plotNumber
             onCurrentObjectChanged:
             {
                 if(currentObject.length!==0) {

@@ -24,6 +24,8 @@ Rectangle{
     property real markerCount:0
     property bool completed:false
     property var limDefChanged:[] //un definitore ha cambiato i limiti, devo aggiornare i limiti di spostamento dei marker analitici
+
+    property int countUpDown: 0
     color:"transparent"
 
     Component.onCompleted:complete.start(10)
@@ -115,6 +117,8 @@ Rectangle{
 
             lineLength:rootMarkerStack.height
             anchors.bottom: lista.bottom
+
+            countUpDown: rootMarkerStack.countUpDown
 
             //quando cambia il valore di un marker invio queste informazioni sopra
             onModifyMe: if(completed){newMarker=[whoAmI,"val",value];}

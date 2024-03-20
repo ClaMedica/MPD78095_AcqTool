@@ -19,26 +19,29 @@ Rectangle{
     property bool selected:false
     property bool enablePopUp: true
     property real value:0 //valore in x a cui sta il marker in udm
-    property real realX:x+icon.width/2
     property real limiteDefMin: modM.limDefMin
     property real limiteDefMax: modM.limDefMax
     property real defCode: modM.defCode
     property bool deselectOnRelease:false
     property real whoAmI:modM.whoAmI
 
+    property real valuey:0
+    property int countUpDown:0
 
     signal modifyMe
     signal deleteMe
-
 
     color:"transparent"
     visible:modM.visible
     height:lineLength+icon.height+label.height
     width:icon.height
-    onXChanged: value=(vMax-vMin)*((rootMarker.x+icon.width/2)-min)/(max-min)+vMin
+
+    onXChanged: value = (vMax-vMin)*((rootMarker.x+icon.width/2)-min)/(max-min)+vMin
 
     onVMaxChanged: {updateX(value);updateY(value)}
     onVMinChanged: {updateX(value);updateY(value)}
+    onYMaxChanged: {updateY(value)}
+    onYMinChanged: {updateY(value)}
 
     MarkerModel{id:modM
     //onImgChanged: if(img!=="")icon.source=img+".bmp"
@@ -78,10 +81,11 @@ Rectangle{
             var pos = xval*modM.nas
             pos = pos.toFixed(0)
             var valPer=(modM.valuesY[pos])/(yMax - yMin)
-            linea.height = (lineLength*valPer)
+            valuey = lineLength*countUpDown/10
+            linea.y = rootMarker.height*(1-valPer)+((rootMarker.height-lineLength)*valPer)-valuey
+            linea.height = lineLength*valPer
         }
     }
-
 
     function updateX(v)
     {
@@ -129,13 +133,11 @@ Rectangle{
         id:linea
         height:lineLength
         width:1
-        anchors.bottom:rootMarker.bottom
+        anchors.bottom: (modM.type !== "Analytical") ? rootMarker.bottom : undefined
         anchors.horizontalCenter: icon.horizontalCenter
         color:modM.color
         opacity: 1
     }
-
-
 
     Image{
         id:icon
@@ -211,7 +213,7 @@ Rectangle{
         }
         onReleased: {
             moving=false;
-            rootMarker.modifyMe()
+            if (!clicright.visible) rootMarker.modifyMe()
             if(deselectOnRelease)
                 selected=false
         }

@@ -368,6 +368,8 @@ Rectangle {
             anchors.margins: 2
             vMax:(plotter.time > plotter.pageTime) ? plotter.time : plotter.pageTime
             vMin:(plotter.time > plotter.pageTime) ? (plotter.time - plotter.pageTime) : 0
+            yMax:plotter.yMax
+            yMin:plotter.yMin
             //onNewMarkerChanged:if(completed)currentObject=newMarker
         }
     }

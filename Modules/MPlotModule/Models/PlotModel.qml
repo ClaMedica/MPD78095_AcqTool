@@ -35,14 +35,14 @@ ListModel {
     //X Proprietà del testo Major
     property string xALMajFontFamily: "Luxi Serif"
     property string xALMajFontColor: "black"
-    property real xALMajFontSize: 8
+    property real xALMajFontSize: PicoFlow ? 8 : 12
     property real xALMajTextDist: 5
     property bool xALMajTextVisible: true
     property real xALMajOpacity: 1.0
     //X Proprietà del testo Minor
     property string xALMinFontFamily: "Luxi Serif"
     property color xALMinFontColor: Qt.rgba(0.5, 0.5, 0.5)
-    property real xALMinFontSize: 6
+    property real xALMinFontSize: PicoFlow ? 6 : 10
     property real xALMinTextDist: 2
     property bool xALMinTextVisible: false
     property real xALMinOpacity: 1.0
@@ -65,14 +65,14 @@ ListModel {
     //Y Proprietà del testo Major
     property string yALMajFontFamily: "Luxi Serif"
     property string yALMajFontColor: "grey"
-    property real yALMajFontSize: 12
+    property real yALMajFontSize: PicoFlow ? 12 : 14
     property real yALMajTextDist: 5
     property bool yALMajTextVisible: true
     property real yALMajOpacity: 1.0
     //Y Proprietà del testo Minor
     property string yALMinFontFamily: "Luxi Serif"
     property color yALMinFontColor: Qt.rgba(0.5, 0.5, 0.5)
-    property real yALMinFontSize: 10
+    property real yALMinFontSize: PicoFlow ? 10 : 12
     property real yALMinTextDist: 2
     property bool yALMinTextVisible: true
     property real yALMinOpacity: 1.0
@@ -81,7 +81,7 @@ ListModel {
     property bool yAUOMVisible: true
     property string yAFontUOMFamily: "Luxi Serif"
     property color yAFontUOMColor: "gray"//Qt.rgba(0.8, 0.8, 0.8)
-    property real yAFontUOMSize: 10
+    property real yAFontUOMSize: PicoFlow ? 10 : 20
     property real yATextUOMDist: 5
     property real yAOpacityUOM: 1.0
     property real yAUOMRotation: -90

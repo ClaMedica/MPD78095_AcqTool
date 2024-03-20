@@ -89,9 +89,10 @@ int main(int argc, char *argv[])
 #if defined(MAC) || defined(WIN32)
      QString logFile = "acqTool_log.htm";// + QDateTime::currentDateTime().toString("yyyyMMdd_hhmmss")+".htm";
      gPath_log = g_P7SettingsManager.dataPath() + "/Temp/"+ logFile;
-     qDebug() << "Start. log:" << gPath_log;
+
      //dirotto il debug log
      MyMessageOutput::init(gPath_log);
+     qDebug() << "Start. log:" << gPath_log;
 #endif
 
     //localizzazione
@@ -119,6 +120,7 @@ int main(int argc, char *argv[])
     if((argc > 1) && (strcmp(argv[argc - 1], (const char *)"debug") == 0))
           DebugAcqTool = true;
 
+    gUser_logged = argv[5]; //utente loggato
 #ifdef PICOFLOW
         g_mainAppBridge = new AcqBridge(QStringList() << argv[1] << argv[2]);   //definisco un bridge tra app di tipo server
 #endif

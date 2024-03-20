@@ -66,10 +66,18 @@ MForm{
         gridActions.items=info
     }
 
-    function setCommandsInfo(info)
+    function setCommandsInfo(info,enabledUser)
     {
         console.log(info)
         gridComand.items=info
+        if (enabledUser === "false"){
+            for (var i=0; i<gridComand.items.length; i++)
+                if (gridComand.items[i]===MDataManager.ANALISI) {
+                    gridComand.items[i+4] = false
+                    break
+                }
+            gridComand.populate()
+        }
     }
 
     function setCommandsInfoBottom(info)
