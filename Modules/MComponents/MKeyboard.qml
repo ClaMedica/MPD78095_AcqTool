@@ -19,6 +19,7 @@ Rectangle {
     property string testo: ""
     property string oldTesto: ""
     property string labelTarget: ""
+    property bool password: false
 
     property var butShift:undefined
     property var butSpecial:undefined
@@ -74,6 +75,7 @@ Rectangle {
             anchors.verticalCenter: parent.verticalCenter
             onTextChanged: if(target!=undefined) target.text=txtField.text
             validator: target!=undefined?target.validator:null
+            echoMode: password ? TextInput.Password : TextInput.Normal
         }
     }
 

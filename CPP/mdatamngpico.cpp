@@ -66,6 +66,7 @@ void MDataMngPico::getGrabbedImage(QObject *gi, QString __nome)
 
 void MDataMngPico::send_Command(int __command)  // replicato da macqmanager perche' non lo si puo' invocare
 {
+    qDebug() << "traccia start-stop " << __command;
     QByteArray msg = (__command == 4) ? "suspBt" : "restartBt";
 
     udpConn.sendSup(msg);
@@ -138,6 +139,9 @@ void MDataMngPico::udpMdmBtDecode(enum WHO __from, QByteArray __msg)
 void MDataMngPico::exitFromReview()
 {
     qDebug() << "Exit" << getToSave();
+
+    if (g_File_LogGDPR.isOpen())
+        g_File_LogGDPR.close();
 
     if (!m_autoLoop) //se non sono in un loop
     {

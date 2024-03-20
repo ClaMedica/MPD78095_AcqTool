@@ -260,7 +260,7 @@ void printermanager::imagePrint()
         imagePrintForward(emptyLines);
         emptyLines = 0;
     }
-    qDebug("linee effettive:%d", lastNotEmpty);
+    //qDebug("linee effettive:%d", lastNotEmpty);
     imageInit();    // immagine azzerata
 
     // riga di strappo
@@ -303,7 +303,7 @@ void printermanager::imageText(QString txt, int fontSize, bool restoreFont)
 
 void printermanager::imageGraph(QString head, QString baset, double xscale, int maxL, int maxR, double *bufL, double *bufR)
 {
-    qDebug()<<"head,baset,xscale:"<<head<<baset<<xscale;
+    //qDebug()<<"head,baset,xscale:"<<head<<baset<<xscale;
     QStringList baseLst = baset.split(" ", QString::SkipEmptyParts);
     imagePt.rx() = 5;
 
@@ -320,7 +320,7 @@ void printermanager::imageGraph(QString head, QString baset, double xscale, int 
         int left = (digitsW + 1);
         int h = 240;
         int w = (imageQsz.width()-imagePt.rx()) - (left + digitsW+5 /* destra */ ); // logical width
-        qDebug("digitsW:%d w:%d",digitsW,w);
+        //qDebug("digitsW:%d w:%d",digitsW,w);
 
         QPoint lt(imagePt.rx() + left, imagePt.ry());         // leftTop
         QPoint lb(imagePt.rx() + left, imagePt.ry() + h);     // leftBottom
@@ -359,7 +359,7 @@ void printermanager::imageGraph(QString head, QString baset, double xscale, int 
             xscale = ((double)(NUMOF_X_PRINT_DOTS) / w);
         }
         QPoint * points = new QPoint[w];
-        qDebug()<<"w,m_num_sam:"<<w<<m_num_sam<<" --> xscale:"<<xscale;
+        //qDebug()<<"w,m_num_sam:"<<w<<m_num_sam<<" --> xscale:"<<xscale;
         imageGraphSingle(lb, points, m_num_sam, xscale, (double)h/maxL, bufL, h);
         if(maxR > 0)
             imageGraphSingle(lb, points, m_num_sam, xscale, (double)h/maxR, bufR, h);
@@ -372,7 +372,7 @@ void printermanager::imageGraph(QString head, QString baset, double xscale, int 
 
 void printermanager::imageGraphSingle(QPoint leftBottom, QPoint *pts, int npts, double kx, double ky, double *bufV, int maxy)
 {
-    qDebug()<<"npts,kx:"<<npts<<kx;
+    //qDebug()<<"npts,kx:"<<npts<<kx;
     for (int ix = 0; ix < npts; ix++ ) {
         int x  = leftBottom.rx() + (int)(kx * ix);
         int ty = (int)(ky * bufV[ix]);
@@ -434,7 +434,7 @@ void printermanager::print(QString __datiCalib)
     }
     m_num_sam = minNas * m_durata;
     m_realDots = m_num_sam;
-    qDebug("m_num_sam: %d",m_num_sam);
+    //qDebug("m_num_sam: %d",m_num_sam);
 
     m_dfm->Close();
 
@@ -445,7 +445,7 @@ void printermanager::print(QString __datiCalib)
 
 void printermanager::pri_rep_review()
 {
-    qDebug("pri_rep_review()");
+    //qDebug("pri_rep_review()");
     int n_chEmg = 0, n_chFlw = 0, n_chVol = 0;
 
     m_dfm->Open();
@@ -492,7 +492,7 @@ void printermanager::pri_rep_review()
     int real_lenght = (n_chVol > n_chFlw) ? n_chFlw : n_chVol;
     if(real_lenght > 20*60*10)
         real_lenght = 20*60*10;
-    qDebug("real_lenght: %d", real_lenght);
+    //qDebug("real_lenght: %d", real_lenght);
 
     // emg: allineamento lunghezze e decimazione valori
     if(m_chEmg >= 0) {
@@ -532,7 +532,7 @@ void printermanager::pri_rep_review()
     }
     else
         xscale = 0.8;   // 1mm = 1sec, 1mm = 8 linee, 10 campioni --> 8 linee
-    qDebug("real_lenght:%d xscale:%.6f", real_lenght, xscale);
+    //qDebug("real_lenght:%d xscale:%.6f", real_lenght, xscale);
 
     // compressione asse X con fattore xscale per i 3 buffer
     if(xscale != 1.0) {
@@ -568,7 +568,7 @@ void printermanager::pri_rep_review()
     m_num_sam = m_realDots = real_lenght * xscale;
 
     smooting_PRINT_flow(); // qui riempie il buffer di stampa con il set mediato dei campioni di flusso
-    qDebug("dopo smooting_PRINT_flow()");
+    //qDebug("dopo smooting_PRINT_flow()");
     
     int max_volume = 0;
     for (int i = 0; i < m_realDots; i++)	// cerco il massimo del buffer volume
@@ -589,7 +589,7 @@ void printermanager::pri_rep_review()
     m_dfm->Close();
 
     Pri_Rep(xscale);
-    qDebug("fine pri_rep_review()");
+    //qDebug("fine pri_rep_review()");
 }
 
 /**
@@ -633,7 +633,7 @@ questa funzione gestisce tutta la stampa del report, sia in modalita portrait ch
 #include "QApplication"
 void printermanager::Pri_Rep(double xscale)
 {
-    qDebug("xscale:%f",xscale);
+    //qDebug("xscale:%f",xscale);
     Intest();       // Intestazione
     Report_data();  // scrive i dati del paziente e lo spazio per le note manuali
 
@@ -650,7 +650,7 @@ void printermanager::Pri_Rep(double xscale)
         Calc_Max_RealReport_rel2(m_num_sam);
         Report_Real_Time(/*xscale*/ 1.0);
     }
-    qDebug() << "dopo Report XXX";
+    //qDebug() << "dopo Report XXX";
 
     if(m_printLiverpool)
         Report_BitMap(1);           // Grafico Liverpool
@@ -765,7 +765,7 @@ stampa del grafico di EMG nella versione a grafici in portrait mode
 void printermanager::Report_emg(double xscale)
 {
     Calc_Max_EMG();
-    qDebug() << "m_max_emg:" << m_max_emg << "m_max_y:" << m_max_y;
+    //qDebug() << "m_max_emg:" << m_max_emg << "m_max_y:" << m_max_y;
 
     QString EMGTitle = " EMG (uV)             "+tr("EMG Diagram");
     imageGraph(EMGTitle,
@@ -880,7 +880,7 @@ Stampa dei nomogrammi
 */
 void printermanager::Report_BitMap(int __nomo) //0 = Siro; 1 = Liver; 2 = Misk
 {
-    qDebug("inizio pr bitm");
+    //qDebug("inizio pr bitm");
     int     sz;
     char  * p;
 
@@ -909,7 +909,7 @@ void printermanager::Report_BitMap(int __nomo) //0 = Siro; 1 = Liver; 2 = Misk
     }
     imagePt.ry() = row + 50;
 
-    qDebug("fine pr bitm imagePt.ry():%d", imagePt.ry());
+    //qDebug("fine pr bitm imagePt.ry():%d", imagePt.ry());
 }
 
 /**
@@ -1088,7 +1088,7 @@ void printermanager::getImage(QImage __img, QString __nome)
     }
 
     free(bm);
-    qDebug("fine getGrabbed, nblack:%d", nblack);
+    //qDebug("fine getGrabbed, nblack:%d", nblack);
 }
 
 /**
@@ -1113,7 +1113,7 @@ void printermanager::Calc_Max(double xscale)
                             };
     int max_x = (m_num_sam / xscale) / 10;
     m_i_max_x = 0;
-    qDebug("m_num_sam:%d m_max_x:%d",m_num_sam,max_x);
+    //qDebug("m_num_sam:%d m_max_x:%d",m_num_sam,max_x);
 
     if(max_x < 0)
         max_x = 1;
@@ -1125,8 +1125,8 @@ void printermanager::Calc_Max(double xscale)
             m_i_max_x = i;
             break;
         }
-    qDebug("m_max_x:%d m_i_max_x:%d",max_x,m_i_max_x);
-    qDebug("label time >>%s<<",str_label_time[m_i_max_x]);
+   // qDebug("m_max_x:%d m_i_max_x:%d",max_x,m_i_max_x);
+    //qDebug("label time >>%s<<",str_label_time[m_i_max_x]);
 
     if (m_rangeChQ == -1) //limite superiore non definito
     {
@@ -1160,7 +1160,7 @@ void printermanager::Calc_Max_EMG()
         if (v > m_max_emg)
             m_max_emg = v;
     }
-    qDebug() << "m_max_emg:"<<m_max_emg;
+    //qDebug() << "m_max_emg:"<<m_max_emg;
 
     static int v_max_y[] = {
                             50,   100,   150,   200,   250,   300,   350,   400,   450,
@@ -1175,14 +1175,14 @@ void printermanager::Calc_Max_EMG()
         for(int i = 0; v_max_y[i] > 0; i++)
             if(m_max_emg <= v_max_y[i]) {
                 m_max_y = v_max_y[i];
-                qDebug() << "m_max_y:"<<m_max_y;
+                //qDebug() << "m_max_y:"<<m_max_y;
                 return;
             }
     }
     else if (m_rangeChEMG < 3500)
     {
         m_max_y = m_rangeChEMG;
-        qDebug() << "m_max_y autono:"<<m_max_y;
+        //qDebug() << "m_max_y autono:"<<m_max_y;
         return;
     }
 
@@ -1267,5 +1267,5 @@ void printermanager::Calc_Max_RealReport_rel2(short __num_sample)
     if (m_rangeChEMG > 0 && m_rangeChEMG <= 3500) //limite superiore defintio
         m_max_emg = m_rangeChEMG;
 
-    qDebug("vmax:%d emgMax:%d", vol_max, emg_max);
+    //qDebug("vmax:%d emgMax:%d", vol_max, emg_max);
 }

@@ -114,7 +114,7 @@ Rectangle {
                     mngSys.startSound()
                     if (keyboardNum !== undefined)
                     {
-                        keyboardNum.testo = cbDay.text
+                        keyboardNum.oldTesto = cbDay.text
                         keyboardNum.target = cbDay
                         keyboardNum.labelTarget = qsTr("Day")
                         DataEngine.putItemOnTop(keyboardNum)
@@ -140,7 +140,7 @@ Rectangle {
                     mngSys.startSound()
                     if (keyboardNum !== undefined)
                     {
-                        keyboardNum.testo = cbMonth.text
+                        keyboardNum.oldTesto = cbMonth.text
                         keyboardNum.target = cbMonth
                         keyboardNum.labelTarget = qsTr("Month")
                         DataEngine.putItemOnTop(keyboardNum)
@@ -174,7 +174,7 @@ Rectangle {
                     if (keyboardNum !== undefined)
                     {
                         edYear.oldYear = edYear.text
-                        keyboardNum.testo = edYear.text
+                        keyboardNum.oldTesto = edYear.text
                         keyboardNum.target = edYear
                         keyboardNum.labelTarget = qsTr("Year")
                         DataEngine.putItemOnTop(keyboardNum)
