@@ -48,11 +48,13 @@ Rectangle {
     onComponentChanged: if(component !== undefined) connection.target = component
 
 
-   onEnabledChanged: {
-       if(type === typTextField && !enabled)
-           component.textColor = "gray"
-       else
-           component.textColor = "black"
+    onEnabledChanged: {
+        if(type === typTextField) {
+            if (!enabled)
+                component.textColor = "gray"
+            else
+                component.textColor = "black"
+       }
    }
 
     function reload()

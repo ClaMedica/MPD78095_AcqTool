@@ -179,7 +179,9 @@ void MDataMngPico::exitFromReview()
     send_Command(5);   // STARTBT
     if (m_autoLoop)
         g_mainAppBridge->sendLoop();
-    else
+    else {
+        udpConn.sendSup("ButtonStStDisable");
         g_mainAppBridge->sendExitReview();
+    }
     g_mainAppBridge->sendSwitch(); //poi dovra tornare al modulo database
 }
