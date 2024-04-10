@@ -618,9 +618,7 @@ bool MAcqManager::sendStopAcq()
     qDebug() << "sendStopAcq()";
     m_alarmMng.manageAlarm(ALA_NOT_ACQUIRING, DISABLE);
     bool ret = sendCommand(ETCP_CMD_STOP);
-#ifdef PICOFLOW
-    udpConn.sendSup("ButtonStStDisable");
-#endif
+
     return ret;
 }
 

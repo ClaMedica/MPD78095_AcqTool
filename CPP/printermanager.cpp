@@ -1128,7 +1128,7 @@ void printermanager::Calc_Max(double xscale)
    // qDebug("m_max_x:%d m_i_max_x:%d",max_x,m_i_max_x);
     //qDebug("label time >>%s<<",str_label_time[m_i_max_x]);
 
-    if (m_rangeChQ == -1) //auto-range abilitato
+    if (m_rangeChQ == -1) //limite superiore non definito
     {
         int decina = m_flu_max / 10;
         m_max_y = (decina + 1) * 10;			// trovo la decina minima superiore al valore max
@@ -1144,12 +1144,12 @@ void printermanager::Calc_Max(double xscale)
         if (m_max_y <=  80) m_max_y =  80; else
             m_max_y = 100;
     }
-    else //auto-range disabilitato
+    else
         m_max_y = m_rangeChQ;
 
-    if (m_rangeChVV == -1)//auto-range abilitato
+    if (m_rangeChVV == -1)//limite superiore non definito
         m_max_y_gr2 = ((long) ((m_max_vol + 10) / 100) + 1) * 100;	// 05 dicembre
-    else //auto-range disabilitato
+    else
         m_max_y_gr2 = m_rangeChVV;
 }
 
@@ -1171,7 +1171,7 @@ void printermanager::Calc_Max_EMG()
 
 
     //auto-range abilitato
-    if (m_rangeChEMG == -1) {
+    if (m_rangeChEMG == -1) { //limite superiore non definito
         for(int i = 0; v_max_y[i] > 0; i++)
             if(m_max_emg <= v_max_y[i]) {
                 m_max_y = v_max_y[i];
@@ -1179,14 +1179,14 @@ void printermanager::Calc_Max_EMG()
                 return;
             }
     }
-    else if (m_rangeChEMG < 3250) //auto-range disabilitato
+    else if (m_rangeChEMG < 3500)
     {
         m_max_y = m_rangeChEMG;
         //qDebug() << "m_max_y autono:"<<m_max_y;
         return;
     }
 
-    m_max_y = 3250;
+    m_max_y = 3500;
     return;
 }
 
@@ -1203,14 +1203,8 @@ long printermanager::Calc_Max_Flw()
         flw_max = 25;
     else
         flw_max = 50;
-//    else if(flw_max <= 50)
-//        flw_max = 50;
-//    else if(flw_max <= 75)
-//        flw_max = 75;
-//    else //if(flw_max <= 160)
-//        flw_max = 100;
 
-    if (m_rangeChQ > 0 && m_rangeChQ < 50) //auto-range disabilitato
+    if (m_rangeChQ > 0) //massimo definito
         flw_max = m_rangeChQ;
 
     return flw_max;
@@ -1267,10 +1261,10 @@ void printermanager::Calc_Max_RealReport_rel2(short __num_sample)
     }
     m_max_emg = emg_max;
 
-    if (m_rangeChVV > 0 && m_rangeChVV < 1000) //auto-range disabilitato
+    if (m_rangeChVV > 0 && m_rangeChVV < 1000) //limite superiore definito
         m_max_vol = m_rangeChVV;
 
-    if (m_rangeChEMG > 0 && m_rangeChEMG < 3500) //auto-range disabilitato
+    if (m_rangeChEMG > 0 && m_rangeChEMG <= 3500) //limite superiore defintio
         m_max_emg = m_rangeChEMG;
 
     //qDebug("vmax:%d emgMax:%d", vol_max, emg_max);

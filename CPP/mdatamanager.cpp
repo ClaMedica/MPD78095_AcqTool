@@ -359,8 +359,9 @@ void MDataManager::loadFile(QString __fileName)
                 QStringList rangesDef = chName->getSafeChild(ATT_RANGE)->getSafeAttribute(ATT_MODEL).split("#");
                 //autorange
                 QString autorange = chName->getSafeChild(ATT_YAUTOSCALE)->getSafeAttribute(ATT_VALUE);
-                if (autorange == "true") {
 
+                if (autorange == "true")
+                {
                     while (M > supLim)
                     {
                         double newSupLim = supLim + rangesDef.at(2).toInt();//aggiungo lo step
@@ -369,6 +370,7 @@ void MDataManager::loadFile(QString __fileName)
                         else
                             break;
                     }
+
                     while (m < infLim)
                     {
                         double newInfLim = infLim - rangesDef.at(2).toInt();//aggiungo lo step
@@ -377,26 +379,15 @@ void MDataManager::loadFile(QString __fileName)
                         else
                             break;
                     }
+                }
 
-                    if (sig->getName().startsWith("VV"))
-                        m_rangeChVV = -1;
-                    else if (sig->getName().startsWith("Q"))
-                        m_rangeChQ = -1;
-                    else if (sig->getName().startsWith("EMG"))
-                        m_rangeChEMG = -1;
-                }
-                else
-                {
-                    //picoflow2r3 devo passare i range dei canali alla stampa
-                    if (sig->getName().startsWith("VV"))
-                        m_rangeChVV = supLim;
-                    else if (sig->getName().startsWith("Q"))
-                        m_rangeChQ = supLim;
-                    else if (sig->getName().startsWith("EMG")) {
-                        if (supLim < 3500) supLim = 3500;
-                        m_rangeChEMG = supLim;
-                    }
-                }
+                //picoflow2r3 devo passare i range dei canali alla stampa
+                if (sig->getName().startsWith("VV"))
+                    m_rangeChVV = supLim;
+                else if (sig->getName().startsWith("Q"))
+                    m_rangeChQ = supLim;
+                else if (sig->getName().startsWith("EMG"))
+                    m_rangeChEMG = supLim;
             }
 
             sig->setSupLim(supLim);
