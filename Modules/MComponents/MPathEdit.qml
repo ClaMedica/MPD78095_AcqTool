@@ -18,7 +18,7 @@ Rectangle {
         anchors.left:parent.left
         anchors.right:btnDialog.left
         anchors.bottom:parent.bottom
-        labelSize: layout.value("F4")
+        labelSize: PICO3000? 4 : layout.value("F4")
         enabled: false
         text:""
     }

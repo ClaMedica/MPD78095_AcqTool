@@ -77,7 +77,6 @@ TRANSLATIONS += acqtool.xlf \
         ../MPD78097_Database/msqlpatientdiagnosiscodes.cpp \
         ../MPD78097_Database/msqlpatients.cpp \
         ../MPD78097_Database/msqlpatientsubcategory.cpp \
-        ../MPD78097_Database/msqlresults.cpp \
         ../MPD78097_Database/msqlroutinearrangement.cpp \
         ../MPD78097_Database/msqlsubcategories.cpp \
         ../MPD78097_Database/msqltests.cpp
@@ -131,7 +130,6 @@ TRANSLATIONS += acqtool.xlf \
         ../MPD78097_Database/msqlpatientdiagnosiscodes.h \
         ../MPD78097_Database/msqlpatients.h \
         ../MPD78097_Database/msqlpatientsubcategory.h \
-        ../MPD78097_Database/msqlresults.h \
         ../MPD78097_Database/msqlroutinearrangement.h \
         ../MPD78097_Database/msqlsubcategories.h \
         ../MPD78097_Database/msqltests.h

@@ -15,9 +15,6 @@ import FileIO 1.0
 
 ApplicationWindow {
     //@@@@@@@@@@ Definitions @@@@@@@@@@
-    //property var keyboard:appKey
-//    property string examFolder:settings.datafilePath
-//    property string configFolder:settings.appPath()
     property bool vis: false
     property bool btOkPrint: false
 
@@ -35,7 +32,7 @@ ApplicationWindow {
 
     //@@@@@@@@@@    Events          @@@@@@@@@@
      Component.onCompleted: {
-         acqLoaded.createFileLoaded()
+         if (PicoFlow) acqLoaded.createFileLoaded()
          console.log("desktop ", Qt.application.arguments[1])
          //se l'argomento 1 è vis o acq stiamo parlando di desktop
          //altrimenti è picoflow2r3 che fa partire acqtool con i parametri per il bridge

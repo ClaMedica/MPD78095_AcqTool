@@ -69,7 +69,7 @@ Rectangle {
         text:rootBtn.text
         anchors.fill: rootBtn
         labelSize: rootBtn.labelSize
-        color: control.pressed?"white": layout.value("textTable")
+        color: control.pressed ? "white": (PICO3000 ? "black": layout.value("textTable"))
         horizontalAlignment: Text.AlignHCenter
         verticalAlignment: Text.AlignVCenter
         Behavior on color {

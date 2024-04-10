@@ -47,6 +47,10 @@ Rectangle {
 
     onComponentChanged: if(component !== undefined) connection.target = component
 
+    onFocusChanged: {
+        if (rootParEdit.focus)
+            component.focus = true
+    }
 
    onEnabledChanged: {
        if(type === typTextField && !enabled)

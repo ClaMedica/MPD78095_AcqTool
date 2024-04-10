@@ -221,7 +221,11 @@ void MDataManager::loadFile(QString __fileName)
         MSQLPatients                *tesPatient;
         MSQLTests                   *tesTest;
         MDatabase db;
+#ifdef PICOFLOW
         db.connectDatabase(QDir::toNativeSeparators(g_P7SettingsManager.dataPath() + "/db.sqlite3"));
+#else
+        db.connectDatabase();
+#endif
         tesPatient = (MSQLPatients*) db.modelPointer(TAB_Patients);
         tesTest = (MSQLTests*) db.modelPointer(TAB_Tests);
 
@@ -1077,7 +1081,7 @@ bool MDataManager::saveDataAndUpdate(QString __family, QString __name, VarMapVec
     }
 
     if(m_storage.archive(__family, __name, __elements, __whatIfAlreadyPresent)) {
-        //se siamo qua dentro vuol dire che tutto A? andato liscio e possiamo visualizzare le info all'utente
+        //se siamo qua dentro vuol dire che tutto e' andato liscio e possiamo visualizzare le info all'utente
         if(!m_data.keys().contains(__family)) {
             m_data[__family].append(__name);
             emit availableTracksChanged();
