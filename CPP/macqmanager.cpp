@@ -331,7 +331,7 @@ bool MAcqManager::newAcquisition(QString __dataFile)
         if (QDir(g_P7SettingsManager.progPath() ).exists(outF))
             QDir(g_P7SettingsManager.progPath()).remove(outF);
 #else
-        OutFile = new QFile(g_P7SettingsManager.dataPath() + "/Temp/" + outF);
+        OutFile = new QFile(g_P7SettingsManager.tempPath() + "/" + outF);
         //Create the out_file new
         if (QDir(g_P7SettingsManager.progPath() ).exists(outF))
             QDir(g_P7SettingsManager.progPath()).remove(outF);

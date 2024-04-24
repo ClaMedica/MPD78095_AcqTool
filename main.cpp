@@ -88,7 +88,7 @@ int main(int argc, char *argv[])
 
 #if defined(MAC) || defined(WIN32)
      QString logFile = "acqTool_log.htm";// + QDateTime::currentDateTime().toString("yyyyMMdd_hhmmss")+".htm";
-     gPath_log = g_P7SettingsManager.dataPath() + "/Temp/"+ logFile;
+     gPath_log = g_P7SettingsManager.tempPath() + "/"+ logFile;
 
      //dirotto il debug log
      MyMessageOutput::init(gPath_log);
@@ -193,7 +193,7 @@ int main(int argc, char *argv[])
 #endif
 
 #endif
-
+    engine.rootContext()->setContextProperty("PICO3000", bool_false);
     engine.rootContext()->setContextProperty("layout", &mngLayout);
     engine.rootContext()->setContextProperty("grafic", &mngGrafic);
     //engine.rootContext()->setContextProperty("settings", &g_P7SettingsManager);

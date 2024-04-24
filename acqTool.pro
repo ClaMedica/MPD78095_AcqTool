@@ -30,6 +30,7 @@ TRANSLATIONS += acqtool.xlf \
     }
 
     SOURCES += \
+    ../M8078027_MGlobal/simplecrypt.cpp \
     ../MPD78097_Database/msqloperators.cpp \
     ../MPD78097_Database/msqlsenders.cpp \
     CPP/TCP/SimpleTCPClientAcq.cpp \
@@ -82,6 +83,7 @@ TRANSLATIONS += acqtool.xlf \
         ../MPD78097_Database/msqltests.cpp
 
     HEADERS += \
+    ../M8078027_MGlobal/simplecrypt.h \
     ../MPD78097_Database/msqloperators.h \
     ../MPD78097_Database/msqlsenders.h \
     CPP/TCP/SimpleTCPClientAcq.h \
