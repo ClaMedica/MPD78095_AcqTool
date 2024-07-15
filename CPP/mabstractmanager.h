@@ -17,9 +17,11 @@
 #include "QtGlobal"
 //classe per unita di misura
 #include "UdmImpl.h"
-#include "appbridge.h"
 
+#ifdef PICOFLOW
+#include "appbridge.h"
 extern AcqBridge *g_mainAppBridge;
+#endif
 
 enum AvvisiUtente {
     AVV_ANMNOINSERT = 0,

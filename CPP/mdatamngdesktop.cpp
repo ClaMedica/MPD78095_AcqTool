@@ -7,10 +7,12 @@
 #include <QTextDocument>
 #include <QProcess>
 #include <QDateTime>
+#include <QPixmap>
 
 
 #ifdef WIN32
 #include <QAxObject>
+#include <windows.h>
 #endif
 
 extern bool DebugAcqTool;

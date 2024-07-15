@@ -53,7 +53,6 @@ TRANSLATIONS += acqtool.xlf \
         CPP/TCP/TcpSettingFile.cpp \
         CPP/graficmanager.cpp \
         ../M8078027_MGlobal/ancestry.cpp \
-        ../M8078027_MGlobal/appbridge.cpp \
         ../M8078027_MGlobal/global.cpp \
         ../M8078027_MGlobal/layoutmanager.cpp \
         ../M8078027_MGlobal/msignal.cpp \
@@ -110,7 +109,6 @@ TRANSLATIONS += acqtool.xlf \
         ../MPD78096_AnaUro/Anaerrorcodes.h \
         ../MPD78096_AnaUro/anautils.h \
         ../M8078027_MGlobal/ancestry.h \
-        ../M8078027_MGlobal/appbridge.h \
         ../M8078027_MGlobal/global.h \
         ../M8078027_MGlobal/layoutmanager.h \
         ../M8078027_MGlobal/msignal.h \
@@ -260,35 +258,18 @@ unix {
 CONFIG += link_pkgconfig
 
 
-
-LINUXDESKTOP {
-    QMAKE_CXXFLAGS += -Wno-psabi
-    DEFINES += LINUXDESKTOP
-    DEFINES += LINUX
-    TARGET = PicoAcq
-    RESOURCES += modules_LinuxDesktop.qrc
-
-    #datafile manager
-    LIBS        += -L$$PWD/../Build-Linux/DatafileManager -lDatafileManager
-    INCLUDEPATH +=   $$PWD/../Build-Linux/DatafileManager
-    DEPENDPATH  +=   $$PWD/../Build-Linux/DatafileManager
-
-    # Additional import path used to resolve QML modules in Qt Creator's code model
-    QML_IMPORT_PATH = ../MGlobal
-    QML_IMPORT_PATH +=  Modules
-
-}
-
 CLAUDIA {
     QMAKE_CXXFLAGS += -Wno-psabi
     DEFINES += PICOFLOW
     TARGET = PicoAcq
 
     SOURCES += \
-        CPP/mdatamngpico.cpp
+        CPP/mdatamngpico.cpp \
+        ../M8078027_MGlobal/appbridge.cpp \
 
     HEADERS += \
-        CPP/mdatamngpico.h
+        CPP/mdatamngpico.h \
+        ../M8078027_MGlobal/appbridge.h \
 
     RESOURCES += modules_picoflow.qrc
 
@@ -311,12 +292,12 @@ PICOFLOW {
     TARGET = PicoAcq
 
     SOURCES += \
-#        ../MGlobal/udpmsgs.cpp \
-        CPP/mdatamngpico.cpp
+        CPP/mdatamngpico.cpp \
+        ../M8078027_MGlobal/appbridge.cpp \
 
     HEADERS += \
-#        ../MGlobal/udpmsgs.h \
-        CPP/mdatamngpico.h
+        CPP/mdatamngpico.h \
+        ../M8078027_MGlobal/appbridge.h \
 
     RESOURCES += modules_picoflow.qrc
 

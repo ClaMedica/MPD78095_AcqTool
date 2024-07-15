@@ -21,7 +21,6 @@
 #include <QObject>
 #include <p7settingsmanager.h>
 #include <MyMessageOutput.h>
-#include <appbridge.h>
 #include <QApplication>
 #include <QQuickWindow>
 #include "layoutmanager.h"
@@ -38,12 +37,12 @@ bool DebugAcqTool = false;
 #include <androidmanager.h>
 #endif
 
-char strvers[] = "AcqTool del " __DATE__ " alle " __TIME__;
-
-
-AcqBridge *g_mainAppBridge;
 #ifdef PICOFLOW
+#include <appbridge.h>
+AcqBridge *g_mainAppBridge;
 #endif
+
+char strvers[] = "AcqTool del " __DATE__ " alle " __TIME__;
 
 int main(int argc, char *argv[])
 {
@@ -159,6 +158,7 @@ int main(int argc, char *argv[])
     engine.rootContext()->setContextProperty("isTouch", bool_true);
     engine.rootContext()->setContextProperty("PicoFlow", bool_true);
     engine.rootContext()->setContextProperty("Mac", bool_false);
+    engine.rootContext()->setContextProperty("bridgeMain", g_mainAppBridge);
 #endif
 
 #ifdef ANDROID
@@ -167,14 +167,6 @@ int main(int argc, char *argv[])
     engine.rootContext()->setContextProperty(QLatin1String("androidmanager"),
                                              androidmanager);
     engine.rootContext()->setContextProperty(QLatin1String("platform"), "android");
-#endif
-
-#ifdef LINUXDESKTOP
-    engine.rootContext()->setContextProperty(QLatin1String("platform"), "linux");
-    engine.rootContext()->setContextProperty("screenH", 480);
-    engine.rootContext()->setContextProperty("screenW", 640);
-    engine.rootContext()->setContextProperty("isTouch", bool_false);
-    engine.rootContext()->setContextProperty("PicoFlow", bool_false);
 #endif
 
 #if defined(WIN32) || defined(MAC)
@@ -197,7 +189,6 @@ int main(int argc, char *argv[])
     engine.rootContext()->setContextProperty("layout", &mngLayout);
     engine.rootContext()->setContextProperty("grafic", &mngGrafic);
     //engine.rootContext()->setContextProperty("settings", &g_P7SettingsManager);
-    engine.rootContext()->setContextProperty("bridgeMain", g_mainAppBridge);    
     engine.rootContext()->setContextProperty("mngSys", &g_systemManager);
 
     qDebug() << engine.importPathList();
