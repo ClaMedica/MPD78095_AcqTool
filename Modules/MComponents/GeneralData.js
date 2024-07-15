@@ -1,37 +1,6 @@
-.pragma library
-var isPatientRowSelected = false
-var selectedPatientRow = ""
-var selectedTestRow= ""
-var BTN_STATE = true
-var BACKGROUND_COLOR = "#355667"
-var TASKBAR_COLOR = "#203d46"
-var hr0 = "#6666FF"
-var hr1 = "#3333FF"
-var FONT_HEADER_POINTSIZE = 10
-var FONT_SUBHEADER_POINTSIZE = 9
-var SELECTED_ROW ="#70B8FF"
-var ir0 = "#FFFFFF"
-var ir1 = "#E0E0E0"
-var ir2 = "#C0C0C0"
-var ir3 = "#A0A0A0"
-var sr = "#66CCFF"
+﻿.pragma library
 
-var c_btn_idle = "#C0C0C0"
-var c_btn_hovered ="#CCE5FF"
-var c_btn_enabled ="#99CCFF"
-var c_btn_checked ="#3399FF"
-var c_btn_pressed ="#0066CC"
-
-var c_btn_orange_hovered ="#F4BC69"
-var c_btn_orange_enabled ="#FFA41C"
-var c_btn_orange_checked ="#F46400"
-var c_btn_orange_pressed ="#F45000"
-
-var MARGIN = 5
-var CategoryWinWidth = 600
-var CategoryWinHeight = 600
-var rowHeight = 40
-
+//utilità
 function isValidDate(d){
     // An invalid date object returns NaN for parse() and NaN is the only
     // object not strictly equal to itself.
