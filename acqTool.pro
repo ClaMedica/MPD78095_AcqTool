@@ -258,34 +258,6 @@ unix {
 CONFIG += link_pkgconfig
 
 
-CLAUDIA {
-    QMAKE_CXXFLAGS += -Wno-psabi
-    DEFINES += PICOFLOW
-    TARGET = PicoAcq
-
-    SOURCES += \
-        CPP/mdatamngpico.cpp \
-        ../M8078027_MGlobal/appbridge.cpp \
-
-    HEADERS += \
-        CPP/mdatamngpico.h \
-        ../M8078027_MGlobal/appbridge.h \
-
-    RESOURCES += modules_picoflow.qrc
-
-    LIBS        += -L/sviluppo/qt/Piattaforma70/Build-IMX6/DatafileManager/ -lDatafileManager
-    INCLUDEPATH +=   /sviluppo/qt/Piattaforma70/Build-IMX6/DatafileManager
-    DEPENDPATH  +=   /sviluppo/qt/Piattaforma70/Build-IMX6/DatafileManager
-
-    # Additional import path used to resolve QML modules in Qt Creator's code model
-    QML_IMPORT_PATH = ../M8078027_MGlobal \
-                      /sviluppo/qt/Piattaforma70/Build-IMX6/CommonPlugin
-
-    DEFINES += nullptr=NULL
-
-
-}
-
 PICOFLOW {
     QMAKE_CXXFLAGS += -Wno-psabi
     DEFINES += PICOFLOW
@@ -300,10 +272,9 @@ PICOFLOW {
         ../M8078027_MGlobal/appbridge.h \
 
     RESOURCES += modules_picoflow.qrc
-
-    LIBS        += -L$$PWD/../Build-IMX6/DatafileManager/ -lDatafileManager
-    INCLUDEPATH +=   $$PWD/../Build-IMX6/DatafileManager
-    DEPENDPATH  +=   $$PWD/../Build-IMX6/DatafileManager
+    LIBS        += -L/sviluppo/qt/Piattaforma70/Build-IMX6/DatafileManager/ -lDatafileManager
+    INCLUDEPATH +=   /sviluppo/qt/Piattaforma70/Build-IMX6/DatafileManager
+    DEPENDPATH  +=   /sviluppo/qt/Piattaforma70/Build-IMX6/DatafileManager
 
     # Additional import path used to resolve QML modules in Qt Creator's code model
     QML_IMPORT_PATH = ../M8078027_MGlobal \
