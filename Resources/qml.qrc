@@ -33,7 +33,6 @@
         <file alias="medica">medica.jpg</file>
         <file alias="resetOff">resetOff.jpg</file>
         <file alias="resetOn">resetOn.jpg</file>
-        <file alias="Supervisor">Supervisor.jpg</file>
     </qresource>
     <qresource prefix="/Config">
         <file>Config_Locale.xml</file>
