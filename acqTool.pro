@@ -247,6 +247,7 @@ STATICO {
     macx:LIBS += -L$$PWD/../BuildStatic/DatafileManager/ -lDatafileManager
     macx:LIBS += -L$$PWD/../BuildStatic/Medicalreport/ -lMedicalReport
     macx:LIBS += -L$$PWD/../BuildStatic/QmlPlotter/ -lQmlPlotter
+
     DEFINES += STATICO
 }
 

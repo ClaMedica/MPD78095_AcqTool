@@ -151,7 +151,8 @@ int main(int argc, char *argv[])
     engine.addImportPath(QApplication::applicationDirPath());
 #endif
 
-#ifdef PICOFLOW//metto questo altrimenti su target non carica il plugin cpp
+#ifdef PICOFLOW
+    //metto questo altrimenti su target non carica il plugin cpp
     engine.rootContext()->setContextProperty(QLatin1String("platform"), "linux");
     engine.rootContext()->setContextProperty("screenH", 480);
     engine.rootContext()->setContextProperty("screenW", 640);
@@ -178,6 +179,7 @@ int main(int argc, char *argv[])
     engine.rootContext()->setContextProperty("PicoFlow", bool_false);
     QString codSoft = QString(argv[3]);
     engine.rootContext()->setContextProperty("codSoft", codSoft);
+    engine.rootContext()->setContextProperty("bridgeMain", nullptr);
 #ifdef MAC
     engine.rootContext()->setContextProperty("Mac", bool_true);
 #else
