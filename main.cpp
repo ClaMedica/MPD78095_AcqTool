@@ -62,8 +62,10 @@ int main(int argc, char *argv[])
 
     QGuiApplication app(argc, argv);
 
+    QString codSoft = QString(argv[3]);
+
     //carico i settaggi
-     g_P7SettingsManager.loadSettings(true);
+     g_P7SettingsManager.loadSettings(true,codSoft.toInt());
 
 #ifdef ANDROID
     QtAndroid::androidActivity().callMethod<void>("registerBroadcastReceiver", "()V");
@@ -177,7 +179,6 @@ int main(int argc, char *argv[])
     engine.rootContext()->setContextProperty("screenH", size.height());
     engine.rootContext()->setContextProperty("screenW", size.width());
     engine.rootContext()->setContextProperty("PicoFlow", bool_false);
-    QString codSoft = QString(argv[3]);
     engine.rootContext()->setContextProperty("codSoft", codSoft);
     engine.rootContext()->setContextProperty("bridgeMain", nullptr);
 #ifdef MAC
