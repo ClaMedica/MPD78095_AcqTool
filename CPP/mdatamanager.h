@@ -181,6 +181,7 @@ protected:
     int     m_rangeChVV;
     int     m_rangeChQ;
     int     m_rangeChEMG;
+    MDatabase m_db;
 
     QVector<mflowdatas*> m_aflwdatas; //array di analisi di tipo flussimetria
 

@@ -1,6 +1,8 @@
 ﻿#include "mdatamanager.h"
 #include "systemmanager.h"
 
+#include <QSysInfo>
+
 extern bool DebugAcqTool;
 
 MDataManager::MDataManager(QObject *parent)
@@ -57,6 +59,12 @@ MDataManager::MDataManager(QObject *parent)
         m_nomoSirAveSign[i] = NULL;
     }
 
+    //database
+#ifdef PICOFLOW
+    m_db.connectDatabase(QDir::toNativeSeparators(g_P7SettingsManager.dataPath() + "/db.sqlite3"));
+#else
+    m_db.connectDatabase();
+#endif
 
     setValVolRes(-999);
 }
@@ -220,14 +228,9 @@ void MDataManager::loadFile(QString __fileName)
         //cerco peso e altezza paziente nel database
         MSQLPatients                *tesPatient;
         MSQLTests                   *tesTest;
-        MDatabase db;
-#ifdef PICOFLOW
-        db.connectDatabase(QDir::toNativeSeparators(g_P7SettingsManager.dataPath() + "/db.sqlite3"));
-#else
-        db.connectDatabase();
-#endif
-        tesPatient = (MSQLPatients*) db.modelPointer(TAB_Patients);
-        tesTest = (MSQLTests*) db.modelPointer(TAB_Tests);
+
+        tesPatient = (MSQLPatients*) m_db.modelPointer(TAB_Patients);
+        tesTest = (MSQLTests*) m_db.modelPointer(TAB_Tests);
 
         QVariantList numTest;
         numTest << m_testNumber;
@@ -1182,12 +1185,20 @@ qDebug() << "INIZIO";
     QString m_patientInfo = m_mng->GetPatient().section(";",PAT_STR_COGNOME,PAT_STR_NOME);
     QStringList patInfo = m_patientInfo.split(";");
 
+#ifdef PICOFLOW
     if (!g_File_LogGDPR.isOpen())
         g_File_LogGDPR.open(QIODevice::Append);
 
     //qDebug()<< "userlogged datamanager" << gUser_logged;
     qDebug() << "GDPR: Stationary Analysis (Patient:" << patInfo[0] + " " + patInfo[1]
              << "- study n." << m_mng->GetTestNum() << "- Date study:" << dataEsame << ")";
+#else
+    MSQLLog *logDB;
+    logDB = (MSQLLog*) m_db.modelPointer(TAB_Log);
+    logDB->setHostName(QSysInfo::machineHostName());
+    logDB->addLogRow("Stationary Analysis (Patient: " + patInfo[0] + " " + patInfo[1] +
+            " - study n. " + QString::number(m_mng->GetTestNum()) + " - Date study: " + dataEsame + ")");
+#endif
 
     //mi salvo nel campo other il valore del volume residuo nel caso l'utente lo avesse nonecambiato
     QString other = m_mng->GetOther();

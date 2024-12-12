@@ -5,6 +5,10 @@
 
 #include "mabstractmanager.h"
 #include "udpmsgs.h"
+#ifndef PICOFLOW
+#include "dbStatements.h"
+#include <mdatabase.h>
+#endif
 
 const double COEFDigFilter[6] = {
     0.06667948314423,   0.1945929082815,   0.2888590053723,   0.2888590053723,
@@ -154,6 +158,12 @@ private:
     bool m_startReset;          //necessario start/stop acquisizione per reset dopo rinserimento beaker sulla cella
     int m_timeGo;               //gestiste il reset in caso di togli/metti beaker
     int m_wrongSamples;
+
+    //database
+#ifndef PICOFLOW
+    MDatabase m_db;;
+#endif
+
 
 };
 

@@ -1,5 +1,7 @@
 ﻿#include "macqmanager.h"
 
+#include <QSysInfo>
+
 MAcqManager::MAcqManager(QObject *parent)
 {
     (void) parent;
@@ -65,6 +67,11 @@ MAcqManager::MAcqManager(QObject *parent)
     udpConn.iAmAcq();
     udpConn.connessioni();
     udpConn.sendSup("hello from acq");
+
+    //database
+#ifndef PICOFLOW
+    m_db.connectDatabase();
+#endif
 
     qDebug() << "fine costruttore ";
     qDebug() << "m_acqFileOpened:" << m_acqFileOpened;
@@ -356,13 +363,13 @@ bool MAcqManager::newAcquisition(QString __dataFile)
         QString m_patientInfo = m_mng->GetPatient().section(";",PAT_STR_COGNOME,PAT_STR_NOME);
         QStringList patInfo = m_patientInfo.split(";");
 
-        QString standby = "";
 #ifdef PICOFLOW
+        QString standby = "";
         Ancestry *autoflow = m_configUser.getSafeChild("AutomaticFlow");
         Ancestry *childLoop = autoflow->getSafeChild("Loop");
         QString val = childLoop->getSafeAttribute("value");
         if (val == "true")standby = "Stand-By mode";
-#endif
+
 
         if (!g_File_LogGDPR.isOpen())
             g_File_LogGDPR.open(QIODevice::Append);
@@ -370,7 +377,13 @@ bool MAcqManager::newAcquisition(QString __dataFile)
         qDebug() << "GDPR: Execution new study n." << m_mng->GetTestNum()
                  << "Protocol:" << m_mng->GetTestDescr() << "Patient:" << patInfo[0] + " " + patInfo[1]
                  << "D.o.B:" << dataNascita << standby;
-
+#else
+    MSQLLog *logDB;
+    logDB = (MSQLLog*) m_db.modelPointer(TAB_Log);
+    logDB->setHostName(QSysInfo::machineHostName());
+    logDB->addLogRow("GDPR: Execution new study n.: " + QString::number(m_mng->GetTestNum()) + "Protocol: " + m_mng->GetTestDescr() +
+            " - Patient: " + patInfo[0] + " " + patInfo[1] + " - D.o.B: " + dataNascita);
+#endif
         m_acqFileOpened = true;     //mi segno che ho aperto il file
         m_acqFinished = false;
 
