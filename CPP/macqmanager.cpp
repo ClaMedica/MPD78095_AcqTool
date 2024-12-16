@@ -68,11 +68,6 @@ MAcqManager::MAcqManager(QObject *parent)
     udpConn.connessioni();
     udpConn.sendSup("hello from acq");
 
-    //database
-#ifndef PICOFLOW
-    m_db.connectDatabase();
-#endif
-
     qDebug() << "fine costruttore ";
     qDebug() << "m_acqFileOpened:" << m_acqFileOpened;
 }
@@ -378,11 +373,15 @@ bool MAcqManager::newAcquisition(QString __dataFile)
                  << "Protocol:" << m_mng->GetTestDescr() << "Patient:" << patInfo[0] + " " + patInfo[1]
                  << "D.o.B:" << dataNascita << standby;
 #else
-    MSQLLog *logDB;
-    logDB = (MSQLLog*) m_db.modelPointer(TAB_Log);
-    logDB->setHostName(QSysInfo::machineHostName());
-    logDB->addLogRow("GDPR: Execution new study n.: " + QString::number(m_mng->GetTestNum()) + "Protocol: " + m_mng->GetTestDescr() +
-            " - Patient: " + patInfo[0] + " " + patInfo[1] + " - D.o.B: " + dataNascita);
+        //database
+        MDatabase db;
+        if (db.connectDatabase()) {
+            MSQLLog *logDB;
+            logDB = (MSQLLog*) db.modelPointer(TAB_Log);
+            logDB->setHostName(QSysInfo::machineHostName());
+            logDB->addLogRow("GDPR: Execution new study n.: " + QString::number(m_mng->GetTestNum()) + "Protocol: " + m_mng->GetTestDescr() +
+                             " - Patient: " + patInfo[0] + " " + patInfo[1] + " - D.o.B: " + dataNascita);
+        }
 #endif
         m_acqFileOpened = true;     //mi segno che ho aperto il file
         m_acqFinished = false;

@@ -158,13 +158,6 @@ private:
     bool m_startReset;          //necessario start/stop acquisizione per reset dopo rinserimento beaker sulla cella
     int m_timeGo;               //gestiste il reset in caso di togli/metti beaker
     int m_wrongSamples;
-
-    //database
-#ifndef PICOFLOW
-    MDatabase m_db;;
-#endif
-
-
 };
 
 

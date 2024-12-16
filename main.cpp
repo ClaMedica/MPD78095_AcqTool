@@ -88,7 +88,9 @@ int main(int argc, char *argv[])
 #endif
 
 #if defined(MAC) || defined(WIN32)
-     QString logFile = "acqTool_log.htm";// + QDateTime::currentDateTime().toString("yyyyMMdd_hhmmss")+".htm";
+        //Pc connesso
+     QString pcconnesso = QSysInfo::machineHostName();
+     QString logFile = "AcqTool_"+ pcconnesso + ".htm";// + QDateTime::currentDateTime().toString("yyyyMMdd_hhmmss")+".htm";
      gPath_log = g_P7SettingsManager.tempPath() + "/"+ logFile;
 
      //dirotto il debug log

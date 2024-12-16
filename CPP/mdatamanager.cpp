@@ -58,14 +58,6 @@ MDataManager::MDataManager(QObject *parent)
         if (i<NOMO_SIR_NUMSIGN)m_nomoSirMaxSign[i] = NULL;
         m_nomoSirAveSign[i] = NULL;
     }
-
-    //database
-#ifdef PICOFLOW
-    m_db.connectDatabase(QDir::toNativeSeparators(g_P7SettingsManager.dataPath() + "/db.sqlite3"));
-#else
-    m_db.connectDatabase();
-#endif
-
     setValVolRes(-999);
 }
 
@@ -224,6 +216,13 @@ void MDataManager::loadFile(QString __fileName)
         m_sexPatient = false;
         if (m_mng->GetPatient().section(";", PAT_STR_SEX, PAT_STR_SEX) == "F")
             m_sexPatient = true;
+
+        //database
+#ifdef PICOFLOW
+        m_db.connectDatabase(QDir::toNativeSeparators(g_P7SettingsManager.dataPath() + "/db.sqlite3"));
+#else
+        m_db.connectDatabase();
+#endif
 
         //cerco peso e altezza paziente nel database
         MSQLPatients                *tesPatient;
