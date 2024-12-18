@@ -333,6 +333,7 @@ bool MAcqManager::newAcquisition(QString __dataFile)
         if (QDir(g_P7SettingsManager.progPath() ).exists(outF))
             QDir(g_P7SettingsManager.progPath()).remove(outF);
 #else
+        outF = QSysInfo::machineHostName() + "_" + outF;
         OutFile = new QFile(g_P7SettingsManager.tempPath() + "/" + outF);
         //Create the out_file new
         if (QDir(g_P7SettingsManager.progPath() ).exists(outF))
