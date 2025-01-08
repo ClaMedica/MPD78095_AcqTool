@@ -1226,7 +1226,7 @@ void MAcqManager::sendBuffersToPlot()
             MSignal copy = *(m_channelMap[type].at(index));
 
             channels << copy;
-            qDebug() << "Canale" << chanName << index << number << type;
+            //qDebug() << "Canale" << chanName << index << number << type;
 
             if (m_channelMap[type].at(index)->size() > 0)
                 toSend = true;
