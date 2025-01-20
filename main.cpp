@@ -62,8 +62,10 @@ int main(int argc, char *argv[])
 
     QGuiApplication app(argc, argv);
 
+    QString codSoft = QString(argv[3]);
+
     //carico i settaggi
-     g_P7SettingsManager.loadSettings(true);
+     g_P7SettingsManager.loadSettings(true,codSoft.toInt());
 
 #ifdef ANDROID
     QtAndroid::androidActivity().callMethod<void>("registerBroadcastReceiver", "()V");
@@ -86,7 +88,9 @@ int main(int argc, char *argv[])
 #endif
 
 #if defined(MAC) || defined(WIN32)
-     QString logFile = "acqTool_log.htm";// + QDateTime::currentDateTime().toString("yyyyMMdd_hhmmss")+".htm";
+        //Pc connesso
+     QString pcconnesso = QSysInfo::machineHostName();
+     QString logFile = "AcqTool_"+ pcconnesso + ".htm";// + QDateTime::currentDateTime().toString("yyyyMMdd_hhmmss")+".htm";
      gPath_log = g_P7SettingsManager.tempPath() + "/"+ logFile;
 
      //dirotto il debug log
@@ -151,7 +155,8 @@ int main(int argc, char *argv[])
     engine.addImportPath(QApplication::applicationDirPath());
 #endif
 
-#ifdef PICOFLOW//metto questo altrimenti su target non carica il plugin cpp
+#ifdef PICOFLOW
+    //metto questo altrimenti su target non carica il plugin cpp
     engine.rootContext()->setContextProperty(QLatin1String("platform"), "linux");
     engine.rootContext()->setContextProperty("screenH", 480);
     engine.rootContext()->setContextProperty("screenW", 640);
@@ -176,8 +181,8 @@ int main(int argc, char *argv[])
     engine.rootContext()->setContextProperty("screenH", size.height());
     engine.rootContext()->setContextProperty("screenW", size.width());
     engine.rootContext()->setContextProperty("PicoFlow", bool_false);
-    QString codSoft = QString(argv[3]);
     engine.rootContext()->setContextProperty("codSoft", codSoft);
+    engine.rootContext()->setContextProperty("bridgeMain", nullptr);
 #ifdef MAC
     engine.rootContext()->setContextProperty("Mac", bool_true);
 #else

@@ -1,5 +1,7 @@
 ﻿#include "macqmanager.h"
 
+#include <QSysInfo>
+
 MAcqManager::MAcqManager(QObject *parent)
 {
     (void) parent;
@@ -331,6 +333,7 @@ bool MAcqManager::newAcquisition(QString __dataFile)
         if (QDir(g_P7SettingsManager.progPath() ).exists(outF))
             QDir(g_P7SettingsManager.progPath()).remove(outF);
 #else
+        outF = QSysInfo::machineHostName() + "_" + outF;
         OutFile = new QFile(g_P7SettingsManager.tempPath() + "/" + outF);
         //Create the out_file new
         if (QDir(g_P7SettingsManager.progPath() ).exists(outF))
@@ -356,13 +359,13 @@ bool MAcqManager::newAcquisition(QString __dataFile)
         QString m_patientInfo = m_mng->GetPatient().section(";",PAT_STR_COGNOME,PAT_STR_NOME);
         QStringList patInfo = m_patientInfo.split(";");
 
-        QString standby = "";
 #ifdef PICOFLOW
+        QString standby = "";
         Ancestry *autoflow = m_configUser.getSafeChild("AutomaticFlow");
         Ancestry *childLoop = autoflow->getSafeChild("Loop");
         QString val = childLoop->getSafeAttribute("value");
         if (val == "true")standby = "Stand-By mode";
-#endif
+
 
         if (!g_File_LogGDPR.isOpen())
             g_File_LogGDPR.open(QIODevice::Append);
@@ -370,7 +373,17 @@ bool MAcqManager::newAcquisition(QString __dataFile)
         qDebug() << "GDPR: Execution new study n." << m_mng->GetTestNum()
                  << "Protocol:" << m_mng->GetTestDescr() << "Patient:" << patInfo[0] + " " + patInfo[1]
                  << "D.o.B:" << dataNascita << standby;
-
+#else
+        //database
+        MDatabase db;
+        if (db.connectDatabase()) {
+            MSQLLog *logDB;
+            logDB = (MSQLLog*) db.modelPointer(TAB_Log);
+            logDB->setHostName(QSysInfo::machineHostName());
+            logDB->addLogRow("GDPR: Execution new study n.: " + QString::number(m_mng->GetTestNum()) + "Protocol: " + m_mng->GetTestDescr() +
+                             " - Patient: " + patInfo[0] + " " + patInfo[1] + " - D.o.B: " + dataNascita);
+        }
+#endif
         m_acqFileOpened = true;     //mi segno che ho aperto il file
         m_acqFinished = false;
 
@@ -1214,7 +1227,7 @@ void MAcqManager::sendBuffersToPlot()
             MSignal copy = *(m_channelMap[type].at(index));
 
             channels << copy;
-            qDebug() << "Canale" << chanName << index << number << type;
+            //qDebug() << "Canale" << chanName << index << number << type;
 
             if (m_channelMap[type].at(index)->size() > 0)
                 toSend = true;
