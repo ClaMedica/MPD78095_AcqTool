@@ -476,8 +476,8 @@ void MAcqManager::endAcquisitionDiscard()
 {
     qDebug() << "endAcquisitionDiscard()";
     endAcquisition(true);
-    udpConn.sendSup("ButtonStStDisable");
 #ifdef PICOFLOW
+    udpConn.sendSup("ButtonStStDisable");
     g_mainAppBridge->sendDiscard();
 #endif
 }
