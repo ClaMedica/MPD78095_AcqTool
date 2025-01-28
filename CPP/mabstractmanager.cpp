@@ -606,7 +606,7 @@ bool MAbstractManager::load()
 QString MAbstractManager::plotConfigFileName()
 {
 #if defined(WIN32) || defined(MAC)
-    return g_P7SettingsManager.tempPath() + "/cur.xml";
+    return g_P7SettingsManager.programDataPath() + "/cur.xml";
 #else
     return m_applicationPath + "/cur.xml";
 #endif
@@ -725,7 +725,7 @@ bool MAbstractManager::buildConfigurationFile()
 
     //ora salvo il file di configurazione come cur.xml
 #if defined(WIN32) || defined(MAC)
-    configPlot.saveToXML(g_P7SettingsManager.tempPath() + "/cur.xml");
+    configPlot.saveToXML(g_P7SettingsManager.programDataPath() + "/cur.xml");
 #else
     configPlot.saveToXML(m_applicationPath+"/cur.xml");
 #endif

@@ -91,8 +91,12 @@ int main(int argc, char *argv[])
         //Pc connesso
      QString pcconnesso = QSysInfo::machineHostName();
      QString logFile = "AcqTool_"+ pcconnesso + ".htm";// + QDateTime::currentDateTime().toString("yyyyMMdd_hhmmss")+".htm";
-     gPath_log = g_P7SettingsManager.tempPath() + "/"+ logFile;
-
+     QString dir = g_P7SettingsManager.programDataPath() + "/logs/";
+     if(!QDir().exists(dir)) {
+         qDebug() << "Creo cartella" << dir;
+         QDir().mkdir(dir);
+     }
+     gPath_log = dir + logFile;
      //dirotto il debug log
      MyMessageOutput::init(gPath_log);
      qDebug() << "Start. log:" << gPath_log;
