@@ -329,16 +329,16 @@ bool MAcqManager::newAcquisition(QString __dataFile)
         QString outF = "out_file";
 #ifdef PICOFLOW
         OutFile = new QFile(g_P7SettingsManager.progPath() + "/" + outF);
-        //Create the out_file new
         if (QDir(g_P7SettingsManager.progPath() ).exists(outF))
             QDir(g_P7SettingsManager.progPath()).remove(outF);
 #else
         outF = QSysInfo::machineHostName() + "_" + outF;
-        OutFile = new QFile(g_P7SettingsManager.tempPath() + "/" + outF);
-        //Create the out_file new
-        if (QDir(g_P7SettingsManager.progPath() ).exists(outF))
-            QDir(g_P7SettingsManager.progPath()).remove(outF);
+        OutFile = new QFile(g_P7SettingsManager.programDataPath() + "/" + outF);
+        if (QDir(g_P7SettingsManager.programDataPath() ).exists(outF))
+            QDir(g_P7SettingsManager.programDataPath()).remove(outF);
 #endif
+        //Create the out_file new
+        qDebug() << " OUT FILE " <<OutFile->fileName();
         OutFile->open(QIODevice::WriteOnly | QIODevice::Text);
         OutFile->write(__dataFile.toLocal8Bit());
         OutFile->close();
