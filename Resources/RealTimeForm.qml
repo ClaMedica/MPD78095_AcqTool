@@ -105,7 +105,7 @@ MForm{
         id:mngCon
         fileName: ""
         //@@@@@@@@@@    Events          @@@@@@@@@@
-        onFileNameChanged: if(fileName!==""){plot.completed=true;read()}
+        onFileNameChanged: if(fileName!==""){read()}
     }
 
 //    ParameterBox{
