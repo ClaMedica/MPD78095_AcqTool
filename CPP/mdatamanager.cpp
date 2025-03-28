@@ -124,6 +124,11 @@ bool MDataManager::addSignal(MSignal *__pSignal)
 
 void MDataManager::loadFile(QString __fileName)
 {
+#ifdef PICOFLOW
+ //   non permetto il reset del touchscreen da tasto Start/Stop
+    udpConn.sendSup("ButtonStStEnable");
+#endif
+
     __fileName.remove("file:///");
     qDebug() << "Apro il file " << __fileName;
 
