@@ -1261,7 +1261,7 @@ void printermanager::Calc_Max_RealReport_rel2(short __num_sample)
     }
     m_max_emg = emg_max;
 
-    if (m_rangeChVV > 0 && m_rangeChVV < 1000) //limite superiore definito
+    if (m_rangeChVV > 0 && m_rangeChVV <= 2000) //limite superiore definito
         m_max_vol = m_rangeChVV;
 
     if (m_rangeChEMG > 0 && m_rangeChEMG <= 3500) //limite superiore defintio
