@@ -1,5 +1,6 @@
 TEMPLATE = app
 VERSION = 2.4.0
+DEFINES += VERSION=\\\"$$VERSION\\\"
 
 QT += qml quick widgets sql network multimedia xml core serialport gui
 
