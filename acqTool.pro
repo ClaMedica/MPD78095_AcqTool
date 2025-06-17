@@ -80,7 +80,6 @@ TRANSLATIONS += acqtool.xlf \
         ../MPD78097_Database/msqlpatientsubcategory.cpp \
         ../MPD78097_Database/msqlroutinearrangement.cpp \
         ../MPD78097_Database/msqlsubcategories.cpp \
-        ../MPD78097_Database/msqllog.cpp \
         ../MPD78097_Database/msqltests.cpp
 
     HEADERS += \
@@ -134,7 +133,6 @@ TRANSLATIONS += acqtool.xlf \
         ../MPD78097_Database/msqlpatientsubcategory.h \
         ../MPD78097_Database/msqlroutinearrangement.h \
         ../MPD78097_Database/msqlsubcategories.h \
-        ../MPD78097_Database/msqllog.h \
         ../MPD78097_Database/msqltests.h
 
 
@@ -175,8 +173,10 @@ win32 {
     QT+=axcontainer
 
     SOURCES += CPP/mdatamngdesktop.cpp \
+               ../MPD78097_Database/msqllog.cpp \
 
     HEADERS += CPP/mdatamngdesktop.h \
+               ../MPD78097_Database/msqllog.h \
 
 # Additional import path used to resolve QML modules in Qt Creator's code model
 QML_IMPORT_PATH = ../M8078027_MGlobal \

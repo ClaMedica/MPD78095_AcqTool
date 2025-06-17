@@ -124,6 +124,11 @@ bool MDataManager::addSignal(MSignal *__pSignal)
 
 void MDataManager::loadFile(QString __fileName)
 {
+#ifdef PICOFLOW
+ //   non permetto il reset del touchscreen da tasto Start/Stop
+    udpConn.sendSup("ButtonStStEnable");
+#endif
+
     __fileName.remove("file:///");
     qDebug() << "Apro il file " << __fileName;
 
@@ -218,18 +223,20 @@ void MDataManager::loadFile(QString __fileName)
             m_sexPatient = true;
 
         //database
-#ifdef PICOFLOW
-        m_db.connectDatabase(QDir::toNativeSeparators(g_P7SettingsManager.dataPath() + "/db.sqlite3"));
-#else
-        m_db.connectDatabase();
-#endif
-
         //cerco peso e altezza paziente nel database
         MSQLPatients                *tesPatient;
         MSQLTests                   *tesTest;
 
+#ifdef PICOFLOW
+        MDatabase db;
+        db.connectDatabase(QDir::toNativeSeparators(g_P7SettingsManager.dataPath() + "/db.sqlite3"));
+        tesPatient = (MSQLPatients*) db.modelPointer(TAB_Patients);
+        tesTest = (MSQLTests*) db.modelPointer(TAB_Tests);
+#else
+        m_db.connectDatabase();
         tesPatient = (MSQLPatients*) m_db.modelPointer(TAB_Patients);
         tesTest = (MSQLTests*) m_db.modelPointer(TAB_Tests);
+#endif
 
         QVariantList numTest;
         numTest << m_testNumber;
