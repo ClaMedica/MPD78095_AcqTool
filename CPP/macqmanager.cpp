@@ -328,9 +328,9 @@ bool MAcqManager::newAcquisition(QString __dataFile)
         //altrimenti c'è il nome del file interrotto
         QString outF = "out_file";
 #ifdef PICOFLOW
-        OutFile = new QFile(g_P7SettingsManager.progPath() + "/" + outF);
-        if (QDir(g_P7SettingsManager.progPath() ).exists(outF))
-            QDir(g_P7SettingsManager.progPath()).remove(outF);
+        OutFile = new QFile(g_P7SettingsManager.tempPath() + "/" + outF);
+        if (QDir(g_P7SettingsManager.tempPath() ).exists(outF))
+            QDir(g_P7SettingsManager.tempPath()).remove(outF);
 #else
         outF = QSysInfo::machineHostName() + "_" + outF;
         OutFile = new QFile(g_P7SettingsManager.programDataPath() + "/" + outF);

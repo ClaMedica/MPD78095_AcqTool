@@ -3,7 +3,6 @@
 
 MAbstractManager::MAbstractManager(QObject *parent) : QObject(parent)
 {
-    m_applicationPath = QApplication::applicationDirPath();
     // Stringhe necessarie per la traduzione delle descrizioni dei definitori e markers caricati
     //dai file xml
     trMap["Flowmetry"] = tr("Flowmetry");
@@ -608,7 +607,7 @@ QString MAbstractManager::plotConfigFileName()
 #if defined(WIN32) || defined(MAC)
     return g_P7SettingsManager.programDataPath() + "/cur.xml";
 #else
-    return m_applicationPath + "/cur.xml";
+    return g_P7SettingsManager.tempPath() + "/cur.xml";
 #endif
 }
 
@@ -727,7 +726,7 @@ bool MAbstractManager::buildConfigurationFile()
 #if defined(WIN32) || defined(MAC)
     configPlot.saveToXML(g_P7SettingsManager.programDataPath() + "/cur.xml");
 #else
-    configPlot.saveToXML(m_applicationPath+"/cur.xml");
+    configPlot.saveToXML(g_P7SettingsManager.tempPath() + "/cur.xml");
 #endif
 
     qDebug() << "Configuration file builded succesfully";
