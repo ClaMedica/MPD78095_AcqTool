@@ -338,7 +338,7 @@ bool MAcqManager::newAcquisition(QString __dataFile)
             QDir(g_P7SettingsManager.programDataPath()).remove(outF);
 #endif
         //Create the out_file new
-        qDebug() << " OUT FILE " <<OutFile->fileName();
+        //qDebug() << " OUT FILE " <<OutFile->fileName();
         OutFile->open(QIODevice::WriteOnly | QIODevice::Text);
         OutFile->write(__dataFile.toLocal8Bit());
         OutFile->close();
