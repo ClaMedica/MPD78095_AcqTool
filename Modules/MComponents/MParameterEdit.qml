@@ -311,6 +311,8 @@ Rectangle {
                 c.maximumLength = maxText
                 if (password)
                     c.echoMode = TextInput.Password
+                if (!container.enabled)
+                    c.textColor = "gray"
             }
 
             component=c

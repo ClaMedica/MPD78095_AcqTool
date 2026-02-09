@@ -557,6 +557,8 @@ bool MAbstractManager::load()
     QString value = g_P7SettingsManager.localization();
     if (value == "pl")
         language = "Windows-1250";   // CODEC Europa Centrale (polacco)
+    else if (value == "hu")
+        language = "UTF-8";          // CODEC Ungherese
     else if (value == "ru")
         language = "Windows-1251";   // CODEC Russo (cirillico)
     else if (value == "el")

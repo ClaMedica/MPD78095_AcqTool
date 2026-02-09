@@ -42,7 +42,7 @@ bool DebugAcqTool = false;
 AcqBridge *g_mainAppBridge;
 #endif
 
-char strvers[] = "AcqTool del " __DATE__ " alle " __TIME__;
+char strvers[] = "AcqTool Ver " VERSION " del " __DATE__ " alle " __TIME__;
 
 int main(int argc, char *argv[])
 {
