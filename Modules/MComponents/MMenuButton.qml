@@ -124,14 +124,9 @@ Rectangle  {
         font.family:
         {
             if (PicoFlow)
-                if (layout !== undefined)
-                    buttonLabel.font.family = layout.value("FFamily")
-                else
-                    buttonLabel.font.family ="Luxi Serif"
-            else if (layout !== undefined)
-                buttonLabel.font.family = layout.value("FFamilyW")
-            else
-                buttonLabel.font.family = "Calibri"
+                return (layout !== undefined) ? layout.value("FFamily") : "Luxi Serif"
+
+            return (layout !== undefined) ? layout.value("FFamilyW") : "Calibri"
         }
         font.bold: true
         horizontalAlignment: Text.AlignHCenter

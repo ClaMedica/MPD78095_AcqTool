@@ -10,7 +10,7 @@ Rectangle {
     border.width: anaBtn.activeFocus ? 3 : 1
     border.color: layout.value("TaskBarColor")
     radius: height*0.1
-    property real labelSize:layout.value("F4")
+    property real labelSize:Math.max(1,layout.value("F4"))
 
     //Since the buttons are created on the fly,
     //we need to identify the button on which the user

@@ -34,17 +34,12 @@ TextField {
     font.family:
     {
         if (PicoFlow)
-            if (layout !== undefined)
-                rootLabel.font.family = layout.value("FFamily")
-            else
-                rootLabel.font.family ="Luxi Serif"
-        else if (layout !== undefined)
-            rootLabel.font.family = layout.value("FFamilyW")
-        else
-            rootLabel.font.family = "Calibri"
+            return (layout !== undefined) ? layout.value("FFamily") : "Luxi Serif"
+
+        return (layout !== undefined) ? layout.value("FFamilyW") : "Calibri"
     }
     font.bold: true
-    font.pixelSize: Mac ? screenH * 0.01 * (labelSize-1) : screenH * 0.01 * labelSize
+    font.pixelSize: screenH > 0 ? (Mac ? screenH * 0.01 * (labelSize-1) : screenH * 0.01 * labelSize) : 1
     verticalAlignment: Text.AlignVCenter
     style: TextFieldStyle {
         textColor: "black"

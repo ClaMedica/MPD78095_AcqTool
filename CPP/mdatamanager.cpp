@@ -175,8 +175,10 @@ void MDataManager::loadFile(QString __fileName)
     switch(fileType(m_copyFileName)) {
     case PIC:
     {
-       if(m_mng != NULL)
+       if(m_mng != NULL) {
             delete m_mng;
+           m_mng = NULL;
+       }
         m_mng = new DatafileManager;
         m_mng->SetFileName(m_copyFileName);
         m_mng->SetFileType(TIPOFILE);
@@ -1604,6 +1606,7 @@ bool MDataManager::InitArraysFLW(int __start,
     }
 
     delete config_ana;
+    config_ana = NULL;
 
     qDebug() << "analisi";
 

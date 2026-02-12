@@ -36,6 +36,7 @@ SimpleTCPChannel::~SimpleTCPChannel()
     //closing TCP server for current channel.
     m_channelTcpServer->close();
     delete m_channelTcpServer;
+    m_channelTcpServer = NULL;
 }
 
 void SimpleTCPChannel::listen()

@@ -625,6 +625,7 @@ bool MAbstractManager::buildConfigurationFile()
     if (m_tcpChannels.size() > 0) {
         foreach (SimpleTCPChannel * cur, m_tcpChannels.values()) {
             delete cur;
+            cur = NULL;
         }
         m_tcpChannels.clear();
     }

@@ -228,14 +228,9 @@ MForm{
                 font.family:
                 {
                     if (PicoFlow)
-                        if (layout !== undefined)
-                            testoDel.font.family = layout.value("FFamily")
-                        else
-                            testoDel.font.family ="Luxi Serif"
-                    else if (layout !== undefined)
-                        testoDel.font.family = layout.value("FFamilyW")
-                    else
-                        testoDel.font.family = "Calibri"
+                        return (layout !== undefined) ? layout.value("FFamily") : "Luxi Serif"
+
+                    return (layout !== undefined) ? layout.value("FFamilyW") : "Calibri"
                 }
                 font.pixelSize: 15
                 anchors.centerIn: parent
@@ -563,14 +558,9 @@ MForm{
             font.family:
             {
                 if (PicoFlow)
-                    if (layout !== undefined)
-                        toolTipText.font.family = layout.value("FFamily")
-                    else
-                        toolTipText.font.family ="Luxi Serif"
-                else if (layout !== undefined)
-                    toolTipText.font.family = layout.value("FFamilyW")
-                else
-                    toolTipText.font.family = "Calibri"
+                    return (layout !== undefined) ? layout.value("FFamily") : "Luxi Serif"
+
+                return (layout !== undefined) ? layout.value("FFamilyW") : "Calibri"
             }
             font.bold: false
             font.pixelSize:screenH * 0.015

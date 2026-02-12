@@ -83,18 +83,21 @@ MAcqManager::~MAcqManager()
     if(m_tcpClients.values().size() > 0) {
         foreach (SimpleTCPClientAcq * cur, m_tcpClients.values()) {
             delete cur;
+            cur = NULL;
         }
     }
 
     if(m_tcpChannels.size() > 0) {
         foreach (SimpleTCPChannel * cur, m_tcpChannels.values()) {
             delete cur;
+            cur = NULL;
         }
     }
 
     foreach (QList<MSignal *> list, m_channelMap) {
         foreach(MSignal *sig,list) {
             delete sig;
+            sig = NULL;
         }
     }
 }
@@ -715,15 +718,30 @@ void MAcqManager::handleTCP(SimpleTCPClientAcq *__client, QByteArray __blocco)
 
         if(who == "STA") {      //allora e' uno stato
             static QByteArray staticblock;
+            static const int MAX_PENDING_STA_BYTES = 1024 * 1024;
             static bool currSelCh = 0;   // (E_CH_DISP) (uint8_t)mngr->getCurrChan(): canale selezionato
             bool     selBtPf = false;
             qint8  * dest;
             qint32   numBytes;
             m_supeConnected = true;
             staticblock += __blocco;
+
+            if (staticblock.size() > MAX_PENDING_STA_BYTES) {
+                qWarning() << "handleTCP(STA): pending status buffer exceeds" << MAX_PENDING_STA_BYTES << "bytes, clearing buffer";
+                staticblock.clear();
+                return;
+            }
+
             while(staticblock.size() > (int)(sizeof(qint32))) {
                 QDataStream in(&staticblock, QIODevice::ReadOnly);
                 in >> numBytes;
+
+                if ((numBytes <= 0) || (numBytes > MAX_PENDING_STA_BYTES)) {
+                    qWarning() << "handleTCP(STA): invalid status packet length" << numBytes << "resetting buffer";
+                    staticblock.clear();
+                    return;
+                }
+
                 if((staticblock.size() - sizeof(qint32)) < numBytes)
                     break;
 
@@ -782,6 +800,12 @@ void MAcqManager::handleTCP(SimpleTCPClientAcq *__client, QByteArray __blocco)
                     }
                 }
                 staticblock.remove(0, numBytes);
+
+                if (staticblock.size() > MAX_PENDING_STA_BYTES) {
+                    qWarning() << "handleTCP(STA): pending status buffer exceeds" << MAX_PENDING_STA_BYTES << "bytes after processing, clearing buffer";
+                    staticblock.clear();
+                    return;
+                }
             }
         }
         else if(who == "VAL") {
@@ -1420,7 +1444,14 @@ void MAcqManager::fillBuffers(QByteArray __blocco)
 {
     uchar maxNumChan = m_mng->GetChanNum();
     static QByteArray staticblock;
+    static const int MAX_PENDING_BYTES = 8 * 1024 * 1024;
     staticblock += __blocco;
+
+    if (staticblock.size() > MAX_PENDING_BYTES) {
+        qWarning() << "fillBuffers(): pending TCP data exceeds" << MAX_PENDING_BYTES << "bytes, clearing buffer";
+        staticblock.clear();
+        return;
+    }
 
     bool samplesToRead = true;
     while(samplesToRead)
@@ -1434,8 +1465,16 @@ void MAcqManager::fillBuffers(QByteArray __blocco)
         QDataStream in(&staticblock, QIODevice::ReadOnly);
 
         in >> numBytes;
+
+        if ((numBytes <= 0) || (numBytes > MAX_PENDING_BYTES)) {
+            qWarning() << "fillBuffers(): invalid packet length" << numBytes << "resetting buffer";
+            staticblock.clear();
+            break;
+        }
+
         //qDebug()<<"NA? bytes: "<<numBytes;
-        if(staticblock.size() < numBytes)
+        //if(staticblock.size() < numBytes)
+        if(staticblock.size() < (numBytes + (qint32) sizeof(qint32)))
             break;
 
         //Chan number
@@ -1519,6 +1558,12 @@ void MAcqManager::fillBuffers(QByteArray __blocco)
 
         if (staticblock.size() < 4)
             samplesToRead = false;
+
+        if (staticblock.size() > MAX_PENDING_BYTES) {
+            qWarning() << "fillBuffers(): pending TCP data exceeds" << MAX_PENDING_BYTES << "bytes after processing, clearing buffer";
+            staticblock.clear();
+            samplesToRead = false;
+        }
     }
 }
 

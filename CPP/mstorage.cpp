@@ -200,6 +200,7 @@ bool MStorage::modifyElement(qulonglong __whoAmI, QVariantList __news)
                     QString nmAn = anMarkerToDelete->value("name").toString();
                     m_storage[fmAn][nmAn]->removeOne(anMarkerToDelete);
                     delete anMarkerToDelete;
+                    anMarkerToDelete = NULL;
                 }
                 QList<QVariant> empty;
                 anM.clear();
@@ -216,6 +217,7 @@ bool MStorage::modifyElement(qulonglong __whoAmI, QVariantList __news)
 
             m_storage[fm][nm]->removeOne(elementToModify);
             delete elementToModify;
+            elementToModify = NULL;
         }
         else {          //provvedo a modificarlo
             for(int i = 0; i < __news.length(); i += 2) {

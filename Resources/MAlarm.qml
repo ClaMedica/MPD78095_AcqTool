@@ -78,14 +78,9 @@ Rectangle {
             font.family:
             {
                 if (PicoFlow)
-                    if (layout !== undefined)
-                        mex.font.family = layout.value("FFamily")
-                    else
-                        mex.font.family ="Luxi Serif"
-                else if (layout !== undefined)
-                    mex.font.family = layout.value("FFamilyW")
-                else
-                    mex.font.family = "Calibri"
+                    return (layout !== undefined) ? layout.value("FFamily") : "Luxi Serif"
+
+                return (layout !== undefined) ? layout.value("FFamilyW") : "Calibri"
             }
             font.bold: true
             font.pixelSize: 16
@@ -128,14 +123,9 @@ Rectangle {
             font.family:
             {
                 if (PicoFlow)
-                    if (layout !== undefined)
-                        mexHelp.font.family = layout.value("FFamily")
-                    else
-                        mexHelp.font.family ="Luxi Serif"
-                else if (layout !== undefined)
-                    mexHelp.font.family = layout.value("FFamilyW")
-                else
-                    mexHelp.font.family = "Calibri"
+                    return (layout !== undefined) ? layout.value("FFamily") : "Luxi Serif"
+
+                return (layout !== undefined) ? layout.value("FFamilyW") : "Calibri"
             }
             font.bold: true
             font.pixelSize: 12

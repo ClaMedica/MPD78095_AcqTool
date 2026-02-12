@@ -94,6 +94,8 @@ MForm{
         anchors.right: panManAuto.left
         height: root.height - alarmBox.height
         plotProp:mngCon.plotSetting
+
+        onCompletedChanged: completed ? timManAuto.start() : timManAuto.stop()
     }
 
     //Managers
@@ -167,7 +169,6 @@ MForm{
     Timer {
         id:timManAuto
         interval:500
-        running: true
         repeat: true
         onTriggered: {
             manAuto = mngAcq.manAutoQml()
@@ -288,8 +289,8 @@ MForm{
 
         MLabel {
             id: idMan
-            opacity: (((manAuto == 1) || (manAuto == 2)) & manAutoBlink) ? 1 : 0.5
-            labelSize: PicoFlow ? layout.value("F4") : layout.value("F4")-2
+            opacity: (((manAuto == 1) || (manAuto == 2)) && manAutoBlink) ? 1 : 0.5
+            labelSize: Math.max(1,PicoFlow ? layout.value("F4") : layout.value("F4")-2)
             anchors.bottom: parent.verticalCenter
             anchors.left: parent.left
         }
@@ -297,8 +298,8 @@ MForm{
             id: idRun
             text: "Rec"
             color: "red"
-            opacity: ((manAuto == 3) & manAutoBlink) ? 1 : 0.5
-            labelSize: PicoFlow ? layout.value("F4") : layout.value("F4")-2
+            opacity: ((manAuto == 3) && manAutoBlink) ? 1 : 0.5
+            labelSize: Math.max(1,PicoFlow ? layout.value("F4") : layout.value("F4")-2)
             anchors.top: idMan.bottom
             anchors.left: parent.left
         }
@@ -402,17 +403,12 @@ MForm{
             font.family:
             {
                 if (PicoFlow)
-                    if (layout !== undefined)
-                        toolTipText.font.family = layout.value("FFamily")
-                    else
-                        toolTipText.font.family ="Luxi Serif"
-                else if (layout !== undefined)
-                    toolTipText.font.family = layout.value("FFamilyW")
-                else
-                    toolTipText.font.family = "Calibri"
+                    return (layout !== undefined) ? layout.value("FFamily") : "Luxi Serif"
+
+                return (layout !== undefined) ? layout.value("FFamilyW") : "Calibri"
             }
             font.bold: false
-            font.pixelSize:screenH * 0.015
+            font.pixelSize: screenH > 0 ? screenH * 0.015 : 1
             text:toolTip.text
             anchors.horizontalCenter: parent.horizontalCenter
         }
@@ -437,7 +433,7 @@ MForm{
              anchors.left: parent.left
              anchors.right:parent.right
              height:parent.height*0.8
-             labelSize: layout.value("F4")
+             labelSize: Math.max(1,layout.value("F4"))
              color: PicoFlow ? "white" : layout.value("textTable")
              horizontalAlignment: Text.AlignHCenter
              verticalAlignment: Text.AlignVCenter
@@ -452,7 +448,7 @@ MForm{
             height: parent.height/5
             width: parent.width/3
             anchors.margins: 10
-            labelSize: layout.value("F4")
+            labelSize: Math.max(1,layout.value("F4"))
             text: qsTr("Yes")
             onClicked: {
                 dlgDiscard.visible = false
@@ -467,7 +463,7 @@ MForm{
             height: parent.height/5
             width: parent.width/3
             anchors.margins: 10
-            labelSize: layout.value("F4")
+            labelSize: Math.max(1,layout.value("F4"))
             text: qsTr("No")
             onClicked: dlgDiscard.visible = false
         }

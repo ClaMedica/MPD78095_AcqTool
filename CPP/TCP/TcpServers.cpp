@@ -17,8 +17,10 @@ TcpServers::~TcpServers()
     {
         for (int i  = 0; i < m_numTCPservers; i++)
         {
-            if(m_pTCPServer[i] != NULL)
+            if(m_pTCPServer[i] != NULL) {
                 delete m_pTCPServer[i];
+                m_pTCPServer[i] = NULL;
+            }
         }
         delete m_pTCPServer;
         m_pTCPServer = NULL;
@@ -72,8 +74,10 @@ void TcpServers::createServers(int __num)
     {
         for (i  = 0; i < m_numTCPservers; i++)
         {
-            if(m_pTCPServer[i] != NULL)
+            if(m_pTCPServer[i] != NULL) {
                 delete m_pTCPServer[i];
+                m_pTCPServer[i] = NULL;
+            }
         }
         delete m_pTCPServer;
         m_pTCPServer = NULL;

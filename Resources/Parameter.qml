@@ -110,14 +110,9 @@ Rectangle{
                 font.family:
                 {
                     if (PicoFlow)
-                        if (layout !== undefined)
-                            label1.font.family = layout.value("FFamily")
-                        else
-                            label1.font.family ="Luxi Serif"
-                    else if (layout !== undefined)
-                        label1.font.family = layout.value("FFamilyW")
-                    else
-                        label1.font.family = "Calibri"
+                        return (layout !== undefined) ? layout.value("FFamily") : "Luxi Serif"
+
+                    return (layout !== undefined) ? layout.value("FFamilyW") : "Calibri"
                 }
             }
             selectedTextColor: "steelblue"

@@ -61,14 +61,9 @@ Rectangle{
         font.family:
         {
             if (PicoFlow)
-                if (layout !== undefined)
-                    popText.font.family = layout.value("FFamily")
-                else
-                    popText.font.family ="Luxi Serif"
-            else if (layout !== undefined)
-                popText.font.family = layout.value("FFamilyW")
-            else
-                popText.font.family = "Calibri"
+                return (layout !== undefined) ? layout.value("FFamily") : "Luxi Serif"
+
+            return (layout !== undefined) ? layout.value("FFamilyW") : "Calibri"
         }
         font.bold: true
         font.pixelSize: 16

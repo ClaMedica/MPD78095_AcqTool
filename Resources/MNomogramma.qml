@@ -162,14 +162,9 @@ Rectangle {
             font.family:
             {
                 if (PicoFlow)
-                    if (layout !== undefined)
-                        text1.font.family = layout.value("FFamily")
-                    else
-                        text1.font.family ="Luxi Serif"
-                else if (layout !== undefined)
-                    text1.font.family = layout.value("FFamilyW")
-                else
-                    text1.font.family = "Calibri"
+                    return (layout !== undefined) ? layout.value("FFamily") : "Luxi Serif"
+
+                return (layout !== undefined) ? layout.value("FFamilyW") : "Calibri"
             }
             font.pixelSize: screenH * 0.01 * labelSize
         }
@@ -191,14 +186,9 @@ Rectangle {
             font.family:
             {
                 if (PicoFlow)
-                    if (layout !== undefined)
-                        text2.font.family = layout.value("FFamily")
-                    else
-                        text2.font.family ="Luxi Serif"
-                else if (layout !== undefined)
-                    text2.font.family = layout.value("FFamilyW")
-                else
-                    text2.font.family = "Calibri"
+                    return (layout !== undefined) ? layout.value("FFamily") : "Luxi Serif"
+
+                return (layout !== undefined) ? layout.value("FFamilyW") : "Calibri"
             }
             font.pixelSize: screenH * 0.01 * labelSize
             transform: Rotation {
@@ -223,14 +213,9 @@ Rectangle {
             font.family:
             {
                 if (PicoFlow)
-                    if (layout !== undefined)
-                        text3.font.family = layout.value("FFamily")
-                    else
-                        text3.font.family ="Luxi Serif"
-                else if (layout !== undefined)
-                    text3.font.family = layout.value("FFamilyW")
-                else
-                    text3.font.family = "Calibri"
+                    return (layout !== undefined) ? layout.value("FFamily") : "Luxi Serif"
+
+                return (layout !== undefined) ? layout.value("FFamilyW") : "Calibri"
             }
             font.pixelSize: screenH * 0.01 * labelSize
         }
@@ -488,14 +473,9 @@ Rectangle {
             font.family:
             {
                 if (PicoFlow)
-                    if (layout !== undefined)
-                        testoDel.font.family = layout.value("FFamily")
-                    else
-                        testoDel.font.family ="Luxi Serif"
-                else if (layout !== undefined)
-                    testoDel.font.family = layout.value("FFamilyW")
-                else
-                    testoDel.font.family = "Calibri"
+                    return (layout !== undefined) ? layout.value("FFamily") : "Luxi Serif"
+
+                return (layout !== undefined) ? layout.value("FFamilyW") : "Calibri"
             }
             font.pixelSize: 15
             anchors.centerIn: parent

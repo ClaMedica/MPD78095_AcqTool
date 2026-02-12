@@ -410,6 +410,7 @@ void MDataMngDesktop::openReport(QString __codSoft)
                 //creazione PDF
                 createPdf();
                 delete editor;
+                editor = NULL;
             });
 
             connect(editor, &QProcess::started,[=]()
@@ -675,6 +676,7 @@ void MDataMngDesktop::createPdf()
                 //messaggio di avviso di chiudere una precedente sessione di pdfcreator
                 emit sg_warnReport(tr("Problems with PDFCreator, please close precedent PDFCreator session"));
                 delete objPdfCreator;
+                objPdfCreator = NULL;
                 return;
             }
             objPdfCreator->setProperty("cVisible",true);
@@ -724,6 +726,7 @@ void MDataMngDesktop::createPdf()
         }
 
         delete objPdfCreator;
+        objPdfCreator = NULL;
         if (toexitwhile == 10)
             emit sg_warnReport(tr("Problems in the report writing"));
         else  //cancello rtf
@@ -808,6 +811,7 @@ void MDataMngDesktop::startPrint(QString __codSoft)
 
     xmlFile->close();
     delete xmlFile;
+    xmlFile = NULL;
 
     //stampo: apro il file
     if (m_autoPrint) {
@@ -989,7 +993,8 @@ void MDataMngDesktop::openExportTool(QString __codSoft)
     [=](int exitCode, QProcess::ExitStatus exitStatus)
     {
      // qDebug()<< exitCode << exitStatus;
-      delete proc;
+        delete proc;
+        proc = NULL;
     });
 
 //    connect(proc, &QProcess::started,[=]()

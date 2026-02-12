@@ -364,6 +364,7 @@ void printermanager::imageGraph(QString head, QString baset, double xscale, int 
         if(maxR > 0)
             imageGraphSingle(lb, points, m_num_sam, xscale, (double)h/maxR, bufR, h);
         delete points;
+        points = NULL;
     }
     imagePainter->setFont(savedFont);
 
@@ -814,6 +815,7 @@ void printermanager::Report_Real_Time(double xscale)
         Report_Real_TimeSingle("Volume", points, xscale, dotXtratt, boxW,   0,  400,  5,  m_max_vol, buffer_vol,   " mL");
 
     delete points;
+    points = NULL;
 
     imagePt.rx() = txtW+m_num_sam*xscale+3;
 

@@ -22,6 +22,7 @@ SimpleTCPClientAcq::~SimpleTCPClientAcq()
         m_channelTcpSocket->close();
 
     delete m_channelTcpSocket;
+    m_channelTcpSocket = NULL;
 }
 
 void SimpleTCPClientAcq::sendData(char* msg, quint32 len){

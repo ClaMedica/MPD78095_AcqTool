@@ -7,7 +7,7 @@ AlarmTimer::AlarmTimer(AlarmRecord __code) {
     connect(m_tim, SIGNAL(timeout()), this, SLOT(send()));
 }
 
-AlarmTimer::~AlarmTimer() {delete m_tim;}
+AlarmTimer::~AlarmTimer() {delete m_tim; m_tim = NULL;}
 
 void AlarmTimer::reset() {start(TIMEOUT_AFTER_RESET);}
 
@@ -24,8 +24,10 @@ AlarmManager::AlarmManager(QObject *parent) : QObject(parent)
 
 AlarmManager::~AlarmManager()
 {
-    foreach(AlarmTimer *a, m_ATMap)
+    foreach(AlarmTimer *a, m_ATMap) {
         delete a;
+        a = NULL;
+    }
 }
 
 bool AlarmManager::loadAllarm(QMap<int,QStringList> __msg)
